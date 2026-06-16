@@ -9,46 +9,70 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        goblin: {
-          bg: "#0b0a14",
-          panel: "#13111f",
-          border: "#241f38",
-          purple: {
-            DEFAULT: "#8b5cf6",
-            light: "#a78bfa",
-            dark: "#6d28d9",
-          },
-          emerald: {
-            DEFAULT: "#34d399",
-            light: "#6ee7b7",
-            dark: "#059669",
-          },
+        bg: "#0a0a0f",
+        surface: "rgba(15,15,26,0.8)",
+        border: "rgba(45,45,78,0.8)",
+        primary: {
+          DEFAULT: "#7c3aed",
+          light: "#a78bfa",
         },
+        secondary: {
+          DEFAULT: "#10b981",
+          dark: "#059669",
+        },
+        muted: "#94a3b8",
+        faint: "#64748b",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
       },
       backgroundImage: {
-        "goblin-glow":
-          "radial-gradient(circle at 50% 0%, rgba(139,92,246,0.25), transparent 60%), radial-gradient(circle at 80% 80%, rgba(52,211,153,0.15), transparent 50%)",
+        "hero-gradient":
+          "linear-gradient(180deg, #0d0d1a 0%, #0a0a0f 100%)",
+        "hero-mesh":
+          "radial-gradient(ellipse 80% 60% at 60% 40%, rgba(124,58,237,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(16,185,129,0.08) 0%, transparent 60%)",
+        "cta-gradient":
+          "linear-gradient(135deg, #7c3aed 0%, #10b981 100%)",
+        "text-gradient":
+          "linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #10b981 100%)",
+        "section-alt":
+          "linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)",
       },
       boxShadow: {
-        glow: "0 0 25px rgba(139,92,246,0.45)",
-        "glow-emerald": "0 0 25px rgba(52,211,153,0.35)",
+        glow: "0 0 28px rgba(124,58,237,0.45)",
+        "glow-lg": "0 0 48px rgba(124,58,237,0.75)",
+        "glow-green": "0 0 28px rgba(16,185,129,0.35)",
+        card: "0 0 30px rgba(124,58,237,0.15)",
       },
       animation: {
-        float: "float 6s ease-in-out infinite",
-        "pulse-glow": "pulse-glow 2.5s ease-in-out infinite",
+        float: "float 4s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2.2s ease-in-out infinite",
+        shimmer: "shimmer 2.8s ease-in-out infinite",
+        particle: "particle 6s ease-in-out infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-12px)" },
+          "50%": { transform: "translateY(-6px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { opacity: "0.6", boxShadow: "0 0 15px rgba(139,92,246,0.4)" },
-          "50%": { opacity: "1", boxShadow: "0 0 35px rgba(139,92,246,0.8)" },
+          "0%, 100%": { boxShadow: "0 0 28px rgba(124,58,237,0.45)" },
+          "50%": { boxShadow: "0 0 48px rgba(124,58,237,0.75)" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+        particle: {
+          "0%, 100%": { transform: "translateY(0px)", opacity: "0.3" },
+          "50%": { transform: "translateY(-30px)", opacity: "0.8" },
         },
       },
-      fontFamily: {
-        display: ["ui-sans-serif", "system-ui", "sans-serif"],
+      borderRadius: {
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
     },
   },

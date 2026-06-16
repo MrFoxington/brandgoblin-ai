@@ -23,13 +23,19 @@ export default function LoadingScreen() {
   }, []);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-      <div className="relative flex h-24 w-24 items-center justify-center">
-        <div className="absolute inset-0 animate-pulse-glow rounded-full bg-goblin-purple/30 blur-xl" />
-        <span className="animate-float text-6xl">🪄</span>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center px-4">
+      <div className="relative flex h-28 w-28 items-center justify-center">
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
+            animation: "pulse-glow 2.2s ease-in-out infinite",
+          }}
+        />
+        <span className="animate-float text-7xl logo-glow">🪄</span>
       </div>
-      <p className="text-lg font-semibold text-white">{MESSAGES[index]}</p>
-      <p className="text-sm text-zinc-400">This usually takes about a minute or two.</p>
+      <p className="font-display text-xl font-bold text-white">{MESSAGES[index]}</p>
+      <p className="text-sm text-muted">This usually takes about a minute or two.</p>
     </div>
   );
 }

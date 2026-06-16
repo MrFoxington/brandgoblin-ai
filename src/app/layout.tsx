@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "BrandGoblin AI — Type an idea. Summon a brand.",
+  title: "BrandGoblin AI — Launch Your Next Brand In Minutes",
   description:
-    "BrandGoblin AI turns a single business idea into a complete launch-ready brand kit: names, taglines, voice, mascot, logo prompts, colors, copy, and a 7-day launch plan.",
+    "Turn any idea into a complete launch-ready brand powered by AI. Names. Logos. Taglines. Mascots. Copy — everything in just one click.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
 };
 
@@ -15,7 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-goblin-bg bg-goblin-glow font-display antialiased">
+      <body
+        className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-bg font-sans antialiased`}
+      >
         {children}
       </body>
     </html>

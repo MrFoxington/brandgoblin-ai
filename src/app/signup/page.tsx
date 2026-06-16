@@ -35,10 +35,8 @@ export default function SignupPage() {
     }
 
     setLoading(false);
-
-    // If email confirmation is disabled, Supabase returns a session immediately.
     if (data.session) {
-      router.push("/dashboard");
+      router.push("/generate");
       router.refresh();
     } else {
       setSuccess(true);
@@ -48,42 +46,38 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex flex-1 items-center justify-center px-4 py-16">
-        <div className="goblin-card w-full max-w-md p-8">
-          <div className="mb-6 text-center">
-            <span className="text-4xl">🪄</span>
-            <h1 className="mt-3 text-2xl font-extrabold text-white">
+      <main className="flex flex-1 items-center justify-center px-4 py-20">
+        <div className="bg-card w-full max-w-md p-8">
+          <div className="mb-8 text-center">
+            <span className="logo-glow block text-5xl mb-3">🪄</span>
+            <h1 className="font-display text-2xl font-extrabold text-white">
               Create your goblin account
             </h1>
-            <p className="mt-1 text-sm text-zinc-400">
-              3 free brand kits included. No card required.
+            <p className="mt-1 text-sm text-muted">
+              3 free brand generations included. No card required.
             </p>
           </div>
 
           {success ? (
-            <p className="rounded-lg border border-goblin-emerald/30 bg-goblin-emerald/10 p-4 text-center text-sm text-goblin-emerald">
+            <div className="rounded-xl border border-secondary/30 bg-secondary/10 p-5 text-center text-sm text-secondary">
               Check your email to confirm your account, then log in.
-            </p>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="goblin-label" htmlFor="email">
-                  Email
-                </label>
+                <label className="label" htmlFor="email">Email</label>
                 <input
                   id="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="goblin-input"
+                  className="input"
                   placeholder="you@example.com"
                 />
               </div>
               <div>
-                <label className="goblin-label" htmlFor="password">
-                  Password
-                </label>
+                <label className="label" htmlFor="password">Password</label>
                 <input
                   id="password"
                   type="password"
@@ -91,27 +85,27 @@ export default function SignupPage() {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="goblin-input"
+                  className="input"
                   placeholder="At least 6 characters"
                 />
               </div>
 
-              {error ? (
-                <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-300">
+              {error && (
+                <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
                   {error}
                 </p>
-              ) : null}
+              )}
 
-              <button type="submit" disabled={loading} className="goblin-btn-primary w-full">
-                {loading ? "Summoning account..." : "Create account ✨"}
+              <button type="submit" disabled={loading} className="btn-primary w-full py-3">
+                {loading ? "Summoning account..." : "✦ Create account free →"}
               </button>
             </form>
           )}
 
-          <p className="mt-6 text-center text-sm text-zinc-400">
+          <p className="mt-6 text-center text-sm text-muted">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-goblin-purple-light">
-              Log in
+            <Link href="/login" className="font-semibold text-primary-light hover:text-white transition-colors">
+              Sign in
             </Link>
           </p>
         </div>

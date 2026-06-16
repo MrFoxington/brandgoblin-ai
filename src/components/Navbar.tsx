@@ -5,8 +5,17 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
+const NAV_LINKS = [
+  { label: "Features", href: "/#features" },
+  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Examples", href: "/dashboard" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/#about" },
+];
+
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -14,54 +23,70 @@ export default function Navbar() {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
-    return () => listener.subscription.unsubscribe();
+
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      listener.subscription.unsubscribe();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [supabase]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-goblin-border/60 bg-goblin-bg/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.95)] backdrop-blur-md"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🪄</span>
-          <span className="text-lg font-extrabold text-white">
-            Brand<span className="text-goblin-purple-light">Goblin</span>{" "}
-            <span className="text-goblin-emerald">AI</span>
+          <span className="logo-glow text-2xl">🪄</span>
+          <span className="font-display text-lg font-extrabold">
+            <span className="text-primary-light">Brand</span>
+            <span className="text-secondary">Goblin</span>
+            {" "}
+            <span className="text-secondary">AI</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-medium text-zinc-300 md:flex">
-          <Link href="/pricing" className="hover:text-white">
-            Pricing
-          </Link>
-          {user ? (
-            <>
-              <Link href="/dashboard" className="hover:text-white">
-                Dashboard
-              </Link>
-              <Link href="/generate" className="hover:text-white">
-                Generate
-              </Link>
-              <Link href="/settings" className="hover:text-white">
-                Settings
-              </Link>
-            </>
-          ) : null}
+        {/* Nav links */}
+        <nav className="hidden items-center gap-7 text-sm font-medium text-muted lg:flex">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={user && link.label === "Examples" ? "/dashboard" : link.href}
+              className="transition-colors hover:text-white"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
+        {/* Auth */}
         <div className="flex items-center gap-3">
           {user ? (
-            <Link href="/dashboard" className="goblin-btn-secondary !px-4 !py-2 text-sm">
-              Dashboard
-            </Link>
+            <>
+              <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
+                Dashboard
+              </Link>
+              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-glow">
+                ✦ Generate
+              </Link>
+            </>
           ) : (
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-zinc-300 hover:text-white sm:block"
+                className="hidden text-sm font-medium text-muted transition-colors hover:text-white sm:block"
               >
-                Log in
+                Sign In
               </Link>
-              <Link href="/signup" className="goblin-btn-primary !px-4 !py-2 text-sm">
-                Summon a Brand ✨
+              <Link href="/signup" className="btn-primary !py-2.5 !px-5 text-sm">
+                ✦ Get Early Access
               </Link>
             </>
           )}

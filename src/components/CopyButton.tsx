@@ -19,19 +19,14 @@ export default function CopyButton({
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard API unavailable — fail silently.
-    }
+    } catch {}
   }
 
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className={clsx(
-        "inline-flex items-center gap-1 rounded-lg border border-goblin-border bg-goblin-bg/60 px-2.5 py-1 text-xs font-medium text-zinc-300 transition hover:border-goblin-purple hover:text-white",
-        className
-      )}
+      className={clsx("btn-ghost !text-xs !py-1 !px-2.5", className)}
     >
       {copied ? "✅ Copied" : `📋 ${label}`}
     </button>
