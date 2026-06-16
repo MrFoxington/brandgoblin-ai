@@ -9,9 +9,7 @@ export default async function SettingsPage() {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
 
-  if (!authData.user) {
-    redirect("/login");
-  }
+  if (!authData.user) redirect("/login");
 
   const { data: userRow } = await supabase
     .from("users")
@@ -22,50 +20,74 @@ export default async function SettingsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-12">
+      <main className="flex-1 px-4 py-16">
         <div className="mx-auto max-w-2xl">
-          <h1 className="text-2xl font-extrabold text-white sm:text-3xl">Settings</h1>
-          <p className="mt-1 mb-8 text-sm text-zinc-400">
-            Manage your account, plan, and credits.
-          </p>
 
-          <div className="goblin-card mb-6 space-y-3 p-6">
-            <h2 className="goblin-section-title">👤 Account</h2>
-            <p className="text-sm text-zinc-300">
-              <span className="text-zinc-500">Email:</span> {userRow?.email ?? authData.user.email}
-            </p>
-            <p className="text-sm text-zinc-300">
-              <span className="text-zinc-500">Member since:</span>{" "}
-              {userRow?.created_at
-                ? new Date(userRow.created_at).toLocaleDateString()
-                : "—"}
-            </p>
+          <div className="mb-10">
+            <span className="badge-purple mb-3 block w-fit">✦ Account</span>
+            <h1 className="font-display text-3xl font-extrabold text-white">Settings</h1>
+            <p className="mt-1 text-sm text-muted">Manage your account, plan, and credits.</p>
           </div>
 
-          <div className="goblin-card mb-6 space-y-4 p-6">
-            <h2 className="goblin-section-title">🪙 Plan & credits</h2>
-            <div className="flex items-center justify-between rounded-lg border border-goblin-border bg-goblin-bg/40 p-4">
-              <div>
-                <p className="font-semibold capitalize text-white">{userRow?.plan ?? "free"} plan</p>
-                <p className="text-sm text-zinc-400">
-                  {userRow?.plan === "free"
-                    ? `${userRow?.credits ?? 0} credits remaining`
-                    : "Unlimited generations"}
-                </p>
+          {/* Account */}
+          <div className="bg-card mb-5 p-6 space-y-3">
+            <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
+              👤 Account
+            </h2>
+            <div className="border-t border-[rgba(45,45,78,0.6)] pt-4 space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted">Email</span>
+                <span className="text-white">{userRow?.email ?? authData.user.email}</span>
               </div>
-              {userRow?.plan === "free" ? (
-                <div className="flex gap-2">
-                  <UpgradeButton plan="pro" label="Upgrade to Pro" />
-                  <UpgradeButton plan="agency" label="Upgrade to Agency" />
-                </div>
-              ) : null}
+              <div className="flex items-center justify-between">
+                <span className="text-muted">Member since</span>
+                <span className="text-white">
+                  {userRow?.created_at
+                    ? new Date(userRow.created_at).toLocaleDateString()
+                    : "—"}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="goblin-card p-6">
-            <h2 className="goblin-section-title mb-4">🚪 Session</h2>
+          {/* Plan & credits */}
+          <div className="bg-card mb-5 p-6 space-y-4">
+            <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
+              🪙 Plan & Credits
+            </h2>
+            <div className="border-t border-[rgba(45,45,78,0.6)] pt-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-display font-bold capitalize text-white text-lg">
+                    {userRow?.plan ?? "free"} plan
+                  </p>
+                  <p className="text-sm text-muted">
+                    {userRow?.plan === "free"
+                      ? `${userRow?.credits ?? 0} generations remaining`
+                      : "Unlimited brand generations"}
+                  </p>
+                </div>
+                {userRow?.plan === "free" && (
+                  <div className="flex gap-2 flex-wrap">
+                    <UpgradeButton plan="pro" label="✦ Upgrade to Pro" />
+                    <UpgradeButton plan="agency" label="Upgrade to Agency" />
+                  </div>
+                )}
+                {userRow?.plan !== "free" && (
+                  <span className="badge-green">Active</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Session */}
+          <div className="bg-card p-6">
+            <h2 className="font-display text-lg font-bold text-white mb-4 flex items-center gap-2">
+              🚪 Session
+            </h2>
             <LogoutButton />
           </div>
+
         </div>
       </main>
       <Footer />

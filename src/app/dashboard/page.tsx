@@ -10,9 +10,7 @@ export default async function DashboardPage() {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
 
-  if (!authData.user) {
-    redirect("/login");
-  }
+  if (!authData.user) redirect("/login");
 
   const [{ data: userRow }, { data: generations }] = await Promise.all([
     supabase.from("users").select("credits, plan").eq("id", authData.user.id).single(),
@@ -30,31 +28,38 @@ export default async function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-10">
+      <main className="flex-1 px-4 py-12">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+
+          {/* Header */}
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-extrabold text-white sm:text-3xl">
-                Your Brand Vault 🗝️
+              <div className="mb-2">
+                <span className="badge-purple">✦ Brand Vault</span>
+              </div>
+              <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
+                Your <span className="gradient-text">Brand Vault</span>
               </h1>
-              <p className="mt-1 text-sm text-zinc-400">
+              <p className="mt-1 text-sm text-muted">
                 {rows.length} brand{rows.length === 1 ? "" : "s"} summoned so far.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="goblin-chip flex items-center gap-1">
-                <span className="font-semibold text-white">
-                  {plan === "free" ? `${credits} credits left` : "Unlimited credits"}
+              <div className="badge-purple">
+                <span className="text-white font-semibold">
+                  {plan === "free" ? `${credits} credits left` : "Unlimited"}
                 </span>
-                <span className="capitalize text-goblin-emerald">· {plan}</span>
+                <span className="text-faint">·</span>
+                <span className="capitalize">{plan}</span>
               </div>
-              <Link href="/generate" className="goblin-btn-primary !px-4 !py-2 text-sm">
-                + New Brand
+              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
+                ✦ New Brand
               </Link>
             </div>
           </div>
 
+          {/* Grid */}
           {rows.length === 0 ? (
             <EmptyState />
           ) : (
@@ -63,21 +68,26 @@ export default async function DashboardPage() {
                 <Link
                   key={row.id}
                   href={`/brand/${row.id}`}
-                  className="goblin-card group flex flex-col gap-2 p-5 transition hover:border-goblin-purple"
+                  className="bg-card bg-card-hover group flex flex-col gap-3 p-6"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl">🪄</span>
-                    {row.favorite ? <span className="text-amber-400">★</span> : null}
+                    <span className="logo-glow text-2xl">🪄</span>
+                    {row.favorite && (
+                      <span className="badge-green text-xs">★ Favorite</span>
+                    )}
                   </div>
-                  <h3 className="font-bold text-white group-hover:text-goblin-purple-light">
+                  <h3 className="font-display text-lg font-bold text-white group-hover:text-primary-light transition-colors">
                     {row.output_data?.recommendedName ?? "Untitled Brand"}
                   </h3>
-                  <p className="line-clamp-2 text-sm text-zinc-400">
+                  <p className="line-clamp-2 text-sm text-muted leading-relaxed">
                     {row.input_data?.businessIdea}
                   </p>
-                  <p className="mt-2 text-xs text-zinc-500">
-                    {new Date(row.created_at).toLocaleDateString()}
-                  </p>
+                  <div className="mt-auto flex items-center justify-between pt-2">
+                    <span className="badge-purple text-xs capitalize">{row.input_data?.vibe}</span>
+                    <span className="text-xs text-faint">
+                      {new Date(row.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
                 </Link>
               ))}
             </div>

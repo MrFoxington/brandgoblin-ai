@@ -4,69 +4,87 @@ import CopyButton from "./CopyButton";
 function SectionCard({
   emoji,
   title,
+  badge,
   copyText,
   children,
 }: {
   emoji: string;
   title: string;
+  badge?: string;
   copyText?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="goblin-card p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="goblin-section-title">
+    <section className="bg-card flex flex-col gap-4 p-6">
+      <div className="flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold text-white">
           <span>{emoji}</span> {title}
         </h2>
-        {copyText ? <CopyButton text={copyText} /> : null}
+        <div className="flex items-center gap-2">
+          {badge && <span className="badge-purple text-xs">{badge}</span>}
+          {copyText && <CopyButton text={copyText} />}
+        </div>
       </div>
       {children}
     </section>
   );
 }
 
+function Chip({ children, green }: { children: React.ReactNode; green?: boolean }) {
+  return (
+    <span className={green ? "badge-green" : "badge-purple"} style={{ fontSize: "0.7rem" }}>
+      {children}
+    </span>
+  );
+}
+
 export default function BrandKitView({ kit }: { kit: BrandKit }) {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      {/* 1 & 2. Brand Names + Recommendation */}
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+      {/* 1. Brand Names */}
       <SectionCard
         emoji="🏷️"
         title="Brand Name Options"
+        badge="Naming"
         copyText={kit.brandNames.map((n) => n.name).join("\n")}
       >
         <ul className="space-y-2">
           {kit.brandNames.map((n, i) => (
             <li
               key={n.name + i}
-              className="flex items-start justify-between gap-3 rounded-lg border border-goblin-border bg-goblin-bg/40 px-3 py-2"
+              className="flex items-start justify-between gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2.5"
             >
               <div>
-                <p className="font-semibold text-white">{n.name}</p>
-                {n.reasoning ? (
-                  <p className="mt-0.5 text-xs text-zinc-400">{n.reasoning}</p>
-                ) : null}
+                <p className="font-display font-semibold text-white">{n.name}</p>
+                {n.reasoning && (
+                  <p className="mt-0.5 text-xs text-muted leading-relaxed">{n.reasoning}</p>
+                )}
               </div>
               <CopyButton text={n.name} label="" className="shrink-0" />
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm text-zinc-400">{kit.topThreeReasoning}</p>
+        <p className="text-sm text-muted leading-relaxed">{kit.topThreeReasoning}</p>
       </SectionCard>
 
-      <SectionCard emoji="👑" title="Recommended Name" copyText={kit.recommendedName}>
-        <p className="mb-2 text-3xl font-extrabold text-goblin-emerald">
-          {kit.recommendedName}
-        </p>
-        <p className="text-sm text-zinc-300">{kit.recommendedNameReasoning}</p>
+      {/* 2. Recommended Name */}
+      <SectionCard emoji="👑" title="Recommended Name" badge="Top Pick" copyText={kit.recommendedName}>
+        <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-5">
+          <p className="font-display text-4xl font-black gradient-text-green mb-3">
+            {kit.recommendedName}
+          </p>
+          <p className="text-sm text-muted leading-relaxed">{kit.recommendedNameReasoning}</p>
+        </div>
       </SectionCard>
 
       {/* 3. Taglines */}
-      <SectionCard emoji="💬" title="Taglines" copyText={kit.taglines.join("\n")}>
+      <SectionCard emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")}>
         <ul className="space-y-2">
           {kit.taglines.map((t, i) => (
             <li
               key={i}
-              className="flex items-center justify-between gap-2 rounded-lg border border-goblin-border bg-goblin-bg/40 px-3 py-2 text-sm text-zinc-200"
+              className="flex items-center justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2 text-sm text-white"
             >
               <span>"{t}"</span>
               <CopyButton text={t} label="" />
@@ -79,51 +97,53 @@ export default function BrandKitView({ kit }: { kit: BrandKit }) {
       <SectionCard
         emoji="📖"
         title="Brand Story"
+        badge="Storytelling"
         copyText={`${kit.brandStory.originStory}\n\n${kit.brandStory.mission}`}
       >
-        <p className="mb-3 text-sm text-zinc-300">{kit.brandStory.originStory}</p>
-        <p className="rounded-lg border border-goblin-purple/30 bg-goblin-purple/10 p-3 text-sm font-medium text-goblin-purple-light">
-          {kit.brandStory.mission}
-        </p>
+        <p className="text-sm text-muted leading-relaxed">{kit.brandStory.originStory}</p>
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm font-semibold text-primary-light leading-relaxed">
+            {kit.brandStory.mission}
+          </p>
+        </div>
       </SectionCard>
 
       {/* 5. Brand Voice */}
-      <SectionCard emoji="🎭" title="Brand Voice">
-        <div className="space-y-3 text-sm">
+      <SectionCard emoji="🎭" title="Brand Voice" badge="Strategy">
+        <div className="space-y-4 text-sm">
           <div>
-            <p className="goblin-label">Personality traits</p>
+            <p className="label mb-2">Personality traits</p>
             <div className="flex flex-wrap gap-2">
               {kit.brandVoice.personalityTraits.map((t) => (
-                <span key={t} className="goblin-chip">
-                  {t}
-                </span>
+                <Chip key={t}>{t}</Chip>
               ))}
             </div>
           </div>
           <div>
-            <p className="goblin-label">Tone examples</p>
-            <ul className="list-inside list-disc space-y-1 text-zinc-300">
+            <p className="label mb-2">Tone examples</p>
+            <ul className="space-y-1 text-muted">
               {kit.brandVoice.toneExamples.map((t, i) => (
-                <li key={i}>{t}</li>
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-primary-light mt-0.5">→</span>
+                  {t}
+                </li>
               ))}
             </ul>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="goblin-label text-goblin-emerald">Use</p>
-              <div className="flex flex-wrap gap-1">
+              <p className="label mb-2 text-secondary">✓ Use</p>
+              <div className="flex flex-wrap gap-1.5">
                 {kit.brandVoice.wordsToUse.map((w) => (
-                  <span key={w} className="goblin-chip border-goblin-emerald/30">
-                    {w}
-                  </span>
+                  <Chip key={w} green>{w}</Chip>
                 ))}
               </div>
             </div>
             <div>
-              <p className="goblin-label text-rose-400">Avoid</p>
-              <div className="flex flex-wrap gap-1">
+              <p className="label mb-2 text-red-400">✗ Avoid</p>
+              <div className="flex flex-wrap gap-1.5">
                 {kit.brandVoice.wordsToAvoid.map((w) => (
-                  <span key={w} className="goblin-chip border-rose-500/30">
+                  <span key={w} className="rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-0.5 text-xs text-red-400">
                     {w}
                   </span>
                 ))}
@@ -134,43 +154,47 @@ export default function BrandKitView({ kit }: { kit: BrandKit }) {
       </SectionCard>
 
       {/* 6. Mascot */}
-      <SectionCard emoji="🐲" title="Mascot Concept" copyText={kit.mascot.imagePrompt}>
-        <p className="mb-1 text-lg font-bold text-white">{kit.mascot.name}</p>
-        <p className="mb-2 text-sm text-zinc-300">{kit.mascot.appearance}</p>
-        <p className="mb-2 text-sm text-zinc-300">{kit.mascot.personality}</p>
-        <p className="mb-3 text-sm italic text-zinc-400">{kit.mascot.visualDescription}</p>
-        <div className="rounded-lg border border-goblin-border bg-goblin-bg/60 p-3">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-goblin-purple-light">
+      <SectionCard emoji="🐲" title="Mascot Concept" badge="Creative" copyText={kit.mascot.imagePrompt}>
+        <p className="font-display text-xl font-bold text-white">{kit.mascot.name}</p>
+        <p className="text-sm text-muted leading-relaxed">{kit.mascot.appearance}</p>
+        <p className="text-sm text-muted leading-relaxed">{kit.mascot.personality}</p>
+        <p className="text-sm italic text-faint leading-relaxed">{kit.mascot.visualDescription}</p>
+        <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary-light">
             AI Image Prompt
           </p>
-          <p className="text-xs text-zinc-300">{kit.mascot.imagePrompt}</p>
+          <p className="text-xs text-muted leading-relaxed">{kit.mascot.imagePrompt}</p>
         </div>
       </SectionCard>
 
       {/* 7. Logo Prompt */}
-      <SectionCard emoji="🖼️" title="Logo Prompt" copyText={kit.logoPrompt}>
-        <p className="text-sm text-zinc-300">{kit.logoPrompt}</p>
+      <SectionCard emoji="🖼️" title="Logo Prompt" badge="Design" copyText={kit.logoPrompt}>
+        <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4">
+          <p className="text-sm text-muted leading-relaxed">{kit.logoPrompt}</p>
+        </div>
       </SectionCard>
 
       {/* 8. Color Palette */}
       <SectionCard
         emoji="🎨"
         title="Color Palette"
-        copyText={kit.colorPalette.map((c) => `${c.name} ${c.hex}`).join("\n")}
+        badge="Design"
+        copyText={kit.colorPalette.map((c) => `${c.name}: ${c.hex}`).join("\n")}
       >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="space-y-2">
           {kit.colorPalette.map((c) => (
             <div
               key={c.hex}
-              className="flex items-center gap-3 rounded-lg border border-goblin-border bg-goblin-bg/40 p-2"
+              className="flex items-center gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3"
             >
               <span
-                className="h-10 w-10 shrink-0 rounded-lg border border-white/10"
+                className="h-10 w-10 shrink-0 rounded-lg border border-white/10 shadow-sm"
                 style={{ backgroundColor: c.hex }}
               />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-white">{c.name}</p>
-                <p className="text-xs text-zinc-400">{c.hex}</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-white text-sm">{c.name}</p>
+                <p className="text-xs text-faint font-mono">{c.hex}</p>
+                <p className="text-xs text-muted truncate">{c.usage}</p>
               </div>
               <CopyButton text={c.hex} label="" />
             </div>
@@ -182,80 +206,106 @@ export default function BrandKitView({ kit }: { kit: BrandKit }) {
       <SectionCard
         emoji="🌐"
         title="Website Copy"
-        copyText={`${kit.websiteCopy.heroHeadline}\n${kit.websiteCopy.subheadline}\n\n${kit.websiteCopy.aboutSection}\n\n${kit.websiteCopy.featureBullets.join("\n")}`}
+        badge="Copy"
+        copyText={`${kit.websiteCopy.heroHeadline}\n${kit.websiteCopy.subheadline}\n\nCTA: ${kit.websiteCopy.ctaText}\n\n${kit.websiteCopy.aboutSection}\n\n${kit.websiteCopy.featureBullets.join("\n")}`}
       >
-        <p className="mb-1 text-xl font-extrabold text-white">
-          {kit.websiteCopy.heroHeadline}
-        </p>
-        <p className="mb-3 text-sm text-zinc-400">{kit.websiteCopy.subheadline}</p>
-        <span className="goblin-btn-primary mb-4 inline-block !px-4 !py-2 text-xs">
-          {kit.websiteCopy.ctaText}
-        </span>
-        <p className="mb-3 text-sm text-zinc-300">{kit.websiteCopy.aboutSection}</p>
-        <ul className="list-inside list-disc space-y-1 text-sm text-zinc-300">
-          {kit.websiteCopy.featureBullets.map((f, i) => (
-            <li key={i}>{f}</li>
-          ))}
-        </ul>
+        <div className="space-y-4">
+          <div>
+            <p className="label mb-1">Hero headline</p>
+            <p className="font-display text-xl font-extrabold text-white">{kit.websiteCopy.heroHeadline}</p>
+          </div>
+          <div>
+            <p className="label mb-1">Subheadline</p>
+            <p className="text-sm text-muted">{kit.websiteCopy.subheadline}</p>
+          </div>
+          <div>
+            <p className="label mb-1">CTA button</p>
+            <span className="btn-primary inline-flex !py-2 !px-4 text-sm !animate-none">{kit.websiteCopy.ctaText}</span>
+          </div>
+          <div>
+            <p className="label mb-1">About section</p>
+            <p className="text-sm text-muted leading-relaxed">{kit.websiteCopy.aboutSection}</p>
+          </div>
+          <div>
+            <p className="label mb-2">Feature bullets</p>
+            <ul className="space-y-1.5">
+              {kit.websiteCopy.featureBullets.map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-muted">
+                  <span className="text-secondary mt-0.5">✓</span>{f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </SectionCard>
 
       {/* 10. Social Kit */}
       <SectionCard
         emoji="📱"
         title="Social Media Kit"
-        copyText={`IG: ${kit.socialKit.instagramBio}\nX: ${kit.socialKit.twitterBio}\nTikTok: ${kit.socialKit.tiktokBio}\n\n${kit.socialKit.launchPosts.join("\n\n")}`}
+        badge="Social"
+        copyText={`Instagram: ${kit.socialKit.instagramBio}\nX/Twitter: ${kit.socialKit.twitterBio}\nTikTok: ${kit.socialKit.tiktokBio}\n\n${kit.socialKit.launchPosts.join("\n\n")}`}
       >
-        <div className="mb-3 space-y-2 text-sm">
-          <p>
-            <span className="font-semibold text-goblin-purple-light">Instagram: </span>
-            {kit.socialKit.instagramBio}
-          </p>
-          <p>
-            <span className="font-semibold text-goblin-purple-light">X/Twitter: </span>
-            {kit.socialKit.twitterBio}
-          </p>
-          <p>
-            <span className="font-semibold text-goblin-purple-light">TikTok: </span>
-            {kit.socialKit.tiktokBio}
-          </p>
-        </div>
-        <p className="goblin-label">Launch posts</p>
-        <ul className="space-y-2">
-          {kit.socialKit.launchPosts.map((p, i) => (
-            <li
-              key={i}
-              className="rounded-lg border border-goblin-border bg-goblin-bg/40 p-2 text-sm text-zinc-200"
-            >
-              {p}
-            </li>
+        <div className="space-y-3">
+          {[
+            { platform: "Instagram", bio: kit.socialKit.instagramBio },
+            { platform: "X / Twitter", bio: kit.socialKit.twitterBio },
+            { platform: "TikTok", bio: kit.socialKit.tiktokBio },
+          ].map(({ platform, bio }) => (
+            <div key={platform} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+              <div className="mb-1 flex items-center justify-between">
+                <p className="text-xs font-bold text-primary-light">{platform}</p>
+                <CopyButton text={bio} label="" />
+              </div>
+              <p className="text-sm text-muted">{bio}</p>
+            </div>
           ))}
-        </ul>
+          <div>
+            <p className="label mb-2">Launch posts</p>
+            <div className="space-y-2">
+              {kit.socialKit.launchPosts.map((p, i) => (
+                <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm text-white leading-relaxed">{p}</p>
+                    <CopyButton text={p} label="" className="shrink-0" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </SectionCard>
 
       {/* 11. Marketing Ideas */}
-      <SectionCard emoji="🚀" title="Meme & Marketing Ideas">
-        <div className="space-y-4 text-sm">
+      <SectionCard emoji="🚀" title="Marketing & Meme Ideas" badge="Growth">
+        <div className="space-y-5 text-sm">
           <div>
-            <p className="goblin-label">Viral content ideas</p>
-            <ul className="list-inside list-disc space-y-1 text-zinc-300">
+            <p className="label mb-2">Viral content ideas</p>
+            <ul className="space-y-1.5">
               {kit.marketingIdeas.viralContentIdeas.map((idea, i) => (
-                <li key={i}>{idea}</li>
+                <li key={i} className="flex items-start gap-2 text-muted">
+                  <span className="text-primary-light mt-0.5 shrink-0">→</span>{idea}
+                </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="goblin-label">Meme ideas</p>
-            <ul className="list-inside list-disc space-y-1 text-zinc-300">
+            <p className="label mb-2">Meme ideas</p>
+            <ul className="space-y-1.5">
               {kit.marketingIdeas.memeIdeas.map((idea, i) => (
-                <li key={i}>{idea}</li>
+                <li key={i} className="flex items-start gap-2 text-muted">
+                  <span className="text-secondary mt-0.5 shrink-0">→</span>{idea}
+                </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="goblin-label">Ad angles</p>
-            <ul className="list-inside list-disc space-y-1 text-zinc-300">
+            <p className="label mb-2">Ad angles</p>
+            <ul className="space-y-1.5">
               {kit.marketingIdeas.adAngles.map((idea, i) => (
-                <li key={i}>{idea}</li>
+                <li key={i} className="flex items-start gap-2 text-muted">
+                  <span className="text-primary-light mt-0.5 shrink-0">→</span>{idea}
+                </li>
               ))}
             </ul>
           </div>
@@ -266,22 +316,24 @@ export default function BrandKitView({ kit }: { kit: BrandKit }) {
       <SectionCard
         emoji="📅"
         title="7-Day Launch Plan"
+        badge="Launch"
         copyText={kit.launchPlan.join("\n")}
       >
         <ol className="space-y-2">
           {kit.launchPlan.map((step, i) => (
             <li
               key={i}
-              className="flex gap-3 rounded-lg border border-goblin-border bg-goblin-bg/40 p-3 text-sm text-zinc-200"
+              className="flex gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-goblin-emerald/20 text-xs font-bold text-goblin-emerald">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary/20 text-xs font-black text-secondary">
                 {i + 1}
               </span>
-              <span>{step}</span>
+              <span className="text-sm text-muted leading-relaxed">{step}</span>
             </li>
           ))}
         </ol>
       </SectionCard>
+
     </div>
   );
 }

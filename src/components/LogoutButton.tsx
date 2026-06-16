@@ -14,8 +14,8 @@ export default function LogoutButton() {
   }
 
   return (
-    <button type="button" onClick={handleLogout} className="goblin-btn-secondary">
-      Log out
+    <button type="button" onClick={handleLogout} className="btn-secondary">
+      Sign out
     </button>
   );
 }

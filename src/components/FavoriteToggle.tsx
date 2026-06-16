@@ -16,7 +16,6 @@ export default function FavoriteToggle({
     setLoading(true);
     const next = !favorite;
     setFavorite(next);
-
     try {
       await fetch(`/api/brand/${id}`, {
         method: "PATCH",
@@ -33,7 +32,7 @@ export default function FavoriteToggle({
       type="button"
       onClick={toggle}
       disabled={loading}
-      className="goblin-btn-secondary !px-4 !py-2 text-sm"
+      className={favorite ? "btn-secondary border-secondary/40 !text-secondary" : "btn-secondary"}
     >
       {favorite ? "★ Favorited" : "☆ Add to favorites"}
     </button>

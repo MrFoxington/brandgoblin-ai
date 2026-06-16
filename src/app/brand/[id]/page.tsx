@@ -11,9 +11,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
 
-  if (!authData.user) {
-    redirect("/login");
-  }
+  if (!authData.user) redirect("/login");
 
   const { data: row } = await supabase
     .from("brand_generations")
@@ -22,28 +20,38 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
     .eq("user_id", authData.user.id)
     .single();
 
-  if (!row) {
-    notFound();
-  }
+  if (!row) notFound();
 
   const generation = row as BrandGenerationRow;
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-10">
+      <main className="flex-1 px-4 py-12">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+
+          {/* Header */}
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white">
+              <Link
+                href="/dashboard"
+                className="mb-3 inline-flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
+              >
                 ← Back to vault
               </Link>
-              <h1 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl">
-                {generation.output_data.recommendedName}
+              <div className="mb-2">
+                <span className="badge-purple">✦ Brand Kit</span>
+              </div>
+              <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
+                <span className="gradient-text">{generation.output_data.recommendedName}</span>
               </h1>
-              <p className="mt-1 text-sm text-zinc-400">
+              <p className="mt-2 text-sm text-muted max-w-xl leading-relaxed">
                 {generation.input_data.businessIdea}
               </p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="badge-purple capitalize">{generation.input_data.vibe}</span>
+                <span className="badge-green">{generation.input_data.industry}</span>
+              </div>
             </div>
             <FavoriteToggle id={generation.id} initialFavorite={generation.favorite} />
           </div>
