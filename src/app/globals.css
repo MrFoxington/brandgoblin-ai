@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0b0a14;
+  color: #ede9fe;
+}
+
+@layer components {
+  .goblin-card {
+    @apply rounded-2xl border border-goblin-border bg-goblin-panel/80 backdrop-blur-sm shadow-xl;
+  }
+
+  .goblin-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-goblin-purple to-goblin-emerald px-6 py-3 font-semibold text-white shadow-glow transition-transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100;
+  }
+
+  .goblin-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-goblin-border bg-goblin-panel px-6 py-3 font-semibold text-goblin-purple-light transition hover:border-goblin-purple hover:bg-goblin-purple/10;
+  }
+
+  .goblin-input {
+    @apply w-full rounded-xl border border-goblin-border bg-goblin-bg/60 px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:border-goblin-purple focus:outline-none focus:ring-2 focus:ring-goblin-purple/40;
+  }
+
+  .goblin-label {
+    @apply mb-2 block text-sm font-medium text-zinc-300;
+  }
+
+  .goblin-section-title {
+    @apply flex items-center gap-2 text-lg font-bold text-white;
+  }
+
+  .goblin-chip {
+    @apply rounded-full border border-goblin-border bg-goblin-bg/60 px-3 py-1 text-xs text-zinc-300;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0a14;
+}
+::-webkit-scrollbar-thumb {
+  background: #241f38;
+  border-radius: 10px;
+}
