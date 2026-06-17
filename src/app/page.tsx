@@ -5,7 +5,7 @@ import Particles from "@/components/Particles";
 import CrystalIcon from "@/components/CrystalIcon";
 
 const FEATURES = [
-  { emoji: "🏷️", title: "10 Brand Names", desc: "Unique, commercially strong names with strategic reasoning for each.", badge: "Naming" },
+  { emoji: "🏷️", title: "5 Brand Names", desc: "A Goblin-picked favorite plus 4 strong alternatives, each with strategic reasoning.", badge: "Naming" },
   { emoji: "💬", title: "10 Taglines", desc: "Punchy, on-brand taglines across different tones and angles.", badge: "Copywriting" },
   { emoji: "📖", title: "Brand Story", desc: "An emotional origin story and customer-focused mission statement.", badge: "Storytelling" },
   { emoji: "🎭", title: "Brand Voice", desc: "Personality traits, tone examples, and words to use and avoid.", badge: "Strategy" },
