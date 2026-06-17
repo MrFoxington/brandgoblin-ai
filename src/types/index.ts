@@ -33,6 +33,8 @@ export type BrandVibe =
   | "bold"
   | "playful";
 
+export type NameMode = "generated" | "existing";
+
 export interface BrandInput {
   businessIdea: string;
   industry: string;
@@ -40,6 +42,8 @@ export interface BrandInput {
   vibe: BrandVibe;
   keywords?: string;
   avoid?: string;
+  nameMode?: NameMode;
+  providedBrandName?: string;
 }
 
 // ---------- AI output: full brand kit ----------
@@ -109,14 +113,23 @@ export interface BrandStory {
   mission: string;
 }
 
+export interface NameStrengthCheck {
+  whatWorks: string;
+  potentialConcerns: string;
+  suggestedRefinement: string;
+  bestPositioningAngle: string;
+}
+
 export interface BrandKit {
   // Legacy fields (kept for backwards compat with existing saved brands)
   brandNames?: BrandNameOption[];
   topThreeReasoning?: string;
   recommendedNameReasoning?: string;
-  // New naming structure
+  // New naming structure (generated mode)
   favoriteName?: FavoriteName;
   alternativeNames?: AlternativeName[];
+  // Existing name mode
+  nameStrengthCheck?: NameStrengthCheck;
   // Always present
   recommendedName: string;
   taglines: string[];

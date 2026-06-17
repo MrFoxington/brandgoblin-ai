@@ -27,6 +27,81 @@ You always respond with valid JSON only — no markdown fences, no commentary be
 after the JSON, no trailing text. The JSON must match the exact schema you are given.`;
 
 /**
+ * Builds the prompt for existing-name mode — skips name generation,
+ * locks the provided brand name, and adds a Name Strength Check section.
+ */
+export function buildExistingNameBrandKitPrompt(input: BrandInput): string {
+  const { businessIdea, industry, targetAudience, vibe, keywords, avoid, providedBrandName } = input;
+
+  return `Generate a complete, launch-ready brand kit for the following business. The founder already has a brand name — do NOT suggest alternative names. Build everything around the provided name.
+
+BRAND NAME (already chosen by founder): ${providedBrandName}
+BUSINESS IDEA: ${businessIdea}
+INDUSTRY / CATEGORY: ${industry}
+TARGET AUDIENCE: ${targetAudience}
+DESIRED BRAND VIBE: ${vibe}
+OPTIONAL KEYWORDS TO WEAVE IN: ${keywords?.trim() ? keywords : "none provided"}
+THINGS TO AVOID: ${avoid?.trim() ? avoid : "none provided"}
+
+Respond with ONLY a JSON object matching this exact shape (no extra keys, no missing keys, no markdown fences):
+
+{
+  "recommendedName": string, // must equal the provided brand name exactly
+  "nameStrengthCheck": {
+    "whatWorks": string,           // 2-3 sentences: the genuine strengths of this name — memorability, feel, market fit
+    "potentialConcerns": string,   // 1-2 sentences: honest but constructive concerns. If the name is strong, say so warmly. Never be harsh.
+    "suggestedRefinement": string, // 1-2 sentences: optional tweak or variation if helpful. If no refinement needed, affirm the name as-is.
+    "bestPositioningAngle": string // 1 sentence: the strongest market positioning angle for this specific name
+  },
+  "taglines": [ string ], // exactly 10 catchy taglines built around the provided name, varied tones
+  "brandStory": {
+    "originStory": string,
+    "mission": string
+  },
+  "brandVoice": {
+    "personalityTraits": [ string ],
+    "toneExamples": [ string ],
+    "wordsToUse": [ string ],
+    "wordsToAvoid": [ string ]
+  },
+  "mascot": {
+    "name": string,
+    "appearance": string,
+    "personality": string,
+    "visualDescription": string,
+    "imagePrompt": string
+  },
+  "logoPrompt": string,
+  "colorPalette": [ { "name": string, "hex": string, "usage": string } ],
+  "websiteCopy": {
+    "heroHeadline": string,
+    "subheadline": string,
+    "ctaText": string,
+    "aboutSection": string,
+    "featureBullets": [ string ]
+  },
+  "socialKit": {
+    "instagramBio": string,
+    "twitterBio": string,
+    "tiktokBio": string,
+    "launchPosts": [ string ]
+  },
+  "marketingIdeas": {
+    "viralContentIdeas": [ string ],
+    "memeIdeas": [ string ],
+    "adAngles": [ string ]
+  },
+  "launchPlan": [ string ]
+}
+
+Important rules:
+- nameStrengthCheck must be encouraging and constructive. Never insult the name. If the name is weak, say "This name has potential — here's how the Goblin would sharpen it."
+- All content must be built specifically around the provided brand name "${providedBrandName}".
+- Respect the "things to avoid" list strictly.
+- Return ONLY the JSON object.`;
+}
+
+/**
  * Builds the user-facing prompt for a single brand kit generation,
  * injecting the founder's inputs and the strict output schema.
  */

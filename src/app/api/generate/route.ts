@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
-import { BRAND_GOBLIN_SYSTEM_PROMPT, buildBrandKitPrompt } from "@/lib/prompts";
+import { BRAND_GOBLIN_SYSTEM_PROMPT, buildBrandKitPrompt, buildExistingNameBrandKitPrompt } from "@/lib/prompts";
 import type { BrandInput, BrandKit } from "@/types";
 
 export const runtime = "nodejs";
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
           model: "claude-sonnet-4-6",
           max_tokens: 16000,
           system: BRAND_GOBLIN_SYSTEM_PROMPT,
-          messages: [{ role: "user", content: buildBrandKitPrompt(body) }],
+          messages: [{ role: "user", content: body.nameMode === "existing" ? buildExistingNameBrandKitPrompt(body) : buildBrandKitPrompt(body) }],
         });
 
         clearInterval(keepalive);

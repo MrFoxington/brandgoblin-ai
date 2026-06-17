@@ -57,6 +57,32 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         </SectionCard>
       </div>
 
+      {/* 2. Name Strength Check (existing-name mode only) */}
+      {kit.nameStrengthCheck && (
+        <div className="lg:col-span-2">
+          <SectionCard emoji="🔍" title="Name Strength Check" badge="Analysis">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-green-400 mb-2">What Works</p>
+                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.whatWorks}</p>
+              </div>
+              <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">Potential Concerns</p>
+                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.potentialConcerns}</p>
+              </div>
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-primary-light mb-2">Suggested Refinement</p>
+                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.suggestedRefinement}</p>
+              </div>
+              <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">Best Positioning Angle</p>
+                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.bestPositioningAngle}</p>
+              </div>
+            </div>
+          </SectionCard>
+        </div>
+      )}
+
       {/* 3. Taglines */}
       <SectionCard emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")}>
         <ul className="space-y-2">
