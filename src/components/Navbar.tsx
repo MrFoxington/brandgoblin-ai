@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import CrystalIcon from "@/components/CrystalIcon";
 
 const NAV_LINKS = [
   { label: "Features", href: "/#features" },
@@ -44,7 +45,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <span className="logo-glow text-2xl">🪄</span>
+          <CrystalIcon className="h-8 w-auto" />
           <span className="font-display text-lg font-extrabold">
             <span className="text-primary-light">Brand</span>
             <span className="text-secondary">Goblin</span>
