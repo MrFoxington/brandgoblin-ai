@@ -2,6 +2,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Particles from "@/components/Particles";
+import CrystalIcon from "@/components/CrystalIcon";
 
 const FEATURES = [
   { emoji: "🏷️", title: "10 Brand Names", desc: "Unique, commercially strong names with strategic reasoning for each.", badge: "Naming" },
@@ -69,9 +70,9 @@ export default function LandingPage() {
         <Particles />
 
         <div className="relative mx-auto max-w-4xl px-4">
-          {/* Goblin mascot + logo */}
-          <div className="mb-6 flex animate-float flex-col items-center gap-2">
-            <span className="logo-glow text-8xl">🪄</span>
+          {/* Crystal + logo */}
+          <div className="mb-6 flex flex-col items-center gap-1">
+            <CrystalIcon className="h-44 w-auto" />
             <div className="flex items-center gap-2 text-3xl font-extrabold font-display">
               <span className="text-primary-light">Brand</span>
               <span className="text-secondary">Goblin</span>
