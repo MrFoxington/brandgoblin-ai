@@ -46,10 +46,19 @@ Respond with ONLY a JSON object matching this exact TypeScript shape (no extra k
 no missing keys, no markdown fences):
 
 {
-  "brandNames": [ { "name": string, "reasoning": string } ],  // exactly 10 unique names
-  "topThreeReasoning": string, // explain why the top 3 names (in order given) work best, 3-5 sentences
-  "recommendedName": string, // the single strongest name, must be one of brandNames
-  "recommendedNameReasoning": string, // 3-5 sentences on why this is THE pick
+  "favoriteName": {
+    "name": string,       // THE single best brand name — memorable, brandable, emotionally resonant
+    "tagline": string,    // best tagline specifically for this name
+    "whyPicked": string,  // 2-3 sentences: why this name wins on memorability, brandability, emotional appeal, domain/social potential
+    "bestFor": string     // 1 sentence: who/what positioning this name is best suited for
+  },
+  "alternativeNames": [  // exactly 4 strong alternatives
+    { "name": string, "tagline": string, "whyItWorks": string },
+    { "name": string, "tagline": string, "whyItWorks": string },
+    { "name": string, "tagline": string, "whyItWorks": string },
+    { "name": string, "tagline": string, "whyItWorks": string }
+  ],
+  "recommendedName": string, // must equal favoriteName.name exactly — used for display elsewhere
   "taglines": [ string ], // exactly 10 catchy taglines, varied tones
   "brandStory": {
     "originStory": string, // short emotional origin story, 3-5 sentences, written as if told by the founder

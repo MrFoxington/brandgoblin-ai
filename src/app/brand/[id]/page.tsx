@@ -61,7 +61,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
             <p className="mt-3 text-sm text-faint max-w-xl mx-auto">{generation.input_data.businessIdea}</p>
           </div>
 
-          <BrandKitView kit={generation.output_data} />
+          <BrandKitView kit={generation.output_data} brandInput={generation.input_data} />
 
           <GoblinFeedback
             brandGenerationId={generation.id}

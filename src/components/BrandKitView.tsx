@@ -1,5 +1,6 @@
-import type { BrandKit } from "@/types";
+import type { BrandKit, BrandInput } from "@/types";
 import CopyButton from "./CopyButton";
+import BrandNamesSection from "./BrandNamesSection";
 
 function SectionCard({
   emoji,
@@ -38,45 +39,23 @@ function Chip({ children, green }: { children: React.ReactNode; green?: boolean 
   );
 }
 
-export default function BrandKitView({ kit }: { kit: BrandKit }) {
+export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brandInput?: BrandInput }) {
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
 
-      {/* 1. Brand Names */}
-      <SectionCard
-        emoji="🏷️"
-        title="Brand Name Options"
-        badge="Naming"
-        copyText={kit.brandNames.map((n) => n.name).join("\n")}
-      >
-        <ul className="space-y-2">
-          {kit.brandNames.map((n, i) => (
-            <li
-              key={n.name + i}
-              className="flex items-start justify-between gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2.5"
-            >
-              <div>
-                <p className="font-display font-semibold text-white">{n.name}</p>
-                {n.reasoning && (
-                  <p className="mt-0.5 text-xs text-muted leading-relaxed">{n.reasoning}</p>
-                )}
-              </div>
-              <CopyButton text={n.name} label="" className="shrink-0" />
-            </li>
-          ))}
-        </ul>
-        <p className="text-sm text-muted leading-relaxed">{kit.topThreeReasoning}</p>
-      </SectionCard>
-
-      {/* 2. Recommended Name */}
-      <SectionCard emoji="👑" title="Recommended Name" badge="Top Pick" copyText={kit.recommendedName}>
-        <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-5">
-          <p className="font-display text-4xl font-black gradient-text-green mb-3">
-            {kit.recommendedName}
-          </p>
-          <p className="text-sm text-muted leading-relaxed">{kit.recommendedNameReasoning}</p>
-        </div>
-      </SectionCard>
+      {/* 1. Brand Names — spans full width */}
+      <div className="lg:col-span-2">
+        <SectionCard emoji="🏆" title="Brand Names" badge="Naming">
+          <BrandNamesSection
+            favoriteName={kit.favoriteName}
+            alternativeNames={kit.alternativeNames}
+            brandNames={kit.brandNames}
+            topThreeReasoning={kit.topThreeReasoning}
+            recommendedName={kit.recommendedName}
+            brandInput={brandInput}
+          />
+        </SectionCard>
+      </div>
 
       {/* 3. Taglines */}
       <SectionCard emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")}>

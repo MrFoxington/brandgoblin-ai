@@ -49,6 +49,19 @@ export interface BrandNameOption {
   reasoning?: string;
 }
 
+export interface FavoriteName {
+  name: string;
+  tagline: string;
+  whyPicked: string;
+  bestFor: string;
+}
+
+export interface AlternativeName {
+  name: string;
+  tagline: string;
+  whyItWorks: string;
+}
+
 export interface MascotConcept {
   name: string;
   appearance: string;
@@ -97,10 +110,15 @@ export interface BrandStory {
 }
 
 export interface BrandKit {
-  brandNames: BrandNameOption[];
-  topThreeReasoning: string;
+  // Legacy fields (kept for backwards compat with existing saved brands)
+  brandNames?: BrandNameOption[];
+  topThreeReasoning?: string;
+  recommendedNameReasoning?: string;
+  // New naming structure
+  favoriteName?: FavoriteName;
+  alternativeNames?: AlternativeName[];
+  // Always present
   recommendedName: string;
-  recommendedNameReasoning: string;
   taglines: string[];
   brandStory: BrandStory;
   brandVoice: BrandVoice;
