@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BrandKitView from "@/components/BrandKitView";
 import FavoriteToggle from "@/components/FavoriteToggle";
+import GoblinFeedback from "@/components/GoblinFeedback";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function BrandPage({ params }: { params: { id: string } }) {
@@ -61,6 +62,11 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
           </div>
 
           <BrandKitView kit={generation.output_data} />
+
+          <GoblinFeedback
+            brandGenerationId={generation.id}
+            brandName={generation.output_data.recommendedName}
+          />
 
           {/* Bottom CTAs */}
           <div className="mt-12 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-10 text-center">
