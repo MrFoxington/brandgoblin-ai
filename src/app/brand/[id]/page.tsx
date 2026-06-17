@@ -30,33 +30,51 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
       <main className="flex-1 px-4 py-12">
         <div className="mx-auto max-w-6xl">
 
-          {/* Header */}
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <Link
-                href="/dashboard"
-                className="mb-3 inline-flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
-              >
-                ← Back to vault
-              </Link>
-              <div className="mb-2">
-                <span className="badge-purple">✦ Brand Kit</span>
-              </div>
-              <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-                <span className="gradient-text">{generation.output_data.recommendedName}</span>
-              </h1>
-              <p className="mt-2 text-sm text-muted max-w-xl leading-relaxed">
-                {generation.input_data.businessIdea}
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <span className="badge-purple capitalize">{generation.input_data.vibe}</span>
-                <span className="badge-green">{generation.input_data.industry}</span>
-              </div>
+          {/* Back nav */}
+          <Link
+            href="/dashboard"
+            className="mb-8 inline-flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
+          >
+            ← Back to Brand Vault
+          </Link>
+
+          {/* Celebration header */}
+          <div className="mb-10 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 px-8 py-10 text-center">
+            <span className="logo-glow block text-5xl mb-4">🎉</span>
+            <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-3">
+              Your Idea Has Become A Brand.
+            </h1>
+            <p className="text-muted max-w-lg mx-auto leading-relaxed">
+              You started with an idea. Now you have a name, identity, story, and launch plan.
+              <br className="hidden sm:block" />
+              <span className="text-primary-light font-semibold"> Keep building.</span>
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <span className="font-display text-2xl font-black gradient-text">
+                {generation.output_data.recommendedName}
+              </span>
+              <span className="badge-purple capitalize">{generation.input_data.vibe}</span>
+              <span className="badge-green">{generation.input_data.industry}</span>
+              <FavoriteToggle id={generation.id} initialFavorite={generation.favorite} />
             </div>
-            <FavoriteToggle id={generation.id} initialFavorite={generation.favorite} />
+            <p className="mt-3 text-sm text-faint max-w-xl mx-auto">{generation.input_data.businessIdea}</p>
           </div>
 
           <BrandKitView kit={generation.output_data} />
+
+          {/* Bottom CTAs */}
+          <div className="mt-12 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-10 text-center">
+            <h2 className="font-display text-2xl font-extrabold text-white mb-2">Ready to keep building?</h2>
+            <p className="text-muted mb-6">Every great brand started as just an idea. Now you have yours.</p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link href="/generate" className="btn-primary px-8 py-3">
+                ✦ Create Another Brand
+              </Link>
+              <Link href="/dashboard" className="btn-secondary px-8 py-3">
+                View Brand Vault
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />

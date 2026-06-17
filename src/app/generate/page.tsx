@@ -101,19 +101,19 @@ export default function GeneratePage() {
       <main className="flex-1 px-4 py-16">
         <div className="mx-auto max-w-2xl">
           <div className="mb-10 text-center">
-            <span className="logo-glow block text-5xl mb-3">🧪</span>
+            <span className="badge-purple mb-4 inline-block">✦ Brand Creator</span>
             <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-              Summon your brand
+              What idea would you like to<br className="hidden sm:block" /> bring to life?
             </h1>
-            <p className="mt-2 text-muted">
-              The more specific you are, the better the magic.
+            <p className="mt-3 text-muted max-w-md mx-auto">
+              The more you share, the more magical your brand will be.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-card space-y-6 p-8">
             <div>
               <label className="label" htmlFor="businessIdea">
-                Business idea <span className="text-red-400">*</span>
+                Your idea <span className="text-red-400">*</span>
               </label>
               <textarea
                 id="businessIdea"
@@ -122,8 +122,11 @@ export default function GeneratePage() {
                 value={form.businessIdea}
                 onChange={(e) => update("businessIdea", e.target.value)}
                 className="input"
-                placeholder="e.g. A subscription box that ships rare houseplants with care guides"
+                placeholder="e.g. I want to start a dog treat company for health-conscious pet owners"
               />
+              <p className="mt-2 text-xs text-faint">
+                Try: "A coffee brand for gamers." · "A candle company inspired by national parks." · "A productivity app for students."
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -137,12 +140,12 @@ export default function GeneratePage() {
                   value={form.industry}
                   onChange={(e) => update("industry", e.target.value)}
                   className="input"
-                  placeholder="e.g. e-commerce, plants"
+                  placeholder="e.g. food & beverage, tech, fashion"
                 />
               </div>
               <div>
                 <label className="label" htmlFor="targetAudience">
-                  Target audience <span className="text-red-400">*</span>
+                  Who is this for? <span className="text-red-400">*</span>
                 </label>
                 <input
                   id="targetAudience"
@@ -150,13 +153,14 @@ export default function GeneratePage() {
                   value={form.targetAudience}
                   onChange={(e) => update("targetAudience", e.target.value)}
                   className="input"
-                  placeholder="e.g. plant-loving millennials"
+                  placeholder="e.g. busy moms, Gen Z gamers, small business owners"
                 />
               </div>
             </div>
 
             <div>
-              <label className="label">Brand vibe <span className="text-red-400">*</span></label>
+              <label className="label">Brand personality <span className="text-red-400">*</span></label>
+              <p className="mb-3 text-xs text-faint">How should your brand feel?</p>
               <div className="flex flex-wrap gap-2">
                 {VIBES.map((vibe) => (
                   <button
@@ -183,7 +187,7 @@ export default function GeneratePage() {
                   value={form.keywords}
                   onChange={(e) => update("keywords", e.target.value)}
                   className="input"
-                  placeholder="e.g. moss, jungle, cozy"
+                  placeholder="e.g. cozy, natural, bold"
                 />
               </div>
               <div>
@@ -193,7 +197,7 @@ export default function GeneratePage() {
                   value={form.avoid}
                   onChange={(e) => update("avoid", e.target.value)}
                   className="input"
-                  placeholder="e.g. childish names, pink"
+                  placeholder="e.g. corporate names, dark colors"
                 />
               </div>
             </div>
@@ -205,7 +209,7 @@ export default function GeneratePage() {
             )}
 
             <button type="submit" className="btn-primary w-full py-4 text-base">
-              ✦ Summon my brand kit →
+              ✦ Create My Brand →
             </button>
           </form>
         </div>

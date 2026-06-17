@@ -38,23 +38,25 @@ export default async function DashboardPage() {
                 <span className="badge-purple">✦ Brand Vault</span>
               </div>
               <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-                Your <span className="gradient-text">Brand Vault</span>
+                What would you love to<br className="hidden sm:block" /> <span className="gradient-text">create today?</span>
               </h1>
               <p className="mt-1 text-sm text-muted">
-                {rows.length} brand{rows.length === 1 ? "" : "s"} summoned so far.
+                {rows.length === 0
+                  ? "Your brands will live here. Start with an idea."
+                  : `${rows.length} brand${rows.length === 1 ? "" : "s"} created so far. Keep building.`}
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="badge-purple">
                 <span className="text-white font-semibold">
-                  {plan === "free" ? `${credits} credits left` : "Unlimited"}
+                  {plan === "free" ? `${credits} credit${credits === 1 ? "" : "s"} left` : "Unlimited"}
                 </span>
                 <span className="text-faint">·</span>
                 <span className="capitalize">{plan}</span>
               </div>
               <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
-                ✦ New Brand
+                ✦ Create a Brand
               </Link>
             </div>
           </div>
@@ -71,7 +73,7 @@ export default async function DashboardPage() {
                   className="bg-card bg-card-hover group flex flex-col gap-3 p-6"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="logo-glow text-2xl">🪄</span>
+                    <span className="logo-glow text-2xl">✦</span>
                     {row.favorite && (
                       <span className="badge-green text-xs">★ Favorite</span>
                     )}
