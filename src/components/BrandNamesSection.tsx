@@ -80,7 +80,7 @@ export default function BrandNamesSection({
             <span className="flex items-center gap-2 rounded-full border border-yellow-400/40 bg-yellow-400/10 px-3 py-1 text-xs font-bold text-yellow-400 uppercase tracking-widest">
               🏆 Goblin&apos;s Favorite Pick
             </span>
-            <CopyButton text={`${currentFavorite.name}\n${currentFavorite.tagline}`} label="" />
+            <CopyButton text={currentFavorite.name} label="" />
           </div>
 
           <p className="font-display text-4xl font-black text-white mb-2">{currentFavorite.name}</p>

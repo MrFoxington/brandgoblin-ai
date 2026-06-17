@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import BrandKitView from "@/components/BrandKitView";
 import FavoriteToggle from "@/components/FavoriteToggle";
 import GoblinFeedback from "@/components/GoblinFeedback";
+import BrandActions from "@/components/BrandActions";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function BrandPage({ params }: { params: { id: string } }) {
@@ -64,18 +65,22 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
           <BrandKitView kit={generation.output_data} brandInput={generation.input_data} />
 
-          <div data-print-hide>
-          <GoblinFeedback
+          <BrandActions
             brandGenerationId={generation.id}
             brandName={generation.output_data.recommendedName}
           />
 
+          <div data-print-hide className="mt-6">
+            <GoblinFeedback
+              brandGenerationId={generation.id}
+              brandName={generation.output_data.recommendedName}
+            />
           </div>
 
-          {/* Bottom CTAs */}
-          <div data-print-hide className="mt-12 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-10 text-center">
-            <h2 className="font-display text-2xl font-extrabold text-white mb-2">Ready to keep building?</h2>
-            <p className="text-muted mb-6">Every great brand started as just an idea. Now you have yours.</p>
+          {/* Bottom CTA */}
+          <div data-print-hide className="mt-8 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-8 text-center">
+            <h2 className="font-display text-xl font-extrabold text-white mb-2">Ready to keep building?</h2>
+            <p className="text-muted mb-5">Every great brand started as just an idea. Now you have yours.</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/generate" className="btn-primary px-8 py-3">
                 ✦ Create Another Brand

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
 type Rating = "nailed_it" | "pretty_close" | "not_what_i_imagined";
 type WouldBuild = "yes" | "maybe" | "no";
@@ -236,94 +235,6 @@ export default function GoblinFeedback({
         </div>
       )}
 
-      {/* Phase 7: Conversion Actions */}
-      {feedbackSubmitted && validationSubmitted && (
-        <div className="bg-card rounded-2xl p-8">
-          <h2 className="font-display text-xl font-extrabold text-white text-center mb-6">
-            What would you like to do next?
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <ActionCard
-              emoji="🚀"
-              title="Create Another Brand"
-              desc="Start fresh with a new idea."
-              href="/generate"
-              onClick={() => track(brandGenerationId, "create_another_click")}
-              primary
-            />
-            <ActionCard
-              emoji="💾"
-              title="Save This Brand"
-              desc="It's already saved in your Brand Vault."
-              href="/dashboard"
-              onClick={() => track(brandGenerationId, "save_click")}
-            />
-            <ActionCard
-              emoji="📥"
-              title="Export My Launch Kit"
-              desc="Copy everything to your clipboard."
-              onClick={() => {
-                track(brandGenerationId, "export_click");
-                window.print();
-              }}
-            />
-            <ActionCard
-              emoji="📣"
-              title="Share My Brand"
-              desc="Show the world what you built."
-              onClick={() => {
-                track(brandGenerationId, "share_click");
-                if (navigator.share) {
-                  navigator.share({ title: brandName, text: `Check out ${brandName} — created with BrandGoblin AI!`, url: window.location.href }).catch(() => {});
-                } else {
-                  navigator.clipboard.writeText(window.location.href).then(() => alert("Link copied!")).catch(() => {});
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
-  );
-}
-
-function ActionCard({
-  emoji, title, desc, href, onClick, primary,
-}: {
-  emoji: string;
-  title: string;
-  desc: string;
-  href?: string;
-  onClick?: () => void;
-  primary?: boolean;
-}) {
-  const cls = `flex items-start gap-4 rounded-xl border-2 p-5 text-left transition cursor-pointer ${
-    primary
-      ? "border-primary/50 bg-primary/10 hover:bg-primary/20"
-      : "border-[rgba(45,45,78,0.8)] hover:border-primary/40 hover:bg-[rgba(45,45,78,0.3)]"
-  }`;
-
-  const inner = (
-    <>
-      <span className="text-3xl shrink-0">{emoji}</span>
-      <div>
-        <p className="font-display font-bold text-white">{title}</p>
-        <p className="text-sm text-muted mt-0.5">{desc}</p>
-      </div>
-    </>
-  );
-
-  if (href) {
-    return (
-      <Link href={href} className={cls} onClick={onClick}>
-        {inner}
-      </Link>
-    );
-  }
-
-  return (
-    <button className={cls} onClick={onClick}>
-      {inner}
-    </button>
   );
 }

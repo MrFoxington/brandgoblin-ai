@@ -1,31 +1,66 @@
-import type { BrandKit, BrandInput } from "@/types";
+"use client";
+
+import { useState } from "react";
+import type { BrandKit, BrandInput, NameStrengthCheck } from "@/types";
 import CopyButton from "./CopyButton";
 import BrandNamesSection from "./BrandNamesSection";
+
+type SectionKey =
+  | "taglines" | "brandStory" | "brandVoice" | "mascot"
+  | "logoPrompt" | "colorPalette" | "websiteCopy" | "socialKit"
+  | "marketingIdeas" | "launchPlan";
 
 function SectionCard({
   emoji,
   title,
   badge,
   copyText,
+  sectionKey,
+  rerollsUsed,
+  rerolling,
+  onReroll,
   children,
 }: {
   emoji: string;
   title: string;
   badge?: string;
   copyText?: string;
+  sectionKey?: SectionKey;
+  rerollsUsed: Set<string>;
+  rerolling: string | null;
+  onReroll?: (key: SectionKey) => void;
   children: React.ReactNode;
 }) {
+  const used = sectionKey ? rerollsUsed.has(sectionKey) : false;
+  const isRerolling = sectionKey ? rerolling === sectionKey : false;
+
   return (
     <section className="bg-card flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="flex items-center gap-2 font-display text-lg font-bold text-white">
           <span>{emoji}</span> {title}
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {badge && <span className="badge-purple text-xs">{badge}</span>}
           {copyText && <CopyButton text={copyText} />}
+          {sectionKey && onReroll && (
+            <button
+              data-print-hide
+              type="button"
+              disabled={used || isRerolling}
+              onClick={() => onReroll(sectionKey)}
+              className="btn-ghost !text-xs !py-1 !px-2.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isRerolling ? "🧌 Remixing…" : used ? "Re-Conjure Used" : "🔄 Re-Conjure"}
+            </button>
+          )}
         </div>
       </div>
+      {isRerolling && (
+        <p className="text-xs text-muted italic animate-pulse">
+          The goblin is remixing this…
+        </p>
+      )}
       {children}
     </section>
   );
@@ -39,13 +74,66 @@ function Chip({ children, green }: { children: React.ReactNode; green?: boolean 
   );
 }
 
-export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brandInput?: BrandInput }) {
+export default function BrandKitView({ kit: initialKit, brandInput }: { kit: BrandKit; brandInput?: BrandInput }) {
+  const [kit, setKit] = useState<BrandKit>(initialKit);
+  const [rerollsUsed, setRerollsUsed] = useState<Set<string>>(new Set());
+  const [rerolling, setRerolling] = useState<string | null>(null);
+  const [rerollErrors, setRerollErrors] = useState<Record<string, string>>({});
+
+  async function handleReroll(sectionKey: SectionKey) {
+    if (!brandInput || rerollsUsed.has(sectionKey) || rerolling) return;
+    setRerolling(sectionKey);
+    setRerollErrors((prev) => ({ ...prev, [sectionKey]: "" }));
+
+    try {
+      const res = await fetch("/api/generate/section", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          section: sectionKey,
+          brandName: kit.recommendedName,
+          input: brandInput,
+          kit,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed.");
+
+      setKit((prev) => ({ ...prev, ...json.data }));
+      setRerollsUsed((prev) => new Set(prev).add(sectionKey));
+    } catch (err) {
+      setRerollErrors((prev) => ({
+        ...prev,
+        [sectionKey]: err instanceof Error ? err.message : "The goblin tripped over a scroll. Try again.",
+      }));
+    } finally {
+      setRerolling(null);
+    }
+  }
+
+  const sectionProps = (key: SectionKey) => ({
+    sectionKey: key,
+    rerollsUsed,
+    rerolling,
+    onReroll: brandInput ? handleReroll : undefined,
+  });
+
+  // Shared empty props for sections without reroll (names, nameStrengthCheck)
+  const noReroll = { rerollsUsed, rerolling };
+
+  function RerollError({ sectionKey }: { sectionKey: SectionKey }) {
+    const msg = rerollErrors[sectionKey];
+    if (!msg) return null;
+    return <p className="text-xs text-red-400">{msg}</p>;
+  }
+
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
 
       {/* 1. Brand Names — spans full width */}
       <div className="lg:col-span-2">
-        <SectionCard emoji="🏆" title="Brand Names" badge="Naming">
+        <SectionCard emoji="🏆" title="Brand Names" badge="Naming" {...noReroll}>
           <BrandNamesSection
             favoriteName={kit.favoriteName}
             alternativeNames={kit.alternativeNames}
@@ -60,31 +148,15 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
       {/* 2. Name Strength Check (existing-name mode only) */}
       {kit.nameStrengthCheck && (
         <div className="lg:col-span-2">
-          <SectionCard emoji="🔍" title="Name Strength Check" badge="Analysis">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-green-400 mb-2">What Works</p>
-                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.whatWorks}</p>
-              </div>
-              <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">Potential Concerns</p>
-                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.potentialConcerns}</p>
-              </div>
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-primary-light mb-2">Suggested Refinement</p>
-                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.suggestedRefinement}</p>
-              </div>
-              <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">Best Positioning Angle</p>
-                <p className="text-sm text-muted leading-relaxed">{kit.nameStrengthCheck.bestPositioningAngle}</p>
-              </div>
-            </div>
+          <SectionCard emoji="🔍" title="Name Strength Check" badge="Analysis" {...noReroll}>
+            <NameStrengthCheckView nsc={kit.nameStrengthCheck} />
           </SectionCard>
         </div>
       )}
 
       {/* 3. Taglines */}
-      <SectionCard emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")}>
+      <SectionCard emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")} {...sectionProps("taglines")}>
+        <RerollError sectionKey="taglines" />
         <ul className="space-y-2">
           {kit.taglines.map((t, i) => (
             <li
@@ -104,7 +176,9 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         title="Brand Story"
         badge="Storytelling"
         copyText={`${kit.brandStory.originStory}\n\n${kit.brandStory.mission}`}
+        {...sectionProps("brandStory")}
       >
+        <RerollError sectionKey="brandStory" />
         <p className="text-sm text-muted leading-relaxed">{kit.brandStory.originStory}</p>
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
           <p className="text-sm font-semibold text-primary-light leading-relaxed">
@@ -114,7 +188,8 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
       </SectionCard>
 
       {/* 5. Brand Voice */}
-      <SectionCard emoji="🎭" title="Brand Voice" badge="Strategy">
+      <SectionCard emoji="🎭" title="Brand Voice" badge="Strategy" {...sectionProps("brandVoice")}>
+        <RerollError sectionKey="brandVoice" />
         <div className="space-y-4 text-sm">
           <div>
             <p className="label mb-2">Personality traits</p>
@@ -159,7 +234,8 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
       </SectionCard>
 
       {/* 6. Mascot */}
-      <SectionCard emoji="🐲" title="Mascot Concept" badge="Creative" copyText={kit.mascot.imagePrompt}>
+      <SectionCard emoji="🐲" title="Mascot Concept" badge="Creative" copyText={kit.mascot.imagePrompt} {...sectionProps("mascot")}>
+        <RerollError sectionKey="mascot" />
         <p className="font-display text-xl font-bold text-white">{kit.mascot.name}</p>
         <p className="text-sm text-muted leading-relaxed">{kit.mascot.appearance}</p>
         <p className="text-sm text-muted leading-relaxed">{kit.mascot.personality}</p>
@@ -173,7 +249,8 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
       </SectionCard>
 
       {/* 7. Logo Prompt */}
-      <SectionCard emoji="🖼️" title="Logo Prompt" badge="Design" copyText={kit.logoPrompt}>
+      <SectionCard emoji="🖼️" title="Logo Prompt" badge="Design" copyText={kit.logoPrompt} {...sectionProps("logoPrompt")}>
+        <RerollError sectionKey="logoPrompt" />
         <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4">
           <p className="text-sm text-muted leading-relaxed">{kit.logoPrompt}</p>
         </div>
@@ -185,7 +262,9 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         title="Color Palette"
         badge="Design"
         copyText={kit.colorPalette.map((c) => `${c.name}: ${c.hex}`).join("\n")}
+        {...sectionProps("colorPalette")}
       >
+        <RerollError sectionKey="colorPalette" />
         <div className="space-y-2">
           {kit.colorPalette.map((c) => (
             <div
@@ -213,7 +292,9 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         title="Website Copy"
         badge="Copy"
         copyText={`${kit.websiteCopy.heroHeadline}\n${kit.websiteCopy.subheadline}\n\nCTA: ${kit.websiteCopy.ctaText}\n\n${kit.websiteCopy.aboutSection}\n\n${kit.websiteCopy.featureBullets.join("\n")}`}
+        {...sectionProps("websiteCopy")}
       >
+        <RerollError sectionKey="websiteCopy" />
         <div className="space-y-4">
           <div>
             <p className="label mb-1">Hero headline</p>
@@ -250,7 +331,9 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         title="Social Media Kit"
         badge="Social"
         copyText={`Instagram: ${kit.socialKit.instagramBio}\nX/Twitter: ${kit.socialKit.twitterBio}\nTikTok: ${kit.socialKit.tiktokBio}\n\n${kit.socialKit.launchPosts.join("\n\n")}`}
+        {...sectionProps("socialKit")}
       >
+        <RerollError sectionKey="socialKit" />
         <div className="space-y-3">
           {[
             { platform: "Instagram", bio: kit.socialKit.instagramBio },
@@ -282,7 +365,8 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
       </SectionCard>
 
       {/* 11. Marketing Ideas */}
-      <SectionCard emoji="🚀" title="Marketing & Meme Ideas" badge="Growth">
+      <SectionCard emoji="🚀" title="Marketing & Meme Ideas" badge="Growth" {...sectionProps("marketingIdeas")}>
+        <RerollError sectionKey="marketingIdeas" />
         <div className="space-y-5 text-sm">
           <div>
             <p className="label mb-2">Viral content ideas</p>
@@ -323,7 +407,9 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         title="7-Day Launch Plan"
         badge="Launch"
         copyText={kit.launchPlan.join("\n")}
+        {...sectionProps("launchPlan")}
       >
+        <RerollError sectionKey="launchPlan" />
         <ol className="space-y-2">
           {kit.launchPlan.map((step, i) => (
             <li
@@ -339,6 +425,29 @@ export default function BrandKitView({ kit, brandInput }: { kit: BrandKit; brand
         </ol>
       </SectionCard>
 
+    </div>
+  );
+}
+
+function NameStrengthCheckView({ nsc }: { nsc: NameStrengthCheck }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-green-400 mb-2">What Works</p>
+        <p className="text-sm text-muted leading-relaxed">{nsc.whatWorks}</p>
+      </div>
+      <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-2">Potential Concerns</p>
+        <p className="text-sm text-muted leading-relaxed">{nsc.potentialConcerns}</p>
+      </div>
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-primary-light mb-2">Suggested Refinement</p>
+        <p className="text-sm text-muted leading-relaxed">{nsc.suggestedRefinement}</p>
+      </div>
+      <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
+        <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">Best Positioning Angle</p>
+        <p className="text-sm text-muted leading-relaxed">{nsc.bestPositioningAngle}</p>
+      </div>
     </div>
   );
 }
