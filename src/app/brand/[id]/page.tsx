@@ -33,6 +33,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
           {/* Back nav */}
           <Link
+            data-print-hide
             href="/dashboard"
             className="mb-8 inline-flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
           >
@@ -63,13 +64,16 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
           <BrandKitView kit={generation.output_data} brandInput={generation.input_data} />
 
+          <div data-print-hide>
           <GoblinFeedback
             brandGenerationId={generation.id}
             brandName={generation.output_data.recommendedName}
           />
 
+          </div>
+
           {/* Bottom CTAs */}
-          <div className="mt-12 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-10 text-center">
+          <div data-print-hide className="mt-12 rounded-2xl border border-secondary/20 bg-secondary/5 px-8 py-10 text-center">
             <h2 className="font-display text-2xl font-extrabold text-white mb-2">Ready to keep building?</h2>
             <p className="text-muted mb-6">Every great brand started as just an idea. Now you have yours.</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
