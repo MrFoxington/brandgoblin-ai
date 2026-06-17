@@ -42,13 +42,30 @@ export default function GeneratePage() {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error ?? "Something went wrong while summoning your brand.");
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? "Something went wrong.");
       }
 
-      router.push(`/brand/${data.id}`);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
+
+        for (const line of lines) {
+          const payload = JSON.parse(line.slice(6));
+          if (payload.status === "error") throw new Error(payload.error);
+          if (payload.status === "done") {
+            router.push(`/brand/${payload.id}`);
+            return;
+          }
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setLoading(false);
