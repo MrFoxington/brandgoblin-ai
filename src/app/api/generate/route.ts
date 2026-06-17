@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
         const message = await anthropic.messages.create({
           model: "claude-sonnet-4-6",
-          max_tokens: 8000,
+          max_tokens: 16000,
           system: BRAND_GOBLIN_SYSTEM_PROMPT,
           messages: [{ role: "user", content: buildBrandKitPrompt(body) }],
         });
@@ -72,6 +72,11 @@ export async function POST(request: Request) {
 
         const textBlock = message.content.find((b) => b.type === "text");
         if (!textBlock || textBlock.type !== "text") throw new Error("AI returned no text.");
+
+        // Guard against token-limit truncation
+        if (message.stop_reason === "max_tokens") {
+          throw new Error("Brand kit was too large to generate in one pass. Please try again with a shorter business description.");
+        }
 
         let brandKit: BrandKit;
         try {

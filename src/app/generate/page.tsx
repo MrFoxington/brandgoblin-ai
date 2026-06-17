@@ -49,18 +49,31 @@ export default function GeneratePage() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
+        // Accumulate chunks — SSE lines can span multiple read() calls
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process only complete lines (split on \n, keep remainder in buffer)
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? ""; // last element may be incomplete
 
         for (const line of lines) {
-          const payload = JSON.parse(line.slice(6));
-          if (payload.status === "error") throw new Error(payload.error);
-          if (payload.status === "done") {
+          if (!line.startsWith("data: ")) continue;
+          const raw = line.slice(6).trim();
+          if (!raw) continue;
+          let payload: { status: string; error?: string; id?: string };
+          try {
+            payload = JSON.parse(raw);
+          } catch {
+            continue; // incomplete data fragment, will be in buffer
+          }
+          if (payload.status === "error") throw new Error(payload.error ?? "Generation failed.");
+          if (payload.status === "done" && payload.id) {
             router.push(`/brand/${payload.id}`);
             return;
           }
