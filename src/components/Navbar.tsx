@@ -87,7 +87,7 @@ export default function Navbar() {
                 Sign In
               </Link>
               <Link href="/signup" className="btn-primary !py-2.5 !px-5 text-sm">
-                ✦ Get Early Access
+                ✦ Start Creating Free
               </Link>
             </>
           )}
