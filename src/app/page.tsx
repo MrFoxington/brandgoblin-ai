@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Particles from "@/components/Particles";
 import CrystalIcon from "@/components/CrystalIcon";
+import { createAdminClient } from "@/lib/supabase/server";
 
 const FEATURES = [
   { emoji: "🏷️", title: "5 Brand Names", desc: "A Goblin-picked favorite plus 4 strong alternatives, each with strategic reasoning.", badge: "Naming" },
@@ -55,7 +56,13 @@ const PLANS = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = createAdminClient();
+  const { data: testimonials } = await supabase
+    .from("brand_testimonials")
+    .select("id, testimonial_text, created_at")
+    .order("created_at", { ascending: false })
+    .limit(6);
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <Navbar />
@@ -214,6 +221,42 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Testimonials ── */}
+      {testimonials && testimonials.length > 0 && (
+        <section className="py-20 px-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-12 text-center">
+              <span className="badge-purple mb-4 inline-block">⭐ From the vault</span>
+              <h2 className="section-heading mb-3">
+                Founders who took the <span className="gradient-text">leap</span>
+              </h2>
+              <p className="section-sub">Real feedback from real brand builders.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {testimonials.map((t: { id: string; testimonial_text: string; created_at: string }) => (
+                <div
+                  key={t.id}
+                  className="bg-card flex flex-col gap-4 p-6"
+                >
+                  <div className="flex gap-0.5 text-yellow-400 text-sm">
+                    {"★★★★★"}
+                  </div>
+                  <p className="text-sm text-muted leading-relaxed flex-1">
+                    &ldquo;{t.testimonial_text}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-2 pt-2 border-t border-[rgba(45,45,78,0.4)]">
+                    <span className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-bold text-primary-light">
+                      🧌
+                    </span>
+                    <span className="text-xs text-faint">BrandGoblin Founder</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Final CTA ── */}
       <section className="py-24 text-center">
