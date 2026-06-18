@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   if (userRow.plan === "free" && userRow.credits <= 0) {
     return new Response(
-      JSON.stringify({ error: "Out of credits. Upgrade to Pro for unlimited brand kits." }),
+      JSON.stringify({ error: "Out of credits. Upgrade to Creator Pro for unlimited brand kits." }),
       { status: 402 }
     );
   }

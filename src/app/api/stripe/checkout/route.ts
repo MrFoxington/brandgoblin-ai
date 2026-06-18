@@ -17,12 +17,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
     }
 
-    const { plan } = await request.json(); // "pro" | "agency"
+    const { plan } = await request.json(); // "pro"
 
-    const priceId =
-      plan === "agency"
-        ? process.env.STRIPE_PRICE_ID_AGENCY
-        : process.env.STRIPE_PRICE_ID_PRO;
+    const priceId = process.env.STRIPE_PRICE_ID_PRO;
 
     if (!priceId) {
       return NextResponse.json(
