@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EmptyState from "@/components/EmptyState";
+import DashboardGrid from "@/components/DashboardGrid";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function DashboardPage() {
@@ -65,34 +66,7 @@ export default async function DashboardPage() {
           {rows.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map((row) => (
-                <Link
-                  key={row.id}
-                  href={`/brand/${row.id}`}
-                  className="bg-card bg-card-hover group flex flex-col gap-3 p-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="logo-glow text-2xl">✦</span>
-                    {row.favorite && (
-                      <span className="badge-green text-xs">★ Favorite</span>
-                    )}
-                  </div>
-                  <h3 className="font-display text-lg font-bold text-white group-hover:text-primary-light transition-colors">
-                    {row.output_data?.recommendedName ?? "Untitled Brand"}
-                  </h3>
-                  <p className="line-clamp-2 text-sm text-muted leading-relaxed">
-                    {row.input_data?.businessIdea}
-                  </p>
-                  <div className="mt-auto flex items-center justify-between pt-2">
-                    <span className="badge-purple text-xs capitalize">{row.input_data?.vibe}</span>
-                    <span className="text-xs text-faint">
-                      {new Date(row.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <DashboardGrid rows={rows} />
           )}
         </div>
       </main>
