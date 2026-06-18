@@ -2,13 +2,48 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
 
-// Stripe-ready placeholder. Wire up a real price ID and webhook handler
-// (see /api/stripe/webhook) before going live.
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_test_placeholder", {
-  apiVersion: "2024-06-20",
-});
+// Lazily construct the Stripe client so a missing key fails loudly with a
+// clear message rather than silently behaving as a fake "placeholder" account.
+function getStripe(): Stripe | null {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return null;
+  return new Stripe(key, { apiVersion: "2024-06-20" });
+}
 
 export async function POST(request: Request) {
+  const stripe = getStripe();
+  if (!stripe) {
+    return NextResponse.json(
+      { error: "Payments aren't switched on yet. (STRIPE_SECRET_KEY is missing.)" },
+      { status: 503 }
+    );
+  }
+
+  const priceId = process.env.STRIPE_PRICE_ID_PRO;
+  if (!priceId) {
+    return NextResponse.json(
+      { error: "Payments aren't switched on yet. (STRIPE_PRICE_ID_PRO is missing.)" },
+      { status: 503 }
+    );
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    return NextResponse.json(
+      { error: "App URL isn't configured. (Set NEXT_PUBLIC_APP_URL.)" },
+      { status: 503 }
+    );
+  }
+  // localhost is fine for LOCAL TEST-MODE rehearsal, but never with a live key —
+  // that would send real paying customers back to your laptop.
+  const isLiveKey = (process.env.STRIPE_SECRET_KEY ?? "").startsWith("sk_live");
+  if (appUrl.includes("localhost") && isLiveKey) {
+    return NextResponse.json(
+      { error: "Live Stripe key is pointed at localhost. Set NEXT_PUBLIC_APP_URL to your real domain in production." },
+      { status: 503 }
+    );
+  }
+
   try {
     const supabase = createClient();
     const { data: authData } = await supabase.auth.getUser();
@@ -19,29 +54,34 @@ export async function POST(request: Request) {
 
     const { plan } = await request.json(); // "pro"
 
-    const priceId = process.env.STRIPE_PRICE_ID_PRO;
+    // Reuse an existing Stripe customer if we already have one, so a user who
+    // upgrades, cancels, and re-subscribes stays a single customer record.
+    const { data: userRow } = await supabase
+      .from("users")
+      .select("stripe_customer_id")
+      .eq("id", authData.user.id)
+      .single();
 
-    if (!priceId) {
-      return NextResponse.json(
-        { error: "Stripe price ID not configured yet." },
-        { status: 501 }
-      );
-    }
+    const existingCustomerId = userRow?.stripe_customer_id ?? undefined;
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      customer_email: authData.user.email,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?upgraded=1`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      ...(existingCustomerId
+        ? { customer: existingCustomerId }
+        : { customer_email: authData.user.email ?? undefined }),
+      success_url: `${appUrl}/settings?upgraded=1`,
+      cancel_url: `${appUrl}/pricing`,
+      // Mirror metadata onto the subscription so later lifecycle webhooks can map back.
       metadata: { userId: authData.user.id, plan },
+      subscription_data: { metadata: { userId: authData.user.id, plan } },
     });
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
     console.error("[/api/stripe/checkout] error:", err);
     return NextResponse.json(
-      { error: "Stripe is not fully configured yet. Add your keys to .env." },
+      { error: "Couldn't start checkout. Please try again in a moment." },
       { status: 500 }
     );
   }

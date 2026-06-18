@@ -15,7 +15,8 @@ create table if not exists public.users (
   email text not null,
   created_at timestamptz not null default now(),
   credits integer not null default 3,
-  plan text not null default 'free' check (plan in ('free', 'pro', 'agency'))
+  plan text not null default 'free' check (plan in ('free', 'pro', 'agency')),
+  stripe_customer_id text
 );
 
 alter table public.users enable row level security;
