@@ -2,7 +2,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Particles from "@/components/Particles";
-import NixAvatar from "@/components/NixAvatar";
+import Image from "next/image";
 import { createAdminClient } from "@/lib/supabase/server";
 
 const FEATURES = [
@@ -71,7 +71,7 @@ export default async function LandingPage() {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-28 text-center">
+      <section className="relative overflow-hidden py-20 sm:py-28">
         {/* Grid */}
         <div className="pointer-events-none absolute inset-0 bg-grid" />
         {/* Mesh glow */}
@@ -79,47 +79,66 @@ export default async function LandingPage() {
         {/* Particles */}
         <Particles />
 
-        <div className="relative mx-auto max-w-4xl px-4">
-          {/* Nix logo */}
-          <div className="mb-6 flex justify-center">
-            <NixAvatar size="hero" glow />
-          </div>
+        <div className="relative mx-auto max-w-6xl px-4">
+          <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
 
-          {/* Badge */}
-          <div className="mb-6 flex justify-center">
-            <span className="badge-purple">
-              <span>✦</span> AI-Powered Brand Creation Engine
-            </span>
-          </div>
+            {/* ── Left: text ── */}
+            <div className="flex-1 text-center lg:text-left">
+              {/* Badge */}
+              <div className="mb-6 flex justify-center lg:justify-start">
+                <span className="badge-purple">
+                  <span>✦</span> AI-Powered Brand Creation Engine
+                </span>
+              </div>
 
-          {/* Headline */}
-          <h1 className="section-heading mb-6 text-5xl sm:text-7xl">
-            Launch Your{" "}
-            <span className="gradient-text">Next Brand</span>
-            <br />
-            In Minutes
-          </h1>
+              {/* Headline */}
+              <h1 className="section-heading mb-6 text-5xl sm:text-6xl lg:text-7xl">
+                Launch Your{" "}
+                <span className="gradient-text">Next Brand</span>
+                <br />
+                In Minutes
+              </h1>
 
-          {/* Subheadline */}
-          <p className="section-sub mx-auto mb-10 text-lg">
-            Turn <span className="text-secondary font-semibold">any</span> idea into a complete launch-ready brand powered by AI.
-            Names. Logos. Taglines. Mascots. Copy —
-            everything in just one click.
-          </p>
+              {/* Nix intro line */}
+              <p className="mb-2 text-base font-semibold text-secondary">
+                Hi! I&rsquo;m Nix. What idea are we bringing to life today?
+              </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/signup" className="btn-primary w-full sm:w-auto px-8 py-4 text-lg">
-              ✦ Generate Your First Brand Free →
-            </Link>
-            <Link href="/pricing" className="btn-secondary w-full sm:w-auto px-8 py-4 text-lg">
-              See Pricing →
-            </Link>
-          </div>
+              {/* Subheadline */}
+              <p className="section-sub mb-10 text-lg max-w-xl mx-auto lg:mx-0">
+                Turn <span className="text-secondary font-semibold">any</span> idea into a complete launch-ready brand powered by AI.
+                Names. Logos. Taglines. Mascots. Copy —
+                everything in just one click.
+              </p>
 
-          <p className="mt-5 text-sm text-faint">
-            No credit card required · 3 free brand kits · Takes ~2 minutes
-          </p>
+              {/* CTAs */}
+              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
+                <Link href="/signup" className="btn-primary w-full sm:w-auto px-8 py-4 text-lg">
+                  ✦ Generate Your First Brand Free →
+                </Link>
+                <Link href="/pricing" className="btn-secondary w-full sm:w-auto px-8 py-4 text-lg">
+                  See Pricing →
+                </Link>
+              </div>
+
+              <p className="mt-5 text-sm text-faint text-center lg:text-left">
+                No credit card required · 3 free brand kits · Takes ~2 minutes
+              </p>
+            </div>
+
+            {/* ── Right: Nix happy-waving ── */}
+            <div className="flex justify-center lg:flex-none">
+              <Image
+                src="/nix/happy-waving-nix.png"
+                alt="Nix the BrandGoblin wizard waving"
+                width={420}
+                height={420}
+                className="w-64 sm:w-80 lg:w-[420px] drop-shadow-[0_0_40px_rgba(124,58,237,0.4)]"
+                priority
+              />
+            </div>
+
+          </div>{/* end flex row */}
         </div>
       </section>
 

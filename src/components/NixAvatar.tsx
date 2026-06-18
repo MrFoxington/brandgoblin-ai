@@ -42,7 +42,7 @@ export default function NixAvatar({
       role="img"
     >
       <Image
-        src="/images/brandgoblin-logo.png"
+        src="/logos/brandgoblin-logo.png"
         alt="Nix the BrandGoblin wizard"
         width={px}
         height={px}
