@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NixAvatar from "@/components/NixAvatar";
 
 const EXAMPLES = [
   "A dog treat company for health-conscious pet owners",
@@ -12,11 +13,12 @@ const EXAMPLES = [
 export default function EmptyState() {
   return (
     <div className="bg-card flex flex-col items-center gap-6 px-6 py-20 text-center">
-      <span className="logo-glow text-6xl">🔮</span>
+      <NixAvatar size="xl" glow />
       <div>
-        <h3 className="font-display text-2xl font-bold text-white">Your first brand is waiting.</h3>
+        <p className="text-sm text-secondary font-semibold mb-1">😴 Nix is waiting for an idea.</p>
+        <h3 className="font-display text-2xl font-bold text-white">Let's create something magical.</h3>
         <p className="mt-2 section-sub text-sm max-w-sm mx-auto">
-          Start with any idea — big, small, half-baked, or fully formed. BrandGoblin will bring it to life.
+          Start with any idea — big, small, half-baked, or fully formed. Nix will bring it to life.
         </p>
       </div>
 
@@ -26,10 +28,10 @@ export default function EmptyState() {
           {EXAMPLES.map((ex) => (
             <Link
               key={ex}
-              href={`/generate`}
+              href="/generate"
               className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-4 py-3 text-left text-sm text-muted transition hover:border-primary/40 hover:text-white"
             >
-              "{ex}"
+              &ldquo;{ex}&rdquo;
             </Link>
           ))}
         </div>

@@ -61,7 +61,12 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
               <span className="font-display text-2xl font-black gradient-text">
                 {generation.output_data.recommendedName}
               </span>
-              <span className="badge-purple capitalize">{generation.input_data.vibe}</span>
+              {((generation.input_data as { brandTraits?: string[] }).brandTraits?.length ?? 0) > 0
+                ? (generation.input_data as { brandTraits: string[] }).brandTraits.map((t) => (
+                    <span key={t} className="badge-purple capitalize">{t}</span>
+                  ))
+                : <span className="badge-purple capitalize">{generation.input_data.vibe}</span>
+              }
               <span className="badge-green">{generation.input_data.industry}</span>
               <FavoriteToggle id={generation.id} initialFavorite={generation.favorite} />
             </div>

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EmptyState from "@/components/EmptyState";
 import DashboardGrid from "@/components/DashboardGrid";
+import NixAvatar from "@/components/NixAvatar";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function DashboardPage() {
@@ -34,18 +35,22 @@ export default async function DashboardPage() {
 
           {/* Header */}
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="mb-2">
-                <span className="badge-purple">✦ Brand Vault</span>
+            <div className="flex items-start gap-4">
+              <NixAvatar size="lg" glow className="shrink-0 hidden sm:block" />
+              <div>
+                <div className="mb-2">
+                  <span className="badge-purple">✦ Brand Vault</span>
+                </div>
+                <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
+                  Hi, I&rsquo;m Nix. 🧙<br className="hidden sm:block" />
+                  <span className="gradient-text">What idea are we bringing to life today?</span>
+                </h1>
+                <p className="mt-1 text-sm text-muted">
+                  {rows.length === 0
+                    ? "Your brands will live here. Let's create something magical."
+                    : `${rows.length} brand${rows.length === 1 ? "" : "s"} created so far. Keep building.`}
+                </p>
               </div>
-              <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-                What would you love to<br className="hidden sm:block" /> <span className="gradient-text">create today?</span>
-              </h1>
-              <p className="mt-1 text-sm text-muted">
-                {rows.length === 0
-                  ? "Your brands will live here. Start with an idea."
-                  : `${rows.length} brand${rows.length === 1 ? "" : "s"} created so far. Keep building.`}
-              </p>
             </div>
 
             <div className="flex items-center gap-3">

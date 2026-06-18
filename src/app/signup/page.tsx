@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NixAvatar from "@/components/NixAvatar";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -49,13 +50,17 @@ export default function SignupPage() {
       <main className="flex flex-1 items-center justify-center px-4 py-20">
         <div className="bg-card w-full max-w-md p-8">
           <div className="mb-8 text-center">
-            <span className="logo-glow block text-5xl mb-3">🪄</span>
+            <div className="flex justify-center mb-4">
+              <NixAvatar size="xl" glow />
+            </div>
             <h1 className="font-display text-2xl font-extrabold text-white">
-              Create your goblin account
+              Start Building Your Brand
             </h1>
-            <p className="mt-1 text-sm text-muted">
-              3 free brand generations included. No card required.
+            <p className="mt-2 text-sm text-muted leading-relaxed">
+              Everyone Has An Idea.<br />
+              BrandGoblin Helps Bring It To Life.
             </p>
+            <p className="mt-2 text-xs text-faint">3 free brand generations · No card required</p>
           </div>
 
           {success ? (

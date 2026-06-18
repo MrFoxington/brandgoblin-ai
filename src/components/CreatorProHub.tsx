@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import CopyButton from "./CopyButton";
+import NixAvatar from "./NixAvatar";
 import type { CreatorContentType, BrandVoiceMode, CreatorContentRow, BrandGenerationRow } from "@/types";
 
 // ─── Config ────────────────────────────────────────────────────────────────
@@ -214,13 +215,18 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
 
       {/* ── Hero header ── */}
       <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 px-8 py-10 text-center">
-        <span className="logo-glow block text-4xl mb-3">✨</span>
+        <div className="flex justify-center mb-4">
+          <NixAvatar size="lg" glow />
+        </div>
         <div className="inline-flex items-center gap-2 mb-3">
           <span className="badge-purple">Creator Pro</span>
         </div>
-        <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-3">
+        <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-2">
           Your AI Marketing Department
         </h1>
+        <p className="text-sm text-secondary font-medium mb-3">
+          🧙 Nix is preparing your next campaign.
+        </p>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm text-muted mb-1">
           <span>Unlimited copywriter.</span>
           <span>Unlimited social media manager.</span>

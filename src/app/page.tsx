@@ -2,7 +2,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Particles from "@/components/Particles";
-import CrystalIcon from "@/components/CrystalIcon";
+import NixAvatar from "@/components/NixAvatar";
 import { createAdminClient } from "@/lib/supabase/server";
 
 const FEATURES = [
@@ -80,14 +80,9 @@ export default async function LandingPage() {
         <Particles />
 
         <div className="relative mx-auto max-w-4xl px-4">
-          {/* Crystal + logo */}
-          <div className="mb-6 flex flex-col items-center gap-1">
-            <CrystalIcon className="h-44 w-auto" />
-            <div className="flex items-center gap-2 text-3xl font-extrabold font-display">
-              <span className="text-primary-light">Brand</span>
-              <span className="text-secondary">Goblin</span>
-              <span className="text-secondary">AI</span>
-            </div>
+          {/* Nix logo */}
+          <div className="mb-6 flex justify-center">
+            <NixAvatar size="hero" glow />
           </div>
 
           {/* Badge */}

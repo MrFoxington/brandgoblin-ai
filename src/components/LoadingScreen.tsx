@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import NixAvatar from "@/components/NixAvatar";
 
 const MESSAGES = [
-  { icon: "🧌", text: "Summoning your brand…" },
-  { icon: "✨", text: "Crafting your story…" },
-  { icon: "🎨", text: "Designing your identity…" },
-  { icon: "💬", text: "Writing your taglines…" },
-  { icon: "📣", text: "Writing your launch message…" },
-  { icon: "🚀", text: "Preparing your launch kit…" },
-  { icon: "🎯", text: "Sharpening your brand voice…" },
-  { icon: "🌟", text: "Polishing every last detail…" },
+  { text: "🧙 Nix is working his magic…" },
+  { text: "✨ Crafting your brand story…" },
+  { text: "🎨 Designing your identity…" },
+  { text: "💬 Writing your taglines…" },
+  { text: "📣 Conjuring your launch message…" },
+  { text: "🚀 Preparing your launch kit…" },
+  { text: "🎯 Sharpening your brand voice…" },
+  { text: "🌟 Polishing every last detail…" },
 ];
 
 export default function LoadingScreen() {
@@ -23,11 +24,9 @@ export default function LoadingScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  const current = MESSAGES[index];
-
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 text-center px-4">
-      <div className="relative flex h-32 w-32 items-center justify-center">
+      <div className="relative flex h-36 w-36 items-center justify-center">
         <div
           className="absolute inset-0 rounded-full"
           style={{
@@ -35,15 +34,13 @@ export default function LoadingScreen() {
             animation: "pulse-glow 2.2s ease-in-out infinite",
           }}
         />
-        <span className="animate-float text-7xl logo-glow" key={index} style={{ animation: "crystal-float 3.2s ease-in-out infinite" }}>
-          {current.icon}
-        </span>
+        <NixAvatar size="xl" glow />
       </div>
 
       <div className="space-y-2">
-        <p className="font-display text-2xl font-bold text-white">{current.text}</p>
+        <p className="font-display text-2xl font-bold text-white">{MESSAGES[index].text}</p>
         <p className="text-sm text-muted">
-          Your idea is becoming a brand. This takes about a minute.
+          Nix is conjuring your complete brand kit. This takes about a minute.
         </p>
       </div>
 

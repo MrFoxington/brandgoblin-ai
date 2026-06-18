@@ -133,9 +133,12 @@ function BrandCard({ row }: { row: BrandGenerationRow }) {
 
       {/* Bottom badges */}
       <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[rgba(45,45,78,0.4)] mt-auto">
-        {input?.vibe && (
-          <span className="badge-purple text-xs capitalize">{input.vibe}</span>
-        )}
+        {(row.input_data as { brandTraits?: string[] }).brandTraits?.length
+          ? (row.input_data as { brandTraits: string[] }).brandTraits.slice(0, 2).map((t) => (
+              <span key={t} className="badge-purple text-xs capitalize">{t}</span>
+            ))
+          : input?.vibe && <span className="badge-purple text-xs capitalize">{input.vibe}</span>
+        }
         {input?.industry && (
           <span className="badge-green text-xs capitalize truncate max-w-[120px]">{input.industry}</span>
         )}

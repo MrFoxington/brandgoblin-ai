@@ -48,7 +48,7 @@ export default async function BrandPrintPage({ params }: { params: { id: string 
             {kit.recommendedName}
           </h1>
           <p style={{ color: "#94a3b8", fontSize: "14px", margin: 0 }}>
-            {input.businessIdea} · {input.industry} · {input.vibe} · Generated {date}
+            {input.businessIdea} · {input.industry} · {(input as { brandTraits?: string[] }).brandTraits?.join(", ") ?? input.vibe} · Generated {date}
           </p>
         </div>
 
