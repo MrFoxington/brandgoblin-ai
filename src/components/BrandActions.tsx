@@ -41,10 +41,10 @@ export default function BrandActions({
         <ActionCard
           emoji="📥"
           title="Export My Launch Kit"
-          desc="Print or save as a dark-mode PDF."
+          desc="Print or save as a clean dark-mode PDF."
           onClick={() => {
             track(brandGenerationId, "export_click");
-            window.print();
+            window.open(`/brand/${brandGenerationId}/print`, "_blank");
           }}
         />
         <ActionCard
