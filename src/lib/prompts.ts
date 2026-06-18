@@ -30,8 +30,29 @@ after the JSON, no trailing text. The JSON must match the exact schema you are g
  * Builds the prompt for existing-name mode — skips name generation,
  * locks the provided brand name, and adds a Name Strength Check section.
  */
+function buildPersonalityBlock(input: BrandInput): string {
+  const { vibe, brandTraits, vibeDescription } = input;
+  const lines: string[] = [];
+
+  if (brandTraits && brandTraits.length > 0) {
+    lines.push(`BRAND PERSONALITY TRAITS: ${brandTraits.join(", ")}`);
+  } else {
+    lines.push(`DESIRED BRAND VIBE: ${vibe}`);
+  }
+
+  if (vibeDescription?.trim()) {
+    lines.push(`VIBE DESCRIPTION (founder's own words): "${vibeDescription.trim()}"`);
+  }
+
+  if (brandTraits && brandTraits.length > 0 && vibeDescription?.trim()) {
+    lines.push(`PERSONALITY DIRECTION: Blend the selected traits (${brandTraits.join(", ")}) with the founder's vibe description to create a nuanced, layered brand personality.`);
+  }
+
+  return lines.join("\n");
+}
+
 export function buildExistingNameBrandKitPrompt(input: BrandInput): string {
-  const { businessIdea, industry, targetAudience, vibe, keywords, avoid, providedBrandName } = input;
+  const { businessIdea, industry, targetAudience, keywords, avoid, providedBrandName } = input;
 
   return `Generate a complete, launch-ready brand kit for the following business. The founder already has a brand name — do NOT suggest alternative names. Build everything around the provided name.
 
@@ -39,7 +60,7 @@ BRAND NAME (already chosen by founder): ${providedBrandName}
 BUSINESS IDEA: ${businessIdea}
 INDUSTRY / CATEGORY: ${industry}
 TARGET AUDIENCE: ${targetAudience}
-DESIRED BRAND VIBE: ${vibe}
+${buildPersonalityBlock(input)}
 OPTIONAL KEYWORDS TO WEAVE IN: ${keywords?.trim() ? keywords : "none provided"}
 THINGS TO AVOID: ${avoid?.trim() ? avoid : "none provided"}
 
@@ -106,14 +127,14 @@ Important rules:
  * injecting the founder's inputs and the strict output schema.
  */
 export function buildBrandKitPrompt(input: BrandInput): string {
-  const { businessIdea, industry, targetAudience, vibe, keywords, avoid } = input;
+  const { businessIdea, industry, targetAudience, keywords, avoid } = input;
 
   return `Generate a complete, launch-ready brand kit for the following business.
 
 BUSINESS IDEA: ${businessIdea}
 INDUSTRY / CATEGORY: ${industry}
 TARGET AUDIENCE: ${targetAudience}
-DESIRED BRAND VIBE: ${vibe}
+${buildPersonalityBlock(input)}
 OPTIONAL KEYWORDS TO WEAVE IN: ${keywords?.trim() ? keywords : "none provided"}
 THINGS TO AVOID: ${avoid?.trim() ? avoid : "none provided"}
 

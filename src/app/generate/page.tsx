@@ -5,12 +5,42 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
-import type { BrandInput, BrandVibe, NameMode } from "@/types";
+import type { BrandInput, BrandTrait, NameMode } from "@/types";
 
-const VIBES: BrandVibe[] = [
-  "fun", "premium", "luxury", "cute", "rebellious",
-  "futuristic", "trustworthy", "minimalist", "bold", "playful",
+const TRAITS: { key: BrandTrait; emoji: string }[] = [
+  { key: "playful",       emoji: "🎮" },
+  { key: "funny",         emoji: "😄" },
+  { key: "friendly",      emoji: "🤝" },
+  { key: "bold",          emoji: "⚡" },
+  { key: "luxury",        emoji: "💎" },
+  { key: "professional",  emoji: "👔" },
+  { key: "inspirational", emoji: "✨" },
+  { key: "minimalist",    emoji: "◻️" },
+  { key: "modern",        emoji: "🔷" },
+  { key: "creative",      emoji: "🎨" },
+  { key: "adventurous",   emoji: "🏔️" },
+  { key: "elegant",       emoji: "🌸" },
+  { key: "innovative",    emoji: "🚀" },
+  { key: "trustworthy",   emoji: "🛡️" },
+  { key: "energetic",     emoji: "🔥" },
+  { key: "sophisticated", emoji: "🎯" },
+  { key: "premium",       emoji: "⭐" },
+  { key: "rebellious",    emoji: "💀" },
+  { key: "authentic",     emoji: "💚" },
+  { key: "approachable",  emoji: "😊" },
 ];
+
+const MAX_TRAITS = 3;
+
+// Map a trait to the closest legacy BrandVibe for backwards compat
+function traitToVibe(trait: BrandTrait): BrandInput["vibe"] {
+  const map: Partial<Record<BrandTrait, BrandInput["vibe"]>> = {
+    playful: "playful", funny: "fun", bold: "bold", luxury: "luxury",
+    rebellious: "rebellious", trustworthy: "trustworthy", minimalist: "minimalist",
+    premium: "premium",
+  };
+  return map[trait] ?? "premium";
+}
 
 export default function GeneratePage() {
   const router = useRouter();
@@ -24,6 +54,8 @@ export default function GeneratePage() {
     keywords: "",
     avoid: "",
   });
+  const [brandTraits, setBrandTraits] = useState<BrandTrait[]>([]);
+  const [vibeDescription, setVibeDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,10 +72,23 @@ export default function GeneratePage() {
       return;
     }
 
+    // Require at least one trait or a vibe description
+    if (brandTraits.length === 0 && !vibeDescription.trim()) {
+      setError("Choose at least one brand trait or describe your vibe.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
-    const payload: BrandInput = { ...form, nameMode };
+    const payload: BrandInput = {
+      ...form,
+      nameMode,
+      brandTraits: brandTraits.length > 0 ? brandTraits : undefined,
+      vibeDescription: vibeDescription.trim() || undefined,
+      // derive legacy vibe from first selected trait for backwards compat
+      vibe: brandTraits.length > 0 ? traitToVibe(brandTraits[0]) : form.vibe,
+    };
 
     try {
       const res = await fetch("/api/generate", {
@@ -223,24 +268,92 @@ export default function GeneratePage() {
                 </div>
               </div>
 
+              {/* ── Brand Personality ── */}
               <div>
-                <label className="label">Brand personality <span className="text-red-400">*</span></label>
-                <p className="mb-3 text-xs text-faint">How should your brand feel?</p>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="label !mb-0">
+                    Choose up to 3 Brand Traits <span className="text-red-400">*</span>
+                  </label>
+                  <span className={`text-xs font-semibold tabular-nums transition ${
+                    brandTraits.length === MAX_TRAITS ? "text-primary-light" : "text-faint"
+                  }`}>
+                    {brandTraits.length}/{MAX_TRAITS} selected
+                  </span>
+                </div>
+                <p className="mb-4 text-xs text-faint">
+                  Most great brands are a blend of personalities. Pick 1–3 that fit yours.
+                </p>
+
+                {/* Trait chips */}
                 <div className="flex flex-wrap gap-2">
-                  {VIBES.map((vibe) => (
-                    <button
-                      key={vibe}
-                      type="button"
-                      onClick={() => update("vibe", vibe)}
-                      className={`rounded-full border px-4 py-1.5 text-sm font-medium capitalize transition ${
-                        form.vibe === vibe
-                          ? "border-primary/60 bg-primary/20 text-primary-light"
-                          : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
-                      }`}
-                    >
-                      {vibe}
-                    </button>
-                  ))}
+                  {TRAITS.map(({ key, emoji }) => {
+                    const selected = brandTraits.includes(key);
+                    const disabled = !selected && brandTraits.length >= MAX_TRAITS;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => {
+                          if (selected) {
+                            setBrandTraits((t) => t.filter((x) => x !== key));
+                          } else if (brandTraits.length < MAX_TRAITS) {
+                            setBrandTraits((t) => [...t, key]);
+                          }
+                        }}
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium capitalize transition ${
+                          selected
+                            ? "border-primary/60 bg-primary/20 text-primary-light shadow-[0_0_10px_rgba(139,92,246,0.3)]"
+                            : disabled
+                            ? "border-[rgba(45,45,78,0.4)] text-[rgba(255,255,255,0.2)] cursor-not-allowed"
+                            : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
+                        }`}
+                      >
+                        <span>{emoji}</span>
+                        {key}
+                        {selected && <span className="text-xs ml-0.5">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Selected preview */}
+                {brandTraits.length > 0 && (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-faint">Your blend:</span>
+                    {brandTraits.map((t) => (
+                      <span key={t} className="rounded-full bg-primary/15 border border-primary/30 px-2.5 py-0.5 text-xs font-semibold text-primary-light capitalize">
+                        ✓ {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div className="my-5 flex items-center gap-3">
+                  <div className="flex-1 border-t border-[rgba(45,45,78,0.6)]" />
+                  <span className="text-xs text-faint font-medium">OR</span>
+                  <div className="flex-1 border-t border-[rgba(45,45,78,0.6)]" />
+                </div>
+
+                {/* Vibe description */}
+                <div>
+                  <label className="label !mb-1.5">
+                    ✨ Describe Your Vibe
+                    <span className="ml-2 text-xs text-faint font-normal">(optional)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    maxLength={250}
+                    value={vibeDescription}
+                    onChange={(e) => setVibeDescription(e.target.value)}
+                    className="input resize-none"
+                    placeholder={`"Luxury but approachable" · "Like Apple meets Disney" · "Fun and playful with a professional edge"`}
+                  />
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-xs text-faint">You can use both — we'll blend them into one personality.</p>
+                    <span className="text-xs text-faint tabular-nums">{vibeDescription.length}/250</span>
+                  </div>
                 </div>
               </div>
 

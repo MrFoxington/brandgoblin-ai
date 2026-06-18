@@ -75,17 +75,25 @@ export type BrandVibe =
   | "bold"
   | "playful";
 
+export type BrandTrait =
+  | "playful" | "funny" | "friendly" | "bold" | "luxury"
+  | "professional" | "inspirational" | "minimalist" | "modern" | "creative"
+  | "adventurous" | "elegant" | "innovative" | "trustworthy" | "energetic"
+  | "sophisticated" | "premium" | "rebellious" | "authentic" | "approachable";
+
 export type NameMode = "generated" | "existing";
 
 export interface BrandInput {
   businessIdea: string;
   industry: string;
   targetAudience: string;
-  vibe: BrandVibe;
+  vibe: BrandVibe;           // kept for backwards compat with existing saved brands
   keywords?: string;
   avoid?: string;
   nameMode?: NameMode;
   providedBrandName?: string;
+  brandTraits?: BrandTrait[];    // NEW: multi-select (up to 3)
+  vibeDescription?: string;     // NEW: free-text personality description
 }
 
 // ---------- AI output: full brand kit ----------
