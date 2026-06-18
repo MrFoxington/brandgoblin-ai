@@ -36,14 +36,34 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan ?? "pro";
+      const customerId = typeof session.customer === "string" ? session.customer : null;
 
       if (userId) {
-        await supabase.from("users").update({ plan, credits: 999999 }).eq("id", userId);
+        await supabase
+          .from("users")
+          .update({ plan, credits: 999999, stripe_customer_id: customerId })
+          .eq("id", userId);
       }
       break;
     }
-    case "customer.subscription.deleted": {
-      // TODO: look up the user by Stripe customer ID and downgrade to "free".
+    case "customer.subscription.deleted":
+    case "customer.subscription.updated": {
+      const sub = event.data.object as Stripe.Subscription;
+      const customerId = typeof sub.customer === "string" ? sub.customer : null;
+      if (!customerId) break;
+
+      // Only downgrade on deleted or when status moves to canceled/unpaid
+      const shouldDowngrade =
+        event.type === "customer.subscription.deleted" ||
+        sub.status === "canceled" ||
+        sub.status === "unpaid";
+
+      if (shouldDowngrade) {
+        await supabase
+          .from("users")
+          .update({ plan: "free", credits: 3 })
+          .eq("stripe_customer_id", customerId);
+      }
       break;
     }
     default:
