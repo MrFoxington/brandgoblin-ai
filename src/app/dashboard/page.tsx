@@ -62,6 +62,34 @@ export default async function DashboardPage() {
             </div>
           </div>
 
+          {/* Creator Pro banner */}
+          {plan === "pro" || plan === "agency" ? (
+            <div className="mb-8 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="badge-purple text-xs">✨ Creator Pro</span>
+                </div>
+                <p className="font-display font-bold text-white">Your AI Marketing Department</p>
+                <p className="text-xs text-muted mt-0.5">
+                  Social posts · Blog content · Email campaigns · Ad copy · Content calendars
+                </p>
+              </div>
+              <Link href="/dashboard/creator-pro" className="btn-primary !py-2.5 !px-6 text-sm shrink-0">
+                Open Creator Pro →
+              </Link>
+            </div>
+          ) : (
+            <div className="mb-8 rounded-2xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.1)] px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-display font-bold text-white text-sm">Unlock your AI Marketing Department</p>
+                <p className="text-xs text-muted mt-0.5">Unlimited content for every channel — $19/month</p>
+              </div>
+              <Link href="/pricing" className="btn-secondary !py-2 !px-5 text-sm shrink-0">
+                ✦ Upgrade to Creator Pro
+              </Link>
+            </div>
+          )}
+
           {/* Grid */}
           {rows.length === 0 ? (
             <EmptyState />

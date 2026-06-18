@@ -144,7 +144,8 @@ export default function PricingPage() {
             <div className="bg-card bg-card-hover flex flex-col p-6 text-left border-primary/50 shadow-glow">
               <span className="badge-purple mb-4 self-start">Most popular</span>
               <h3 className="font-display text-xl font-bold text-white">Creator Pro</h3>
-              <p className="mt-1 mb-4 text-sm text-muted">For founders building and growing real brands.</p>
+              <p className="mt-0.5 mb-0.5 text-xs font-semibold text-secondary">Your AI Marketing Department</p>
+              <p className="mt-1 mb-4 text-sm text-muted">Unlimited copywriter. Social manager. Content strategist. All in one.</p>
               <div className="mb-6 flex items-baseline gap-1">
                 <span className="font-display text-4xl font-black text-white">$19</span>
                 <span className="text-sm text-faint">/month</span>

@@ -21,6 +21,29 @@ export interface MarketingContentRow {
   created_at: string;
 }
 
+// ---------- Creator Pro content engine ----------
+
+export type CreatorContentType =
+  | "instagram_post" | "twitter_post" | "facebook_post" | "linkedin_post" | "threads_post"
+  | "caption" | "hashtag_set"
+  | "blog_post" | "product_description" | "email_campaign" | "ad_copy"
+  | "headline" | "promotion" | "seasonal_campaign" | "launch_announcement"
+  | "marketing_ideas" | "campaign_ideas" | "content_calendar"
+  | "audience_suggestions" | "brand_voice_suggestions";
+
+export type BrandVoiceMode =
+  | "professional" | "funny" | "luxury" | "friendly" | "inspirational" | "minimalist" | "bold";
+
+export interface CreatorContentRow {
+  id: string;
+  user_id: string;
+  brand_id: string | null;
+  content_type: CreatorContentType;
+  title: string;
+  content: unknown;
+  created_at: string;
+}
+
 export interface UserRow {
   id: string;
   email: string;
