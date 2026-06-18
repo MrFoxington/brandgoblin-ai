@@ -2,6 +2,25 @@
 
 export type Plan = "free" | "pro" | "agency";
 
+export function planDisplayName(plan: Plan): string {
+  if (plan === "pro" || plan === "agency") return "Creator Pro";
+  return "Free";
+}
+
+export type MarketingContentType =
+  | "social_posts" | "captions" | "blog_ideas" | "ad_copy"
+  | "email_campaigns" | "video_ideas" | "hashtags" | "seasonal_campaigns"
+  | "meme_ideas" | "headline_ideas" | "website_copy" | "cta_ideas";
+
+export interface MarketingContentRow {
+  id: string;
+  user_id: string;
+  brand_id: string;
+  content_type: MarketingContentType;
+  content_json: unknown;
+  created_at: string;
+}
+
 export interface UserRow {
   id: string;
   email: string;

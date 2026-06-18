@@ -29,30 +29,20 @@ const PLANS = [
     price: "$0",
     period: "forever",
     desc: "Try the magic before you commit.",
-    features: ["3 brand generations", "Full 12-section brand kit", "Save to your vault", "Copy-to-clipboard"],
+    features: ["3 brand generations", "Full 12-section brand kit", "Save to your vault", "Dark-mode PDF export"],
     cta: "Start free",
     href: "/signup",
     highlight: false,
   },
   {
-    name: "Pro",
+    name: "Creator Pro",
     price: "$19",
     period: "/month",
-    desc: "For founders launching real brands.",
-    features: ["Unlimited brand generations", "Unlimited saved brands", "Premium AI outputs", "Priority generation speed"],
-    cta: "Get Pro",
-    href: "/signup",
+    desc: "For founders building and growing real brands.",
+    features: ["Unlimited brand generations", "Keep Growing content engine", "Social posts, captions, blogs & ads", "Priority generation speed"],
+    cta: "Get Creator Pro",
+    href: "/pricing",
     highlight: true,
-  },
-  {
-    name: "Agency",
-    price: "$49",
-    period: "/month",
-    desc: "For agencies serving clients.",
-    features: ["Everything in Pro", "Client-ready brand kits", "Bulk generation", "White-label-ready output"],
-    cta: "Get Agency",
-    href: "/signup",
-    highlight: false,
   },
 ];
 
@@ -185,7 +175,7 @@ export default async function LandingPage() {
           <p className="section-sub mb-16">
             Start free. Upgrade when your brand starts making you money.
           </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}

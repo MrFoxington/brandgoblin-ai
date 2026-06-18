@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LogoutButton from "@/components/LogoutButton";
 import UpgradeButton from "@/components/UpgradeButton";
+import { planDisplayName } from "@/types";
 
 export default async function SettingsPage() {
   const supabase = createClient();
@@ -58,19 +59,18 @@ export default async function SettingsPage() {
             <div className="border-t border-[rgba(45,45,78,0.6)] pt-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-display font-bold capitalize text-white text-lg">
-                    {userRow?.plan ?? "free"} plan
+                  <p className="font-display font-bold text-white text-lg">
+                    {planDisplayName(userRow?.plan ?? "free")} plan
                   </p>
                   <p className="text-sm text-muted">
                     {userRow?.plan === "free"
                       ? `${userRow?.credits ?? 0} generations remaining`
-                      : "Unlimited brand generations"}
+                      : "Unlimited brand generations + Keep Growing content engine"}
                   </p>
                 </div>
                 {userRow?.plan === "free" && (
                   <div className="flex gap-2 flex-wrap">
-                    <UpgradeButton plan="pro" label="✦ Upgrade to Pro" />
-                    <UpgradeButton plan="agency" label="Upgrade to Agency" />
+                    <UpgradeButton plan="pro" label="✦ Upgrade to Creator Pro" />
                   </div>
                 )}
                 {userRow?.plan !== "free" && (

@@ -7,7 +7,8 @@ import BrandKitView from "@/components/BrandKitView";
 import FavoriteToggle from "@/components/FavoriteToggle";
 import GoblinFeedback from "@/components/GoblinFeedback";
 import BrandActions from "@/components/BrandActions";
-import type { BrandGenerationRow } from "@/types";
+import ContentEngine from "@/components/ContentEngine";
+import type { BrandGenerationRow, Plan } from "@/types";
 
 export default async function BrandPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -15,16 +16,20 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
   if (!authData.user) redirect("/login");
 
-  const { data: row } = await supabase
-    .from("brand_generations")
-    .select("id, user_id, input_data, output_data, created_at, favorite, rerolls_used")
-    .eq("id", params.id)
-    .eq("user_id", authData.user.id)
-    .single();
+  const [{ data: row }, { data: userRow }] = await Promise.all([
+    supabase
+      .from("brand_generations")
+      .select("id, user_id, input_data, output_data, created_at, favorite, rerolls_used")
+      .eq("id", params.id)
+      .eq("user_id", authData.user.id)
+      .single(),
+    supabase.from("users").select("plan").eq("id", authData.user.id).single(),
+  ]);
 
   if (!row) notFound();
 
   const generation = row as BrandGenerationRow;
+  const userPlan = (userRow?.plan ?? "free") as Plan;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -73,6 +78,13 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
           <BrandActions
             brandGenerationId={generation.id}
             brandName={generation.output_data.recommendedName}
+          />
+
+          <ContentEngine
+            brandId={generation.id}
+            kit={generation.output_data}
+            input={generation.input_data}
+            plan={userPlan}
           />
 
           <div data-print-hide className="mt-6">

@@ -13,30 +13,34 @@ const PLANS = [
     price: "$0",
     period: "forever",
     desc: "Try the magic before you commit.",
-    features: ["3 brand generations", "Full 12-section brand kit", "Save to your vault", "Copy-to-clipboard"],
+    features: [
+      "3 brand generations",
+      "Full 12-section brand kit",
+      "Save to your vault",
+      "Copy-to-clipboard",
+      "Dark-mode PDF export",
+    ],
     cta: "Start free",
     plan: null,
     highlight: false,
   },
   {
-    name: "Pro",
+    name: "Creator Pro",
     price: "$19",
     period: "/month",
-    desc: "For founders launching real brands.",
-    features: ["Unlimited brand generations", "Unlimited saved brands", "Premium AI outputs", "Priority generation speed"],
-    cta: "Get Pro",
+    desc: "For founders building and growing real brands.",
+    features: [
+      "Unlimited brand generations",
+      "Unlimited saved brands",
+      "Re-Conjure any section",
+      "Keep Growing content engine",
+      "Social posts, captions, blogs & more",
+      "Ad copy, email campaigns, video ideas",
+      "Priority generation speed",
+    ],
+    cta: "Get Creator Pro",
     plan: "pro" as const,
     highlight: true,
-  },
-  {
-    name: "Agency",
-    price: "$49",
-    period: "/month",
-    desc: "For agencies serving clients.",
-    features: ["Everything in Pro", "Client-ready brand kits", "Bulk generation", "White-label-ready output"],
-    cta: "Get Agency",
-    plan: "agency" as const,
-    highlight: false,
   },
 ];
 
@@ -108,7 +112,7 @@ export default function PricingPage() {
             Start free. Upgrade when your brand starts making you money.
           </p>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
             {PLANS.map((p) => (
               <div
                 key={p.name}
