@@ -29,11 +29,11 @@
 | File | Path | Used In | Status |
 |---|---|---|---|
 | Happy Waving | `/public/nix/happy-waving-nix.png` | Homepage Hero, Dashboard greeting | ✅ Live |
-| Thinking | `/public/nix/thinking-nix.png` | FAQ, Loading states | 🔴 Needs generation |
+| Thinking | `/public/nix/thinking-nix.png` | FAQ, Loading states | ✅ Live |
 | Working | `/public/nix/working-nix.png` | Creator Pro | 🔴 Needs generation |
-| Celebrating | `/public/nix/celebrating-nix.png` | Success screens | 🔴 Needs generation |
-| Sleeping | `/public/nix/sleeping-nix.png` | Empty states | 🔴 Needs generation |
-| Magic Wand | `/public/nix/magic-wand-nix.png` | Goblin Labs | 🔴 Needs generation |
+| Celebrating | `/public/nix/celebrating-nix.png` | Success screens | ✅ Live |
+| Sleeping | `/public/nix/sleeping-nix.png` | Empty states | ✅ Live |
+| Conjuring | `/public/nix/conjuring-nix.png` | Goblin Labs | ✅ Live |
 | Artist | `/public/nix/artist-nix.png` | Goblin Studio | 🔴 Needs generation |
 | Scientist | `/public/nix/scientist-nix.png` | Goblin Labs / Experiments | 🔴 Needs generation |
 | Builder | `/public/nix/builder-nix.png` | Goblin Sites | 🔴 Needs generation |
@@ -83,7 +83,7 @@
 | Creator Pro hub | `/public/nix/working-nix.png` |
 | Success / brand generated | `/public/nix/celebrating-nix.png` |
 | FAQ section | `/public/nix/thinking-nix.png` |
-| Goblin Labs | `/public/nix/magic-wand-nix.png` |
+| Goblin Labs | `/public/nix/conjuring-nix.png` |
 | Goblin Studio | `/public/nix/artist-nix.png` |
 | Goblin Sites | `/public/nix/builder-nix.png` |
 | Navbar logo | `/public/logos/brandgoblin-logo.png` |

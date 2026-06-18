@@ -1,26 +1,47 @@
 import Link from "next/link";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Particles from "@/components/Particles";
-import Image from "next/image";
-import { createAdminClient } from "@/lib/supabase/server";
+import HeroTypewriter from "@/components/HeroTypewriter";
+import ComparisonSection from "@/components/ComparisonSection";
+import BrandKitPreview from "@/components/BrandKitPreview";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 const FEATURES = [
-  { emoji: "🏷️", title: "5 Brand Names", desc: "A Goblin-picked favorite plus 4 strong alternatives, each with strategic reasoning.", badge: "Naming" },
-  { emoji: "💬", title: "10 Taglines", desc: "Punchy, on-brand taglines across different tones and angles.", badge: "Copywriting" },
-  { emoji: "📖", title: "Brand Story", desc: "An emotional origin story and customer-focused mission statement.", badge: "Storytelling" },
-  { emoji: "🎭", title: "Brand Voice", desc: "Personality traits, tone examples, and words to use and avoid.", badge: "Strategy" },
-  { emoji: "🐲", title: "Mascot Concept", desc: "Full character brief with appearance, personality, and an AI image prompt.", badge: "Creative" },
-  { emoji: "🎨", title: "Color Palette", desc: "5 brand colors with hex codes and usage notes.", badge: "Design" },
-  { emoji: "🌐", title: "Website Copy", desc: "Hero headline, subhead, CTA, about section, and feature bullets.", badge: "Copy" },
-  { emoji: "📱", title: "Social Media Kit", desc: "Optimized bios for Instagram, X, TikTok plus 5 launch posts.", badge: "Social" },
-  { emoji: "🚀", title: "7-Day Launch Plan", desc: "A day-by-day action checklist to go from idea to launch.", badge: "Launch" },
+  { emoji: "🏷️", title: "5 Brand Names", badge: "Naming", sample: "Solace · Luminary · Drift · Vela · Cairn", desc: "Nix picks a strategic favorite and explains exactly why it wins." },
+  { emoji: "💬", title: "10 Taglines", badge: "Copy", sample: '"Skin that feels like Sunday morning."', desc: "Across tones — punchy, emotional, minimalist, bold, and premium." },
+  { emoji: "🎨", title: "Color Palette", badge: "Design", sample: "#F5E6D3 · #C8A882 · #7B6B5A · #E8D5C4 · #3D3028", desc: "5 colors with hex codes, usage rules, and psychological rationale." },
+  { emoji: "🎭", title: "Brand Voice Guide", badge: "Strategy", sample: "Warm · Science-backed · Gentle · Words to use & avoid", desc: "Personality, tone, vocabulary — so every post sounds like you." },
+  { emoji: "📖", title: "Brand Story", badge: "Storytelling", sample: '"We built Solace because skin should feel like a ritual, not a chore."', desc: "Emotional origin story and customer-focused mission statement." },
+  { emoji: "🐲", title: "Mascot Concept", badge: "Creative", sample: "Full character brief + AI image prompt ready to generate", desc: "Appearance, personality, backstory — your brand's visual identity." },
+  { emoji: "🌐", title: "Website Copy", badge: "Copy", sample: "Hero · Subhead · CTA · About · Features · Footer", desc: "Copy-paste directly into your site. No rewriting required." },
+  { emoji: "📱", title: "Social Media Kit", badge: "Social", sample: "Instagram · X · TikTok · LinkedIn bios + 5 launch posts", desc: "Optimized bios and launch content for every major platform." },
+  { emoji: "🚀", title: "7-Day Launch Plan", badge: "Launch", sample: "Day 1: Announce · Day 3: Story · Day 7: Offer", desc: "A day-by-day checklist from idea to first customer." },
 ];
 
 const HOW_IT_WORKS = [
-  { step: "01", emoji: "💡", title: "Describe your idea", desc: "Tell us your business concept, target audience, and the vibe you're going for. The more specific, the better the magic." },
-  { step: "02", emoji: "🪄", title: "AI summons your brand", desc: "Our AI acts as a world-class branding agency — generating names, voice, visuals, copy, and strategy in under 2 minutes." },
-  { step: "03", emoji: "🚀", title: "Launch with confidence", desc: "Copy-paste a complete brand kit directly into your website, socials, and ad campaigns. Everything you need, nothing you don't." },
+  {
+    step: "01",
+    emoji: "💡",
+    title: "Describe your idea",
+    desc: "Tell Nix your concept, target audience, and vibe. The more specific, the better the magic. Takes 30 seconds.",
+    example: '"A calm, science-backed skincare brand for people overwhelmed by harsh chemicals."',
+  },
+  {
+    step: "02",
+    emoji: "🧌",
+    title: "Nix goes to work",
+    desc: "Nix acts as your brand strategist, copywriter, and creative director — all at once. No back-and-forth. No prompting loops.",
+    example: "12 deliverables generating in parallel...",
+  },
+  {
+    step: "03",
+    emoji: "🚀",
+    title: "Launch with confidence",
+    desc: "Download your complete brand kit. Copy-paste into your site, socials, and ads. You're ready to launch — for real.",
+    example: "Average time from prompt to kit: 1 min 52 sec",
+  },
 ];
 
 const PLANS = [
@@ -29,8 +50,8 @@ const PLANS = [
     price: "$0",
     period: "forever",
     desc: "Try the magic before you commit.",
-    features: ["One complete brand generation", "10 brand names", "Tagline & brand story", "Logo prompts & social bios", "Launch content"],
-    cta: "Generate My Brand",
+    features: ["3 complete brand generations", "All 9 core deliverables", "Color palette + brand names", "Social media kit", "7-day launch plan"],
+    cta: "Generate My Brand Free",
     href: "/signup",
     highlight: false,
     comingSoon: false,
@@ -39,8 +60,16 @@ const PLANS = [
     name: "Creator Pro",
     price: "$19",
     period: "/month",
-    desc: "For founders building and growing real brands.",
-    features: ["Unlimited content generations", "Social posts, blogs & email campaigns", "Ad copy & product descriptions", "Continuous content engine"],
+    desc: "Your AI Marketing Department.",
+    badge: "Most popular",
+    features: [
+      "Unlimited brand generations",
+      "20 content types (posts, blogs, emails, ads)",
+      "7 brand voice modes",
+      "Content history & regeneration",
+      "Creator Pro hub dashboard",
+    ],
+    subtext: "Never stare at a blank caption again.",
     cta: "Get Creator Pro",
     href: "/pricing",
     highlight: true,
@@ -50,8 +79,8 @@ const PLANS = [
     name: "Agency Edition",
     price: "Coming Soon",
     period: "",
-    desc: "For freelancers, consultants, and agencies managing multiple brands.",
-    features: ["Multi-client workspaces", "White-label reports", "Team collaboration", "Agency dashboard"],
+    desc: "For agencies managing multiple brand identities.",
+    features: ["Multi-client workspaces", "White-label brand reports", "Team collaboration tools", "Priority generation queue"],
     cta: "Join Waitlist",
     href: "/pricing",
     highlight: false,
@@ -60,122 +89,88 @@ const PLANS = [
 ];
 
 export default async function LandingPage() {
-  const supabase = createAdminClient();
-  const { data: testimonials } = await supabase
-    .from("brand_testimonials")
-    .select("id, testimonial_text, created_at")
-    .order("created_at", { ascending: false })
-    .limit(6);
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <Navbar />
 
-      {/* ── Hero ── */}
+      {/* ── 1. Hero ── */}
       <section className="relative overflow-hidden py-20 sm:py-28">
-        {/* Grid */}
         <div className="pointer-events-none absolute inset-0 bg-grid" />
-        {/* Mesh glow */}
         <div className="pointer-events-none absolute inset-0 bg-hero-mesh" />
-        {/* Particles */}
         <Particles />
 
         <div className="relative mx-auto max-w-6xl px-4">
           <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
+            <HeroTypewriter />
 
-            {/* ── Left: text ── */}
-            <div className="flex-1 text-center lg:text-left">
-              {/* Badge */}
-              <div className="mb-6 flex justify-center lg:justify-start">
-                <span className="badge-purple">
-                  <span>✦</span> AI-Powered Brand Creation Engine
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1 className="section-heading mb-6 text-5xl sm:text-6xl lg:text-7xl">
-                Launch Your{" "}
-                <span className="gradient-text">Next Brand</span>
-                <br />
-                In Minutes
-              </h1>
-
-              {/* Nix intro line */}
-              <p className="mb-2 text-base font-semibold text-secondary">
-                Hi! I&rsquo;m Nix. What idea are we bringing to life today?
-              </p>
-
-              {/* Subheadline */}
-              <p className="section-sub mb-10 text-lg max-w-xl mx-auto lg:mx-0">
-                Turn <span className="text-secondary font-semibold">any</span> idea into a complete launch-ready brand powered by AI.
-                Names. Logos. Taglines. Mascots. Copy —
-                everything in just one click.
-              </p>
-
-              {/* CTAs */}
-              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
-                <Link href="/signup" className="btn-primary w-full sm:w-auto px-8 py-4 text-lg">
-                  ✦ Generate Your First Brand Free →
-                </Link>
-                <Link href="/pricing" className="btn-secondary w-full sm:w-auto px-8 py-4 text-lg">
-                  See Pricing →
-                </Link>
-              </div>
-
-              <p className="mt-5 text-sm text-faint text-center lg:text-left">
-                No credit card required · 3 free brand kits · Takes ~2 minutes
-              </p>
-            </div>
-
-            {/* ── Right: Nix happy-waving ── */}
-            <div className="flex justify-center lg:flex-none">
+            {/* Nix */}
+            <div className="relative flex justify-center lg:flex-none">
+              <div
+                className="absolute inset-0 rounded-full opacity-40"
+                style={{
+                  background: "radial-gradient(circle, rgba(124,58,237,0.5) 0%, transparent 65%)",
+                  animation: "pulse-glow 3s ease-in-out infinite",
+                }}
+              />
               <Image
                 src="/nix/happy-waving-nix.png"
-                alt="Nix the BrandGoblin wizard waving"
-                width={420}
-                height={420}
-                className="w-64 sm:w-80 lg:w-[420px] drop-shadow-[0_0_40px_rgba(124,58,237,0.4)]"
+                alt="Nix the BrandGoblin AI brand strategist"
+                width={440}
+                height={440}
+                className="relative w-64 sm:w-80 lg:w-[440px] drop-shadow-[0_0_50px_rgba(124,58,237,0.45)]"
                 priority
               />
             </div>
-
-          </div>{/* end flex row */}
+          </div>
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className="bg-section-alt py-24">
+      {/* ── 2. The Real Comparison ── */}
+      <ComparisonSection />
+
+      {/* ── 3. Live Brand Kit Preview ── */}
+      <BrandKitPreview />
+
+      {/* ── 4. Testimonials ── */}
+      <TestimonialsSection />
+
+      {/* ── 5. What You Get (with samples) ── */}
+      <section className="py-28">
         <div className="mx-auto max-w-6xl px-4 text-center">
-          <span className="badge-green mb-6">✦ What's Inside</span>
+          <span className="badge-green mb-6">✦ What's Inside Every Kit</span>
           <h2 className="section-heading mb-4">
-            Everything your launch <span className="gradient-text">needs</span>
+            12 deliverables. <span className="gradient-text">One prompt.</span>
           </h2>
-          <p className="section-sub mb-16">
-            One generation. Twelve deliverables. No designer, copywriter, or agency retainer required.
+          <p className="section-sub mb-16 max-w-2xl mx-auto">
+            No designer, no copywriter, no agency retainer. Nix delivers everything you need to look like a $50K brand — on day one.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
-              <div key={f.title} className="bg-card bg-card-hover p-6 text-left">
+              <div key={f.title} className="bg-card bg-card-hover p-6 text-left group">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-3xl">{f.emoji}</span>
                   <span className="badge-purple text-xs">{f.badge}</span>
                 </div>
-                <h3 className="mb-2 font-display text-lg font-bold text-white">{f.title}</h3>
-                <p className="text-sm text-muted leading-relaxed">{f.desc}</p>
+                <h3 className="mb-1 font-display text-lg font-bold text-white">{f.title}</h3>
+                <p className="mb-3 text-xs text-muted leading-relaxed">{f.desc}</p>
+                <div className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2">
+                  <p className="text-xs font-mono text-secondary leading-relaxed">{f.sample}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── How It Works ── */}
-      <section className="py-24">
+      {/* ── 6. How It Works ── */}
+      <section className="bg-section-alt py-28">
         <div className="mx-auto max-w-5xl px-4 text-center">
           <span className="badge-purple mb-6">✦ How It Works</span>
           <h2 className="section-heading mb-4">
-            Three steps to a <span className="gradient-text">complete brand</span>
+            From blank page to <span className="gradient-text">launch-ready brand</span>
           </h2>
           <p className="section-sub mb-16">
-            From blank page to launch-ready brand kit in under two minutes.
+            Three steps. Under two minutes. No design skills required.
           </p>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {HOW_IT_WORKS.map((step, i) => (
@@ -184,16 +179,19 @@ export default async function LandingPage() {
                   <span className="font-display text-4xl font-black text-primary/30">{step.step}</span>
                   <span className="text-3xl">{step.emoji}</span>
                 </div>
-                <h3 className="mb-3 font-display text-xl font-bold text-white">{step.title}</h3>
-                <p className="text-sm text-muted leading-relaxed">{step.desc}</p>
+                <h3 className="mb-2 font-display text-xl font-bold text-white">{step.title}</h3>
+                <p className="mb-4 text-sm text-muted leading-relaxed">{step.desc}</p>
+                <div className="rounded-lg bg-primary/8 border border-primary/15 px-3 py-2">
+                  <p className="text-xs font-mono text-secondary italic leading-relaxed">{step.example}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Pricing ── */}
-      <section className="bg-section-alt py-24">
+      {/* ── 7. Pricing ── */}
+      <section className="py-28">
         <div className="mx-auto max-w-5xl px-4 text-center">
           <span className="badge-green mb-6">✦ Pricing</span>
           <h2 className="section-heading mb-4">
@@ -203,11 +201,11 @@ export default async function LandingPage() {
             Start free. Upgrade when your brand starts making you money.
           </p>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {PLANS.map((plan) => (
+            {PLANS.map((plan) =>
               plan.comingSoon ? (
                 <div
                   key={plan.name}
-                  className="relative flex flex-col p-6 text-left rounded-2xl border-2 border-dashed border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,15,0.6)] opacity-90"
+                  className="relative flex flex-col p-6 text-left rounded-2xl border-2 border-dashed border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,15,0.6)]"
                 >
                   <span className="mb-4 self-start rounded-full border border-yellow-500/40 bg-yellow-500/10 px-3 py-0.5 text-xs font-bold text-yellow-400 tracking-widest uppercase">
                     🚧 Coming Soon
@@ -225,10 +223,7 @@ export default async function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link
-                    href={plan.href}
-                    className="w-full rounded-xl border border-primary/30 bg-primary/10 py-3 text-center text-sm font-semibold text-primary-light transition hover:bg-primary/20"
-                  >
+                  <Link href={plan.href} className="w-full rounded-xl border border-primary/30 bg-primary/10 py-3 text-center text-sm font-semibold text-primary-light transition hover:bg-primary/20">
                     {plan.cta}
                   </Link>
                   <p className="mt-3 text-center text-xs text-faint">🧌 Goblin Labs</p>
@@ -236,15 +231,16 @@ export default async function LandingPage() {
               ) : (
                 <div
                   key={plan.name}
-                  className={`bg-card bg-card-hover flex flex-col p-6 text-left ${
-                    plan.highlight ? "border-primary/50 shadow-glow" : ""
-                  }`}
+                  className={`bg-card bg-card-hover flex flex-col p-6 text-left ${plan.highlight ? "border-primary/50 shadow-glow" : ""}`}
                 >
-                  {plan.highlight && (
-                    <span className="badge-purple mb-4 self-start">Most popular</span>
+                  {"badge" in plan && plan.badge && (
+                    <span className="badge-purple mb-4 self-start">{plan.badge}</span>
                   )}
                   <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
-                  <p className="mt-1 mb-4 text-sm text-muted">{plan.desc}</p>
+                  <p className="mt-1 mb-1 text-sm text-muted">{plan.desc}</p>
+                  {"subtext" in plan && plan.subtext && (
+                    <p className="mb-4 text-xs font-semibold text-secondary">{plan.subtext}</p>
+                  )}
                   <div className="mb-6 flex items-baseline gap-1">
                     <span className="font-display text-4xl font-black text-white">{plan.price}</span>
                     <span className="text-sm text-faint">{plan.period}</span>
@@ -252,74 +248,64 @@ export default async function LandingPage() {
                   <ul className="mb-8 flex-1 space-y-2">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                        <span className="text-secondary mt-0.5">✓</span>
+                        <span className="text-secondary mt-0.5 shrink-0">✓</span>
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Link
-                    href={plan.href}
-                    className={plan.highlight ? "btn-primary" : "btn-secondary"}
-                  >
+                  <Link href={plan.href} className={plan.highlight ? "btn-primary" : "btn-secondary"}>
                     {plan.cta}
                   </Link>
                 </div>
               )
-            ))}
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
-      {testimonials && testimonials.length > 0 && (
-        <section className="py-20 px-4">
-          <div className="mx-auto max-w-5xl">
-            <div className="mb-12 text-center">
-              <span className="badge-purple mb-4 inline-block">⭐ From the vault</span>
-              <h2 className="section-heading mb-3">
-                Founders who took the <span className="gradient-text">leap</span>
-              </h2>
-              <p className="section-sub">Real feedback from real brand builders.</p>
-            </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {testimonials.map((t: { id: string; testimonial_text: string; created_at: string }) => (
-                <div
-                  key={t.id}
-                  className="bg-card flex flex-col gap-4 p-6"
-                >
-                  <div className="flex gap-0.5 text-yellow-400 text-sm">
-                    {"★★★★★"}
-                  </div>
-                  <p className="text-sm text-muted leading-relaxed flex-1">
-                    &ldquo;{t.testimonial_text}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-2 pt-2 border-t border-[rgba(45,45,78,0.4)]">
-                    <span className="h-7 w-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-bold text-primary-light">
-                      🧌
-                    </span>
-                    <span className="text-xs text-faint">BrandGoblin Founder</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* ── 8. Final CTA ── */}
+      <section className="py-24 bg-section-alt">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-12 text-center">
+            {/* BG glow */}
+            <div className="pointer-events-none absolute inset-0 bg-hero-mesh opacity-40" />
 
-      {/* ── Final CTA ── */}
-      <section className="py-24 text-center">
-        <div className="mx-auto max-w-2xl px-4">
-          <div className="bg-card p-12">
-            <span className="logo-glow mb-4 block text-6xl">🪄</span>
-            <h2 className="section-heading mb-4">
-              Your next brand is one <span className="gradient-text">idea away</span>
-            </h2>
-            <p className="section-sub mb-8">
-              Join founders summoning launch-ready brands in minutes, not months.
-            </p>
-            <Link href="/signup" className="btn-primary mx-auto inline-flex px-10 py-4 text-lg">
-              ✦ Generate Your First Brand Free →
-            </Link>
+            <div className="relative">
+              <Image
+                src="/nix/conjuring-nix.png"
+                alt="Nix conjuring your brand"
+                width={160}
+                height={160}
+                className="mx-auto mb-6 drop-shadow-[0_0_30px_rgba(124,58,237,0.6)]"
+              />
+
+              <div className="mb-4 inline-flex items-center gap-2 rounded-2xl border border-secondary/30 bg-secondary/10 px-4 py-2">
+                <span className="text-sm font-medium text-secondary">🧌 Nix has a message for you</span>
+              </div>
+
+              <h2 className="section-heading mb-4 text-4xl sm:text-5xl">
+                Your brand is one <span className="gradient-text">idea away.</span>
+              </h2>
+              <p className="section-sub mb-3 text-lg max-w-xl mx-auto">
+                While your competitors are still on their 47th ChatGPT prompt, you could already be launched.
+              </p>
+              <p className="text-sm text-faint mb-10">
+                No credit card. No design skills. No agency retainer. Just you, your idea, and Nix.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/signup" className="btn-primary px-10 py-4 text-lg">
+                  ✦ Generate My Brand Free →
+                </Link>
+                <Link href="/pricing" className="btn-secondary px-8 py-4 text-base">
+                  See what's included
+                </Link>
+              </div>
+
+              <p className="mt-6 text-xs text-faint">
+                3 free brand kits · No card required · Takes ~2 minutes
+              </p>
+            </div>
           </div>
         </div>
       </section>

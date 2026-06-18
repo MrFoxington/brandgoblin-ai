@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { BrandKit, BrandInput, NameStrengthCheck } from "@/types";
 import CopyButton from "./CopyButton";
 import BrandNamesSection from "./BrandNamesSection";
@@ -141,6 +142,21 @@ export default function BrandKitView({
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+
+      {/* Success banner */}
+      <div className="lg:col-span-2 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 px-6 py-5 flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:gap-6 text-center sm:text-left">
+        <Image
+          src="/nix/celebrating-nix.png"
+          alt="Nix celebrating"
+          width={100}
+          height={100}
+          className="shrink-0 drop-shadow-[0_0_16px_rgba(124,58,237,0.5)]"
+        />
+        <div>
+          <p className="font-display text-xl font-extrabold text-white">🎉 Your brand has been conjured!</p>
+          <p className="text-sm text-muted mt-1">Nix worked his magic. Your complete brand kit is ready below.</p>
+        </div>
+      </div>
 
       {/* 1. Brand Names — spans full width */}
       <div className="lg:col-span-2">

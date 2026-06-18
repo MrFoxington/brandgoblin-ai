@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import CopyButton from "./CopyButton";
-import NixAvatar from "./NixAvatar";
 import type { CreatorContentType, BrandVoiceMode, CreatorContentRow, BrandGenerationRow } from "@/types";
 
 // ─── Config ────────────────────────────────────────────────────────────────
@@ -214,26 +214,32 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
     <div className="space-y-8">
 
       {/* ── Hero header ── */}
-      <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 px-8 py-10 text-center">
-        <div className="flex justify-center mb-4">
-          <NixAvatar size="lg" glow />
+      <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 px-8 py-8 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-8 sm:text-left text-center">
+        <Image
+          src="/nix/working-nix.png"
+          alt="Nix working on your campaign"
+          width={130}
+          height={130}
+          className="shrink-0 drop-shadow-[0_0_20px_rgba(124,58,237,0.5)]"
+          priority
+        />
+        <div>
+          <div className="inline-flex items-center gap-2 mb-2">
+            <span className="badge-purple">Creator Pro</span>
+          </div>
+          <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-1">
+            Your AI Marketing Department
+          </h1>
+          <p className="text-sm text-secondary font-medium mb-3">
+            Nix is preparing your next campaign.
+          </p>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-6 gap-y-1 text-sm text-muted">
+            <span>Unlimited copywriter.</span>
+            <span>Unlimited social media manager.</span>
+            <span>Unlimited content strategist.</span>
+            <span>Unlimited marketing ideas.</span>
+          </div>
         </div>
-        <div className="inline-flex items-center gap-2 mb-3">
-          <span className="badge-purple">Creator Pro</span>
-        </div>
-        <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-2">
-          Your AI Marketing Department
-        </h1>
-        <p className="text-sm text-secondary font-medium mb-3">
-          🧙 Nix is preparing your next campaign.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-sm text-muted mb-1">
-          <span>Unlimited copywriter.</span>
-          <span>Unlimited social media manager.</span>
-          <span>Unlimited content strategist.</span>
-          <span>Unlimited marketing ideas.</span>
-        </div>
-        <p className="text-xs text-faint mt-2">All for $19/month.</p>
       </div>
 
       {/* ── Brand + Voice selectors ── */}

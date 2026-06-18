@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import NixAvatar from "@/components/NixAvatar";
+import Image from "next/image";
 
 const MESSAGES = [
   { text: "🧙 Nix is working his magic…" },
@@ -26,7 +26,7 @@ export default function LoadingScreen() {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 text-center px-4">
-      <div className="relative flex h-36 w-36 items-center justify-center">
+      <div className="relative flex items-center justify-center">
         <div
           className="absolute inset-0 rounded-full"
           style={{
@@ -34,7 +34,14 @@ export default function LoadingScreen() {
             animation: "pulse-glow 2.2s ease-in-out infinite",
           }}
         />
-        <NixAvatar size="xl" glow />
+        <Image
+          src="/nix/thinking-nix.png"
+          alt="Nix is thinking"
+          width={180}
+          height={180}
+          className="relative drop-shadow-[0_0_20px_rgba(124,58,237,0.5)]"
+          priority
+        />
       </div>
 
       <div className="space-y-2">

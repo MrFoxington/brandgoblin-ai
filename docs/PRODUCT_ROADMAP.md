@@ -68,8 +68,8 @@
 | `thinking-nix.png` | ⭐⭐⭐⭐⭐ | 🔴 Pending |
 | `working-nix.png` | ⭐⭐⭐⭐⭐ | 🔴 Pending |
 | `celebrating-nix.png` | ⭐⭐⭐⭐⭐ | 🔴 Pending |
-| `sleeping-nix.png` | ⭐⭐⭐⭐⭐ | 🔴 Pending |
-| `magic-wand-nix.png` | ⭐⭐⭐⭐⭐ | 🔴 Pending |
+| `sleeping-nix.png` | ⭐⭐⭐⭐⭐ | ✅ Live |
+| `conjuring-nix.png` | ⭐⭐⭐⭐⭐ | ✅ Live |
 | `creator-pro-badge.png` | ⭐⭐⭐⭐ | 🔴 Pending |
 | `goblin-labs-badge.png` | ⭐⭐⭐⭐ | 🔴 Pending |
 | `goblin-studio-badge.png` | ⭐⭐⭐⭐ | 🔴 Pending |
