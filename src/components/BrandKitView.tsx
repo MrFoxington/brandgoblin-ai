@@ -74,9 +74,19 @@ function Chip({ children, green }: { children: React.ReactNode; green?: boolean 
   );
 }
 
-export default function BrandKitView({ kit: initialKit, brandInput }: { kit: BrandKit; brandInput?: BrandInput }) {
+export default function BrandKitView({
+  kit: initialKit,
+  brandInput,
+  brandGenerationId,
+  initialRerollsUsed = [],
+}: {
+  kit: BrandKit;
+  brandInput?: BrandInput;
+  brandGenerationId?: string;
+  initialRerollsUsed?: string[];
+}) {
   const [kit, setKit] = useState<BrandKit>(initialKit);
-  const [rerollsUsed, setRerollsUsed] = useState<Set<string>>(new Set());
+  const [rerollsUsed, setRerollsUsed] = useState<Set<string>>(new Set(initialRerollsUsed));
   const [rerolling, setRerolling] = useState<string | null>(null);
   const [rerollErrors, setRerollErrors] = useState<Record<string, string>>({});
 
@@ -94,6 +104,7 @@ export default function BrandKitView({ kit: initialKit, brandInput }: { kit: Bra
           brandName: kit.recommendedName,
           input: brandInput,
           kit,
+          brandGenerationId,
         }),
       });
 

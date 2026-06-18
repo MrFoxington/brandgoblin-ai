@@ -17,7 +17,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
   const { data: row } = await supabase
     .from("brand_generations")
-    .select("id, user_id, input_data, output_data, created_at, favorite")
+    .select("id, user_id, input_data, output_data, created_at, favorite, rerolls_used")
     .eq("id", params.id)
     .eq("user_id", authData.user.id)
     .single();
@@ -63,7 +63,12 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
             <p className="mt-3 text-sm text-faint max-w-xl mx-auto">{generation.input_data.businessIdea}</p>
           </div>
 
-          <BrandKitView kit={generation.output_data} brandInput={generation.input_data} />
+          <BrandKitView
+            kit={generation.output_data}
+            brandInput={generation.input_data}
+            brandGenerationId={generation.id}
+            initialRerollsUsed={(generation as { rerolls_used?: string[] }).rerolls_used ?? []}
+          />
 
           <BrandActions
             brandGenerationId={generation.id}

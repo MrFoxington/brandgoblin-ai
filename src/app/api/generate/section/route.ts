@@ -105,9 +105,10 @@ export async function POST(request: Request) {
     brandName: string;
     input: BrandInput;
     kit: Partial<BrandKit>;
+    brandGenerationId?: string;
   };
 
-  const { section, brandName, input, kit } = body;
+  const { section, brandName, input, kit, brandGenerationId } = body;
 
   if (!VALID_SECTIONS.includes(section as SectionKey)) {
     return NextResponse.json({ error: "Invalid section." }, { status: 400 });
@@ -129,6 +130,26 @@ export async function POST(request: Request) {
 
     const raw = textBlock.text.replace(/```(?:json)?\s*/gi, "").replace(/```/g, "").trim();
     const data = JSON.parse(raw);
+
+    // Persist updated section + mark reroll used in Supabase
+    if (brandGenerationId) {
+      const { data: existing } = await supabase
+        .from("brand_generations")
+        .select("output_data, rerolls_used")
+        .eq("id", brandGenerationId)
+        .eq("user_id", authData.user.id)
+        .single();
+
+      if (existing) {
+        const updatedOutput = { ...(existing.output_data as object), ...data };
+        const updatedRerolls = [...(existing.rerolls_used ?? []), section];
+        await supabase
+          .from("brand_generations")
+          .update({ output_data: updatedOutput, rerolls_used: updatedRerolls })
+          .eq("id", brandGenerationId)
+          .eq("user_id", authData.user.id);
+      }
+    }
 
     return NextResponse.json({ section, data });
   } catch (err) {
