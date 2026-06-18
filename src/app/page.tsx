@@ -29,20 +29,33 @@ const PLANS = [
     price: "$0",
     period: "forever",
     desc: "Try the magic before you commit.",
-    features: ["3 brand generations", "Full 12-section brand kit", "Save to your vault", "Dark-mode PDF export"],
-    cta: "Start free",
+    features: ["One complete brand generation", "10 brand names", "Tagline & brand story", "Logo prompts & social bios", "Launch content"],
+    cta: "Generate My Brand",
     href: "/signup",
     highlight: false,
+    comingSoon: false,
   },
   {
     name: "Creator Pro",
     price: "$19",
     period: "/month",
     desc: "For founders building and growing real brands.",
-    features: ["Unlimited brand generations", "Keep Growing content engine", "Social posts, captions, blogs & ads", "Priority generation speed"],
+    features: ["Unlimited content generations", "Social posts, blogs & email campaigns", "Ad copy & product descriptions", "Continuous content engine"],
     cta: "Get Creator Pro",
     href: "/pricing",
     highlight: true,
+    comingSoon: false,
+  },
+  {
+    name: "Agency Edition",
+    price: "Coming Soon",
+    period: "",
+    desc: "For freelancers, consultants, and agencies managing multiple brands.",
+    features: ["Multi-client workspaces", "White-label reports", "Team collaboration", "Agency dashboard"],
+    cta: "Join Waitlist",
+    href: "/pricing",
+    highlight: false,
+    comingSoon: true,
   },
 ];
 
@@ -175,38 +188,69 @@ export default async function LandingPage() {
           <p className="section-sub mb-16">
             Start free. Upgrade when your brand starts making you money.
           </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {PLANS.map((plan) => (
-              <div
-                key={plan.name}
-                className={`bg-card bg-card-hover flex flex-col p-6 text-left ${
-                  plan.highlight ? "border-primary/50 shadow-glow" : ""
-                }`}
-              >
-                {plan.highlight && (
-                  <span className="badge-purple mb-4 self-start">Most popular</span>
-                )}
-                <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
-                <p className="mt-1 mb-4 text-sm text-muted">{plan.desc}</p>
-                <div className="mb-6 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-black text-white">{plan.price}</span>
-                  <span className="text-sm text-faint">{plan.period}</span>
-                </div>
-                <ul className="mb-8 flex-1 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                      <span className="text-secondary mt-0.5">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={plan.href}
-                  className={plan.highlight ? "btn-primary" : "btn-secondary"}
+              plan.comingSoon ? (
+                <div
+                  key={plan.name}
+                  className="relative flex flex-col p-6 text-left rounded-2xl border-2 border-dashed border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,15,0.6)] opacity-90"
                 >
-                  {plan.cta}
-                </Link>
-              </div>
+                  <span className="mb-4 self-start rounded-full border border-yellow-500/40 bg-yellow-500/10 px-3 py-0.5 text-xs font-bold text-yellow-400 tracking-widest uppercase">
+                    🚧 Coming Soon
+                  </span>
+                  <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
+                  <p className="mt-1 mb-4 text-sm text-muted">{plan.desc}</p>
+                  <div className="mb-6">
+                    <span className="font-display text-2xl font-black text-faint">{plan.price}</span>
+                  </div>
+                  <ul className="mb-8 flex-1 space-y-2">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-muted/70">
+                        <span className="text-primary/50 mt-0.5 shrink-0">✦</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={plan.href}
+                    className="w-full rounded-xl border border-primary/30 bg-primary/10 py-3 text-center text-sm font-semibold text-primary-light transition hover:bg-primary/20"
+                  >
+                    {plan.cta}
+                  </Link>
+                  <p className="mt-3 text-center text-xs text-faint">🧌 Goblin Labs</p>
+                </div>
+              ) : (
+                <div
+                  key={plan.name}
+                  className={`bg-card bg-card-hover flex flex-col p-6 text-left ${
+                    plan.highlight ? "border-primary/50 shadow-glow" : ""
+                  }`}
+                >
+                  {plan.highlight && (
+                    <span className="badge-purple mb-4 self-start">Most popular</span>
+                  )}
+                  <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
+                  <p className="mt-1 mb-4 text-sm text-muted">{plan.desc}</p>
+                  <div className="mb-6 flex items-baseline gap-1">
+                    <span className="font-display text-4xl font-black text-white">{plan.price}</span>
+                    <span className="text-sm text-faint">{plan.period}</span>
+                  </div>
+                  <ul className="mb-8 flex-1 space-y-2">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-muted">
+                        <span className="text-secondary mt-0.5">✓</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={plan.href}
+                    className={plan.highlight ? "btn-primary" : "btn-secondary"}
+                  >
+                    {plan.cta}
+                  </Link>
+                </div>
+              )
             ))}
           </div>
         </div>

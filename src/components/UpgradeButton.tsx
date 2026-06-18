@@ -6,7 +6,7 @@ export default function UpgradeButton({
   plan,
   label,
 }: {
-  plan: "pro" | "agency";
+  plan: "pro";
   label: string;
 }) {
   const [loading, setLoading] = useState(false);
