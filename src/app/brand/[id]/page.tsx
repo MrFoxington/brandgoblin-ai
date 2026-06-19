@@ -8,7 +8,8 @@ import FavoriteToggle from "@/components/FavoriteToggle";
 import GoblinFeedback from "@/components/GoblinFeedback";
 import BrandActions from "@/components/BrandActions";
 import ContentEngine from "@/components/ContentEngine";
-import { startTrialIfEligible } from "@/lib/trial";
+import { headers } from "next/headers";
+import { startTrialIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan } from "@/lib/access";
 import type { BrandGenerationRow, Plan } from "@/types";
 
@@ -18,7 +19,12 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
   if (!authData.user) redirect("/login");
 
-  await startTrialIfEligible(authData.user.id);
+  const rawIp = headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  await startTrialIfEligible(authData.user.id, {
+    email: authData.user.email ?? "",
+    emailConfirmedAt: authData.user.email_confirmed_at ?? null,
+    ipHash: rawIp ? hashIp(rawIp) : undefined,
+  });
 
   const [{ data: row }, { data: userRow }] = await Promise.all([
     supabase

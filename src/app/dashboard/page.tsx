@@ -8,7 +8,8 @@ import DailyCreatorDashboard from "@/components/DailyCreatorDashboard";
 import PaymentRecoveryBanner from "@/components/PaymentRecoveryBanner";
 import TrialCountdownBanner from "@/components/TrialCountdownBanner";
 import TrialEndScreen from "@/components/TrialEndScreen";
-import { startTrialIfEligible } from "@/lib/trial";
+import { headers } from "next/headers";
+import { startTrialIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan, isTrialing, trialDaysLeft, trialExpired } from "@/lib/access";
 import type { BrandGenerationRow } from "@/types";
 
@@ -18,7 +19,12 @@ export default async function DashboardPage() {
   if (!authData.user) redirect("/login");
 
   // Start 7-day trial for brand-new users (idempotent — guarded by has_used_trial)
-  await startTrialIfEligible(authData.user.id);
+  const rawIp = headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  await startTrialIfEligible(authData.user.id, {
+    email: authData.user.email ?? "",
+    emailConfirmedAt: authData.user.email_confirmed_at ?? null,
+    ipHash: rawIp ? hashIp(rawIp) : undefined,
+  });
 
   const [{ data: userRow }, { data: generations }] = await Promise.all([
     supabase.from("users").select("credits, plan, payment_status, is_trial, trial_ends_at, has_used_trial").eq("id", authData.user.id).single(),
