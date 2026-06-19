@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { BRAND_GOBLIN_SYSTEM_PROMPT } from "@/lib/prompts";
 import { checkEnergyForGeneration, deductEnergy, refundEnergy } from "@/lib/energy";
+import { getEffectivePlan } from "@/lib/access";
+import { expireTrialIfNeeded } from "@/lib/trial";
 import type { CreatorContentType, BrandVoiceMode } from "@/types";
 
 export const runtime = "nodejs";
@@ -141,9 +143,15 @@ export async function POST(request: Request) {
   }
 
   const { data: userRow } = await supabase
-    .from("users").select("plan").eq("id", authData.user.id).single();
+    .from("users").select("plan, is_trial, trial_ends_at").eq("id", authData.user.id).single();
 
-  if (!userRow || userRow.plan === "free") {
+  if (!userRow) {
+    return NextResponse.json({ error: "Creator Pro required.", upgrade: true }, { status: 403 });
+  }
+
+  await expireTrialIfNeeded(authData.user.id, userRow);
+
+  if (getEffectivePlan(userRow) === "free") {
     return NextResponse.json({ error: "Creator Pro required.", upgrade: true }, { status: 403 });
   }
 

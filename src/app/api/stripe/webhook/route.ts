@@ -56,10 +56,10 @@ export async function POST(request: Request) {
         console.log(`[webhook] energy refill added for user ${userId}`);
 
       } else {
-        // 🆕 New Creator Pro subscription
+        // 🆕 New Creator Pro subscription — clear trial flag so state is unambiguous
         await supabase
           .from("users")
-          .update({ plan: "pro", credits: PRO_CREDITS, stripe_customer_id: customerId })
+          .update({ plan: "pro", credits: PRO_CREDITS, stripe_customer_id: customerId, is_trial: false })
           .eq("id", userId);
 
         // Determine billing period from subscription if available

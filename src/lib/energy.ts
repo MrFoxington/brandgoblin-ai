@@ -3,6 +3,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { ENERGY_CONFIG, getEnergyCost } from "@/lib/energy-config";
+import { getEffectivePlan } from "@/lib/access";
 
 export interface EnergyBalance {
   monthlyTotal: number;
@@ -50,14 +51,29 @@ export async function checkEnergyForGeneration(
 ): Promise<EnergyCheckResult> {
   const supabase = createAdminClient();
 
-  // Verify plan
+  // Verify access — check trial columns so getEffectivePlan can include active trials
   const { data: userRow } = await supabase
     .from("users")
-    .select("plan")
+    .select("plan, is_trial, trial_ends_at")
     .eq("id", userId)
     .single();
 
-  if (!userRow || userRow.plan === "free") {
+  if (!userRow) return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
+
+  // Lazy trial expiry — inline to avoid circular import with trial.ts
+  if (
+    userRow.is_trial &&
+    userRow.trial_ends_at &&
+    new Date(userRow.trial_ends_at) <= new Date() &&
+    userRow.plan !== "pro" &&
+    userRow.plan !== "agency"
+  ) {
+    await supabase.from("users").update({ is_trial: false }).eq("id", userId);
+    await revokeEnergy(userId);
+    return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
+  }
+
+  if (getEffectivePlan(userRow) === "free") {
     return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
   }
 

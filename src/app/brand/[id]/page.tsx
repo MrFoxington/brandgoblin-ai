@@ -8,6 +8,8 @@ import FavoriteToggle from "@/components/FavoriteToggle";
 import GoblinFeedback from "@/components/GoblinFeedback";
 import BrandActions from "@/components/BrandActions";
 import ContentEngine from "@/components/ContentEngine";
+import { startTrialIfEligible } from "@/lib/trial";
+import { getEffectivePlan } from "@/lib/access";
 import type { BrandGenerationRow, Plan } from "@/types";
 
 export default async function BrandPage({ params }: { params: { id: string } }) {
@@ -16,6 +18,8 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
   if (!authData.user) redirect("/login");
 
+  await startTrialIfEligible(authData.user.id);
+
   const [{ data: row }, { data: userRow }] = await Promise.all([
     supabase
       .from("brand_generations")
@@ -23,13 +27,17 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
       .eq("id", params.id)
       .eq("user_id", authData.user.id)
       .single(),
-    supabase.from("users").select("plan").eq("id", authData.user.id).single(),
+    supabase.from("users").select("plan, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
   ]);
 
   if (!row) notFound();
 
   const generation = row as BrandGenerationRow;
-  const userPlan = (userRow?.plan ?? "free") as Plan;
+  const userPlan = getEffectivePlan({
+    plan: userRow?.plan ?? "free",
+    is_trial: userRow?.is_trial ?? false,
+    trial_ends_at: userRow?.trial_ends_at ?? null,
+  }) as Plan;
 
   return (
     <div className="flex min-h-screen flex-col">
