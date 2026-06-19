@@ -8,6 +8,8 @@ import BrandNamesSection from "./BrandNamesSection";
 import GoblinFavoritePick from "./GoblinFavoritePick";
 import BrandDNA from "./BrandDNA";
 import ContinueBuilding from "./ContinueBuilding";
+import ShareCard from "./ShareCard";
+import UpgradeNudge from "./UpgradeNudge";
 import NixPose from "./primitives/NixPose";
 import Sparkles from "./primitives/Sparkles";
 import { RevealProvider, RevealCard, SkipRevealButton } from "./primitives/Reveal";
@@ -105,9 +107,9 @@ function CompleteMoment({ onDone }: { onDone: () => void }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function BrandKitView({
-  kit: initialKit, brandInput, brandGenerationId, initialRerollsUsed = [],
+  kit: initialKit, brandInput, brandGenerationId, initialRerollsUsed = [], userPlan = "free",
 }: {
-  kit: BrandKit; brandInput?: BrandInput; brandGenerationId?: string; initialRerollsUsed?: string[];
+  kit: BrandKit; brandInput?: BrandInput; brandGenerationId?: string; initialRerollsUsed?: string[]; userPlan?: "free" | "pro" | "agency";
 }) {
   const [kit, setKit] = useState<BrandKit>(initialKit);
   const [rerollsUsed, setRerollsUsed] = useState<Set<string>>(new Set(initialRerollsUsed));
@@ -408,11 +410,18 @@ export default function BrandKitView({
               <NixPose pose="waving" size={56} float={false} glow={false} animated={false} />
               <div>
                 <p className="font-display font-black text-white">
-                  &ldquo;{["Magic complete!", "I'd buy from this brand.", "This makes me smile.", "I can see customers loving this.", "I've got a good feeling about this."][Math.floor(Math.random() * 5)]}&rdquo;
+                  &ldquo;{["Magic complete!", "I&apos;d buy from this brand.", "This makes me smile.", "I can see customers loving this.", "I&apos;ve got a good feeling about this."][Math.floor(Math.random() * 5)]}&rdquo;
                 </p>
                 <p className="text-xs text-muted mt-0.5">— Nix, your brand goblin</p>
               </div>
             </motion.div>
+
+            {/* Share card — always visible */}
+            <ShareCard kit={kit} />
+
+            {/* Upgrade nudge — free users only, shown in-context before ContinueBuilding */}
+            {userPlan === "free" && <UpgradeNudge />}
+
             <ContinueBuilding brandId={brandGenerationId} />
           </div>
         )}

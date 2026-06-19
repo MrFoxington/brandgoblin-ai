@@ -78,6 +78,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
             brandInput={generation.input_data}
             brandGenerationId={generation.id}
             initialRerollsUsed={(generation as { rerolls_used?: string[] }).rerolls_used ?? []}
+            userPlan={userPlan}
           />
 
           <BrandActions
