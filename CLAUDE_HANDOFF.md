@@ -31,21 +31,52 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ⚠️ HONEST STATUS (June 18, 2026) — READ FIRST
+## ⚠️ HONEST STATUS (updated June 18, 2026 — evening) — READ FIRST
 
-**Pre-revenue. The app cannot take money yet.** Specifics:
+**Pre-revenue, but actively wiring up payments in Stripe TEST mode.**
 
-- **Stripe is not switched on.** No `STRIPE_SECRET_KEY` / `STRIPE_PRICE_ID_PRO` /
-  `STRIPE_WEBHOOK_SECRET` in the live environment. The "$19/mo Creator Pro" button cannot charge.
-- **Not pointed at a public domain.** `NEXT_PUBLIC_APP_URL` is still `localhost:3000`.
-  Confirm the real Vercel domain before launch.
-- **Fixed this session:** a latent payment-killer bug — the `users` table had no
-  `stripe_customer_id` column, so a paid upgrade could never be written back. Migration added
-  (`supabase/migrations/20260618_add_stripe_customer_id.sql`). **Must be run in Supabase.**
-- **Testimonials are placeholders.** Zero real customers so far.
-- **Working correctly:** brand generation, auth, free-tier credit enforcement, dashboard.
+### 🌅 TOMORROW — START HERE
+1. **Commit the last code change** (idempotency fix is staged but not committed — the sandbox
+   couldn't write to `.git`). In Terminal:
+   ```
+   cd "/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai"
+   rm -f .git/index.lock
+   git add -A
+   git commit -m "Add refill idempotency: app guard + ledger-first write + unique index"
+   ```
+2. **Finish the local Stripe test purchase** (test mode):
+   - Terminal 1: `stripe listen --forward-to localhost:3000/api/stripe/webhook` → put the
+     `whsec_…` into `.env.local`
+   - Terminal 2: `npm run dev`
+   - Browser: upgrade to Pro, then buy an energy refill with card `4242 4242 4242 4242`
+   - Verify in Supabase `user_energy_balances`: refill energy goes up exactly once.
+   - Prove idempotency: `stripe events resend <evt_id>` → balance must NOT change again.
+3. **Then promote to live Vercel** — Step 2 of `docs/LAUNCH_CHECKLIST.md` (live keys, real
+   domain in `NEXT_PUBLIC_APP_URL`, webhook endpoint pointed at the public URL).
 
-➡️ **The path to first dollar is in `docs/LAUNCH_CHECKLIST.md`.** Do that before any new features.
+### ✅ Done so far
+- **Stripe checkout + webhook hardened** (committed `392ad9e`): fails loudly on missing keys,
+  reuses Stripe customer, blocks live-key-on-localhost, re-grants Pro on renewal.
+- **Creative Energy system** built (committed `d3cf835`): monthly allowance + $19 refills,
+  energy gating on Creator Pro content, transaction ledger.
+- **Refill idempotency fix** (STAGED, not yet committed — see step 1): app guard + ledger-first
+  write + DB unique index, so a duplicate webhook can't double-grant a $19 refill.
+- **DB migrations run in Supabase:** energy tables, energy idempotency index, and
+  `stripe_customer_id` column — all applied. ✅
+- **`.env.local`** has Stripe TEST slots + energy vars. Fox is filling in the test keys.
+
+### ⚠️ Still open / known issues
+- **Gotcha:** `STRIPE_PRICE_ID_ENERGY_REFILL` must be a **one-time** price; `STRIPE_PRICE_ID_PRO`
+  the **recurring** one. Mixing them up throws a checkout error.
+- **`deductEnergy` is not atomic** (read-modify-write) — concurrent generations could overspend.
+  Future fix: a Postgres decrement function. Low priority for now.
+- **Dual metering:** brand-kit generation still uses old `credits`; only Creator Pro content uses
+  energy. `brand_generation: 50` in energy-config is currently unused. Decide if intentional.
+- **Monthly reset is heuristic** (on `subscription.updated`). More robust:
+  `invoice.payment_succeeded` + `billing_reason: subscription_cycle`.
+- **Testimonials still placeholder; zero real customers.**
+
+➡️ Full launch path: `docs/LAUNCH_CHECKLIST.md`.
 
 ---
 
@@ -263,4 +294,4 @@ src/
 
 ---
 
-*Last updated: June 18, 2026 — Stripe hardening + stripe_customer_id migration + launch checklist. See docs/LAUNCH_CHECKLIST.md.*
+*Last updated: June 18, 2026 (evening) — Creative Energy review + refill idempotency fix + all DB migrations applied in Supabase. Stripe in test mode, mid-rehearsal. Resume at "🌅 TOMORROW — START HERE" up top.*

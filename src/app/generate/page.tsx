@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useXP } from "@/components/XPSystem";
+import { useToast } from "@/components/NixToast";
 import type { BrandInput, BrandTrait, NameMode } from "@/types";
 
 const TRAITS: { key: BrandTrait; emoji: string }[] = [
@@ -44,6 +46,8 @@ function traitToVibe(trait: BrandTrait): BrandInput["vibe"] {
 
 export default function GeneratePage() {
   const router = useRouter();
+  const { trackGeneration } = useXP();
+  const { showToast } = useToast();
 
   const [nameMode, setNameMode] = useState<NameMode | null>(null);
   const [form, setForm] = useState<BrandInput>({
@@ -126,6 +130,8 @@ export default function GeneratePage() {
           }
           if (payload.status === "error") throw new Error(payload.error ?? "Generation failed.");
           if (payload.status === "done" && payload.id) {
+            trackGeneration();
+            showToast("Brand conjured! Welcome to your new brand ✨", "success", "🎉");
             router.push(`/brand/${payload.id}`);
             return;
           }

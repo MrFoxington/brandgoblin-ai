@@ -2,23 +2,39 @@
 
 import { useState } from "react";
 import clsx from "clsx";
+import { useToast } from "./NixToast";
+
+const NIX_COPY_QUOTES = [
+  "Copied! Go build something great.",
+  "That's a good one. Copied! ✨",
+  "Nix approves. Copied! 🧌",
+  "Saved to clipboard!",
+  "Copied! Use it well.",
+];
 
 export default function CopyButton({
   text,
   label = "Copy",
   className,
+  silent,
 }: {
   text: string;
   label?: string;
   className?: string;
+  silent?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
+      if (!silent) {
+        const quote = NIX_COPY_QUOTES[Math.floor(Math.random() * NIX_COPY_QUOTES.length)];
+        showToast(quote, "nix");
+      }
     } catch {}
   }
 

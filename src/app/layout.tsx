@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
+import { NixToastProvider } from "@/components/NixToast";
+import { XPProvider } from "@/components/XPSystem";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -74,7 +76,11 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-bg font-sans antialiased`}
       >
-        {children}
+        <XPProvider>
+          <NixToastProvider>
+            {children}
+          </NixToastProvider>
+        </XPProvider>
       </body>
     </html>
   );
