@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUserEnergyBalance } from "@/lib/energy";
+import { getEffectivePlan } from "@/lib/access";
 import { ENERGY_CONFIG, getEnergyWarningLevel, getCapacityEstimates } from "@/lib/energy-config";
 
 export async function GET() {
@@ -12,11 +13,11 @@ export async function GET() {
 
   const { data: userRow } = await supabase
     .from("users")
-    .select("plan")
+    .select("plan, is_trial, trial_ends_at")
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || userRow.plan === "free") {
+  if (!userRow || getEffectivePlan(userRow) === "free") {
     return NextResponse.json({ plan: "free", totalRemaining: 0 });
   }
 

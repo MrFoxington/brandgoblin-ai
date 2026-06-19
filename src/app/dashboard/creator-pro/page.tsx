@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getEffectivePlan } from "@/lib/access";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CreatorProHub from "@/components/CreatorProHub";
@@ -18,7 +19,7 @@ export default async function CreatorProPage({
   if (!authData.user) redirect("/login");
 
   const [{ data: userRow }, { data: brands }, { data: recentContent }] = await Promise.all([
-    supabase.from("users").select("plan").eq("id", authData.user.id).single(),
+    supabase.from("users").select("plan, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
     supabase
       .from("brand_generations")
       .select("id, input_data, output_data")
@@ -33,7 +34,11 @@ export default async function CreatorProPage({
       .limit(20),
   ]);
 
-  const plan = userRow?.plan ?? "free";
+  const plan = getEffectivePlan({
+    plan: userRow?.plan ?? "free",
+    is_trial: userRow?.is_trial ?? false,
+    trial_ends_at: userRow?.trial_ends_at ?? null,
+  });
 
   // Gate: free users see upgrade prompt
   if (plan === "free") {
