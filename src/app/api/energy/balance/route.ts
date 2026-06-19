@@ -24,7 +24,21 @@ export async function GET() {
   const balance = await getUserEnergyBalance(authData.user.id);
 
   if (!balance) {
-    return NextResponse.json({ plan: "pro", totalRemaining: 0, uninitialized: true });
+    // Pro user without an initialized energy row yet — return the FULL shape with
+    // safe defaults so the dashboard never reads an undefined field (e.g. .toLocaleString()).
+    return NextResponse.json({
+      plan:             "pro",
+      monthlyTotal:     0,
+      monthlyRemaining: 0,
+      refillRemaining:  0,
+      totalRemaining:   0,
+      monthlyAllowance: ENERGY_CONFIG.MONTHLY_ALLOWANCE,
+      percentRemaining: 0,
+      warningLevel:     null,
+      estimates:        [],
+      periodEnd:        null,
+      uninitialized:    true,
+    });
   }
 
   const warningLevel = getEnergyWarningLevel(balance.totalRemaining, ENERGY_CONFIG.MONTHLY_ALLOWANCE);

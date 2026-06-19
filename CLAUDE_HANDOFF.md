@@ -31,39 +31,45 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ⚠️ HONEST STATUS (updated June 18, 2026 — evening) — READ FIRST
+## ✅ HONEST STATUS (updated June 20, 2026) — READ FIRST
 
-**Pre-revenue, but actively wiring up payments in Stripe TEST mode.**
+**REVENUE-CAPABLE. Stripe is fully set up and tested in LIVE mode.** BrandGoblin can now take
+real money: Creator Pro subscriptions ($19/mo), energy refills, dunning/recovery, and the
+customer portal all verified. This was the #1 blocker from day one — it is now closed.
 
-### 🌅 TOMORROW — START HERE
-1. **Commit the last code change** (idempotency fix is staged but not committed — the sandbox
-   couldn't write to `.git`). In Terminal:
-   ```
-   cd "/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai"
-   rm -f .git/index.lock
-   git add -A
-   git commit -m "Add refill idempotency: app guard + ledger-first write + unique index"
-   ```
-2. **Finish the local Stripe test purchase** (test mode):
-   - Terminal 1: `stripe listen --forward-to localhost:3000/api/stripe/webhook` → put the
-     `whsec_…` into `.env.local`
-   - Terminal 2: `npm run dev`
-   - Browser: upgrade to Pro, then buy an energy refill with card `4242 4242 4242 4242`
-   - Verify in Supabase `user_energy_balances`: refill energy goes up exactly once.
-   - Prove idempotency: `stripe events resend <evt_id>` → balance must NOT change again.
-3. **Then promote to live Vercel** — Step 2 of `docs/LAUNCH_CHECKLIST.md` (live keys, real
-   domain in `NEXT_PUBLIC_APP_URL`, webhook endpoint pointed at the public URL).
+**The constraint has shifted from PRODUCT to DISTRIBUTION.** The app is built, magical, and can
+charge. What's missing now is real users. Everything from here is acquisition → conversion →
+retention. See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+
+### 🌅 START HERE (next priorities, in order)
+1. **Pre-launch must-dos** (from `docs/LAUNCH_CHECKLIST.md`):
+   - Replace placeholder testimonials with ≥1 real quote.
+   - Confirm the live public domain + `NEXT_PUBLIC_APP_URL` is the real https domain.
+   - Do ONE real end-to-end live purchase (real card, refund yourself) to confirm the full flow.
+2. **Phase 2 — Reverse Trial** (`docs/PHASE2_REVERSE_TRIAL_BRIEF.md`): biggest conversion lever.
+   7-day auto-Pro, app-managed, `getEffectivePlan()` gating. Build next.
+3. **Phase 3 — Annual plan + $49 Launch Kit** (in Growth Engine doc): value ladder.
+4. **Acquisition loops:** share card (built) → public brand pages (SEO) → gift-energy referral.
 
 ### ✅ Done so far
 - **Stripe checkout + webhook hardened** (committed `392ad9e`): fails loudly on missing keys,
   reuses Stripe customer, blocks live-key-on-localhost, re-grants Pro on renewal.
 - **Creative Energy system** built (committed `d3cf835`): monthly allowance + $19 refills,
   energy gating on Creator Pro content, transaction ledger.
-- **Refill idempotency fix** (STAGED, not yet committed — see step 1): app guard + ledger-first
-  write + DB unique index, so a duplicate webhook can't double-grant a $19 refill.
-- **DB migrations run in Supabase:** energy tables, energy idempotency index, and
-  `stripe_customer_id` column — all applied. ✅
-- **`.env.local`** has Stripe TEST slots + energy vars. Fox is filling in the test keys.
+- **Refill idempotency fix** (committed): app guard + ledger-first write + DB unique index.
+- **Magical Creator Experience** — 9 phases (committed): staggered Reveal, Brand DNA scores,
+  sound system, XP + streaks, share card, upgrade nudge, locked builders, daily dashboard,
+  instrumentation/analytics.
+- **Phase 1 Dunning** (committed `7539b56`, ✅ PUSHED + LIVE):
+  - `past_due` no longer triggers immediate downgrade — grace window preserved
+  - `invoice.payment_failed` webhook case → sets `payment_status='past_due'`
+  - `invoice.payment_succeeded` webhook case → clears back to `payment_status='active'`
+  - `customer.subscription.deleted` + `unpaid` → sets `payment_status='canceled'`
+  - `POST /api/stripe/portal` route — opens Stripe Customer Portal for card update
+  - `PaymentRecoveryBanner` component — amber banner with waving Nix, shown on `past_due`
+  - Migration `20260619_payment_state.sql` — run and confirmed ✅
+- **DB migrations run in Supabase:** energy tables, energy idempotency index,
+  `stripe_customer_id`, analytics properties, payment state columns — all applied. ✅
 
 ### ⚠️ Still open / known issues
 - **Gotcha:** `STRIPE_PRICE_ID_ENERGY_REFILL` must be a **one-time** price; `STRIPE_PRICE_ID_PRO`
@@ -75,8 +81,9 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 - **Monthly reset is heuristic** (on `subscription.updated`). More robust:
   `invoice.payment_succeeded` + `billing_reason: subscription_cycle`.
 - **Testimonials still placeholder; zero real customers.**
+- **Stripe LIVE mode confirmed working** (tested June 20). Real payments enabled. ✅
 
-➡️ Full launch path: `docs/LAUNCH_CHECKLIST.md`.
+➡️ Full launch path: `docs/LAUNCH_CHECKLIST.md`. Growth plan: `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
@@ -294,4 +301,4 @@ src/
 
 ---
 
-*Last updated: June 18, 2026 (evening) — Creative Energy review + refill idempotency fix + all DB migrations applied in Supabase. Stripe in test mode, mid-rehearsal. Resume at "🌅 TOMORROW — START HERE" up top.*
+*Last updated: June 19, 2026 (evening) — Phase 1 dunning committed but not pushed. Migration run. Stripe webhook events may need confirming. Resume at "🌅 TOMORROW — START HERE" up top.*

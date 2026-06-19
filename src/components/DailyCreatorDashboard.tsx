@@ -266,8 +266,8 @@ export default function DailyCreatorDashboard({
             </div>
             <div className="flex items-center gap-3 text-xs text-muted">
               <span className="tabular-nums font-semibold text-white">
-                {energy.totalRemaining.toLocaleString()}
-                <span className="text-faint font-normal"> / {energy.monthlyAllowance.toLocaleString()}</span>
+                {(energy.totalRemaining ?? 0).toLocaleString()}
+                <span className="text-faint font-normal"> / {(energy.monthlyAllowance ?? 0).toLocaleString()}</span>
               </span>
               {resetDays !== null && (
                 <span className={`px-2 py-0.5 rounded-full border text-xs font-semibold ${

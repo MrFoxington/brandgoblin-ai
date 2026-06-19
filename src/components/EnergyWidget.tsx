@@ -94,7 +94,7 @@ export default function EnergyWidget() {
         <div className="mb-2">
           <div className="flex justify-between mb-1.5">
             <span className="text-xs text-muted">{pct}% remaining</span>
-            <span className="text-xs text-faint">{energy.totalRemaining.toLocaleString()} / {energy.monthlyAllowance.toLocaleString()}</span>
+            <span className="text-xs text-faint">{(energy.totalRemaining ?? 0).toLocaleString()} / {(energy.monthlyAllowance ?? 0).toLocaleString()}</span>
           </div>
           <div className="h-2 w-full rounded-full bg-white/8 overflow-hidden">
             <div
