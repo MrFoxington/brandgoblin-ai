@@ -85,15 +85,13 @@ export async function POST(request: Request) {
       const customerId = typeof sub.customer === "string" ? sub.customer : null;
       if (!customerId) break;
 
-      const downgrade =
-        sub.status === "canceled" ||
-        sub.status === "unpaid"   ||
-        sub.status === "past_due";
+      // past_due = retrying, NOT canceled. Only downgrade when Stripe gives up.
+      const downgrade = sub.status === "canceled" || sub.status === "unpaid";
 
       if (downgrade) {
         await supabase
           .from("users")
-          .update({ plan: "free", credits: FREE_CREDITS })
+          .update({ plan: "free", credits: FREE_CREDITS, payment_status: "canceled" })
           .eq("stripe_customer_id", customerId);
 
         const { data: userRow } = await supabase
@@ -151,6 +149,41 @@ export async function POST(request: Request) {
         .single();
 
       if (userRow) await revokeEnergy(userRow.id);
+
+      await supabase
+        .from("users")
+        .update({ payment_status: "canceled" })
+        .eq("stripe_customer_id", customerId);
+      break;
+    }
+
+    // ── Invoice payment failed → grace window (past_due, keep Pro) ────────
+    case "invoice.payment_failed": {
+      const invoice    = event.data.object as Stripe.Invoice;
+      const customerId = typeof invoice.customer === "string" ? invoice.customer : null;
+      if (!customerId) break;
+
+      await supabase
+        .from("users")
+        .update({ payment_status: "past_due", payment_issue_at: new Date().toISOString() })
+        .eq("stripe_customer_id", customerId);
+
+      console.log(`[webhook] payment failed — grace window started for customer ${customerId}`);
+      break;
+    }
+
+    // ── Invoice payment succeeded → clear recovery state ──────────────────
+    case "invoice.payment_succeeded": {
+      const invoice    = event.data.object as Stripe.Invoice;
+      const customerId = typeof invoice.customer === "string" ? invoice.customer : null;
+      if (!customerId) break;
+
+      await supabase
+        .from("users")
+        .update({ payment_status: "active", payment_issue_at: null })
+        .eq("stripe_customer_id", customerId);
+
+      console.log(`[webhook] payment recovered for customer ${customerId}`);
       break;
     }
 
