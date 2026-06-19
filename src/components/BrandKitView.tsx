@@ -422,7 +422,7 @@ export default function BrandKitView({
             {/* Upgrade nudge — free users only, shown in-context before ContinueBuilding */}
             {userPlan === "free" && <UpgradeNudge />}
 
-            <ContinueBuilding brandId={brandGenerationId} />
+            <ContinueBuilding brandId={brandGenerationId} userPlan={userPlan} brandInput={brandInput} />
           </div>
         )}
       </RevealCard>
