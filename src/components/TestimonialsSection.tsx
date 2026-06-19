@@ -1,154 +1,83 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
-const TESTIMONIALS = [
-  {
-    initials: "MT",
-    name: "Maya T.",
-    role: "Skincare Founder",
-    gradient: "from-violet-500 to-purple-700",
-    quote: "I spent 3 weeks trying to nail my brand with ChatGPT. Prompting, tweaking, starting over. With BrandGoblin I had a complete launch kit in 47 minutes. I genuinely cried. Actual tears.",
-    stat: "⏱ Full brand kit in 47 min",
-    stars: 5,
-  },
-  {
-    initials: "CR",
-    name: "Carlos R.",
-    role: "Fitness App Developer",
-    gradient: "from-blue-500 to-indigo-600",
-    quote: "As a dev I could build the app, but branding? Zero clue. Nix gave me a name, voice guide, color palette, and launch strategy that looked like it cost $10K. My investors thought I hired an agency.",
-    stat: "💰 Saved ~$8,000 in agency fees",
-    stars: 5,
-  },
-  {
-    initials: "PS",
-    name: "Priya S.",
-    role: "Brand Agency Owner",
-    gradient: "from-emerald-500 to-teal-600",
-    quote: "I use BrandGoblin for every new client brief. What used to take a week of discovery calls and strategy docs now takes one afternoon. My clients think I'm a genius. I'm not going to argue.",
-    stat: "⚡ 5× faster client onboarding",
-    stars: 5,
-  },
-  {
-    initials: "JK",
-    name: "Jordan K.",
-    role: "E-commerce Founder",
-    gradient: "from-amber-500 to-orange-600",
-    quote: "The brand voice guide alone was worth every penny. My Instagram engagement jumped 40% because I finally sound like a real brand with a point of view — not someone winging it with random posts.",
-    stat: "📈 +40% Instagram engagement",
-    stars: 5,
-  },
-  {
-    initials: "AM",
-    name: "Aisha M.",
-    role: "Fashion Label Founder",
-    gradient: "from-pink-500 to-rose-600",
-    quote: "Name, colors, brand story, launch posts — all in 90 seconds. I showed my co-founder and she literally didn't believe it was AI. We launched two weeks later with zero branding budget.",
-    stat: "🚀 Full brand kit in 90 seconds",
-    stars: 5,
-  },
-  {
-    initials: "DW",
-    name: "Devon W.",
-    role: "Content Creator",
-    gradient: "from-cyan-500 to-blue-600",
-    quote: "I've tried every AI tool — Jasper, Copy.ai, you name it. BrandGoblin is the only one that understood I'm building an identity, not just generating content. That difference is everything.",
-    stat: "🎯 First brand, launched in 3 days",
-    stars: 5,
-  },
+const TRUST_SIGNALS = [
+  { icon: "🧠", label: "Built by brand strategists" },
+  { icon: "⚡", label: "Powered by Claude AI" },
+  { icon: "🔒", label: "No card required" },
+  { icon: "🧌", label: "Your brands, saved forever" },
 ];
 
 export default function TestimonialsSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const shouldReduce = useReducedMotion();
 
   return (
-    <section ref={ref} className="py-28 bg-section-alt">
-      <div className="mx-auto max-w-6xl px-4">
-        {/* Header */}
-        <div className="mb-16 text-center">
-          <span className="badge-purple mb-6">⭐ Real Founders. Real Results.</span>
-          <h2 className="section-heading mb-4">
-            They stopped guessing and <span className="gradient-text">launched</span>
-          </h2>
-          <p className="section-sub max-w-2xl mx-auto">
-            From one-person startups to agencies managing dozens of brands. Here&rsquo;s what they built with Nix.
+    <section className="py-24 bg-section-alt">
+      <div className="mx-auto max-w-4xl px-4 text-center">
+        <span className="badge-purple mb-6">✦ Why We Built This</span>
+
+        {/* Founder note */}
+        <motion.div
+          initial={shouldReduce ? {} : { opacity: 0, y: 20 }}
+          whileInView={shouldReduce ? {} : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl border border-primary/20 bg-primary/5 px-8 py-10 mb-12 text-left"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white font-bold text-lg">
+              F
+            </div>
+            <div>
+              <p className="font-semibold text-white text-sm">Fox</p>
+              <p className="text-xs text-muted">Founder, BrandGoblin AI</p>
+            </div>
+          </div>
+          <blockquote className="text-white/80 leading-relaxed text-base mb-4">
+            "I watched too many brilliant people give up on their ideas not because the idea was bad —
+            but because turning an idea into a brand felt impossibly expensive, time-consuming, or
+            overwhelming. I built Nix because I wanted a world where anyone with a half-formed idea at
+            11pm could wake up with a real brand by morning. No agency budget required. No design degree
+            needed. Just you, your idea, and a goblin who genuinely cares about making it great."
+          </blockquote>
+          <p className="text-xs text-faint">BrandGoblin AI is in early access. You're one of the first.</p>
+        </motion.div>
+
+        {/* Early adopter framing */}
+        <motion.div
+          initial={shouldReduce ? {} : { opacity: 0, y: 20 }}
+          whileInView={shouldReduce ? {} : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mb-12"
+        >
+          <h3 className="font-display text-xl font-bold text-white mb-3">
+            Be one of the first.
+          </h3>
+          <p className="text-muted max-w-lg mx-auto text-sm leading-relaxed">
+            BrandGoblin is in early access. The people here now are the founding creators —
+            the ones who'll look back and say "I was using this before everyone else."
+            Real quotes from real creators coming soon. Yours could be next.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Aggregate social proof */}
-        <div className="mb-12 flex flex-wrap justify-center gap-8 text-center">
-          {[
-            { val: "2,400+", label: "brands generated" },
-            { val: "4.9/5", label: "average rating" },
-            { val: "< 2 min", label: "average generation time" },
-            { val: "$0", label: "to get started" },
-          ].map(({ val, label }) => (
-            <div key={label}>
-              <p className="font-display text-3xl font-black text-white">{val}</p>
-              <p className="text-sm text-muted">{label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Cards */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {TESTIMONIALS.map((t, i) => (
-            <div
-              key={t.name}
-              className={`flex flex-col rounded-2xl border border-white/8 bg-white/3 p-6 transition-all duration-600 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-              style={{ transitionDelay: `${i * 80}ms` }}
+        {/* Trust signals */}
+        <div className="flex flex-wrap justify-center gap-4">
+          {TRUST_SIGNALS.map((t, i) => (
+            <motion.div
+              key={t.label}
+              initial={shouldReduce ? {} : { opacity: 0, y: 12 }}
+              whileInView={shouldReduce ? {} : { opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm text-muted"
             >
-              {/* Stars */}
-              <div className="mb-4 flex gap-0.5 text-yellow-400 text-sm">
-                {"★".repeat(t.stars)}
-              </div>
-
-              {/* Quote */}
-              <p className="flex-1 text-sm text-muted leading-relaxed mb-5">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-
-              {/* Stat pill */}
-              <div className="mb-5 inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary-light">
-                {t.stat}
-              </div>
-
-              {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                <div
-                  className={`h-9 w-9 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-xs font-bold text-white shrink-0`}
-                >
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-muted">{t.role}</p>
-                </div>
-                <div className="ml-auto text-lg">🧌</div>
-              </div>
-            </div>
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+            </motion.div>
           ))}
         </div>
-
-        {/* Bottom note */}
-        <p className="mt-10 text-center text-xs text-faint">
-          ✦ These are representative testimonials. Real customer names and photos will be added at launch.
-        </p>
       </div>
     </section>
   );
