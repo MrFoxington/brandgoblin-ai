@@ -31,25 +31,43 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ✅ HONEST STATUS (updated June 20, 2026) — READ FIRST
+## ✅ HONEST STATUS (updated June 19, 2026 — late) — READ FIRST
 
-**REVENUE-CAPABLE. Stripe is fully set up and tested in LIVE mode.** BrandGoblin can now take
-real money: Creator Pro subscriptions ($19/mo), energy refills, dunning/recovery, and the
-customer portal all verified. This was the #1 blocker from day one — it is now closed.
+**REVENUE-CAPABLE AND WORKING END-TO-END IN LIVE MODE.** Real purchases, energy refills, the
+monthly Pro energy grant, dunning, and the customer portal all verified working with the live
+webhook actually firing. App lives at **`https://app.brandgoblinai.com`** (root `brandgoblinai.com`
+is the landing page). Email verification + Resend transactional email are live.
 
-**The constraint has shifted from PRODUCT to DISTRIBUTION.** The app is built, magical, and can
-charge. What's missing now is real users. Everything from here is acquisition → conversion →
-retention. See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+**The constraint is DISTRIBUTION, not product.** The app is built, magical, charges money, and is
+protected against abuse. What's missing is real users → acquisition → conversion → retention.
+See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+
+### 🔥 BIG FIXES SHIPPED June 19 (all pushed + live)
+- **Reverse trial + anti-farming** (Phase 2 + Layer 4): 7-day auto-Pro, `getEffectivePlan()`
+  gating everywhere, one-trial-per-normalized-email, IP cap, email-verification gate.
+- **Email verification**: `/auth/confirm` route, Supabase "Confirm email" ON, Site URL =
+  `https://app.brandgoblinai.com`, Google sign-in + Turnstile (in progress/optional).
+- **Resend email**: domain verified at GoDaddy (DKIM/SPF on `send.` subdomain), Supabase custom
+  SMTP → `smtp.resend.com`. Google Workspace = human inbox (support@brandgoblinai.com).
+- **Dashboard crash fix** (`3d883a6`): energy/balance API now returns full shape for
+  uninitialized Pro users; guarded `.toLocaleString()`.
+- **🚨 LIVE WEBHOOK SECRET FIX (the big one):** `STRIPE_WEBHOOK_SECRET` in Vercel had a
+  TEST-mode secret → every live webhook failed signature (400) → no energy/dunning ran. Set it to
+  the live endpoint's secret + subscribed the endpoint to all 5 events + deleted a bogus
+  placeholder endpoint. Now firing. See `docs/STRIPE_LIVE_CONFIG.md`.
+- **Energy refill price**: created live one-time $19 price → `STRIPE_PRICE_ID_ENERGY_REFILL` in Vercel.
+- **False low-energy warning fix** (`4fc8bc6`): dashboard showed "Less than 25% remaining" for
+  everyone because it checked `!== "ok"` but the API returns `null` when healthy. Now guarded.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Pre-launch must-dos** (from `docs/LAUNCH_CHECKLIST.md`):
-   - Replace placeholder testimonials with ≥1 real quote.
-   - Confirm the live public domain + `NEXT_PUBLIC_APP_URL` is the real https domain.
-   - Do ONE real end-to-end live purchase (real card, refund yourself) to confirm the full flow.
-2. **Phase 2 — Reverse Trial** (`docs/PHASE2_REVERSE_TRIAL_BRIEF.md`): biggest conversion lever.
-   7-day auto-Pro, app-managed, `getEffectivePlan()` gating. Build next.
-3. **Phase 3 — Annual plan + $49 Launch Kit** (in Growth Engine doc): value ladder.
-4. **Acquisition loops:** share card (built) → public brand pages (SEO) → gift-energy referral.
+1. **Energy refill celebration moment** — build the "bar fills, Nix celebrates, ⚡ You're brimming
+   with Creative Energy!, Let's build →" overlay on `/dashboard/creator-pro?refill=success`.
+   Re-fetch balance, strip the URL param after, reduced-motion + muteable sound. (Prompt ready.)
+2. **Pre-launch must-dos**: ≥1 real testimonial; refund the test refill/sub in Stripe; rotate the
+   GitHub PAT (was exposed in chat).
+3. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
+   (public brand pages for SEO + gift-energy referral).
+4. **Phase 3 — Annual plan + $49 Launch Kit** (later; only matters once traffic exists).
 
 ### ✅ Done so far
 - **Stripe checkout + webhook hardened** (committed `392ad9e`): fails loudly on missing keys,
@@ -202,6 +220,14 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `NIX_CHARACTER_RULES.md` | Full Nix character bible + rules |
 | `BRAND_GUIDELINES.md` | Colors, fonts, voice, brand rules |
 | `PRODUCT_ROADMAP.md` | Feature status + ecosystem plans |
+| `STRIPE_LIVE_CONFIG.md` | ⭐ Source of truth for all Stripe/Vercel live-mode values + webhook setup |
+| `LAUNCH_CHECKLIST.md` | Pre-launch gating steps |
+| `CREATOR_PRO_GROWTH_ENGINE.md` | The growth/monetization strategy ($10k MRR plan) |
+| `MAGIC_EXPERIENCE_BRIEF.md` | The "holy crap" reveal + delight build spec |
+| `PHASE2_REVERSE_TRIAL_BRIEF.md` | Reverse trial spec (BUILT — for reference) |
+| `ANTI_ABUSE_BRIEF.md` | Email verification / Google sign-in / Turnstile / trial-farming |
+| `COFOUNDER_LITE_BRIEF.md` | Additive brand-memory / welcome-back / library-search ideas |
+| `PHASE1_DUNNING_BRIEF.md` | Dunning spec (BUILT — for reference) |
 
 ---
 
@@ -301,4 +327,4 @@ src/
 
 ---
 
-*Last updated: June 19, 2026 (evening) — Phase 1 dunning committed but not pushed. Migration run. Stripe webhook events may need confirming. Resume at "🌅 TOMORROW — START HERE" up top.*
+*Last updated: June 19, 2026 (late) — Live payments fully working end-to-end (webhook secret fix was the unlock). Dashboard crash + false-warning bugs fixed. Email verification + Resend live. Latest pushed commit: `4fc8bc6`. CLAUDE_HANDOFF.md edits are uncommitted — push with next commit. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top (next: refill celebration moment).*
