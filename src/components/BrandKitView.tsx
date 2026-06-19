@@ -14,6 +14,12 @@ import NixPose from "./primitives/NixPose";
 import Sparkles from "./primitives/Sparkles";
 import { RevealProvider, RevealCard, SkipRevealButton } from "./primitives/Reveal";
 import { useSoundFx, SoundToggle } from "./primitives/SoundFx";
+import { trackEvent } from "@/lib/analytics";
+import { createContext, useContext } from "react";
+
+// Context so CopyButton can read brandId without prop-threading every call
+const BrandIdContext = createContext<string | undefined>(undefined);
+export function useBrandId() { return useContext(BrandIdContext); }
 
 type SectionKey =
   | "taglines" | "brandStory" | "brandVoice" | "mascot"
@@ -119,8 +125,11 @@ export default function BrandKitView({
   const { playReveal } = useSoundFx();
   const shouldReduce = useReducedMotion();
 
-  // Play reveal sound once on mount
-  useEffect(() => { playReveal(); }, [playReveal]);
+  // Play reveal sound + track kit view on mount
+  useEffect(() => {
+    playReveal();
+    trackEvent("brand_kit_viewed", { brandId: brandGenerationId });
+  }, [playReveal, brandGenerationId]);
 
   async function handleReroll(sectionKey: SectionKey) {
     if (!brandInput || rerollsUsed.has(sectionKey) || rerolling) return;
@@ -358,7 +367,8 @@ export default function BrandKitView({
   ];
 
   return (
-    <RevealProvider flagKey={`brand_${brandGenerationId ?? "kit"}`}>
+    <BrandIdContext.Provider value={brandGenerationId}>
+    <RevealProvider flagKey={`brand_${brandGenerationId ?? "kit"}`} brandId={brandGenerationId}>
       {/* Sound toggle */}
       <div className="flex justify-end mb-2">
         <SoundToggle />
@@ -427,5 +437,6 @@ export default function BrandKitView({
         )}
       </RevealCard>
     </RevealProvider>
+    </BrandIdContext.Provider>
   );
 }

@@ -37,6 +37,7 @@ export default async function DashboardPage() {
             plan={plan}
             brandCount={rows.length}
             latestBrand={rows[0]}
+            signupDate={authData.user.created_at}
           />
 
           {/* Brand Vault grid */}

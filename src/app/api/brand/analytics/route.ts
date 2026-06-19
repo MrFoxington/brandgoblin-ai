@@ -6,13 +6,14 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const { data: authData } = await supabase.auth.getUser();
 
-    const { brandGenerationId, eventType } = await request.json();
+    const { brandGenerationId, eventType, properties } = await request.json();
     if (!eventType) return NextResponse.json({ error: "Missing eventType." }, { status: 400 });
 
     await supabase.from("brand_analytics").insert({
       brand_generation_id: brandGenerationId ?? null,
       user_id: authData.user?.id ?? null,
       event_type: eventType,
+      properties: properties ?? {},
     });
 
     return NextResponse.json({ ok: true });

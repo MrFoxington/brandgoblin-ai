@@ -18,6 +18,7 @@ import {
 } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { globalSoundFx } from "./SoundFx";
+import { trackEvent, msOnPage } from "@/lib/analytics";
 
 // ── Context ──────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,7 @@ interface RevealContextValue {
   revealed: boolean;
   revealAll: () => void;
   isFirstRun: boolean;
+  brandId?: string;
 }
 
 const RevealContext = createContext<RevealContextValue>({
@@ -55,14 +57,17 @@ function markSeen() {
 export function RevealProvider({
   children,
   flagKey,
+  brandId,
 }: {
   children: ReactNode;
   flagKey?: string;
+  brandId?: string;
 }) {
   const key = flagKey ? `brandgoblin_seen_${flagKey}` : SEEN_KEY;
   const [isFirstRun, setIsFirstRun] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const shouldReduce = useReducedMotion();
+  const revealCompleteFired = useRef(false);
 
   useEffect(() => {
     const seen = (() => {
@@ -77,18 +82,31 @@ export function RevealProvider({
     try { localStorage.setItem(key, "1"); } catch { /* noop */ }
   }, [key]);
 
-  // Mark seen after provider mounts (first-run gets the cinematic, then we remember)
+  // Skip button handler — fires reveal_skipped event
+  const revealAllWithTracking = useCallback(() => {
+    revealAll();
+    trackEvent("reveal_skipped", { brandId, timeOnPageMs: msOnPage() });
+  }, [revealAll, brandId]);
+
+  // Mark seen after 5s into first-run cinematic; fire reveal_completed
   useEffect(() => {
-    if (isFirstRun) {
-      const t = setTimeout(() => {
-        try { localStorage.setItem(key, "1"); } catch { /* noop */ }
-      }, 5000); // mark seen 5s in — they've experienced it
-      return () => clearTimeout(t);
-    }
+    if (!isFirstRun) return;
+    const t = setTimeout(() => {
+      try { localStorage.setItem(key, "1"); } catch { /* noop */ }
+    }, 5000);
+    return () => clearTimeout(t);
   }, [isFirstRun, key]);
 
+  // Fire reveal_completed when the reveal settles naturally (revealed flips true without skip)
+  useEffect(() => {
+    if (revealed && isFirstRun && !revealCompleteFired.current) {
+      revealCompleteFired.current = true;
+      trackEvent("reveal_completed", { brandId, timeOnPageMs: msOnPage() });
+    }
+  }, [revealed, isFirstRun, brandId]);
+
   return (
-    <RevealContext.Provider value={{ revealed, revealAll, isFirstRun }}>
+    <RevealContext.Provider value={{ revealed, revealAll: revealAllWithTracking, isFirstRun, brandId }}>
       {children}
     </RevealContext.Provider>
   );

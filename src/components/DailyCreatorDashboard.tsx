@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { XPBar } from "./XPSystem";
 import NixPose from "./primitives/NixPose";
 import type { BrandKit, BrandGenerationRow } from "@/types";
+import { trackEvent } from "@/lib/analytics";
 
 // ── Streak ────────────────────────────────────────────────────────────────────
 const STREAK_KEY = "brandgoblin_streak_v1";
@@ -122,11 +123,13 @@ export default function DailyCreatorDashboard({
   plan,
   brandCount,
   latestBrand,
+  signupDate,
 }: {
   email: string;
   plan: string;
   brandCount: number;
   latestBrand?: BrandGenerationRow;
+  signupDate?: string;
 }) {
   const isPro = plan === "pro" || plan === "agency";
   const firstName = getFirstName(email);
@@ -142,6 +145,13 @@ export default function DailyCreatorDashboard({
   useEffect(() => {
     setMounted(true);
     setStreak(loadAndUpdateStreak());
+
+    // D1/D7 return tracking — fires once per session on dashboard load
+    const daysSinceSignup = signupDate
+      ? Math.floor((Date.now() - new Date(signupDate).getTime()) / 86400000)
+      : undefined;
+    trackEvent("session_start", { daysSinceSignup, plan });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch energy for pro users
