@@ -19,6 +19,21 @@ function send(controller: ReadableStreamDefaultController, data: object) {
   controller.enqueue(encoder.encode("data: " + JSON.stringify(data) + "\n\n"));
 }
 
+// Map JSON keys (in model output order) → progress events for the client.
+// Each entry fires once when its key first appears in the accumulated text.
+const SECTION_MILESTONES: { key: string; section: string; label: string; pose: string }[] = [
+  { key: '"brandNames"',     section: "names",      label: "Discovering your brand names…",      pose: "thinking"    },
+  { key: '"taglines"',       section: "taglines",   label: "Writing your taglines…",              pose: "working"     },
+  { key: '"brandStory"',     section: "story",      label: "Crafting your brand story…",          pose: "working"     },
+  { key: '"brandVoice"',     section: "voice",      label: "Finding your brand voice…",           pose: "conjuring"   },
+  { key: '"colorPalette"',   section: "colors",     label: "Choosing your color palette…",        pose: "conjuring"   },
+  { key: '"logoPrompt"',     section: "logo",       label: "Designing your logo direction…",      pose: "conjuring"   },
+  { key: '"websiteCopy"',    section: "website",    label: "Writing your website copy…",          pose: "working"     },
+  { key: '"socialKit"',      section: "social",     label: "Building your social kit…",           pose: "working"     },
+  { key: '"marketingIdeas"', section: "marketing",  label: "Dreaming up marketing ideas…",        pose: "celebrating" },
+  { key: '"launchPlan"',     section: "launch",     label: "Mapping your 7-day launch plan…",     pose: "celebrating" },
+];
+
 export async function POST(request: Request) {
   const supabase = createClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -54,29 +69,53 @@ export async function POST(request: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        // Send keepalives every 15s so the client connection stays alive
-        const keepalive = setInterval(() => {
-          send(controller, { status: "generating" });
-        }, 15000);
+        send(controller, { status: "generating", section: "start", label: "Nix is thinking…", pose: "thinking" });
 
-        send(controller, { status: "generating" });
+        let accumulated = "";
+        const fired = new Set<string>();
 
-        const message = await anthropic.messages.create({
+        const anthropicStream = anthropic.messages.stream({
           model: "claude-sonnet-4-6",
           max_tokens: 16000,
           system: BRAND_GOBLIN_SYSTEM_PROMPT,
-          messages: [{ role: "user", content: body.nameMode === "existing" ? buildExistingNameBrandKitPrompt(body) : buildBrandKitPrompt(body) }],
+          messages: [
+            {
+              role: "user",
+              content: body.nameMode === "existing"
+                ? buildExistingNameBrandKitPrompt(body)
+                : buildBrandKitPrompt(body),
+            },
+          ],
         });
 
-        clearInterval(keepalive);
+        for await (const chunk of anthropicStream) {
+          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+            accumulated += chunk.delta.text;
 
-        const textBlock = message.content.find((b) => b.type === "text");
-        if (!textBlock || textBlock.type !== "text") throw new Error("AI returned no text.");
-
-        // Guard against token-limit truncation
-        if (message.stop_reason === "max_tokens") {
-          throw new Error("Brand kit was too large to generate in one pass. Please try again with a shorter business description.");
+            // Fire milestone events as keys appear in the buffer
+            for (const milestone of SECTION_MILESTONES) {
+              if (!fired.has(milestone.key) && accumulated.includes(milestone.key)) {
+                fired.add(milestone.key);
+                send(controller, {
+                  status: "generating",
+                  section: milestone.section,
+                  label: milestone.label,
+                  pose: milestone.pose,
+                  progress: fired.size / SECTION_MILESTONES.length,
+                });
+              }
+            }
+          }
         }
+
+        const finalMessage = await anthropicStream.finalMessage();
+
+        if (finalMessage.stop_reason === "max_tokens") {
+          throw new Error("Brand kit was too large to generate. Please try again with a shorter business description.");
+        }
+
+        const textBlock = finalMessage.content.find((b) => b.type === "text");
+        if (!textBlock || textBlock.type !== "text") throw new Error("AI returned no text.");
 
         let brandKit: BrandKit;
         try {

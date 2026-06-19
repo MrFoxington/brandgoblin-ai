@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import LoadingScreen from "@/components/LoadingScreen";
+import LoadingScreen, { type GenerationProgress } from "@/components/LoadingScreen";
 import { useXP } from "@/components/XPSystem";
 import { useToast } from "@/components/NixToast";
 import type { BrandInput, BrandTrait, NameMode } from "@/types";
@@ -62,6 +62,7 @@ export default function GeneratePage() {
   const [vibeDescription, setVibeDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
 
   function update<K extends keyof BrandInput>(key: K, value: BrandInput[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -84,6 +85,7 @@ export default function GeneratePage() {
 
     setLoading(true);
     setError(null);
+    setGenProgress(null);
 
     const payload: BrandInput = {
       ...form,
@@ -122,32 +124,56 @@ export default function GeneratePage() {
           if (!line.startsWith("data: ")) continue;
           const raw = line.slice(6).trim();
           if (!raw) continue;
-          let payload: { status: string; error?: string; id?: string };
+          let evt: {
+            status: string;
+            error?: string;
+            id?: string;
+            section?: string;
+            label?: string;
+            pose?: string;
+            progress?: number;
+          };
           try {
-            payload = JSON.parse(raw);
+            evt = JSON.parse(raw);
           } catch {
             continue;
           }
-          if (payload.status === "error") throw new Error(payload.error ?? "Generation failed.");
-          if (payload.status === "done" && payload.id) {
+          if (evt.status === "error") throw new Error(evt.error ?? "Generation failed.");
+          if (evt.status === "generating" && evt.section && evt.label) {
+            setGenProgress({
+              section: evt.section,
+              label: evt.label,
+              pose: (evt.pose as GenerationProgress["pose"]) ?? "thinking",
+              progress: evt.progress ?? 0,
+            });
+          }
+          if (evt.status === "done" && evt.id) {
             trackGeneration();
             showToast("Brand conjured! Welcome to your new brand ✨", "success", "🎉");
-            router.push(`/brand/${payload.id}`);
+            router.push(`/brand/${evt.id}`);
             return;
           }
         }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
-      setLoading(false);
+      // Keep loading=true so the error screen stays visible inside LoadingScreen
     }
+  }
+
+  function handleRetry() {
+    setError(null);
+    setGenProgress(null);
+    setLoading(false);
   }
 
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="flex-1"><LoadingScreen /></main>
+        <main className="flex-1">
+          <LoadingScreen progress={genProgress} error={error} onRetry={handleRetry} />
+        </main>
         <Footer />
       </div>
     );
