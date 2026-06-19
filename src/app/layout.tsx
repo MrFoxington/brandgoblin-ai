@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { NixToastProvider } from "@/components/NixToast";
 import { XPProvider } from "@/components/XPSystem";
+import { SoundFxProvider } from "@/components/primitives/SoundFx";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -76,11 +77,13 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-bg font-sans antialiased`}
       >
-        <XPProvider>
-          <NixToastProvider>
-            {children}
-          </NixToastProvider>
-        </XPProvider>
+        <SoundFxProvider>
+          <XPProvider>
+            <NixToastProvider>
+              {children}
+            </NixToastProvider>
+          </XPProvider>
+        </SoundFxProvider>
       </body>
     </html>
   );
