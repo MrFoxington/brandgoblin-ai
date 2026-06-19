@@ -36,6 +36,7 @@ export default async function DashboardPage() {
             email={email}
             plan={plan}
             brandCount={rows.length}
+            latestBrand={rows[0]}
           />
 
           {/* Brand Vault grid */}
