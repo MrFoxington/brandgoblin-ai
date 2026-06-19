@@ -295,7 +295,7 @@ export default function DailyCreatorDashboard({
             />
           </div>
 
-          {energy.warningLevel !== "ok" && (
+          {energy.warningLevel && energy.warningLevel !== "ok" && (
             <p className={`text-xs ${energy.warningLevel === "critical" ? "text-red-400" : "text-yellow-400"}`}>
               {energy.warningLevel === "critical"
                 ? "Running low — top up to keep creating."
