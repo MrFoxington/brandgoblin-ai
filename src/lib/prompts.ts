@@ -112,7 +112,19 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
     "memeIdeas": [ string ],
     "adAngles": [ string ]
   },
-  "launchPlan": [ string ]
+  "launchPlan": [ string ], // exactly 7 items, one per day
+  "brandDna": [
+    { "label": "Creativity",          "score": number, "why": string },
+    { "label": "Memorability",        "score": number, "why": string },
+    { "label": "Market Clarity",      "score": number, "why": string },
+    { "label": "Emotional Resonance", "score": number, "why": string },
+    { "label": "Virality Potential",  "score": number, "why": string },
+    { "label": "Professionalism",     "score": number, "why": string },
+    { "label": "Playfulness",         "score": number, "why": string },
+    { "label": "Audience Match",      "score": number, "why": string }
+  ]
+  // brandDna scores must reflect this specific brand, not be generic.
+  // Scores should be varied and honest — not all 90s. The "why" must name something specific.
 }
 
 Important rules:
@@ -193,7 +205,22 @@ no missing keys, no markdown fences):
     "memeIdeas": [ string ], // exactly 5 funny, format-specific meme ideas
     "adAngles": [ string ] // exactly 5 distinct paid-ad angles/hooks
   },
-  "launchPlan": [ string ] // exactly 7 items, one per day, "Day 1: ...", "Day 2: ...", etc.
+  "launchPlan": [ string ], // exactly 7 items, one per day, "Day 1: ...", "Day 2: ...", etc.
+  "brandDna": [             // exactly 8 items — score this specific brand, not a hypothetical one
+    { "label": "Creativity",          "score": number, "why": string }, // how original/unexpected the brand concept feels
+    { "label": "Memorability",        "score": number, "why": string }, // will customers recall the name after one encounter
+    { "label": "Market Clarity",      "score": number, "why": string }, // does the name/story signal the category immediately
+    { "label": "Emotional Resonance", "score": number, "why": string }, // how much it connects emotionally with the target audience
+    { "label": "Virality Potential",  "score": number, "why": string }, // organic shareability and social media potential
+    { "label": "Professionalism",     "score": number, "why": string }, // polish, credibility, how enterprise-ready it feels
+    { "label": "Playfulness",         "score": number, "why": string }, // fun, warmth, approachability of the personality
+    { "label": "Audience Match",      "score": number, "why": string }  // how tightly everything targets the stated audience
+  ]
+  // IMPORTANT for brandDna: scores must be specific and defensible — not all high, not all the same.
+  // A luxury brand should score high on Professionalism/Emotional Resonance but lower on Playfulness.
+  // A funny Gen Z brand should score high on Virality/Playfulness but perhaps lower on Professionalism.
+  // The "why" must be ONE sentence naming something specific about THIS brand, not generic praise.
+  // Bad why: "This brand has great creativity." Good why: "The name 'Barkly' uses unexpected animal wordplay that stands out in pet food."
 }
 
 Make every field specific to THIS business idea — never generic placeholder content.

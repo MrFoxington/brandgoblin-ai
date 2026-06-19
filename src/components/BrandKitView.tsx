@@ -153,8 +153,8 @@ export default function BrandKitView({
       favoriteName={kit.favoriteName} alternativeNames={kit.alternativeNames}
       recommendedName={kit.recommendedName} brandNames={kit.brandNames} />,
 
-    // 1: Brand DNA
-    ...(brandInput ? [<BrandDNA key="dna" kit={kit} input={brandInput} />] : []),
+    // 1: Brand DNA (model-scored; renders nothing for old brands without brandDna)
+    <BrandDNA key="dna" kit={kit} />,
 
     // 2: All Names
     <SectionCard key="names" emoji="🏆" title="All Brand Names" badge="Naming" {...noReroll}>

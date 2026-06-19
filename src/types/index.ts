@@ -170,6 +170,12 @@ export interface NameStrengthCheck {
   bestPositioningAngle: string;
 }
 
+export interface BrandDNAScore {
+  label: string;
+  score: number;   // 0–100
+  why: string;     // one-sentence justification from the model
+}
+
 export interface BrandKit {
   // Legacy fields (kept for backwards compat with existing saved brands)
   brandNames?: BrandNameOption[];
@@ -192,4 +198,6 @@ export interface BrandKit {
   socialKit: SocialKit;
   marketingIdeas: MarketingIdeas;
   launchPlan: string[];
+  // Brand DNA — model-computed scores with justifications
+  brandDna?: BrandDNAScore[];
 }
