@@ -3,6 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { useToast } from "./NixToast";
+import { useSoundFx } from "./primitives/SoundFx";
 
 const NIX_COPY_QUOTES = [
   "Copied! Go build something great.",
@@ -25,11 +26,13 @@ export default function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   const { showToast } = useToast();
+  const { playCopy } = useSoundFx();
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      playCopy();
       setTimeout(() => setCopied(false), 1500);
       if (!silent) {
         const quote = NIX_COPY_QUOTES[Math.floor(Math.random() * NIX_COPY_QUOTES.length)];

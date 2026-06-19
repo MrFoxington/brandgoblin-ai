@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import { globalSoundFx } from "./primitives/SoundFx";
 
 export interface XPState {
   xp: number;
@@ -128,6 +129,7 @@ export function XPProvider({ children }: { children: React.ReactNode }) {
         const lvl = LEVELS[newLevel];
         setTimeout(() => {
           setLevelUpMsg({ name: lvl.name, emoji: lvl.emoji });
+          globalSoundFx.playLevelUp();
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ["#a78bfa", "#34d399", "#fbbf24", "#f472b6"] });
           setTimeout(() => setLevelUpMsg(null), 4000);
         }, 300);

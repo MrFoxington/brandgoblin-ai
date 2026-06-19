@@ -17,6 +17,7 @@ import {
   type ReactNode,
 } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { globalSoundFx } from "./SoundFx";
 
 // ── Context ──────────────────────────────────────────────────────────────────
 
@@ -133,9 +134,19 @@ export function RevealCard({
   const { revealed, isFirstRun } = useReveal();
   const shouldReduce = useReducedMotion();
   const delay = revealed ? 0 : (isFirstRun ? staggerMs : fastStaggerMs) * index / 1000;
+  const didPlay = useRef(false);
 
   if (shouldReduce) {
     return <div className={className}>{children}</div>;
+  }
+
+  function handleAnimationComplete() {
+    // Play a soft chime on first-run card entrances (index > 0 = skip header card)
+    // Only once per card mount so re-renders don't re-fire
+    if (isFirstRun && index > 0 && !revealed && !didPlay.current) {
+      didPlay.current = true;
+      globalSoundFx.playReveal();
+    }
   }
 
   return (
@@ -144,6 +155,7 @@ export function RevealCard({
       initial={revealed ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.45, ease: "easeOut" }}
+      onAnimationComplete={handleAnimationComplete}
     >
       {children}
     </motion.div>

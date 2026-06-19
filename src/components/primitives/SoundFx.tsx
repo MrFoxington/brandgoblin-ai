@@ -116,6 +116,13 @@ function createPlayer(muted: () => boolean) {
   };
 }
 
+// Module-level reference so components outside the tree (e.g. XPProvider) can fire sounds
+export const globalSoundFx = {
+  playReveal: () => {},
+  playLevelUp: () => {},
+  playCopy: () => {},
+};
+
 export function SoundFxProvider({ children }: { children: ReactNode }) {
   const [muted, setMuted] = useState(true); // start true — flip after hydration
   const mutedRef = { current: muted };
@@ -138,16 +145,23 @@ export function SoundFxProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const value = {
+    muted,
+    toggleMute,
+    playReveal: () => player.reveal(),
+    playCopy: () => player.copy(),
+    playLevelUp: () => player.levelUp(),
+    playComplete: () => player.complete(),
+    playFavorite: () => player.favorite(),
+  };
+
+  // Keep module-level ref in sync so components outside React tree can fire sounds
+  globalSoundFx.playReveal = value.playReveal;
+  globalSoundFx.playLevelUp = value.playLevelUp;
+  globalSoundFx.playCopy = value.playCopy;
+
   return (
-    <SoundContext.Provider value={{
-      muted,
-      toggleMute,
-      playReveal: () => player.reveal(),
-      playCopy: () => player.copy(),
-      playLevelUp: () => player.levelUp(),
-      playComplete: () => player.complete(),
-      playFavorite: () => player.favorite(),
-    }}>
+    <SoundContext.Provider value={value}>
       {children}
     </SoundContext.Provider>
   );

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import NixAvatar from "@/components/NixAvatar";
+import { SoundToggle } from "@/components/primitives/SoundFx";
 
 const NAV_LINKS = [
   { label: "Features", href: "/#features" },
@@ -64,6 +65,7 @@ export default function Navbar() {
 
         {/* Auth */}
         <div className="flex items-center gap-3">
+          <SoundToggle />
           {user ? (
             <>
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
