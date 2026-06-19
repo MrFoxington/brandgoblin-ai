@@ -245,6 +245,24 @@ export async function addRefillEnergy(
   const supabase = createAdminClient();
   const refillAmount = ENERGY_CONFIG.REFILL_AMOUNT;
 
+  // ── Idempotency guard ──────────────────────────────────────────────────────
+  // Stripe delivers webhooks at-least-once and retries on any error. Without
+  // this check, a redelivered "checkout.session.completed" would grant the
+  // refill twice for a single payment. Bail if we've already processed it.
+  if (stripePaymentId) {
+    const { data: existingTx } = await supabase
+      .from("energy_transactions")
+      .select("id")
+      .eq("transaction_type", "refill_purchase")
+      .eq("stripe_payment_id", stripePaymentId)
+      .maybeSingle();
+
+    if (existingTx) {
+      console.log(`[energy] refill ${stripePaymentId} already processed — skipping`);
+      return;
+    }
+  }
+
   const { data } = await supabase
     .from("user_energy_balances")
     .select("monthly_energy_remaining, refill_energy_total, refill_energy_remaining")
@@ -255,6 +273,29 @@ export async function addRefillEnergy(
   const newRefillRemaining = (data?.refill_energy_remaining ?? 0) + refillAmount;
   const balanceAfter = (data?.monthly_energy_remaining ?? 0) + newRefillRemaining;
 
+  // ── Write the ledger row FIRST as the idempotency lock ──────────────────────
+  // A partial unique index on stripe_payment_id (see migration) means a duplicate
+  // webhook fails here BEFORE we touch the balance — so a single payment can never
+  // grant energy twice, even if two redeliveries race past the guard above.
+  const { error: ledgerError } = await supabase.from("energy_transactions").insert({
+    user_id:          userId,
+    transaction_type: "refill_purchase",
+    amount:           refillAmount,
+    balance_after:    balanceAfter,
+    description:      "⚡ Creative Energy Refill purchase",
+    stripe_payment_id: stripePaymentId,
+  });
+
+  if (ledgerError) {
+    // 23505 = unique_violation → this payment was already granted. Safe to skip.
+    if (ledgerError.code === "23505") {
+      console.log(`[energy] refill ${stripePaymentId} already processed (race) — skipping`);
+      return;
+    }
+    throw ledgerError;
+  }
+
+  // Ledger insert succeeded → we own this grant. Now apply it to the balance.
   if (data) {
     await supabase
       .from("user_energy_balances")
@@ -271,15 +312,6 @@ export async function addRefillEnergy(
       refill_energy_remaining:  newRefillRemaining,
     });
   }
-
-  await supabase.from("energy_transactions").insert({
-    user_id:          userId,
-    transaction_type: "refill_purchase",
-    amount:           refillAmount,
-    balance_after:    balanceAfter,
-    description:      "⚡ Creative Energy Refill purchase",
-    stripe_payment_id: stripePaymentId,
-  });
 }
 
 // ── Revoke energy on plan downgrade ───────────────────────────────────────
