@@ -19,14 +19,14 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "Unlimited content generations",
-  "Additional social media posts",
-  "Blog posts",
-  "Email campaigns",
-  "Ad copy",
-  "Product descriptions",
-  "Marketing ideas",
-  "Continuous content engine",
+  "Monthly Creative Energy included",
+  "Social posts, blogs, emails & ads",
+  "Product descriptions & headlines",
+  "Marketing & campaign ideas",
+  "Content calendars",
+  "Brand voice tools",
+  "Access to all Creator Pro tools",
+  "Refill anytime for just $19",
 ];
 
 const AGENCY_FEATURES = [
@@ -145,7 +145,7 @@ export default function PricingPage() {
               <span className="badge-purple mb-4 self-start">Most popular</span>
               <h3 className="font-display text-xl font-bold text-white">Creator Pro</h3>
               <p className="mt-0.5 mb-0.5 text-xs font-semibold text-secondary">Your AI Marketing Department</p>
-              <p className="mt-1 mb-4 text-sm text-muted">Unlimited copywriter. Social manager. Content strategist. All in one.</p>
+              <p className="mt-1 mb-4 text-sm text-muted">Monthly Creative Energy included. Your AI copywriter, social manager, and content strategist — all in one.</p>
               <div className="mb-6 flex items-baseline gap-1">
                 <span className="font-display text-4xl font-black text-white">$19</span>
                 <span className="text-sm text-faint">/month</span>

@@ -3,10 +3,16 @@ import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CreatorProHub from "@/components/CreatorProHub";
+import EnergyWidget from "@/components/EnergyWidget";
+import RefillSuccessBanner from "@/components/RefillSuccessBanner";
 import Link from "next/link";
 import type { BrandGenerationRow, CreatorContentRow } from "@/types";
 
-export default async function CreatorProPage() {
+export default async function CreatorProPage({
+  searchParams,
+}: {
+  searchParams: { refill?: string };
+}) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) redirect("/login");
@@ -81,18 +87,30 @@ export default async function CreatorProPage() {
             ← Back to Brand Vault
           </Link>
 
-          {brandRows.length === 0 ? (
-            <div className="text-center py-24">
-              <span className="text-4xl block mb-4">🧌</span>
-              <h2 className="font-display text-xl font-bold text-white mb-2">Generate a brand first</h2>
-              <p className="text-sm text-muted mb-6">Creator Pro needs at least one saved brand to generate content for.</p>
-              <Link href="/generate" className="btn-primary px-8 py-3">
-                ✦ Create Your First Brand
-              </Link>
+          {searchParams.refill === "success" && <RefillSuccessBanner />}
+
+          <div className="flex flex-col xl:flex-row gap-8 items-start">
+            {/* Main content area */}
+            <div className="flex-1 min-w-0">
+              {brandRows.length === 0 ? (
+                <div className="text-center py-24">
+                  <span className="text-4xl block mb-4">🧌</span>
+                  <h2 className="font-display text-xl font-bold text-white mb-2">Generate a brand first</h2>
+                  <p className="text-sm text-muted mb-6">Creator Pro needs at least one saved brand to generate content for.</p>
+                  <Link href="/generate" className="btn-primary px-8 py-3">
+                    ✦ Create Your First Brand
+                  </Link>
+                </div>
+              ) : (
+                <CreatorProHub brands={brandRows} recentContent={contentRows} />
+              )}
             </div>
-          ) : (
-            <CreatorProHub brands={brandRows} recentContent={contentRows} />
-          )}
+
+            {/* Energy sidebar */}
+            <div className="w-full xl:w-72 shrink-0">
+              <EnergyWidget />
+            </div>
+          </div>
 
         </div>
       </main>

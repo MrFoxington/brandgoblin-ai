@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { BRAND_GOBLIN_SYSTEM_PROMPT } from "@/lib/prompts";
+import { checkEnergyForGeneration, deductEnergy, refundEnergy } from "@/lib/energy";
 import type { CreatorContentType, BrandVoiceMode } from "@/types";
 
 export const runtime = "nodejs";
@@ -152,6 +153,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
 
+  // ⚡ Check Creative Energy before generation
+  const energyCheck = await checkEnergyForGeneration(authData.user.id, body.contentType);
+  if (!energyCheck.allowed) {
+    return NextResponse.json({
+      error: "out_of_energy",
+      message: "Nix needs a Creative Energy refill before creating more magic.",
+      totalRemaining: energyCheck.totalRemaining,
+      cost: energyCheck.cost,
+      showRefillModal: true,
+    }, { status: 402 });
+  }
+
   try {
     const message = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
@@ -183,9 +196,26 @@ export async function POST(request: Request) {
 
     if (saveError) console.error("[creator/save]", saveError);
 
-    return NextResponse.json({ id: saved?.id, contentType: body.contentType, title, content });
+    // ⚡ Deduct Creative Energy after successful generation
+    const { balanceAfter } = await deductEnergy(authData.user.id, body.contentType, {
+      generationId: saved?.id,
+      modelUsed: "claude-haiku-4-5-20251001",
+      promptTokens: message.usage?.input_tokens,
+      completionTokens: message.usage?.output_tokens,
+    });
+
+    return NextResponse.json({
+      id: saved?.id,
+      contentType: body.contentType,
+      title,
+      content,
+      energyRemaining: balanceAfter,
+      energyCost: energyCheck.cost,
+    });
   } catch (err) {
     console.error("[/api/generate/creator]", err);
+    // Refund energy if generation failed after we would have deducted
+    // (we only deduct after success, so no refund needed here — but keeping for safety)
     return NextResponse.json({ error: "The goblin dropped the scroll. Try again." }, { status: 500 });
   }
 }

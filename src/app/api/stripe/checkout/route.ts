@@ -52,29 +52,58 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
     }
 
-    const { plan } = await request.json(); // "pro"
+    const body = await request.json();
+    const checkoutType = body.type ?? "subscription"; // "subscription" | "energy_refill"
 
-    // Reuse an existing Stripe customer if we already have one, so a user who
-    // upgrades, cancels, and re-subscribes stays a single customer record.
+    // Reuse an existing Stripe customer if we already have one
     const { data: userRow } = await supabase
       .from("users")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, plan")
       .eq("id", authData.user.id)
       .single();
 
     const existingCustomerId = userRow?.stripe_customer_id ?? undefined;
+    const customerParams = existingCustomerId
+      ? { customer: existingCustomerId }
+      : { customer_email: authData.user.email ?? undefined };
 
+    // ── Energy Refill (one-time $19 payment) ──────────────────────────────
+    if (checkoutType === "energy_refill") {
+      const refillPriceId = process.env.STRIPE_PRICE_ID_ENERGY_REFILL;
+      if (!refillPriceId) {
+        return NextResponse.json(
+          { error: "Energy refill isn't configured yet. (STRIPE_PRICE_ID_ENERGY_REFILL missing.)" },
+          { status: 503 }
+        );
+      }
+      if (userRow?.plan !== "pro") {
+        return NextResponse.json(
+          { error: "Creator Pro subscription required to purchase a refill." },
+          { status: 403 }
+        );
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [{ price: refillPriceId, quantity: 1 }],
+        ...customerParams,
+        success_url: `${appUrl}/dashboard/creator-pro?refill=success`,
+        cancel_url:  `${appUrl}/dashboard/creator-pro`,
+        metadata: { userId: authData.user.id, type: "energy_refill" },
+      });
+
+      return NextResponse.json({ url: session.url });
+    }
+
+    // ── Creator Pro subscription ───────────────────────────────────────────
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      ...(existingCustomerId
-        ? { customer: existingCustomerId }
-        : { customer_email: authData.user.email ?? undefined }),
+      ...customerParams,
       success_url: `${appUrl}/settings?upgraded=1`,
-      cancel_url: `${appUrl}/pricing`,
-      // Mirror metadata onto the subscription so later lifecycle webhooks can map back.
-      metadata: { userId: authData.user.id, plan },
-      subscription_data: { metadata: { userId: authData.user.id, plan } },
+      cancel_url:  `${appUrl}/pricing`,
+      metadata: { userId: authData.user.id, plan: "pro", type: "subscription" },
+      subscription_data: { metadata: { userId: authData.user.id, plan: "pro" } },
     });
 
     return NextResponse.json({ url: session.url });
