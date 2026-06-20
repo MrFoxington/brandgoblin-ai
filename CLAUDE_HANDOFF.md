@@ -58,16 +58,41 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 - **Energy refill price**: created live one-time $19 price → `STRIPE_PRICE_ID_ENERGY_REFILL` in Vercel.
 - **False low-energy warning fix** (`4fc8bc6`): dashboard showed "Less than 25% remaining" for
   everyone because it checked `!== "ok"` but the API returns `null` when healthy. Now guarded.
+- **🎉 APP LANDING PAGE REBUILT** (`32b406b`): emotional reframe ("Watch your idea become real"),
+  **interactive hero** with a real rate-limited `/api/teaser` endpoint (3/IP/hr, never returns the
+  full kit), **fabricated social proof REMOVED** (now honest founder note + "be one of the first"),
+  7-day-trial messaging everywhere, idea-spark section, animated Nix (`NixFloat`). New components:
+  `HeroInteractive`, `IdeaSparkSection`, `NixFloat`; `TestimonialsSection` made honest.
+  Spec: `docs/LANDING_REBUILD_BRIEF.md` (essentially fully implemented — do NOT rebuild).
+- **⚡ ENERGY REFILL CELEBRATION** (`c9dd549`, committed — ⚠️ NOT PUSHED, awaiting Fox's review):
+  replaced the small auto-dismiss `RefillSuccessBanner` with `RefillCelebration.tsx`, a full
+  celebration overlay on `/dashboard/creator-pro?refill=success`. Fetches `GET /api/energy/balance`
+  on mount (fresh total, no stale props), animates the energy bar filling from pre-refill level up
+  to the new total with a Framer Motion sparkle burst + floating celebrating Nix
+  (`/nix/celebrating-nix.png`), headline "⚡ You're brimming with Creative Energy!" + capacity line
+  via `getCapacityEstimates`, "✦ Let's build →" CTA scrolls to `#content-generator`, plays the
+  fanfare via `useSoundFx().playLevelUp` (respects global mute), respects `prefers-reduced-motion`
+  (final bar instantly, no anim), and strips `?refill=success` via `router.replace`. Modal is an
+  `absolute inset-0` overlay inside a now-`relative` `<main>` (NOT position:fixed). `tsc` + `npm run
+  build` both clean. NOT yet driven end-to-end in a browser — auth-gated route, needs a real Pro
+  login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Energy refill celebration moment** — build the "bar fills, Nix celebrates, ⚡ You're brimming
-   with Creative Energy!, Let's build →" overlay on `/dashboard/creator-pro?refill=success`.
-   Re-fetch balance, strip the URL param after, reduced-motion + muteable sound. (Prompt ready.)
-2. **Pre-launch must-dos**: ≥1 real testimonial; refund the test refill/sub in Stripe; rotate the
-   GitHub PAT (was exposed in chat).
-3. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
-   (public brand pages for SEO + gift-energy referral).
-4. **Phase 3 — Annual plan + $49 Launch Kit** (later; only matters once traffic exists).
+1. **Push + verify the refill celebration** — `c9dd549` is committed but NOT pushed. After Fox
+   reviews, push, then log in as a Pro user and hit `/dashboard/creator-pro?refill=success` to
+   confirm the overlay, bar fill, sound, and scroll work live.
+2. **GoDaddy marketing site sync** (IN PROGRESS via Arrow AI) — match `brandgoblinai.com` to the new
+   app landing: same offer (7-day trial), same hero, honest proof, CTAs → app `/signup`,
+   "Logo Direction" not "Logo Prompt". Spec: `docs/GODADDY_LANDING_ARROW_AI_BRIEF.md`.
+3. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; rotate the
+   GitHub PAT (was exposed in chat); hard-reload live app to confirm new landing is deployed.
+   ⚠️ Also: live Stripe **webhook signing secret was committed in plaintext** in
+   `docs/STRIPE_LIVE_CONFIG.md` and pushed — rotate it in Stripe + update Vercel + scrub the doc.
+4. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
+   (public brand pages for SEO + gift-energy referral). See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+   NOTE: when Fox next says "keep building", the open fork is which acquisition loop to build first
+   — public brand pages (SEO, additive, read-only) vs gift-energy referral (touches energy grants).
+5. **Phase 3 — Annual plan + $49 Launch Kit** (later; only matters once traffic exists).
 
 ### ✅ Done so far
 - **Stripe checkout + webhook hardened** (committed `392ad9e`): fails loudly on missing keys,
@@ -228,6 +253,8 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `ANTI_ABUSE_BRIEF.md` | Email verification / Google sign-in / Turnstile / trial-farming |
 | `COFOUNDER_LITE_BRIEF.md` | Additive brand-memory / welcome-back / library-search ideas |
 | `PHASE1_DUNNING_BRIEF.md` | Dunning spec (BUILT — for reference) |
+| `LANDING_REBUILD_BRIEF.md` | App landing rebuild (BUILT `32b406b` — interactive hero, honest proof) |
+| `GODADDY_LANDING_ARROW_AI_BRIEF.md` | Arrow AI prompt to sync the GoDaddy marketing site |
 
 ---
 
@@ -327,4 +354,4 @@ src/
 
 ---
 
-*Last updated: June 19, 2026 (late) — Live payments fully working end-to-end (webhook secret fix was the unlock). Dashboard crash + false-warning bugs fixed. Email verification + Resend live. Latest pushed commit: `4fc8bc6`. CLAUDE_HANDOFF.md edits are uncommitted — push with next commit. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top (next: refill celebration moment).*
+*Last updated: June 20, 2026 — Live payments working end-to-end. App landing page rebuilt (`32b406b`, PUSHED). Refill celebration moment shipped (`c9dd549`, committed but NOT pushed — awaiting Fox's review). Latest PUSHED commit: `32b406b`. In progress externally: GoDaddy marketing-site sync (Arrow AI). Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
