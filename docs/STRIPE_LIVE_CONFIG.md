@@ -44,7 +44,8 @@ secret** sitting in a live deployment. So: every Stripe value must be a LIVE val
   - `invoice.payment_failed`
   - `invoice.payment_succeeded`
 - **Signing secret** → reveal it → goes in Vercel as `STRIPE_WEBHOOK_SECRET`
-  - Current correct LIVE value: `whsec_kskDrc3eSdHgtggTdIPMzI4DAriyAU3W`
+  - ⚠️ Never commit the actual `whsec_…` value here — it lives only in Vercel env vars.
+    (The previous value was leaked and rotated on June 20, 2026.)
 
 ---
 
@@ -57,7 +58,7 @@ Set/verify every one of these. Stripe values must be the LIVE ones from §1.
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_live_…` |
 | `STRIPE_PRICE_ID_PRO` | live `price_…` for Creator Pro $19/mo recurring |
 | `STRIPE_PRICE_ID_ENERGY_REFILL` | live `price_…` for the $19 one-time refill |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_kskDrc3eSdHgtggTdIPMzI4DAriyAU3W` |
+| `STRIPE_WEBHOOK_SECRET` | live `whsec_…` from the webhook endpoint (set in Vercel only — never commit) |
 | `NEXT_PUBLIC_APP_URL` | `https://app.brandgoblinai.com` |
 | `NEXT_PUBLIC_SUPABASE_URL` | (unchanged — same for test/live) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (unchanged) |
