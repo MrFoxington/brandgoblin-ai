@@ -67,15 +67,41 @@ export async function POST(request: Request) {
       ? { customer: existingCustomerId }
       : { customer_email: authData.user.email ?? undefined };
 
-    // ── Energy Refill (one-time $19 payment) ──────────────────────────────
+    // ── Energy Refill (one-time payment — supports all three pack sizes) ──────
     if (checkoutType === "energy_refill") {
-      const refillPriceId = process.env.STRIPE_PRICE_ID_ENERGY_REFILL;
-      if (!refillPriceId) {
+      // Allowlist the three valid refill price IDs from env
+      const allowedRefillPrices = [
+        process.env.STRIPE_PRICE_ID_ENERGY_REFILL,
+        process.env.STRIPE_PRICE_ID_ENERGY_3000,
+        process.env.STRIPE_PRICE_ID_ENERGY_7000,
+      ].filter(Boolean) as string[];
+
+      if (allowedRefillPrices.length === 0) {
         return NextResponse.json(
-          { error: "Energy refill isn't configured yet. (STRIPE_PRICE_ID_ENERGY_REFILL missing.)" },
+          { error: "Energy refills aren't configured. (STRIPE_PRICE_ID_ENERGY_REFILL missing.)" },
           { status: 503 }
         );
       }
+
+      // Resolve pack key → price ID (keeps price IDs server-side only)
+      const packKeyMap: Record<string, string | undefined> = {
+        starter: process.env.STRIPE_PRICE_ID_ENERGY_REFILL,
+        value:   process.env.STRIPE_PRICE_ID_ENERGY_3000,
+        creator: process.env.STRIPE_PRICE_ID_ENERGY_7000,
+      };
+      const packKey = body.packKey as string | undefined;
+      const byPackKey = packKey ? packKeyMap[packKey] : undefined;
+      // Also accept a literal priceId for backward compatibility / direct API calls
+      const byPriceId = body.priceId as string | undefined;
+      const requestedPriceId = byPackKey ?? byPriceId ?? process.env.STRIPE_PRICE_ID_ENERGY_REFILL;
+
+      if (!requestedPriceId || !allowedRefillPrices.includes(requestedPriceId)) {
+        return NextResponse.json(
+          { error: "Invalid refill pack. Please choose a valid pack." },
+          { status: 400 }
+        );
+      }
+
       if (userRow?.plan !== "pro") {
         return NextResponse.json(
           { error: "Creator Pro subscription required to purchase a refill." },
@@ -83,13 +109,28 @@ export async function POST(request: Request) {
         );
       }
 
+      // Read energy_amount metadata from Stripe so the webhook is metadata-driven
+      // (no hardcoded price→energy map anywhere in the codebase)
+      let energyAmount: string | undefined;
+      try {
+        const price = await stripe.prices.retrieve(requestedPriceId);
+        energyAmount = price.metadata?.energy_amount;
+      } catch (err) {
+        console.error("[checkout] price metadata fetch failed:", err);
+        // Non-fatal — webhook falls back to ENERGY_CONFIG.REFILL_AMOUNT
+      }
+
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
-        line_items: [{ price: refillPriceId, quantity: 1 }],
+        line_items: [{ price: requestedPriceId, quantity: 1 }],
         ...customerParams,
         success_url: `${appUrl}/dashboard/creator-pro?refill=success`,
         cancel_url:  `${appUrl}/dashboard/creator-pro`,
-        metadata: { userId: authData.user.id, type: "energy_refill" },
+        metadata: {
+          userId: authData.user.id,
+          type: "energy_refill",
+          ...(energyAmount ? { energyAmount } : {}),
+        },
       });
 
       return NextResponse.json({ url: session.url });

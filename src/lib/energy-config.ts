@@ -47,7 +47,7 @@ export const ENERGY_CONFIG = {
     // ── Brand generation (Pro users) ──────────
     brand_generation:        50,
 
-    // ── Future: Goblin Studio ─────────────────
+    // ── Goblin Studio (legacy stubs — Studio uses computeStudioEnergyCost()) ──
     image_generation:       150,
     image_variation:        100,
     image_hires:            250,
@@ -75,6 +75,151 @@ export function getEnergyWarningLevel(remaining: number, monthlyAllowance: numbe
   if (ratio <= ENERGY_CONFIG.CRITICAL_THRESHOLD) return "critical";
   if (ratio <= ENERGY_CONFIG.LOW_THRESHOLD) return "low";
   return null;
+}
+
+// ── Goblin Studio model registry ──────────────────────────────────────────
+// Prices verified vs fal.ai public pricing June 20 2026.
+// Re-verify each model's live price + license before flipping Studio live.
+//
+// costUnit:
+//   'per_megapixel' → usdRate is $/MP; MP = ceil(width × height / 1_000_000)
+//   'flat'          → usdRate is a fixed $/image cost
+//   'per_second'    → usdRate is $/sec (video only)
+//
+// NEVER enable a model not listed here. Energy is always computed at runtime
+// from usdRate so a price change = one number edit, never re-tuned constants.
+
+export type StudioCostUnit = "per_megapixel" | "flat" | "per_second";
+export type StudioModelKey =
+  | "flux_schnell"
+  | "flux_pro_v1"
+  | "seedream_v45"
+  | "bg_removal"
+  | "clarity_upscaler"
+  | "wan_2_6"
+  | "kling_3_0";
+
+export interface StudioModel {
+  falEndpoint: string;
+  replicateModel?: string;
+  costUnit: StudioCostUnit;
+  usdRate: number;         // $/MP | $/img | $/sec
+  license: string;
+  defaultFor?: "image" | "video";
+  enableSafetyChecker: boolean;
+}
+
+export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
+  // ── Phase 1: Images ───────────────────────────────────────────────────────
+  flux_schnell: {
+    falEndpoint: "fal-ai/flux/schnell",
+    replicateModel: "black-forest-labs/flux-schnell",
+    costUnit: "per_megapixel",
+    usdRate: 0.003,          // $0.003/MP — verified June 20 2026
+    license: "Apache-2.0",
+    defaultFor: "image",
+    enableSafetyChecker: true,
+  },
+  flux_pro_v1: {
+    falEndpoint: "fal-ai/flux-pro/v1.1",
+    costUnit: "per_megapixel",
+    usdRate: 0.04,           // $0.04/MP — verified June 20 2026
+    license: "commercial-via-fal",
+    enableSafetyChecker: true,
+  },
+  seedream_v45: {
+    falEndpoint: "fal-ai/bytedance/seedream/v4.5/text-to-image",
+    costUnit: "flat",
+    usdRate: 0.03,           // $0.03/image — verified June 20 2026
+    license: "commercial-via-fal",
+    enableSafetyChecker: true,
+  },
+  bg_removal: {
+    falEndpoint: "fal-ai/imageutils/rembg",
+    costUnit: "flat",
+    usdRate: 0.01,           // ~$0.01/image — re-verify before launch
+    license: "commercial-via-fal",
+    enableSafetyChecker: false,
+  },
+  clarity_upscaler: {
+    falEndpoint: "fal-ai/clarity-upscaler",
+    costUnit: "per_megapixel",
+    usdRate: 0.03,           // $0.03/MP of INPUT — re-verify before launch
+    license: "commercial-via-fal",
+    enableSafetyChecker: false,
+  },
+  // ── Phase 2: Video (mapped; not wired yet) ────────────────────────────────
+  wan_2_6: {
+    falEndpoint: "fal-ai/wan-video/wan2.6-14b",
+    costUnit: "per_second",
+    usdRate: 0.05,           // $0.05/sec — re-verify before launch
+    license: "commercial-via-fal",
+    defaultFor: "video",
+    enableSafetyChecker: true,
+  },
+  kling_3_0: {
+    falEndpoint: "fal-ai/kling-video/v1.6/standard/text-to-video",
+    costUnit: "per_second",
+    usdRate: 0.10,           // $0.10/sec — re-verify before launch
+    license: "commercial-via-fal",
+    enableSafetyChecker: true,
+  },
+};
+
+// Allowed output dimensions per image type — PIN these server-side to
+// prevent users from requesting arbitrary large sizes that erode margin.
+// Megapixels = ceil(width × height / 1_000_000).
+export type ImageType = "logo_concept" | "social_graphic" | "product_art";
+
+export interface PinnedSize {
+  falSize: string;
+  width: number;
+  height: number;
+  label: string;
+}
+
+export const IMAGE_TYPE_SIZES: Record<ImageType, PinnedSize> = {
+  logo_concept:   { falSize: "square_hd",     width: 1024, height: 1024, label: "1024×1024" },
+  social_graphic: { falSize: "landscape_4_3", width: 1024, height: 768,  label: "1024×768"  },
+  product_art:    { falSize: "square_hd",     width: 1024, height: 1024, label: "1024×1024" },
+};
+
+/** ceil(pixels / 1_000_000) matching fal.ai billing rounding */
+export function megapixelsForSize(width: number, height: number): number {
+  return Math.ceil((width * height) / 1_000_000);
+}
+
+/**
+ * Compute energy cost from the model registry at runtime.
+ * energy = ceil(usdCost × MARKUP / 0.018)
+ * Never call with guessed/hardcoded numbers — always pass dimensions from
+ * IMAGE_TYPE_SIZES (images) or explicit durationSeconds (video).
+ */
+export function computeStudioEnergyCost(
+  modelKey: StudioModelKey,
+  params: { width?: number; height?: number; durationSeconds?: number } = {}
+): number {
+  const model = STUDIO_MODELS[modelKey];
+  const markup = parseInt(process.env.ENERGY_MARKUP_MULTIPLIER ?? "10");
+
+  let usdCost: number;
+  if (model.costUnit === "per_megapixel") {
+    const mp = megapixelsForSize(params.width ?? 1024, params.height ?? 1024);
+    usdCost = model.usdRate * mp;
+  } else if (model.costUnit === "per_second") {
+    usdCost = model.usdRate * (params.durationSeconds ?? 5);
+  } else {
+    usdCost = model.usdRate;
+  }
+
+  return Math.ceil((usdCost * markup) / 0.018);
+}
+
+/** Returns an allowed image type's pinned size, throwing on unknown types. */
+export function getPinnedSize(imageType: ImageType): PinnedSize {
+  const size = IMAGE_TYPE_SIZES[imageType];
+  if (!size) throw new Error(`Unknown imageType: ${imageType}`);
+  return size;
 }
 
 /** Rough estimate of what a user can still create, shown in the UI */

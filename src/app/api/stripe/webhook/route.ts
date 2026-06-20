@@ -48,12 +48,15 @@ export async function POST(request: Request) {
       if (!userId) break;
 
       if (type === "energy_refill") {
-        // ⚡ Energy Refill purchase — add energy, don't touch plan
+        // ⚡ Energy Refill — amount comes from Stripe price metadata (set at checkout)
         const paymentId = typeof session.payment_intent === "string"
           ? session.payment_intent
           : session.id;
-        await addRefillEnergy(userId, paymentId);
-        console.log(`[webhook] energy refill added for user ${userId}`);
+        const energyAmount = session.metadata?.energyAmount
+          ? parseInt(session.metadata.energyAmount)
+          : undefined; // falls back to ENERGY_CONFIG.REFILL_AMOUNT inside addRefillEnergy
+        await addRefillEnergy(userId, paymentId, energyAmount);
+        console.log(`[webhook] energy refill +${energyAmount ?? "default"} for user ${userId}`);
 
       } else {
         // 🆕 New Creator Pro subscription — clear trial flag so state is unambiguous

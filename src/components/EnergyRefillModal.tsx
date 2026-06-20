@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 
+interface RefillPack {
+  priceId: string;
+  energy: number;
+  price: string;
+  label: string;
+  badge?: string;
+}
+
 interface Props {
   isOpen:    boolean;
   onClose:   () => void;
@@ -10,11 +18,39 @@ interface Props {
 }
 
 export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState<string | null>(null);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState<string | null>(null);
+  const [selectedPack, setSelectedPack] = useState<string>(
+    process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ENERGY_REFILL ?? "starter"
+  );
 
   if (!isOpen) return null;
 
+  // Pack definitions — priceId sent to checkout, energy for display only
+  const packs: RefillPack[] = [
+    {
+      priceId: "starter",   // resolved server-side to STRIPE_PRICE_ID_ENERGY_REFILL
+      energy:  1000,
+      price:   "$19",
+      label:   "Starter",
+    },
+    {
+      priceId: "value",     // resolved server-side to STRIPE_PRICE_ID_ENERGY_3000
+      energy:  3000,
+      price:   "$49",
+      label:   "Value",
+      badge:   "Best Value",
+    },
+    {
+      priceId: "creator",   // resolved server-side to STRIPE_PRICE_ID_ENERGY_7000
+      energy:  7000,
+      price:   "$99",
+      label:   "Creator",
+    },
+  ];
+
+  // Map pack keys to env price IDs client-side isn't possible (env isn't exposed),
+  // so we send a pack key and the server resolves it.
   async function handleRefill() {
     setLoading(true);
     setError(null);
@@ -22,7 +58,10 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "energy_refill" }),
+        body: JSON.stringify({
+          type: "energy_refill",
+          packKey: selectedPack,          // server resolves this to the env price ID
+        }),
       });
       const data = await res.json();
       if (data.url) {
@@ -61,43 +100,53 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
             ⚡
           </div>
           <h2 className="font-display text-2xl font-black text-white">
-            {isEmpty ? "Nix needs a refill!" : "Need More Creative Energy?"}
+            {isEmpty ? "Nix needs a refill!" : "Top Up Creative Energy"}
           </h2>
           <p className="mt-2 text-sm text-muted">
             {isEmpty
-              ? "Nix is out of Creative Energy for now. Refill instantly and keep the magic going."
-              : "You've used most of this month's Creative Energy. Refill instantly and keep creating with Nix."}
+              ? "You're out of Creative Energy. Refill instantly and keep the magic going."
+              : "More energy means more images, social graphics, and blog posts. Pick your pack."}
           </p>
         </div>
 
-        {/* What you get */}
-        <div className="mb-6 rounded-2xl bg-primary/8 border border-primary/20 p-4">
-          <p className="text-xs uppercase tracking-widest text-primary-light font-bold mb-3">
-            What you get
-          </p>
-          <ul className="space-y-2">
-            {[
-              "Another full month of Creator Pro energy",
-              "Unlimited tool access while energy lasts",
-              "Social posts, blogs, emails, ads & more",
-              "Applies to your account instantly",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-muted">
-                <span className="text-secondary mt-0.5 shrink-0">✓</span>
-                {item}
-              </li>
-            ))}
-          </ul>
+        {/* Pack selector */}
+        <div className="mb-6 space-y-2">
+          {packs.map((pack) => (
+            <button
+              key={pack.priceId}
+              onClick={() => setSelectedPack(pack.priceId)}
+              className={`w-full rounded-2xl border p-4 flex items-center justify-between text-left transition-all ${
+                selectedPack === pack.priceId
+                  ? "border-primary bg-primary/10"
+                  : "border-white/10 bg-white/3 hover:border-primary/40"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-4 h-4 rounded-full border-2 transition-colors shrink-0 ${
+                  selectedPack === pack.priceId
+                    ? "border-primary bg-primary"
+                    : "border-white/20"
+                }`} />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-white">{pack.label}</span>
+                    {pack.badge && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/20 text-secondary font-semibold">
+                        {pack.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-faint">⚡ {pack.energy.toLocaleString()} energy</span>
+                </div>
+              </div>
+              <span className="font-display text-xl font-black text-white">{pack.price}</span>
+            </button>
+          ))}
         </div>
 
-        {/* Price */}
-        <div className="mb-6 text-center">
-          <span className="font-display text-4xl font-black text-white">$19</span>
-          <span className="text-sm text-faint ml-2">one-time refill</span>
-          <p className="mt-1 text-xs text-faint">
-            Your Creator Pro subscription stays the same. This is a one-time refill.
-          </p>
-        </div>
+        <p className="mb-6 text-center text-xs text-faint">
+          One-time purchase · Your Creator Pro subscription stays the same
+        </p>
 
         {error && (
           <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2 text-xs text-red-400">
@@ -111,7 +160,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
           disabled={loading}
           className="w-full btn-primary py-4 text-base font-bold disabled:opacity-60"
         >
-          {loading ? "Opening checkout…" : "⚡ Refill Creative Energy"}
+          {loading ? "Opening checkout…" : `⚡ Refill — ${packs.find((p) => p.priceId === selectedPack)?.price}`}
         </button>
 
         <button

@@ -31,7 +31,7 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ✅ HONEST STATUS (updated June 19, 2026 — late) — READ FIRST
+## ✅ HONEST STATUS (updated June 20, 2026) — READ FIRST
 
 **REVENUE-CAPABLE AND WORKING END-TO-END IN LIVE MODE.** Real purchases, energy refills, the
 monthly Pro energy grant, dunning, and the customer portal all verified working with the live
@@ -41,6 +41,40 @@ is the landing page). Email verification + Resend transactional email are live.
 **The constraint is DISTRIBUTION, not product.** The app is built, magical, charges money, and is
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+
+### 🎨 GOBLIN STUDIO — Phase 1 BUILT (June 20, 2026) — NOT YET PUSHED
+Phase 1 code complete, `tsc + npm run build` both clean. **Do NOT push until reviewed.**
+- **New routes:** `/dashboard/studio` (paid Pro only), `/api/studio/jobs`, `/api/studio/jobs/[jobId]`,
+  `/api/studio/webhook/fal`, `/api/studio/sweep`
+- **New libs:** `src/lib/studio/models.ts`, `provider.ts`, `jobs.ts`
+- **Modified:** `energy-config.ts` (STUDIO_MODELS registry + computeStudioEnergyCost),
+  `energy.ts` (reserveEnergy + finalizeReservation + addRefillEnergy amount param),
+  `api/stripe/checkout` (3-pack support + packKey→priceId mapping),
+  `api/stripe/webhook` (metadata-driven energy amount), `EnergyRefillModal` (3-pack UI)
+- **DB migration to run:** `supabase/migrations/20260620_studio_phase1.sql` — creates `studio_jobs`
+  table + `reserve_energy()` Postgres function (the atomic-reservation fix)
+- **Key guardrails shipped:**
+  - Trial gate: `plan !== "pro"` in both the page AND the API — trial users see upgrade prompt
+  - Atomic reservation: Postgres `reserve_energy()` FOR UPDATE lock; no reservation → no job
+  - Energy never lost: fal webhook is primary completion driver; client polls as backup; stale
+    sweeper refunds jobs stuck > 10 min (runs on page load + `/api/studio/sweep`)
+  - Moderation: fal's built-in `enable_safety_checker` + `has_nsfw_concepts[]` — blocked jobs
+    get full energy refund
+  - History: URLs always re-signed from `storage_path` on read, never served stale
+  - Per-user concurrency cap: 2 concurrent jobs max
+  - All energy labels computed from `computeStudioEnergyCost()` — never hardcoded
+- **Model registry (exact fal endpoints, verified June 20):**
+  - `fal-ai/flux/schnell` — $0.003/MP, default image ✓
+  - `fal-ai/flux-pro/v1.1` — $0.04/MP, premium ✓ (`fal-ai/flux-pro` is deprecated)
+  - `fal-ai/bytedance/seedream/v4.5/text-to-image` — $0.03 flat, artistic ✓
+  - `fal-ai/imageutils/rembg` — ~$0.01 flat, bg removal (Phase 1 UI stub)
+  - `fal-ai/clarity-upscaler` — $0.03/MP input, upscale (Phase 1 UI stub)
+  - Video models mapped but NOT built: Wan 2.6, Kling 3.0 (Phase 2)
+- **Before flipping live:** run `supabase/migrations/20260620_studio_phase1.sql` in Supabase SQL
+  editor; re-verify fal.ai prices on each model page; verify Seedream + rembg + clarity-upscaler
+  costs; FLUX dev is NON-commercial (excluded; schnell is Apache-2.0 ✓)
+- **Cost model (locked):** `energy = ceil(usdCost × MARKUP / 0.018)`, MARKUP=10 env-tunable,
+  pricing is per-megapixel (not flat) — margin correct at any resolution
 
 ### 🔥 BIG FIXES SHIPPED June 19 (all pushed + live)
 - **Reverse trial + anti-farming** (Phase 2 + Layer 4): 7-day auto-Pro, `getEffectivePlan()`
@@ -78,23 +112,37 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
+1. **Review + push Goblin Studio Phase 1** — code is built and build-verified. Review the changes
+   then push. Before Studio goes live to users: run the DB migration in Supabase SQL editor
+   (`supabase/migrations/20260620_studio_phase1.sql`), re-verify fal model prices, confirm each
+   model's commercial license on its fal model page.
+2. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
    and hit `/dashboard/creator-pro?refill=success` to confirm the overlay, bar fill, sound, and
    scroll-to-generator all work in production (was build-verified only, never driven live).
-2. **GoDaddy marketing site sync** (IN PROGRESS via Arrow AI) — match `brandgoblinai.com` to the new
-   app landing: same offer (7-day trial), same hero, honest proof, CTAs → app `/signup`,
-   "Logo Direction" not "Logo Prompt". Spec: `docs/GODADDY_LANDING_ARROW_AI_BRIEF.md`.
-3. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; hard-reload
+3. **GoDaddy marketing site sync** — ⚠️ AUDITED June 20: Airo's first pass **did NOT take**. Live
+   `brandgoblinai.com` still shows the old page — pricing still "$0 / one complete brand generation"
+   (no 7-day trial), "Demo Video Coming Soon" still there, "Logo Prompt Creator" still naming
+   Midjourney/DALL-E, full "Where Future Magic Is Forged" six-product grid still there, CTAs point
+   to app root not `/signup`, hero headline not synced to "Watch your idea become real." Honest-proof
+   guardrail DID hold (no fake stats/testimonials). **Corrected paste-in issued:**
+   `docs/GODADDY_LANDING_ARROW_AI_BRIEF_V2.md` — supersedes v1. V2 adds strategic DELETIONS per
+   Fox's call (June 20): remove the "See what BrandGoblin conjures" canned-examples section
+   (redundant with Mana Brew; no dopamine), remove the Goblin Labs vaporware grid, and **cut Agency
+   Edition entirely** (no card, no waitlist, no nav/footer links). Page now sells exactly TWO things:
+   Free Trial (7 days of everything) + Creator Pro $19/mo — all focus on the create→hook→daily-return
+   →refill-energy loop. Add tools/tiers later when paying customers ask. Next: paste V2 into Airo,
+   then hard-reload live to verify the checklist at the bottom of V2.
+4. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; hard-reload
    live app to confirm new landing is deployed.
    ✅ DONE June 20: Stripe **webhook signing secret rotated** (was leaked in `4fc8bc6`) — new
    secret set in Stripe + Vercel, old value scrubbed from `docs/STRIPE_LIVE_CONFIG.md` (`5c73e4f`).
    Old secret still exists in git history but is now useless. The leaked GitHub PATs are dead
    (GitHub auto-revoked them); replaced entirely by SSH — see Git/Deploy notes below.
-4. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
+5. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
    (public brand pages for SEO + gift-energy referral). See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
    NOTE: when Fox next says "keep building", the open fork is which acquisition loop to build first
    — public brand pages (SEO, additive, read-only) vs gift-energy referral (touches energy grants).
-5. **Phase 3 — Annual plan + $49 Launch Kit** (later; only matters once traffic exists).
+6. **Phase 3 — Annual plan + $49 Launch Kit** (later; only matters once traffic exists).
 
 ### ✅ Done so far
 - **Stripe checkout + webhook hardened** (committed `392ad9e`): fails loudly on missing keys,
@@ -256,7 +304,11 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `COFOUNDER_LITE_BRIEF.md` | Additive brand-memory / welcome-back / library-search ideas |
 | `PHASE1_DUNNING_BRIEF.md` | Dunning spec (BUILT — for reference) |
 | `LANDING_REBUILD_BRIEF.md` | App landing rebuild (BUILT `32b406b` — interactive hero, honest proof) |
-| `GODADDY_LANDING_ARROW_AI_BRIEF.md` | Arrow AI prompt to sync the GoDaddy marketing site |
+| `GODADDY_LANDING_ARROW_AI_BRIEF.md` | Arrow AI prompt to sync the GoDaddy marketing site (v1) |
+| `GODADDY_LANDING_ARROW_AI_BRIEF_V2.md` | ⭐ Corrected Airo paste-in — supersedes v1 (audit June 20) |
+| `STUDIO_SETUP_RUNBOOK.md` | ⭐ External setup Fox must complete before Studio goes live — fal.ai + Replicate keys, 3 Stripe refill prices (metadata-driven), `studio-assets` bucket, env table, per-model license checks. |
+| `STUDIO_MODEL_COST_MAP.md` | ⭐ Green-lit models + energy pricing (energy = cost/0.0018 = 10× cost). Default image FLUX.1 schnell (NOT dev), default video Wan 2.6. fal prices verified June 20. |
+| `GOBLIN_STUDIO_BRIEF.md` | ⭐ Goblin Studio build spec — all decisions LOCKED June 20. Cost model (energy = USD cost ×10 markup, never on us), atomic energy reservation, refill packs $19/$49/$99, trial = 1 free image + video-CTA (render gated to Pro), bring-your-own-brand input, TikTok/Reels/Shorts. Providers: fal.ai primary / Replicate fallback / Higgsfield optional. Positioning: text unlimited, media = "energy powers your images & videos." |
 
 ---
 
@@ -361,4 +413,7 @@ src/
 
 ---
 
-*Last updated: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
+*Last updated: June 20, 2026 (v4) — Goblin Studio fully spec'd + external setup complete (fal.ai +
+Replicate + Stripe packs + bucket all wired); ready for Claude Code to build Phase 1. Airo landing
+V2 + Agency-cut issued. — (v3 below)*
+*Earlier: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*

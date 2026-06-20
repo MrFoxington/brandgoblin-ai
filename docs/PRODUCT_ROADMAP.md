@@ -34,10 +34,15 @@
 - Agency dashboard
 - Waitlist: `agency_waitlist` table in Supabase
 
-### 🔜 Goblin Studio
-- Full brand identity design
-- Logo creation
-- Visual assets
+### 🏗️ Goblin Studio — Phase 1 BUILT (June 20, 2026)
+- **Phase 1 live:** atomic energy reservation, model registry, image generation
+- `/dashboard/studio` — paid Pro only (trial users shown upgrade prompt)
+- fal.ai primary (FLUX schnell/pro, Seedream 4.5) + Replicate fallback
+- Stale-job sweeper + fal webhook for server-side completion
+- Storage in private `studio-assets` Supabase bucket with signed URLs
+- 3-pack energy refill UI ($19/$49/$99) driven by Stripe price metadata
+- **Phase 2 next:** short-form video (Wan 2.6 / Kling 3.0 — mapped, not built)
+- **Phase 3 later:** background removal, upscale, bring-your-own-brand input
 
 ### 🔜 Goblin Labs
 - Experimental AI tools

@@ -252,14 +252,96 @@ export async function grantMonthlyEnergy(
   });
 }
 
-// ── Add refill energy (on $19 refill purchase) ────────────────────────────
+// ── Atomic energy reservation (Studio) ────────────────────────────────────
+// Calls the reserve_energy Postgres function which holds a FOR UPDATE lock,
+// checks the balance, and decrements atomically — no race condition possible.
+// Returns the energy_transactions row ID so it can be finalized on success.
+
+export interface ReserveResult {
+  success: boolean;
+  txId?: string;
+  totalRemaining: number;
+}
+
+export async function reserveEnergy(
+  userId: string,
+  amount: number
+): Promise<ReserveResult> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .rpc("reserve_energy", { p_user_id: userId, p_amount: amount });
+
+  if (error) {
+    console.error("[reserveEnergy] RPC error:", error);
+    return { success: false, totalRemaining: 0 };
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row?.success) {
+    return {
+      success: false,
+      totalRemaining: (row?.monthly_remaining ?? 0) + (row?.refill_remaining ?? 0),
+    };
+  }
+
+  // Write an auditable ledger row for the reservation (type changes to 'usage' on finalize)
+  const { data: tx, error: txError } = await supabase
+    .from("energy_transactions")
+    .insert({
+      user_id:          userId,
+      transaction_type: "reservation",
+      amount:           -amount,
+      balance_after:    (row.monthly_remaining ?? 0) + (row.refill_remaining ?? 0),
+      description:      "Studio energy reservation",
+    })
+    .select("id")
+    .single();
+
+  if (txError || !tx) {
+    console.error("[reserveEnergy] ledger insert failed:", txError);
+    // The balance was already decremented — refund it so energy isn't silently lost
+    await refundEnergy(userId, amount, "Reservation ledger failure — auto-refund");
+    return { success: false, totalRemaining: 0 };
+  }
+
+  return {
+    success: true,
+    txId: tx.id,
+    totalRemaining: (row.monthly_remaining ?? 0) + (row.refill_remaining ?? 0),
+  };
+}
+
+// ── Finalize reservation → convert to permanent usage ─────────────────────
+// Call after the studio asset is stored and the job is marked completed.
+
+export async function finalizeReservation(
+  txId: string,
+  jobId: string,
+  description: string
+): Promise<void> {
+  const supabase = createAdminClient();
+  await supabase
+    .from("energy_transactions")
+    .update({
+      transaction_type:        "usage",
+      description,
+      related_generation_id:   jobId,
+    })
+    .eq("id", txId);
+}
+
+// ── Add refill energy (on energy refill purchase) ─────────────────────────
+// `amount` is read from the Stripe price's energy_amount metadata; falls
+// back to ENERGY_CONFIG.REFILL_AMOUNT for backward compatibility.
 
 export async function addRefillEnergy(
   userId: string,
-  stripePaymentId: string
+  stripePaymentId: string,
+  amount?: number
 ): Promise<void> {
   const supabase = createAdminClient();
-  const refillAmount = ENERGY_CONFIG.REFILL_AMOUNT;
+  const refillAmount = amount ?? ENERGY_CONFIG.REFILL_AMOUNT;
 
   // ── Idempotency guard ──────────────────────────────────────────────────────
   // Stripe delivers webhooks at-least-once and retries on any error. Without

@@ -1,3 +1,26 @@
+// ---------- Goblin Studio ----------
+
+export interface StudioJobRow {
+  id: string;
+  user_id: string;
+  brand_id: string | null;
+  job_type: string;
+  model_key: string;
+  image_type: string | null;
+  image_size: string;
+  energy_reserved: number;
+  status: "pending" | "running" | "completed" | "failed" | "cancelled" | "moderation_blocked";
+  provider: string;
+  provider_job_id: string | null;
+  prompt: string | null;
+  output_url: string | null;
+  storage_path: string | null;
+  error_message: string | null;
+  reservation_tx_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // ---------- Database row types ----------
 
 export type Plan = "free" | "pro" | "agency";
