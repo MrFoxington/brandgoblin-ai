@@ -84,10 +84,12 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 2. **GoDaddy marketing site sync** (IN PROGRESS via Arrow AI) — match `brandgoblinai.com` to the new
    app landing: same offer (7-day trial), same hero, honest proof, CTAs → app `/signup`,
    "Logo Direction" not "Logo Prompt". Spec: `docs/GODADDY_LANDING_ARROW_AI_BRIEF.md`.
-3. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; rotate the
-   GitHub PAT (was exposed in chat); hard-reload live app to confirm new landing is deployed.
-   ⚠️ Also: live Stripe **webhook signing secret was committed in plaintext** in
-   `docs/STRIPE_LIVE_CONFIG.md` and pushed — rotate it in Stripe + update Vercel + scrub the doc.
+3. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; hard-reload
+   live app to confirm new landing is deployed.
+   ✅ DONE June 20: Stripe **webhook signing secret rotated** (was leaked in `4fc8bc6`) — new
+   secret set in Stripe + Vercel, old value scrubbed from `docs/STRIPE_LIVE_CONFIG.md` (`5c73e4f`).
+   Old secret still exists in git history but is now useless. The leaked GitHub PATs are dead
+   (GitHub auto-revoked them); replaced entirely by SSH — see Git/Deploy notes below.
 4. **Get users** (the real lever): soft launch to beta crew + share cards, then acquisition loops
    (public brand pages for SEO + gift-energy referral). See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
    NOTE: when Fox next says "keep building", the open fork is which acquisition loop to build first
@@ -300,10 +302,15 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 ## 10. HOW PUSHING TO GITHUB WORKS
 
 - Vercel auto-deploys when you push to `main`
-- To push you need a GitHub PAT (Personal Access Token) with `repo` scope
-- Generate at: GitHub → Settings → Developer Settings → Personal Access Tokens → Tokens (classic)
-- Claude uses it temporarily to push, then clears it from the remote URL immediately
-- You should NOT share PATs in chat — but we have been doing this for convenience. Consider switching to SSH keys for a more permanent solution.
+- **SSH is set up (June 20, 2026) — just run `git push origin main` directly.** No PAT, no
+  set-URL/clear dance, nothing expires.
+- The remote uses the SSH URL: `git@github.com:MrFoxington/brandgoblin-ai.git`
+- An ed25519 key lives at `~/.ssh/id_ed25519` (private key never leaves the Mac); its public half
+  is registered in GitHub → Settings → SSH and GPG keys.
+- ⚠️ The old PAT flow is DEAD — every PAT pasted in chat got auto-revoked by GitHub's secret
+  scanner. Do not go back to PATs. If a push ever fails auth, the key/agent is the thing to check,
+  not a token.
+- Recurring gotcha: if `.git/index.lock` exists, `rm -f .git/index.lock` then retry.
 
 ---
 
@@ -354,4 +361,4 @@ src/
 
 ---
 
-*Last updated: June 20, 2026 — Live payments working end-to-end. App landing page rebuilt (`32b406b`, PUSHED). Refill celebration moment shipped + PUSHED (`c9dd549`). Latest PUSHED commit: `5cd5880` (this handoff). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
+*Last updated: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
