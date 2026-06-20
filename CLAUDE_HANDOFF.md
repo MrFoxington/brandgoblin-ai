@@ -64,7 +64,7 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
   7-day-trial messaging everywhere, idea-spark section, animated Nix (`NixFloat`). New components:
   `HeroInteractive`, `IdeaSparkSection`, `NixFloat`; `TestimonialsSection` made honest.
   Spec: `docs/LANDING_REBUILD_BRIEF.md` (essentially fully implemented — do NOT rebuild).
-- **⚡ ENERGY REFILL CELEBRATION** (`c9dd549`, committed — ⚠️ NOT PUSHED, awaiting Fox's review):
+- **⚡ ENERGY REFILL CELEBRATION** (`c9dd549`, committed + PUSHED ✅):
   replaced the small auto-dismiss `RefillSuccessBanner` with `RefillCelebration.tsx`, a full
   celebration overlay on `/dashboard/creator-pro?refill=success`. Fetches `GET /api/energy/balance`
   on mount (fresh total, no stale props), animates the energy bar filling from pre-refill level up
@@ -78,9 +78,9 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Push + verify the refill celebration** — `c9dd549` is committed but NOT pushed. After Fox
-   reviews, push, then log in as a Pro user and hit `/dashboard/creator-pro?refill=success` to
-   confirm the overlay, bar fill, sound, and scroll work live.
+1. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
+   and hit `/dashboard/creator-pro?refill=success` to confirm the overlay, bar fill, sound, and
+   scroll-to-generator all work in production (was build-verified only, never driven live).
 2. **GoDaddy marketing site sync** (IN PROGRESS via Arrow AI) — match `brandgoblinai.com` to the new
    app landing: same offer (7-day trial), same hero, honest proof, CTAs → app `/signup`,
    "Logo Direction" not "Logo Prompt". Spec: `docs/GODADDY_LANDING_ARROW_AI_BRIEF.md`.
@@ -354,4 +354,4 @@ src/
 
 ---
 
-*Last updated: June 20, 2026 — Live payments working end-to-end. App landing page rebuilt (`32b406b`, PUSHED). Refill celebration moment shipped (`c9dd549`, committed but NOT pushed — awaiting Fox's review). Latest PUSHED commit: `32b406b`. In progress externally: GoDaddy marketing-site sync (Arrow AI). Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
+*Last updated: June 20, 2026 — Live payments working end-to-end. App landing page rebuilt (`32b406b`, PUSHED). Refill celebration moment shipped + PUSHED (`c9dd549`). Latest PUSHED commit: `5cd5880` (this handoff). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
