@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CreatorProHub from "@/components/CreatorProHub";
 import EnergyWidget from "@/components/EnergyWidget";
-import RefillSuccessBanner from "@/components/RefillSuccessBanner";
+import RefillCelebration from "@/components/RefillCelebration";
 import Link from "next/link";
 import type { BrandGenerationRow, CreatorContentRow } from "@/types";
 
@@ -81,7 +81,9 @@ export default async function CreatorProPage({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-12">
+      <main className="relative flex-1 px-4 py-12">
+        {searchParams.refill === "success" && <RefillCelebration />}
+
         <div className="mx-auto max-w-6xl">
 
           {/* Back nav */}
@@ -92,11 +94,9 @@ export default async function CreatorProPage({
             ← Back to Brand Vault
           </Link>
 
-          {searchParams.refill === "success" && <RefillSuccessBanner />}
-
           <div className="flex flex-col xl:flex-row gap-8 items-start">
             {/* Main content area */}
-            <div className="flex-1 min-w-0">
+            <div id="content-generator" className="flex-1 min-w-0">
               {brandRows.length === 0 ? (
                 <div className="text-center py-24">
                   <span className="text-4xl block mb-4">🧌</span>
