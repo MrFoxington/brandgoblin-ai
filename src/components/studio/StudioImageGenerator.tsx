@@ -38,14 +38,27 @@ const IDEA_SPARKS = [
   { label: "bold product flatlay", imageType: "product_art"  as ImageType, note: "bold product flatlay with colorful props and graphic styling" },
 ];
 
+// 7 base sparkles (streak 1) + 11 outer ring (streak 2–6+); count scales with real streak
 const SPARKLES = [
-  { x: -110, y: -80,  d: 0    },
-  { x:  100, y: -65,  d: 0.08 },
-  { x:  -80, y:  55,  d: 0.16 },
-  { x:  120, y:  45,  d: 0.12 },
+  { x: -110, y:  -80, d: 0    },
+  { x:  100, y:  -65, d: 0.08 },
+  { x:  -80, y:   55, d: 0.16 },
+  { x:  120, y:   45, d: 0.12 },
   { x:    0, y: -120, d: 0.2  },
   { x: -140, y:   -5, d: 0.06 },
   { x:  140, y:  -15, d: 0.18 },
+  // outer ring — unlocked by streak
+  { x:  -60, y: -105, d: 0.04 },
+  { x:   60, y: -115, d: 0.14 },
+  { x: -165, y:  -40, d: 0.22 },
+  { x:  165, y:  -50, d: 0.10 },
+  { x:  -50, y:   82, d: 0.18 },
+  { x:   72, y:   78, d: 0.26 },
+  { x: -130, y:   68, d: 0.08 },
+  { x:  130, y:   62, d: 0.20 },
+  { x:   10, y:  135, d: 0.12 },
+  { x:  -92, y:  -38, d: 0.30 },
+  { x:   92, y:  -32, d: 0.24 },
 ];
 
 const POLL_INTERVAL_MS = 3000;
@@ -56,9 +69,15 @@ function generateSeed(): number {
 }
 
 export default function StudioImageGenerator({ brands, initialJobs }: Props) {
-  const { addXP }        = useXP();
-  const { playComplete } = useSoundFx();
-  const reduce           = useReducedMotion();
+  const { addXP } = useXP();
+  const {
+    playComplete,
+    playButtonPress,
+    playConjureStart,
+    stopAnticipation,
+    playStreak,
+  } = useSoundFx();
+  const reduce = useReducedMotion();
 
   const [selectedBrandId, setSelectedBrandId] = useState<string>(brands[0]?.id ?? "");
   const [imageType, setImageType]   = useState<ImageType>("logo_concept");
@@ -74,16 +93,22 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
   // Stable refs — prevent stale closures in timers
-  const awardedXPJobs   = useRef<Set<string>>(new Set());
-  const cookDebounceRef = useRef<ReturnType<typeof setTimeout>>();
-  const suppressCookRef = useRef(false);
-  const pollTimers      = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
-  const pollJobRef      = useRef<(id: string) => Promise<void>>(() => Promise.resolve());
-  const addXPRef        = useRef(addXP);
-  const playCompleteRef = useRef(playComplete);
+  const awardedXPJobs        = useRef<Set<string>>(new Set());
+  const cookDebounceRef      = useRef<ReturnType<typeof setTimeout>>();
+  const suppressCookRef      = useRef(false);
+  const pollTimers           = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
+  const pollJobRef           = useRef<(id: string) => Promise<void>>(() => Promise.resolve());
+  const addXPRef             = useRef(addXP);
+  const playCompleteRef      = useRef(playComplete);
+  const stopAnticipationRef  = useRef(stopAnticipation);
+  const playStreakRef        = useRef(playStreak);
+  const streakRef            = useRef(1);
 
-  useEffect(() => { addXPRef.current = addXP; },         [addXP]);
+  useEffect(() => { addXPRef.current = addXP; }, [addXP]);
   useEffect(() => { playCompleteRef.current = playComplete; }, [playComplete]);
+  useEffect(() => { stopAnticipationRef.current = stopAnticipation; }, [stopAnticipation]);
+  useEffect(() => { playStreakRef.current = playStreak; }, [playStreak]);
+  useEffect(() => { streakRef.current = streak; }, [streak]);
 
   // Streak from localStorage
   useEffect(() => {
@@ -133,7 +158,9 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         if (updated.status === "completed" && !awardedXPJobs.current.has(jobId)) {
           awardedXPJobs.current.add(jobId);
           addXPRef.current(10);
-          playCompleteRef.current();
+          stopAnticipationRef.current();   // fade out the loop before the reveal lands
+          playCompleteRef.current();       // reveal.mp3 — sparkle burst + warm chord
+          playStreakRef.current(streakRef.current); // streak chime, pitch-scaled by real streak
           setCelebratingJob(updated);
         }
       }
@@ -215,7 +242,10 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType) {
     setGenerating(true);
     setError(null);
-    const ps   = IMAGE_TYPE_SIZES[it];
+    // Fire conjure-start synchronously (before first await) — still in gesture context,
+    // so AudioContext is running and the anticipation loop that follows will be unblocked.
+    playConjureStart();
+    const ps = IMAGE_TYPE_SIZES[it];
     const cost = computeStudioEnergyCost(mk, { width: ps.width, height: ps.height });
 
     try {
@@ -309,10 +339,12 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   // ── CTA handlers ───────────────────────────────────────────────────────────
 
   async function handleGenerate() {
+    playButtonPress(); // in gesture context — primes audio unlock chain for the loop
     await submitJob(prompt, modelKey, imageType);
   }
 
   function handleMakeAnother() {
+    playButtonPress();
     seedRef.current = generateSeed();
     setCelebratingJob(null);
     requestAnimationFrame(() => {
@@ -323,6 +355,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   }
 
   async function handleVariation(job: StudioJobRow) {
+    playButtonPress();
     seedRef.current = generateSeed();
     setCelebratingJob(null);
     await submitJob(
@@ -333,6 +366,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   }
 
   async function handleNewStyle(job: StudioJobRow) {
+    playButtonPress();
     seedRef.current = generateSeed();
     setCelebratingJob(null);
     suppressCookRef.current = true;
@@ -350,6 +384,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   }
 
   async function handleSpark(spark: (typeof IDEA_SPARKS)[number]) {
+    playButtonPress();
     seedRef.current = generateSeed();
     suppressCookRef.current = true;
     setImageType(spark.imageType);
@@ -385,7 +420,8 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
             >
               {!reduce && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  {SPARKLES.map((s, i) => (
+                  {/* Sparkle count scales with real streak: 7 base → up to 18 at streak 6+ */}
+                  {SPARKLES.slice(0, Math.min(7 + Math.max(0, streak - 1) * 2, SPARKLES.length)).map((s, i) => (
                     <motion.span key={i} className="absolute text-xl select-none"
                       initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
                       animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0.4, 1.1, 0.6] }}
@@ -505,6 +541,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
             <label className="text-xs uppercase tracking-widest text-primary-light font-bold">Prompt</label>
             <button
               onClick={async () => {
+                playButtonPress();
                 seedRef.current = generateSeed();
                 const cooked = await cookPrompt(imageType);
                 if (cooked) setPrompt(cooked);
