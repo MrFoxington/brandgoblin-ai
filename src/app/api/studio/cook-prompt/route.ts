@@ -108,12 +108,12 @@ export async function POST(request: Request) {
     system: `You are an expert image-prompt engineer for text-to-image AI models (FLUX, Seedream).
 Given a brand's identity and the requested asset type, write ONE vivid, concrete image-generation prompt.
 Rules:
-- Describe subject, composition, lighting, style, mood, and colors with specific visual detail
-- Reference the exact brand hex colors if provided
-- Stay true to the brand's personality and logo direction
-- VISUAL DESCRIPTION ONLY — no marketing copy, no slogans, no text-in-image instructions
+- Describe subject, composition, lighting, style, and mood with specific visual detail
+- PALETTE LOCK: if hex colors are provided, you MUST name every primary color as its exact hex value (e.g. "#3B82F6 cobalt blue") — never substitute other colors. The output image must look like this brand's palette.
+- Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic
+- VISUAL DESCRIPTION ONLY — no marketing copy, no slogans, no text-in-image instructions, no brand names embedded in the image
 - One short paragraph, 2-3 sentences max
-- Produce output ready to paste directly into a text-to-image model`,
+- Output must be ready to paste directly into a text-to-image model with no editing`,
     messages: [{ role: "user", content: userMsg }],
   });
 

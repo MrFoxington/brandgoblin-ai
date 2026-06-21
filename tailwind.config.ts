@@ -53,6 +53,7 @@ const config: Config = {
         shimmer: "shimmer 2.8s ease-in-out infinite",
         particle: "particle 6s ease-in-out infinite",
         "studio-glow": "studio-glow 2s ease-in-out infinite",
+        "conjure-pulse": "conjure-pulse 2s ease-in-out infinite",
       },
       keyframes: {
         float: {
@@ -74,6 +75,10 @@ const config: Config = {
         "studio-glow": {
           "0%, 100%": { boxShadow: "0 0 8px rgba(251,191,36,0.4), 0 0 16px rgba(251,191,36,0.2)" },
           "50%":       { boxShadow: "0 0 16px rgba(251,191,36,0.7), 0 0 32px rgba(251,191,36,0.35)" },
+        },
+        "conjure-pulse": {
+          "0%, 100%": { boxShadow: "0 0 16px rgba(255,107,53,0.45), 0 0 32px rgba(255,107,53,0.2)" },
+          "50%":       { boxShadow: "0 0 28px rgba(255,107,53,0.7), 0 0 56px rgba(255,107,53,0.35)" },
         },
       },
       borderRadius: {

@@ -58,12 +58,19 @@ export async function POST(request: Request) {
     imageType,
     brandId,
     prompt: clientPrompt,
+    seed: clientSeed,
   } = body as {
     modelKey: string;
     imageType: string;
     brandId?: string;
     prompt?: string;
+    seed?: number;
   };
+
+  // Validate seed if provided: must be a safe positive integer
+  const seed = (typeof clientSeed === "number" && Number.isInteger(clientSeed) && clientSeed >= 0 && clientSeed <= 2147483647)
+    ? clientSeed
+    : undefined;
 
   // Validate model is in the green-lit registry
   if (!modelKey || !(modelKey in STUDIO_MODELS)) {
@@ -186,12 +193,17 @@ export async function POST(request: Request) {
   let providerResult: { requestId: string; provider: "fal" | "replicate" };
   try {
     providerResult = await submitImageJob({
-      modelKey:   modelKey as StudioModelKey,
-      imageType:  imageType as ImageType,
+      modelKey:       modelKey as StudioModelKey,
+      imageType:      imageType as ImageType,
       prompt,
-      width:      pinnedSize.width,
-      height:     pinnedSize.height,
+      width:          pinnedSize.width,
+      height:         pinnedSize.height,
       webhookUrl,
+      seed,
+      // Seedream: discourage off-brand palette drift; FLUX doesn't accept negative_prompt
+      negativePrompt: modelKey === "seedream_v45"
+        ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry"
+        : undefined,
     });
   } catch (err) {
     await markJobFailed(jobId, authData.user.id, energyCost, "Provider submission failed", reservation.txId);

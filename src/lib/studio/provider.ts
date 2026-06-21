@@ -19,6 +19,8 @@ export interface SubmitJobParams {
   width: number;
   height: number;
   webhookUrl: string;
+  seed?: number;
+  negativePrompt?: string;
 }
 
 export interface SubmitJobResult {
@@ -53,6 +55,11 @@ export async function submitImageJob(params: SubmitJobParams): Promise<SubmitJob
         output_format: "jpeg",
       };
 
+      // Seed — pin composition across quality-only changes; new seed = new creative intent
+      if (params.seed !== undefined) {
+        input.seed = params.seed;
+      }
+
       // Most fal image models accept image_size as preset OR {width, height}
       // Use the pinned {width, height} so cost is always tied to confirmed dimensions
       if (params.modelKey === "flux_schnell" || params.modelKey === "flux_pro_v1") {
@@ -61,6 +68,10 @@ export async function submitImageJob(params: SubmitJobParams): Promise<SubmitJob
         // Seedream and others use width/height directly
         input.width  = params.width;
         input.height = params.height;
+        // Seedream supports negative_prompt; use it to discourage off-brand palette drift
+        if (params.negativePrompt) {
+          input.negative_prompt = params.negativePrompt;
+        }
       }
 
       const { request_id } = await fal.queue.submit(model.falEndpoint, {
