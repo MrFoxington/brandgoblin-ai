@@ -42,8 +42,36 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
-### 🎨 GOBLIN STUDIO — Phase 1.5 BUILT (June 21, 2026) — NOT YET PUSHED
-Phase 1 + 1.5 complete, `tsc + npm run build` both clean. **Do NOT push until reviewed.**
+### 🎨 GOBLIN STUDIO — Phase 1.6 PUSHED ✅ (June 21, 2026) — commit `645802d`
+Phase 1 + 1.5 + 1.6 all complete and live. `tsc + npm run build` both clean.
+
+**Phase 1.6 new/modified files (additive only — no energy/Stripe/trial/grant changes):**
+- **NEW** `src/app/api/studio/process/route.ts` — crash-safe bg_removal + clarity_upscaler via
+  `fal.subscribe()`. Energy reserved + job row created BEFORE fal call. Derived jobs inherit
+  `brand_id` from source (brand-scoped gallery stays consistent). `maxDuration=60`.
+- **REWRITTEN** `src/components/studio/StudioImageGenerator.tsx`:
+  - Seed pinning: `seedRef = useRef(generateSeed())`. Fresh seed on brand change, type change,
+    any prompt change (textarea, auto-cook, re-cook, spark, variation, more-like-this, make-another,
+    new-style). Same seed reused ONLY on quality-tier-only change.
+  - Brand-scoped gallery: `filterByBrand(job)` — jobs filtered to `selectedBrandId`; null brand_id
+    shown only under Freeform selection.
+  - Orange Conjure button (#FF6B35→#FF8C42 gradient + `animate-conjure-pulse` glow) on main CTA
+    and post-reveal "Try a variation" + "Make another" CTAs.
+  - Seedream labeled with ALT badge + visible warning: "different art engine · expect a new look".
+  - `handleProcess(job, operation)` calls `/api/studio/process`; result prepended to jobs list.
+  - `handleMoreLikeThis(job)` calls freshSeed + submitJob with job's prompt/model/type.
+- **REWRITTEN** `src/components/studio/JobCard.tsx` — Remove BG + Upscale wired to handleProcess;
+  ✨ More like this; Share (Web Share API → clipboard fallback + "✓ Copied" toast);
+  derived variant tags (Background removed / ✨ Upscaled); process buttons gated to original jobs.
+- **MODIFIED** `src/app/api/studio/cook-prompt/route.ts` — PALETTE LOCK instruction added to
+  system prompt (hex colors must appear verbatim in output).
+- **MODIFIED** `src/app/api/studio/jobs/route.ts` — accepts + validates `seed` from client body;
+  passes seed to provider; Seedream gets `negative_prompt`.
+- **MODIFIED** `src/lib/studio/provider.ts` — `seed` + `negativePrompt` added to SubmitJobParams
+  and fal input; `negative_prompt` Seedream-only.
+- **MODIFIED** `tailwind.config.ts` — `conjure-pulse` keyframe + `animate-conjure-pulse` (orange glow pulse).
+
+**Phase 1.5 context (unchanged):**
 
 **Phase 1.5 new/modified files (additive only — no energy/Stripe/trial/grant changes):**
 - **NEW** `src/app/api/studio/cook-prompt/route.ts` — Claude Haiku prompt engineer. FREE (no energy),
@@ -118,10 +146,13 @@ Phase 1 + 1.5 complete, `tsc + npm run build` both clean. **Do NOT push until re
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Review + push Goblin Studio Phase 1 + 1.5** — both phases built and build-verified. Review
-   the diff then push. Before Studio goes live: run the DB migration in Supabase SQL editor
-   (`supabase/migrations/20260620_studio_phase1.sql`), add `ANTHROPIC_API_KEY` to Vercel env vars
-   (needed for cook-prompt), re-verify fal model prices, confirm each model's commercial license.
+1. **Verify Phase 1.6 live** — `645802d` pushed + deploying. Confirm on live app:
+   - Brand-scoped gallery filters correctly per brand selection
+   - Conjure button is orange with glow pulse
+   - Remove BG + Upscale produce their own card with variant tag
+   - ✨ More like this generates a new image (different seed, same style)
+   - Share button copies URL / triggers Web Share on mobile
+   - Seedream shows ALT badge + warning text in quality picker
 2. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
    and hit `/dashboard/creator-pro?refill=success` to confirm the overlay, bar fill, sound, and
    scroll-to-generator all work in production (was build-verified only, never driven live).
