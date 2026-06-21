@@ -71,8 +71,14 @@ export default function Navbar() {
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
                 Dashboard
               </Link>
-              <Link href="/dashboard/studio" className="btn-ghost hidden lg:inline-flex">
+              <Link
+                href="/dashboard/studio"
+                className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-medium text-amber-300 hover:text-amber-100 hover:bg-amber-400/15 shadow-studio-glow motion-safe:animate-studio-glow transition-colors"
+              >
                 🎨 Studio
+                <span className="absolute -top-1.5 -right-1.5 rounded-full bg-amber-400 px-1 text-[9px] font-bold leading-4 text-black">
+                  NEW
+                </span>
               </Link>
               <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-glow">
                 ✦ Generate

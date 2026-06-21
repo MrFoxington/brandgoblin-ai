@@ -34,14 +34,24 @@
 - Agency dashboard
 - Waitlist: `agency_waitlist` table in Supabase
 
-### 🏗️ Goblin Studio — Phase 1 BUILT (June 20, 2026)
-- **Phase 1 live:** atomic energy reservation, model registry, image generation
-- `/dashboard/studio` — paid Pro only (trial users shown upgrade prompt)
-- fal.ai primary (FLUX schnell/pro, Seedream 4.5) + Replicate fallback
-- Stale-job sweeper + fal webhook for server-side completion
-- Storage in private `studio-assets` Supabase bucket with signed URLs
-- 3-pack energy refill UI ($19/$49/$99) driven by Stripe price metadata
-- **Phase 2 next:** short-form video (Wan 2.6 / Kling 3.0 — mapped, not built)
+### 🏗️ Goblin Studio — Phase 1.5 BUILT (June 21, 2026) — NOT YET PUSHED
+- **Phase 1 shipped:** atomic energy reservation, model registry, image generation (live)
+- **Phase 1.5 built (June 21):** all 5 features complete, `tsc + npm run build` clean:
+  - **Feature A:** `POST /api/studio/cook-prompt` — Nix (Claude Haiku) writes vivid on-brand
+    prompts from brand kit (FREE, Pro-gated, rate-limited). Editable prompt textarea auto-filled,
+    debounced auto-cook on brand/type change, Re-cook button. Client prompt sent directly to fal
+    (jobs route updated to accept `prompt` field, no longer builds template server-side).
+  - **Feature B:** Default quality = Standard (flux_schnell, ≈4 energy). Post-reveal CTAs:
+    "Try a variation · ⚡N" / "New style · ⚡N" / "Make another" — the addiction loop.
+  - **Feature C:** `NixCooking.tsx` — animated conjuring Nix + rotating status lines (every 2.5s)
+    + shimmer bar during active generation. Celebrating Nix + sparkle burst + sound + XP reveal.
+    +10 XP per creation (once-per-job ref guard). Streak from localStorage. `playComplete()` on reveal.
+  - **Feature D:** Idea sparks row — 4 clickable sparks that set imageType + cook a prompt.
+  - **Feature E:** Amber/gold glow on Studio button (Navbar + `shadow-studio-glow` + `animate-studio-glow`
+    + NEW badge). Same warm amber treatment on Creator Pro sidebar card and dashboard Studio card.
+- **Additive only** — no changes to energy reservation, Stripe, trial, or grant logic.
+- **Phase 1.6 next:** multi-variation gacha spread, share-to-grow virality, deeper gamification.
+- **Phase 2 later:** short-form video (Wan 2.6 / Kling 3.0 — mapped, not built)
 - **Phase 3 later:** background removal, upscale, bring-your-own-brand input
 
 ### 🔜 Goblin Labs

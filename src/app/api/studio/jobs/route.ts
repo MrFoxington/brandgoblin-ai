@@ -57,12 +57,12 @@ export async function POST(request: Request) {
     modelKey,
     imageType,
     brandId,
-    customPrompt,
+    prompt: clientPrompt,
   } = body as {
     modelKey: string;
     imageType: string;
     brandId?: string;
-    customPrompt?: string;
+    prompt?: string;
   };
 
   // Validate model is in the green-lit registry
@@ -119,9 +119,12 @@ export async function POST(request: Request) {
     );
   }
 
-  // Build the prompt — use the brand kit's logoPrompt if available, else customPrompt
-  let prompt = customPrompt ?? "";
-  if (brandId) {
+  // Use the client-cooked prompt directly if provided; fall back to template builder
+  let prompt = clientPrompt
+    ? clientPrompt.trim().replace(/\0/g, "").slice(0, 2000)
+    : "";
+
+  if (!prompt && brandId) {
     const { data: brand } = await adminSb
       .from("brand_generations")
       .select("output_data")

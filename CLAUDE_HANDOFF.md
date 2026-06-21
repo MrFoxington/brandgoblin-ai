@@ -42,39 +42,45 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
-### 🎨 GOBLIN STUDIO — Phase 1 BUILT (June 20, 2026) — NOT YET PUSHED
-Phase 1 code complete, `tsc + npm run build` both clean. **Do NOT push until reviewed.**
+### 🎨 GOBLIN STUDIO — Phase 1.5 BUILT (June 21, 2026) — NOT YET PUSHED
+Phase 1 + 1.5 complete, `tsc + npm run build` both clean. **Do NOT push until reviewed.**
+
+**Phase 1.5 new/modified files (additive only — no energy/Stripe/trial/grant changes):**
+- **NEW** `src/app/api/studio/cook-prompt/route.ts` — Claude Haiku prompt engineer. FREE (no energy),
+  Pro-gated (`plan === "pro"`), best-effort rate limit ~20/min. Input: `{ brandId?, imageType, userNote? }`.
+  Loads brand kit (name, tagline, story, voice, palette, logoPrompt), calls `claude-haiku-4-5-20251001`,
+  returns `{ prompt }` (2-3 sentence visual description, no marketing copy).
+- **NEW** `src/components/studio/NixCooking.tsx` — animated conjuring Nix + 5 rotating status lines
+  (every 2.5s) + shimmer bar. `useReducedMotion()` respected. Props: `count: number`.
+- **REWRITTEN** `src/components/studio/StudioImageGenerator.tsx` — full rewrite:
+  - Prompt textarea auto-filled by cook-prompt; editable + Re-cook button; non-blocking
+  - 400ms debounce auto-cook on brand/type change (suppressed during spark/newStyle cooks)
+  - IDEA_SPARKS row (4 sparks → setImageType + cookPrompt with note)
+  - Model order: Standard | Artistic | Premium. **Default: Standard (flux_schnell)**
+  - Celebration reveal overlay: celebrating Nix, 7-sparkle burst, "+10 XP · N-day streak 🔥"
+  - Post-reveal CTAs: "Try a variation · ⚡N" / "New style · ⚡N" / "Make another"
+  - XP once-per-job: `awardedXPJobs = useRef<Set<string>>(new Set())`; `addXP(10)` via `useXP()`
+  - `playComplete()` on reveal; streak read from `localStorage["brandgoblin_streak_v1"]`
+  - Stale-closure-safe refs: `addXPRef`, `playCompleteRef`, `pollJobRef`, `suppressCookRef`
+  - "Your Creations ({count})" gallery header
+- **MODIFIED** `src/app/api/studio/jobs/route.ts` — accepts `prompt` from client body (replaces
+  `customPrompt`); uses it directly (trim, strip nulls, cap 2000 chars); template builder is now
+  fallback only when `prompt` is empty.
+- **MODIFIED** `tailwind.config.ts` — `shadow-studio-glow` (amber box-shadow) + `animate-studio-glow`
+  keyframe (2s pulse between 8px and 16px amber glow).
+- **MODIFIED** `src/components/Navbar.tsx` — Studio button: amber border/bg/text, `shadow-studio-glow`,
+  `motion-safe:animate-studio-glow`, NEW badge (absolute -top-1.5 -right-1.5 amber pill).
+- **MODIFIED** `src/components/DailyCreatorDashboard.tsx` — Studio card: purple → amber/gold.
+- **MODIFIED** `src/app/dashboard/creator-pro/page.tsx` — Studio sidebar card: purple → amber/gold + NEW badge.
+
+**Phase 1 context (unchanged):**
 - **New routes:** `/dashboard/studio` (paid Pro only), `/api/studio/jobs`, `/api/studio/jobs/[jobId]`,
   `/api/studio/webhook/fal`, `/api/studio/sweep`
 - **New libs:** `src/lib/studio/models.ts`, `provider.ts`, `jobs.ts`
-- **Modified:** `energy-config.ts` (STUDIO_MODELS registry + computeStudioEnergyCost),
-  `energy.ts` (reserveEnergy + finalizeReservation + addRefillEnergy amount param),
-  `api/stripe/checkout` (3-pack support + packKey→priceId mapping),
-  `api/stripe/webhook` (metadata-driven energy amount), `EnergyRefillModal` (3-pack UI)
-- **DB migration to run:** `supabase/migrations/20260620_studio_phase1.sql` — creates `studio_jobs`
-  table + `reserve_energy()` Postgres function (the atomic-reservation fix)
-- **Key guardrails shipped:**
-  - Trial gate: `plan !== "pro"` in both the page AND the API — trial users see upgrade prompt
-  - Atomic reservation: Postgres `reserve_energy()` FOR UPDATE lock; no reservation → no job
-  - Energy never lost: fal webhook is primary completion driver; client polls as backup; stale
-    sweeper refunds jobs stuck > 10 min (runs on page load + `/api/studio/sweep`)
-  - Moderation: fal's built-in `enable_safety_checker` + `has_nsfw_concepts[]` — blocked jobs
-    get full energy refund
-  - History: URLs always re-signed from `storage_path` on read, never served stale
-  - Per-user concurrency cap: 2 concurrent jobs max
-  - All energy labels computed from `computeStudioEnergyCost()` — never hardcoded
-- **Model registry (exact fal endpoints, verified June 20):**
-  - `fal-ai/flux/schnell` — $0.003/MP, default image ✓
-  - `fal-ai/flux-pro/v1.1` — $0.04/MP, premium ✓ (`fal-ai/flux-pro` is deprecated)
-  - `fal-ai/bytedance/seedream/v4.5/text-to-image` — $0.03 flat, artistic ✓
-  - `fal-ai/imageutils/rembg` — ~$0.01 flat, bg removal (Phase 1 UI stub)
-  - `fal-ai/clarity-upscaler` — $0.03/MP input, upscale (Phase 1 UI stub)
-  - Video models mapped but NOT built: Wan 2.6, Kling 3.0 (Phase 2)
-- **Before flipping live:** run `supabase/migrations/20260620_studio_phase1.sql` in Supabase SQL
-  editor; re-verify fal.ai prices on each model page; verify Seedream + rembg + clarity-upscaler
-  costs; FLUX dev is NON-commercial (excluded; schnell is Apache-2.0 ✓)
-- **Cost model (locked):** `energy = ceil(usdCost × MARKUP / 0.018)`, MARKUP=10 env-tunable,
-  pricing is per-megapixel (not flat) — margin correct at any resolution
+- **DB migration to run before live:** `supabase/migrations/20260620_studio_phase1.sql`
+- **Model registry:** `fal-ai/flux/schnell` ($0.003/MP) | `fal-ai/flux-pro/v1.1` ($0.04/MP) |
+  `fal-ai/bytedance/seedream/v4.5/text-to-image` ($0.03 flat)
+- **Cost model:** `energy = ceil(usdCost × MARKUP / 0.018)`, MARKUP=10 env-tunable
 
 ### 🔥 BIG FIXES SHIPPED June 19 (all pushed + live)
 - **Reverse trial + anti-farming** (Phase 2 + Layer 4): 7-day auto-Pro, `getEffectivePlan()`
@@ -112,10 +118,10 @@ Phase 1 code complete, `tsc + npm run build` both clean. **Do NOT push until rev
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Review + push Goblin Studio Phase 1** — code is built and build-verified. Review the changes
-   then push. Before Studio goes live to users: run the DB migration in Supabase SQL editor
-   (`supabase/migrations/20260620_studio_phase1.sql`), re-verify fal model prices, confirm each
-   model's commercial license on its fal model page.
+1. **Review + push Goblin Studio Phase 1 + 1.5** — both phases built and build-verified. Review
+   the diff then push. Before Studio goes live: run the DB migration in Supabase SQL editor
+   (`supabase/migrations/20260620_studio_phase1.sql`), add `ANTHROPIC_API_KEY` to Vercel env vars
+   (needed for cook-prompt), re-verify fal model prices, confirm each model's commercial license.
 2. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
    and hit `/dashboard/creator-pro?refill=success` to confirm the overlay, bar fill, sound, and
    scroll-to-generator all work in production (was build-verified only, never driven live).
@@ -413,7 +419,7 @@ src/
 
 ---
 
-*Last updated: June 20, 2026 (v4) — Goblin Studio fully spec'd + external setup complete (fal.ai +
-Replicate + Stripe packs + bucket all wired); ready for Claude Code to build Phase 1. Airo landing
-V2 + Agency-cut issued. — (v3 below)*
+*Last updated: June 21, 2026 (v5) — Goblin Studio Phase 1.5 built + build-verified (all 5 features:
+cook-prompt endpoint, prompt textarea + debounce, NixCooking component, celebration reveal + XP/streak,
+idea sparks, amber Studio glow). tsc + npm run build clean. NOT yet pushed — review diff first.*
 *Earlier: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*

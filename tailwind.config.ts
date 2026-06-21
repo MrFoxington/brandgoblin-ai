@@ -45,12 +45,14 @@ const config: Config = {
         "glow-lg": "0 0 48px rgba(124,58,237,0.75)",
         "glow-green": "0 0 28px rgba(16,185,129,0.35)",
         card: "0 0 30px rgba(124,58,237,0.15)",
+        "studio-glow": "0 0 12px rgba(251,191,36,0.45), 0 0 24px rgba(251,191,36,0.2)",
       },
       animation: {
         float: "float 4s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2.2s ease-in-out infinite",
         shimmer: "shimmer 2.8s ease-in-out infinite",
         particle: "particle 6s ease-in-out infinite",
+        "studio-glow": "studio-glow 2s ease-in-out infinite",
       },
       keyframes: {
         float: {
@@ -68,6 +70,10 @@ const config: Config = {
         particle: {
           "0%, 100%": { transform: "translateY(0px)", opacity: "0.3" },
           "50%": { transform: "translateY(-30px)", opacity: "0.8" },
+        },
+        "studio-glow": {
+          "0%, 100%": { boxShadow: "0 0 8px rgba(251,191,36,0.4), 0 0 16px rgba(251,191,36,0.2)" },
+          "50%":       { boxShadow: "0 0 16px rgba(251,191,36,0.7), 0 0 32px rgba(251,191,36,0.35)" },
         },
       },
       borderRadius: {

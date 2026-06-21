@@ -119,8 +119,11 @@ export default async function CreatorProPage({
               {/* Goblin Studio entry */}
               <Link
                 href="/dashboard/studio"
-                className="group flex items-center gap-3 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/8 to-pink-500/8 p-4 hover:border-purple-500/50 hover:from-purple-500/12 transition-all duration-200"
+                className="group relative flex items-center gap-3 rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-400/8 to-yellow-400/5 p-4 hover:border-amber-400/50 hover:from-amber-400/12 shadow-studio-glow transition-all duration-200"
               >
+                <span className="absolute -top-1.5 -right-1.5 rounded-full bg-amber-400 px-1 text-[9px] font-bold leading-4 text-black">
+                  NEW
+                </span>
                 <div className="shrink-0">
                   <Image
                     src="/nix/conjuring-nix.png"
@@ -130,10 +133,10 @@ export default async function CreatorProPage({
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold tracking-widest uppercase text-purple-400 mb-0.5">🎨 Goblin Studio</p>
+                  <p className="text-xs font-bold tracking-widest uppercase text-amber-400 mb-0.5">🎨 Goblin Studio</p>
                   <p className="text-sm font-semibold text-white leading-snug">Turn your brand into real images</p>
                 </div>
-                <span className="text-muted group-hover:text-white transition-colors shrink-0">→</span>
+                <span className="text-muted group-hover:text-amber-300 transition-colors shrink-0">→</span>
               </Link>
             </div>
           </div>
