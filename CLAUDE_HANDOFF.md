@@ -42,6 +42,32 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
+### 🎨 GOBLIN STUDIO — Phase 1.7 PUSHED ✅ (June 21, 2026) — commit `8123a5a`
+Phases 1–1.7 all complete and live. `tsc + npm run build` both clean.
+
+**Phase 1.7 "Juice & Sound" — new/modified files (additive only):**
+- **REWRITTEN** `src/components/primitives/SoundFx.tsx` — real HTMLAudioElement player (replaces
+  Web Audio synth). 6 cue files wired to `/public/sounds/`; graceful silent fallback on 404.
+  `ensurePrimed()` unlocks all audio on first gesture so the anticipation loop (started from a
+  useEffect) isn't blocked by browser autoplay policy. `stopLoopImmediate()` called on mute so
+  toggling mute mid-generation kills the loop instantly. Default-on: null localStorage pref → sound
+  ON; "1" → muted. `SoundToggle` shows a one-time "🔊 sound on — tap to mute" hint (4s auto-dismiss).
+  New cues: `playButtonPress`, `playConjureStart`, `startAnticipation`, `stopAnticipation`,
+  `playStreak(count)` (pitch-shifted 1.0×–1.8× by real streak). Existing API unchanged.
+- **REWRITTEN** `src/components/studio/NixCooking.tsx` — anticipation swell: `startAnticipation()`
+  on mount / `stopAnticipation()` on unmount. Progress 0→1 over 18s via rAF (honest time-based).
+  Stage 0/1/2 at 0.4/0.7: Nix float -8→-12→-16px, shimmer brightens, stage 2 adds 5 ✦ particle
+  sparks floating up around Nix. Reduced-motion: no loop, no particles, no whoosh.
+- **MODIFIED** `src/components/studio/StudioImageGenerator.tsx` — SPARKLES expanded to 18 (streak-
+  scaled burst: 7 base + 2/streak, cap 18). `playButtonPress()` wired to Conjure, Re-cook, all
+  sparks, Make another, Try a variation, New style. `playConjureStart()` at top of `submitJob()`
+  (before first await — gesture context). `stopAnticipation()` + `playStreak(streak)` on job
+  completion before reveal. New refs: `stopAnticipationRef`, `playStreakRef`, `streakRef`.
+
+**PENDING:** Drop 6 CC0 audio files into `/public/sounds/` to activate sound (app is silent but
+fully functional without them): `button-press.mp3`, `conjure-start.mp3`, `anticipation-loop.mp3`,
+`reveal.mp3`, `streak-chime.mp3`, `level-up.mp3`. Sources: Kenney.nl, Mixkit, Freesound CC0.
+
 ### 🎨 GOBLIN STUDIO — Phase 1.6 PUSHED ✅ (June 21, 2026) — commit `645802d`
 Phase 1 + 1.5 + 1.6 all complete and live. `tsc + npm run build` both clean.
 
@@ -146,29 +172,41 @@ Phase 1 + 1.5 + 1.6 all complete and live. `tsc + npm run build` both clean.
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Verify Phase 1.6 live** — `645802d` pushed + deploying. Confirm on live app:
-   - Brand-scoped gallery filters correctly per brand selection
-   - Conjure button is orange with glow pulse
-   - Remove BG + Upscale produce their own card with variant tag
-   - ✨ More like this generates a new image (different seed, same style)
-   - Share button copies URL / triggers Web Share on mobile
-   - Seedream shows ALT badge + warning text in quality picker
-2. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
+1. **Drop 6 sound files into `/public/sounds/`** — Phase 1.7 is live but silent until files land.
+   Sources: Kenney.nl Interface Sounds (CC0), Mixkit, Freesound CC0. Files needed:
+   `button-press.mp3` · `conjure-start.mp3` · `anticipation-loop.mp3` · `reveal.mp3` · `streak-chime.mp3` · `level-up.mp3`
+   After dropping files: `git add public/sounds/ && git commit -m "Add Phase 1.7 CC0 sound pack" && git push`
+2. **Smoke-test Phase 1.7 live** (after sound files land): click Conjure, hear whoosh, watch Nix
+   swell, hear sparkle burst on reveal, see streak chime pitch rise, mute mid-gen stops loop.
+3. **Verify Phase 1.6 live** — also confirm brand gallery filter, orange Conjure, Remove BG/Upscale
+   variant cards, ✨ More like this, Share button, Seedream ALT badge.
+2. **NEXT STUDIO BUILDS — spec'd, NOT built yet (give to Claude Code one at a time):**
+   - **Phase 1.6 — DONE/PUSHED** (`645802d`) — verify live (item 1).
+   - **Phase 1.7 "Juice & Sound"** — `docs/GOBLIN_STUDIO_PHASE_1_7_BRIEF.md`. Real on-brand SFX pack
+     (current SoundFx.tsx is thin synth tones + defaults muted), default-sound-ON, anticipation build
+     during generation, escalating reveal, loop momentum. HARD RULE: honest dopamine only — NO
+     losses-disguised-as-wins / near-miss / loss-chasing (energy = real money). Audio files must be
+     sourced (CC0/royalty-free) and dropped in `/public/sounds/` — CC will output the exact file list.
+   - **Live Showcase Wall** — `docs/GOBLIN_STUDIO_SHOWCASE_BRIEF.md`. Public, embeddable, auto-rotating
+     `/embed/showcase` of REAL featured creations (iframe'd into Airo, which blocks JS but allows
+     iframes). `featured` flag + admin toggle; consent + moderation guardrails (only Fox-owned or
+     opt-in creations public); short-lived signed URLs from the private bucket. Updates auto-pull from
+     the app — no manual Airo edits.
+   - Later (Phase 1.7+ / Phase 2): multi-variation gacha spread, deeper gamification, short-form VIDEO
+     (Wan 2.6 / Kling 3.0 — registry-mapped, NOT built; do NOT advertise video anywhere until built).
+3. **GoDaddy / Airo marketing landing — V2 LANDED ✅, V3 in progress.** `brandgoblinai.com` now matches
+   the app: "Watch your idea become real" hero, idea sparks, "Logo Direction", two-tier pricing
+   (Agency cut), addictive-loop section, demo-video/examples/Goblin-Labs sections gone, CTAs → `/signup`.
+   **V3 (`docs/GODADDY_LANDING_ARROW_AI_BRIEF_V3.md`) deltas:** ✅ hero orange CTA "✦ Start Creating —
+   Free" is LIVE. ⏳ Pending Airo paste-ins issued this session: (a) make the top-nav "Start Creating
+   Free" button orange to match; (b) add a "Goblin Studio / make real images" section right after the
+   hero (images only — NOT video); (c) drop in 2–3 real Studio example images; (d) embed the Showcase
+   iframe once built. ⚠️ Footer Legal links (Privacy/Terms/Refund) + Company links are all dead `#` —
+   real fix needed for a paid site (Stripe/trust). NOTE: Airo ignores multi-part prompts — feed it
+   ONE change at a time.
+4. **Verify the refill celebration live** — `c9dd549` is pushed + deployed. Log in as a Pro user
    and hit `/dashboard/creator-pro?refill=success` to confirm the overlay, bar fill, sound, and
    scroll-to-generator all work in production (was build-verified only, never driven live).
-3. **GoDaddy marketing site sync** — ⚠️ AUDITED June 20: Airo's first pass **did NOT take**. Live
-   `brandgoblinai.com` still shows the old page — pricing still "$0 / one complete brand generation"
-   (no 7-day trial), "Demo Video Coming Soon" still there, "Logo Prompt Creator" still naming
-   Midjourney/DALL-E, full "Where Future Magic Is Forged" six-product grid still there, CTAs point
-   to app root not `/signup`, hero headline not synced to "Watch your idea become real." Honest-proof
-   guardrail DID hold (no fake stats/testimonials). **Corrected paste-in issued:**
-   `docs/GODADDY_LANDING_ARROW_AI_BRIEF_V2.md` — supersedes v1. V2 adds strategic DELETIONS per
-   Fox's call (June 20): remove the "See what BrandGoblin conjures" canned-examples section
-   (redundant with Mana Brew; no dopamine), remove the Goblin Labs vaporware grid, and **cut Agency
-   Edition entirely** (no card, no waitlist, no nav/footer links). Page now sells exactly TWO things:
-   Free Trial (7 days of everything) + Creator Pro $19/mo — all focus on the create→hook→daily-return
-   →refill-energy loop. Add tools/tiers later when paying customers ask. Next: paste V2 into Airo,
-   then hard-reload live to verify the checklist at the bottom of V2.
 4. **Pre-launch must-dos**: ≥1 real testimonial; refund test refill/sub in Stripe; hard-reload
    live app to confirm new landing is deployed.
    ✅ DONE June 20: Stripe **webhook signing secret rotated** (was leaked in `4fc8bc6`) — new
@@ -342,7 +380,12 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `PHASE1_DUNNING_BRIEF.md` | Dunning spec (BUILT — for reference) |
 | `LANDING_REBUILD_BRIEF.md` | App landing rebuild (BUILT `32b406b` — interactive hero, honest proof) |
 | `GODADDY_LANDING_ARROW_AI_BRIEF.md` | Arrow AI prompt to sync the GoDaddy marketing site (v1) |
-| `GODADDY_LANDING_ARROW_AI_BRIEF_V2.md` | ⭐ Corrected Airo paste-in — supersedes v1 (audit June 20) |
+| `GODADDY_LANDING_ARROW_AI_BRIEF_V2.md` | Corrected Airo paste-in — LANDED ✅ (audit June 20) |
+| `GODADDY_LANDING_ARROW_AI_BRIEF_V3.md` | ⭐ Airo V3 delta (June 21) — orange CTA (live), add Studio "real images" section, fix logo-direction language. Feed Airo one change at a time. |
+| `GOBLIN_STUDIO_PHASE_1_5_BRIEF.md` | Studio Phase 1.5 spec (BUILT/PUSHED) — cook-prompt, loop, reveal/XP, idea sparks, glow. |
+| `GOBLIN_STUDIO_PHASE_1_6_BRIEF.md` | Studio Phase 1.6 spec (BUILT/PUSHED `645802d`) — orange button, brand gallery, seed-pinning, more-like-this, Remove BG/Upscale, Share. |
+| `GOBLIN_STUDIO_PHASE_1_7_BRIEF.md` | ⭐ Studio Phase 1.7 spec (NOT built) — "Juice & Sound": real SFX pack, default-on, anticipation, escalating reveal. Honest-dopamine hard rule (no casino deception). Needs CC0 audio files in /public/sounds/. |
+| `GOBLIN_STUDIO_SHOWCASE_BRIEF.md` | ⭐ Live Showcase Wall spec (NOT built) — public embeddable /embed/showcase of featured real creations, iframe'd into Airo. Consent + moderation guardrails. |
 | `STUDIO_SETUP_RUNBOOK.md` | ⭐ External setup Fox must complete before Studio goes live — fal.ai + Replicate keys, 3 Stripe refill prices (metadata-driven), `studio-assets` bucket, env table, per-model license checks. |
 | `STUDIO_MODEL_COST_MAP.md` | ⭐ Green-lit models + energy pricing (energy = cost/0.0018 = 10× cost). Default image FLUX.1 schnell (NOT dev), default video Wan 2.6. fal prices verified June 20. |
 | `GOBLIN_STUDIO_BRIEF.md` | ⭐ Goblin Studio build spec — all decisions LOCKED June 20. Cost model (energy = USD cost ×10 markup, never on us), atomic energy reservation, refill packs $19/$49/$99, trial = 1 free image + video-CTA (render gated to Pro), bring-your-own-brand input, TikTok/Reels/Shorts. Providers: fal.ai primary / Replicate fallback / Higgsfield optional. Positioning: text unlimited, media = "energy powers your images & videos." |
@@ -450,7 +493,13 @@ src/
 
 ---
 
-*Last updated: June 21, 2026 (v5) — Goblin Studio Phase 1.5 built + build-verified (all 5 features:
+*Last updated: June 21, 2026 (v6) — Goblin Studio Phase 1.6 BUILT + PUSHED (`645802d`): orange Conjure
+button, brand-scoped gallery, seed-pinning (on-brand quality tiers), "More like this", Remove BG +
+Upscale wired, Share. Two new phases spec'd (NOT built): Phase 1.7 "Juice & Sound" (real SFX pack,
+honest-dopamine guardrails) + Live Showcase Wall (embeddable /embed/showcase, iframe'd into Airo).
+Airo landing: V2 LANDED, V3 hero orange CTA live; pending nav-orange + Studio section + example images
++ showcase iframe + dead footer legal links. Resume at "🌅 START HERE". — (v5 below)*
+*Earlier: June 21, 2026 (v5) — Goblin Studio Phase 1.5 built + build-verified (all 5 features:
 cook-prompt endpoint, prompt textarea + debounce, NixCooking component, celebration reveal + XP/streak,
 idea sparks, amber Studio glow). tsc + npm run build clean. NOT yet pushed — review diff first.*
 *Earlier: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
