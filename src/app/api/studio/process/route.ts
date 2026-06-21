@@ -224,6 +224,7 @@ export async function POST(request: Request) {
     storage_path:     null,
     error_message:    null,
     reservation_tx_id: reservation.txId!,
+    favorite:         false,
     created_at:       new Date().toISOString(),
     updated_at:       new Date().toISOString(),
   };

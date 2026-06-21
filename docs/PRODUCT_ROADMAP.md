@@ -52,6 +52,16 @@
   `share.mp3` applause, celebrating-Nix toast with 4 rotating encouraging lines (3s rotation, 8s
   auto-dismiss), orange "✨ Create something new" loop-back CTA → scrolls to generator. Closes the
   create → share → grow → build loop. Honest-dopamine: celebrates only a genuine share, no nag/FOMO.
+- **Favorites + Button Hierarchy + Share-at-Reveal (built June 21, additive):**
+  - `studio_jobs.favorite` flag (migration `20260621_studio_favorites.sql`, partial index) +
+    `POST /api/studio/favorite` (Pro-gated, ownership-checked). Gold-star toggle on every card
+    (optimistic UI, reverts on failure, `playButtonPress` cue).
+  - Favorites filter tab in Studio "Your Creations" (composes with brand filter) + a Favorites
+    section on `/dashboard` (capped 6, "view all in Studio"). Single renamable `FAVORITES_LABEL`.
+  - Button hierarchy: Share = ORANGE glowing ("Share it ✨"), More like this = GREEN solid;
+    Download neutral; Remove BG / Upscale quiet utility chips. Only those two get bold color.
+  - Share surfaced at the reveal ("📣 Share it" + "Love it? Show the world 🌍.") — same
+    real-share-only flow (`src/lib/studio/share.ts`) → existing Share Celebration.
 - **Additive only** — no changes to energy reservation, Stripe, trial, or grant logic.
 - **Phase 2 later:** short-form video (Wan 2.6 / Kling 3.0 — mapped, not built)
 - **Phase 3 later:** bring-your-own-brand input (Remove BG + Upscale already shipped in 1.6)

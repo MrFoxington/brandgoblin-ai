@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useSoundFx } from "@/components/primitives/SoundFx";
+import { shareImage } from "@/lib/studio/share";
 
 interface Props {
   job: StudioJobRow;
   onMoreLikeThis?: (job: StudioJobRow) => Promise<void>;
   onProcess?: (job: StudioJobRow, operation: "bg_removal" | "clarity_upscaler") => Promise<void>;
   onShareSuccess?: (job: StudioJobRow) => void;
+  onToggleFavorite?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
 }
 
 const IMAGE_TYPE_LABELS: Record<string, string> = {
@@ -35,13 +37,16 @@ const DERIVED_TAGS: Record<string, string> = {
   clarity_upscaler: "✨ Upscaled",
 };
 
-export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess }: Props) {
-  const { playShare } = useSoundFx();
+export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite }: Props) {
+  const { playShare, playButtonPress } = useSoundFx();
+  const reduce = useReducedMotion();
   const [downloading, setDownloading]   = useState(false);
   const [sharing, setSharing]           = useState(false);
   const [copied, setCopied]             = useState(false);
   const [processing, setProcessing]     = useState<"bg_removal" | "clarity_upscaler" | null>(null);
   const [moreLikeThis, setMoreLikeThis] = useState(false);
+  const [fav, setFav]                   = useState<boolean>(job.favorite);
+  const [favBusy, setFavBusy]           = useState(false);
 
   const pinnedSize = job.image_type
     ? IMAGE_TYPE_SIZES[job.image_type as ImageType] ?? IMAGE_TYPE_SIZES.logo_concept
@@ -78,25 +83,15 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
   async function handleShare() {
     if (!job.output_url || sharing) return;
     setSharing(true);
-    let succeeded = false;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const nav = (typeof navigator !== "undefined" ? navigator : null) as any;
-      if (nav?.share) {
-        // Resolves only on a real share; rejects on cancel (caught → no celebration)
-        await nav.share({ title: "My creation — BrandGoblin Studio", text: "Made with Goblin Studio 🎨", url: job.output_url });
-        succeeded = true;
-      } else if (nav?.clipboard?.writeText) {
-        await nav.clipboard.writeText(job.output_url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        succeeded = true;
-      }
-    } catch { /* user cancelled or clipboard failed — never celebrate */ } finally {
-      setSharing(false);
+    // Single real-share-only flow shared with the reveal celebration.
+    const result = await shareImage(job.output_url);
+    if (result === "copied") {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-    // Celebrate ONLY a genuine successful share (still in gesture context for audio unlock)
-    if (succeeded) {
+    setSharing(false);
+    // Celebrate ONLY a genuine success (shared or copied) — never on cancel.
+    if (result === "shared" || result === "copied") {
       playShare();
       onShareSuccess?.(job);
     }
@@ -119,6 +114,22 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
       await onMoreLikeThis(job);
     } finally {
       setMoreLikeThis(false);
+    }
+  }
+
+  async function handleToggleFavorite() {
+    if (!onToggleFavorite || favBusy) return;
+    const next = !fav;
+    setFav(next);          // optimistic
+    setFavBusy(true);
+    playButtonPress();
+    try {
+      const ok = await onToggleFavorite(job, next);
+      if (!ok) setFav(!next); // revert on API failure
+    } catch {
+      setFav(!next);          // revert on network failure
+    } finally {
+      setFavBusy(false);
     }
   }
 
@@ -149,66 +160,87 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
             {derivedTag}
           </span>
         )}
+        {/* Favorite star — gold pop when set */}
+        {onToggleFavorite && (
+          <button
+            onClick={handleToggleFavorite}
+            disabled={favBusy}
+            aria-pressed={fav}
+            title={fav ? "Remove from Favorites" : "Add to Favorites"}
+            className="absolute top-2 right-2 rounded-full bg-black/55 backdrop-blur-sm p-1.5 leading-none hover:bg-black/70 transition-colors disabled:opacity-70"
+          >
+            <motion.span
+              key={fav ? "on" : "off"}
+              initial={reduce ? false : { scale: 0.5 }}
+              animate={reduce ? {} : { scale: fav ? [1.4, 1] : 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 16 }}
+              className={`block text-base ${fav ? "drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]" : ""}`}
+            >
+              {fav ? "⭐" : "☆"}
+            </motion.span>
+          </button>
+        )}
       </div>
 
       {/* Meta + actions */}
       <div className="p-4 space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{typeLabel}</p>
-            <p className="text-xs text-faint">{modelLabel} · ⚡ {job.energy_reserved} used</p>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Share */}
-            <button
-              onClick={handleShare}
-              disabled={sharing}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-white/10 text-faint hover:border-primary/40 hover:text-muted disabled:opacity-60 transition-colors"
-              title="Share"
-            >
-              {copied ? "✓ Copied" : sharing ? "…" : "↗ Share"}
-            </button>
-            {/* Download */}
-            <button
-              onClick={handleDownload}
-              disabled={downloading}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-white/10 text-faint hover:border-primary/40 hover:text-muted disabled:opacity-60 transition-colors"
-            >
-              {downloading ? "…" : "↓"}
-            </button>
-          </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-white truncate">{typeLabel}</p>
+          <p className="text-xs text-faint">{modelLabel} · ⚡ {job.energy_reserved} used</p>
         </div>
 
-        {/* Process actions + More like this */}
-        <div className="flex gap-2 flex-wrap">
-          {isOriginalImage && (
-            <>
-              <button
-                onClick={() => handleProcess("bg_removal")}
-                disabled={!!processing}
-                className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-faint hover:border-primary/40 hover:text-muted disabled:opacity-50 disabled:cursor-wait transition-colors"
-              >
-                {processing === "bg_removal" ? "Removing BG…" : `✂ Remove BG · ⚡${bgRemovalCost}`}
-              </button>
-              <button
-                onClick={() => handleProcess("clarity_upscaler")}
-                disabled={!!processing}
-                className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-faint hover:border-primary/40 hover:text-muted disabled:opacity-50 disabled:cursor-wait transition-colors"
-              >
-                {processing === "clarity_upscaler" ? "Upscaling…" : `↑ Upscale · ⚡${upscaleCost}`}
-              </button>
-            </>
-          )}
+        {/* Primary loop actions — only Share (orange) + More like this (green) get bold color */}
+        <div className="flex items-center gap-2">
+          {/* Share — ORANGE, most prominent (the growth action) */}
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            className="flex-1 rounded-xl px-3 py-2 text-xs font-bold text-white text-center bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] motion-safe:animate-conjure-pulse hover:opacity-90 disabled:opacity-60 transition-opacity"
+          >
+            {copied ? "✓ Copied" : sharing ? "…" : "Share it ✨"}
+          </button>
+
+          {/* More like this — GREEN, solid (the create-again action) */}
           {isOriginalImage && onMoreLikeThis && (
             <button
               onClick={handleMoreLikeThis}
               disabled={moreLikeThis}
-              className="text-xs px-3 py-1.5 rounded-lg border border-secondary/30 text-secondary/80 hover:border-secondary/60 hover:text-secondary disabled:opacity-50 disabled:cursor-wait transition-colors"
+              className="flex-1 rounded-xl px-3 py-2 text-xs font-bold text-white text-center bg-secondary hover:bg-secondary/85 shadow-[0_0_10px_rgba(16,185,129,0.3)] disabled:opacity-60 disabled:cursor-wait transition-colors"
             >
               {moreLikeThis ? "Creating…" : "✨ More like this"}
             </button>
           )}
+
+          {/* Download — neutral/subtle (ends the loop; don't glamorize) */}
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            title="Download"
+            className="shrink-0 rounded-xl px-2.5 py-2 text-xs border border-white/10 text-faint hover:text-muted hover:border-white/20 disabled:opacity-60 transition-colors"
+          >
+            {downloading ? "…" : "↓"}
+          </button>
         </div>
+
+        {/* Quiet utility chips — paid upsells, must NOT compete with the loop actions */}
+        {isOriginalImage && (
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => handleProcess("bg_removal")}
+              disabled={!!processing}
+              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint/80 hover:text-faint hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
+            >
+              {processing === "bg_removal" ? "Removing BG…" : `✂ Remove BG · ⚡${bgRemovalCost}`}
+            </button>
+            <button
+              onClick={() => handleProcess("clarity_upscaler")}
+              disabled={!!processing}
+              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint/80 hover:text-faint hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
+            >
+              {processing === "clarity_upscaler" ? "Upscaling…" : `↑ Upscale · ⚡${upscaleCost}`}
+            </button>
+          </div>
+        )}
       </div>
     </motion.div>
   );

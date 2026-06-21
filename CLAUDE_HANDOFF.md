@@ -42,6 +42,26 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
+### ⭐ GOBLIN STUDIO — Favorites + Button Hierarchy + Share-at-Reveal (built June 21) — AWAITING PUSH
+Built additive to Phase 1.6 + Share Celebration. `tsc + npm run build` clean. **DB MIGRATION REQUIRED
+before live:** run `supabase/migrations/20260621_studio_favorites.sql` in Supabase SQL editor
+(adds `studio_jobs.favorite BOOLEAN NOT NULL DEFAULT false` + partial index).
+
+**Files:**
+- **NEW** `supabase/migrations/20260621_studio_favorites.sql` — favorite flag + partial index (run it!)
+- **NEW** `src/app/api/studio/favorite/route.ts` — `POST { jobId, favorite }`, Pro-gated, ownership-checked
+- **NEW** `src/lib/studio/share.ts` — extracted real-share-only flow (`shareImage()` → "shared" |
+  "copied" | "cancelled" | "failed"). Reused by JobCard AND the reveal; celebrate only on shared/copied.
+- **NEW** `src/lib/studio/favorites.ts` — single renamable `FAVORITES_LABEL` ("⭐ Favorites")
+- **NEW** `src/components/studio/StudioFavoritesSection.tsx` — dashboard treasure-stash grid (capped 6)
+- **MODIFIED** `src/lib/studio/jobs.ts` — `favorite` on StudioJobRow; `listUserFavoriteJobs()`, `setJobFavorite()`
+- **MODIFIED** `src/components/studio/JobCard.tsx` — gold-star toggle (optimistic, reverts on fail);
+  button hierarchy: Share ORANGE glowing / More-like-this GREEN solid / Download neutral / BG+Upscale quiet chips
+- **MODIFIED** `src/components/studio/StudioImageGenerator.tsx` — `handleToggleFavorite` (optimistic),
+  All/Favorites filter tabs (compose with brand filter), `handleRevealShare` + "📣 Share it" at the reveal
+- **MODIFIED** `src/app/dashboard/page.tsx` — renders StudioFavoritesSection (Pro/agency only)
+- **MODIFIED** `src/types/index.ts` — `favorite` added to the duplicate StudioJobRow (kept in sync)
+
 ### 🎨 GOBLIN STUDIO — Phase 1.7 PUSHED ✅ (June 21, 2026) — commit `8123a5a`
 Phases 1–1.7 all complete and live. `tsc + npm run build` both clean.
 

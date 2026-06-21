@@ -22,6 +22,7 @@ export interface StudioJobRow {
   storage_path: string | null;
   error_message: string | null;
   reservation_tx_id: string | null;
+  favorite: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -276,4 +277,50 @@ export async function listUserJobs(userId: string, limit = 20): Promise<StudioJo
       return job;
     })
   );
+}
+
+// ── List favorited completed jobs (for the dashboard Favorites section) ───────
+
+export async function listUserFavoriteJobs(userId: string, limit = 6): Promise<StudioJobRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("studio_jobs")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("favorite", true)
+    .eq("status", "completed")
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (!data?.length) return [];
+
+  return Promise.all(
+    data.map(async (job: StudioJobRow) => {
+      if (job.storage_path) {
+        try {
+          job.output_url = await getSignedUrl(job.storage_path);
+        } catch {
+          // non-fatal
+        }
+      }
+      return job;
+    })
+  );
+}
+
+// ── Toggle the favorite flag (ownership-checked) ─────────────────────────────
+
+export async function setJobFavorite(
+  jobId: string,
+  userId: string,
+  favorite: boolean
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("studio_jobs")
+    .update({ favorite })
+    .eq("id", jobId)
+    .eq("user_id", userId) // ownership guard
+    .select("id");
+  return !error && !!data && data.length > 0;
 }

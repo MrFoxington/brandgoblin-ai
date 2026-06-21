@@ -17,6 +17,7 @@ export interface StudioJobRow {
   storage_path: string | null;
   error_message: string | null;
   reservation_tx_id: string | null;
+  favorite: boolean;
   created_at: string;
   updated_at: string;
 }

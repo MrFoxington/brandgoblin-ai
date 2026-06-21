@@ -11,6 +11,8 @@ import TrialEndScreen from "@/components/TrialEndScreen";
 import { headers } from "next/headers";
 import { startTrialIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan, isTrialing, trialDaysLeft, trialExpired } from "@/lib/access";
+import StudioFavoritesSection from "@/components/studio/StudioFavoritesSection";
+import { listUserFavoriteJobs } from "@/lib/studio/jobs";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function DashboardPage() {
@@ -38,6 +40,16 @@ export default async function DashboardPage() {
   const rows = (generations ?? []) as BrandGenerationRow[];
   const email = authData.user.email ?? "";
   const paymentStatus = userRow?.payment_status ?? "active";
+
+  // Studio favorites — paid Pro/agency only (matches Studio access); empty otherwise.
+  const isPaidStudio = userRow?.plan === "pro" || userRow?.plan === "agency";
+  const studioFavorites = isPaidStudio
+    ? (await listUserFavoriteJobs(authData.user.id, 6)).map((j) => ({
+        id: j.id,
+        output_url: j.output_url,
+        image_type: j.image_type,
+      }))
+    : [];
 
   const userAccess = {
     plan: userRow?.plan ?? "free",
@@ -73,6 +85,9 @@ export default async function DashboardPage() {
             latestBrand={rows[0]}
             signupDate={authData.user.created_at}
           />
+
+          {/* Studio Favorites — treasure stash (hidden if none) */}
+          <StudioFavoritesSection favorites={studioFavorites} />
 
           {/* Brand Vault grid */}
           <div>

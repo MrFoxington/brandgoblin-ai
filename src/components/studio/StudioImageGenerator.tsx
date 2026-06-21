@@ -11,6 +11,8 @@ import type { BrandGenerationRow } from "@/types";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useXP } from "@/components/XPSystem";
 import { useSoundFx } from "@/components/primitives/SoundFx";
+import { shareImage } from "@/lib/studio/share";
+import { FAVORITES_LABEL } from "@/lib/studio/favorites";
 
 interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
@@ -85,6 +87,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     stopAnticipation,
     playStreak,
     playNudge,
+    playShare,
   } = useSoundFx();
   const reduce = useReducedMotion();
 
@@ -100,6 +103,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   const [streak, setStreak]         = useState(1);
   const [shareCelebrating, setShareCelebrating] = useState(false);
   const [shareMsgIndex, setShareMsgIndex]       = useState(0);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
@@ -153,6 +157,38 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         behavior: reduce ? "auto" : "smooth", block: "start",
       });
     });
+  }
+
+  // Optimistic favorite toggle — reverts on API failure. Returns success to JobCard.
+  async function handleToggleFavorite(job: StudioJobRow, next: boolean): Promise<boolean> {
+    setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, favorite: next } : j)));
+    try {
+      const res = await fetch("/api/studio/favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, favorite: next }),
+      });
+      if (!res.ok) {
+        setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, favorite: !next } : j)));
+        return false;
+      }
+      return true;
+    } catch {
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, favorite: !next } : j)));
+      return false;
+    }
+  }
+
+  // Share from the reveal — same real-share-only flow as the card.
+  async function handleRevealShare(job: StudioJobRow) {
+    if (!job.output_url) return;
+    const result = await shareImage(job.output_url);
+    if (result === "shared" || result === "copied") {
+      playShare();
+      setCelebratingJob(null);   // close the reveal so the share toast is the focus
+      handleShareSuccess();      // fire the Share Celebration
+    }
+    // cancelled / failed → do nothing
   }
 
   // Streak from localStorage
@@ -231,7 +267,13 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   // Brand-scoped gallery: show only jobs matching the selected brand
   const filterByBrand = (j: StudioJobRow) =>
     selectedBrandId ? j.brand_id === selectedBrandId : !j.brand_id;
-  const completedJobs = jobs.filter((j) => j.status === "completed" && filterByBrand(j));
+  // Brand-scoped completed jobs (drives the section + tab counts)
+  const brandCompletedJobs = jobs.filter((j) => j.status === "completed" && filterByBrand(j));
+  const favoriteCount = brandCompletedJobs.filter((j) => j.favorite).length;
+  // Favorites filter composes with the brand filter
+  const completedJobs = showFavoritesOnly
+    ? brandCompletedJobs.filter((j) => j.favorite)
+    : brandCompletedJobs;
   const failedJobs    = jobs.filter((j) => (j.status === "failed" || j.status === "moderation_blocked") && filterByBrand(j));
 
   const selectedBrandName = selectedBrandId
@@ -339,6 +381,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         storage_path:    null,
         error_message:   null,
         reservation_tx_id: null,
+        favorite:        false,
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       };
@@ -501,28 +544,41 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
                 </div>
               )}
 
-              {/* Loop CTAs — orange = magnetic repeat-action */}
+              {/* Nix invite — share at peak intent */}
+              <p className="text-xs text-muted mb-2.5">Love it? Show the world 🌍.</p>
+
+              {/* Two glowing paths at peak emotion: Share (orange) + Make another (green) */}
               <div className="space-y-2.5 mb-4">
                 <button
-                  onClick={() => handleVariation(celebratingJob)}
-                  disabled={generating || activeJobs.length >= 2}
-                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90"
+                  onClick={() => handleRevealShare(celebratingJob)}
+                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] motion-safe:animate-conjure-pulse transition-opacity hover:opacity-90"
                 >
-                  🎨 Try a variation · ⚡{celebratingJobCost}
-                </button>
-                <button
-                  onClick={() => handleNewStyle(celebratingJob)}
-                  disabled={generating || activeJobs.length >= 2 || isCooking}
-                  className="w-full rounded-xl border border-secondary/40 bg-secondary/10 px-4 py-3 text-sm font-bold text-white hover:bg-secondary/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  🪄 New style · ⚡{celebratingJobCost}
+                  📣 Share it
                 </button>
                 <button
                   onClick={handleMakeAnother}
-                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] motion-safe:animate-conjure-pulse transition-opacity hover:opacity-90"
+                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-secondary hover:bg-secondary/85 shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-colors"
                 >
                   ✨ Make another
                 </button>
+
+                {/* Secondary create paths — quieter so the two bold actions stay magnetic */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleVariation(celebratingJob)}
+                    disabled={generating || activeJobs.length >= 2}
+                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    🎨 Variation · ⚡{celebratingJobCost}
+                  </button>
+                  <button
+                    onClick={() => handleNewStyle(celebratingJob)}
+                    disabled={generating || activeJobs.length >= 2 || isCooking}
+                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    🪄 New style · ⚡{celebratingJobCost}
+                  </button>
+                </div>
               </div>
 
               <button onClick={() => setCelebratingJob(null)} className="text-xs text-muted hover:text-white transition-colors">
@@ -753,22 +809,51 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
       {activeJobs.length > 0 && <NixCooking count={activeJobs.length} />}
 
       {/* ── Completed jobs — brand-scoped trophy case ─────────────────────────  */}
-      {completedJobs.length > 0 && (
+      {brandCompletedJobs.length > 0 && (
         <div>
-          <h2 className="text-xs uppercase tracking-widest text-primary-light font-bold mb-3">
-            {selectedBrandId ? `${selectedBrandName} Creations` : "Freeform Creations"} ({completedJobs.length})
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {completedJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                onMoreLikeThis={handleMoreLikeThis}
-                onProcess={handleProcess}
-                onShareSuccess={handleShareSuccess}
-              />
-            ))}
+          <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+            <h2 className="text-xs uppercase tracking-widest text-primary-light font-bold">
+              {selectedBrandId ? `${selectedBrandName} Creations` : "Freeform Creations"} ({brandCompletedJobs.length})
+            </h2>
+            {/* All / Favorites filter tabs */}
+            <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-0.5">
+              <button
+                onClick={() => setShowFavoritesOnly(false)}
+                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  !showFavoritesOnly ? "bg-white/10 text-white" : "text-muted hover:text-white"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setShowFavoritesOnly(true)}
+                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  showFavoritesOnly ? "bg-amber-400/15 text-amber-300" : "text-muted hover:text-white"
+                }`}
+              >
+                {FAVORITES_LABEL} ({favoriteCount})
+              </button>
+            </div>
           </div>
+
+          {completedJobs.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {completedJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  onMoreLikeThis={handleMoreLikeThis}
+                  onProcess={handleProcess}
+                  onShareSuccess={handleShareSuccess}
+                  onToggleFavorite={handleToggleFavorite}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-faint py-6 text-center">
+              No favorites yet — tap the ☆ on any creation to add it to {FAVORITES_LABEL}.
+            </p>
+          )}
         </div>
       )}
 
