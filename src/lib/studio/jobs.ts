@@ -87,6 +87,9 @@ export async function markJobRunning(
 }
 
 // ── Mark job failed + refund energy ────────────────────────────────────────
+// Atomic: only transitions and refunds if the job is still non-terminal.
+// Concurrent callers (webhook + poll) racing on the same job: exactly one wins.
+// Callers that have no job row yet must call refundEnergy() directly.
 
 export async function markJobFailed(
   jobId: string,
@@ -96,16 +99,21 @@ export async function markJobFailed(
   txId?: string | null,
   statusOverride: "failed" | "moderation_blocked" = "failed"
 ): Promise<void> {
+  if (!jobId) return; // No row exists; caller must refund directly.
+
   const supabase = createAdminClient();
-  await supabase
+  // Conditional UPDATE — only proceeds if status is still non-terminal.
+  const { data: claimed } = await supabase
     .from("studio_jobs")
     .update({ status: statusOverride, error_message: reason })
-    .eq("id", jobId);
+    .eq("id", jobId)
+    .in("status", ["pending", "running"])
+    .select("id");
 
-  // Refund the reserved energy
+  if (!claimed || claimed.length === 0) return; // Already finalized by another caller.
+
   await refundEnergy(userId, energyReserved, `Studio refund: ${reason}`);
 
-  // Remove the reservation tx (or leave it — refundEnergy adds a 'refund' tx)
   if (txId) {
     await supabase
       .from("energy_transactions")
@@ -149,6 +157,10 @@ export async function getSignedUrl(storagePath: string): Promise<string> {
 }
 
 // ── Complete a job: store asset, finalize energy ────────────────────────────
+// Upload is idempotent (upsert: true) so both concurrent callers can upload
+// safely. The status transition is atomic — only the first caller to claim the
+// row proceeds with finalizeReservation. The second caller gets signedUrl back
+// without double-finalizing.
 
 export async function completeJob(params: {
   jobId: string;
@@ -159,14 +171,23 @@ export async function completeJob(params: {
   txId: string | null;
   energyReserved: number;
 }): Promise<string> {
+  // Upload first — idempotent via upsert, safe for concurrent callers.
   const storagePath = await uploadAsset(params.userId, params.jobId, params.buffer, params.mimeType);
   const signedUrl   = await getSignedUrl(storagePath);
 
   const supabase = createAdminClient();
-  await supabase
+  // Conditional UPDATE — only transitions if still non-terminal.
+  const { data: claimed } = await supabase
     .from("studio_jobs")
     .update({ status: "completed", storage_path: storagePath, output_url: signedUrl })
-    .eq("id", params.jobId);
+    .eq("id", params.jobId)
+    .in("status", ["pending", "running"])
+    .select("id");
+
+  if (!claimed || claimed.length === 0) {
+    // Another caller already completed this job; return the URL without re-finalizing.
+    return signedUrl;
+  }
 
   if (params.txId) {
     await finalizeReservation(

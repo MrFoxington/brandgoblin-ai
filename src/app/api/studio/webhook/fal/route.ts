@@ -6,8 +6,33 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { parseFalWebhook, downloadAsset } from "@/lib/studio/provider";
-import { getSignedUrl, markJobFailed, completeJob } from "@/lib/studio/jobs";
+import { markJobFailed, completeJob } from "@/lib/studio/jobs";
 import type { StudioModelKey } from "@/lib/studio/models";
+
+// Allowlist of hostnames that fal.ai uses for CDN output.
+// Prevents SSRF via a forged webhook with a malicious imageUrl.
+const FAL_ALLOWED_HOSTS = new Set([
+  "fal.media",
+  "v3.fal.media",
+  "cdn.fal.ai",
+  "storage.googleapis.com", // fal's primary GCS-backed CDN
+]);
+
+function isFalHost(hostname: string): boolean {
+  if (FAL_ALLOWED_HOSTS.has(hostname)) return true;
+  // Wildcard: any subdomain of fal.ai or fal.media
+  if (hostname.endsWith(".fal.ai") || hostname.endsWith(".fal.media")) return true;
+  return false;
+}
+
+function isValidFalImageUrl(rawUrl: string): boolean {
+  try {
+    const parsed = new URL(rawUrl);
+    return parsed.protocol === "https:" && isFalHost(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,6 +40,17 @@ export async function POST(request: Request) {
 
   if (!jobId) {
     return NextResponse.json({ error: "Missing jobId." }, { status: 400 });
+  }
+
+  // Shared-secret auth: FAL_WEBHOOK_SECRET is embedded in the webhookUrl at
+  // job creation time. Any POST that doesn't match is rejected immediately.
+  const webhookSecret = process.env.FAL_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const incomingSecret = searchParams.get("secret");
+    if (incomingSecret !== webhookSecret) {
+      console.warn("[studio/webhook/fal] rejected: invalid secret for jobId", jobId);
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
   }
 
   let body: unknown;
@@ -57,6 +93,19 @@ export async function POST(request: Request) {
   }
 
   if (result.status === "completed" && result.imageUrl) {
+    // Reject imageUrls that don't resolve to a known fal CDN domain (SSRF guard).
+    if (!isValidFalImageUrl(result.imageUrl)) {
+      console.error("[studio/webhook/fal] rejected imageUrl with unknown host:", result.imageUrl);
+      await markJobFailed(
+        job.id,
+        job.user_id,
+        job.energy_reserved,
+        "Invalid image URL from provider — your energy has been returned",
+        job.reservation_tx_id
+      );
+      return NextResponse.json({ ok: true });
+    }
+
     // Moderation check via fal's built-in safety output
     if (result.hasNsfw) {
       await markJobFailed(

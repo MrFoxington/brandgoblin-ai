@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { reserveEnergy } from "@/lib/energy";
+import { reserveEnergy, refundEnergy } from "@/lib/energy";
 import { STUDIO_MODELS, IMAGE_TYPE_SIZES, computeStudioEnergyCost, getPinnedSize } from "@/lib/energy-config";
 import { submitImageJob } from "@/lib/studio/provider";
 import {
@@ -169,15 +169,16 @@ export async function POST(request: Request) {
       reservationTxId: reservation.txId!,
     });
   } catch (err) {
-    // Job row creation failed — refund energy so it's not lost
-    await markJobFailed("", authData.user.id, energyCost, "Job creation failed");
+    // No job row exists yet — refund directly; markJobFailed requires a row.
+    await refundEnergy(authData.user.id, energyCost, "Studio refund: Job creation failed");
     console.error("[studio/jobs POST] createJobRow failed:", err);
     return NextResponse.json({ error: "Failed to create generation job. Energy has been returned." }, { status: 500 });
   }
 
   // Webhook URL lets fal notify us on completion (primary path)
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-  const webhookUrl = `${appUrl}/api/studio/webhook/fal?jobId=${jobId}`;
+  const webhookSecret = process.env.FAL_WEBHOOK_SECRET ?? "";
+  const webhookUrl = `${appUrl}/api/studio/webhook/fal?jobId=${jobId}&secret=${webhookSecret}`;
 
   let providerResult: { requestId: string; provider: "fal" | "replicate" };
   try {
