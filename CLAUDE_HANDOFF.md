@@ -64,9 +64,30 @@ Phases 1–1.7 all complete and live. `tsc + npm run build` both clean.
   (before first await — gesture context). `stopAnticipation()` + `playStreak(streak)` on job
   completion before reveal. New refs: `stopAnticipationRef`, `playStreakRef`, `streakRef`.
 
-**PENDING:** Drop 6 CC0 audio files into `/public/sounds/` to activate sound (app is silent but
-fully functional without them): `button-press.mp3`, `conjure-start.mp3`, `anticipation-loop.mp3`,
-`reveal.mp3`, `streak-chime.mp3`, `level-up.mp3`. Sources: Kenney.nl, Mixkit, Freesound CC0.
+**✅ SOUND PACK PLACED (June 21):** 8 CC0/royalty-free files now in `/public/sounds/` (304KB total),
+converted to mp3 via ffmpeg from Kenney (CC0) + Mixkit (free commercial):
+- `button-press.mp3` (Kenney click) · `streak-chime.mp3` (Kenney glass)
+- `conjure-start.mp3` (Mixkit Magic sparkle whoosh) · `anticipation-loop.mp3` (Mixkit Sparkling fairy
+  glow) · `reveal.mp3` (Mixkit Fairy magic sparkle) · `level-up.mp3` (Mixkit Fantasy game success)
+- `nudge.mp3` (Mixkit Arcade magic notification — NEW cue, see below)
+- `share.mp3` (Mixkit Medium crowd applause, trimmed ~3s — for the Share Celebration build)
+
+**NEW CUE — `nudge.mp3` (being wired by Claude Code):** `playNudge()` added to SoundFx; fires ONCE when
+the post-reveal "Make another/Try a variation/New style" CTAs appear (the honest "continue creating"
+moment — sparse, inviting, never naggy). Commit + push includes all 8 sound files.
+
+**✅ SHARE CELEBRATION BUILT (June 21) — additive to 1.6 Share + 1.7 sound. Awaiting review/push.**
+`tsc + npm run build` clean. Files:
+- **MODIFIED** `src/components/primitives/SoundFx.tsx` — added `playShare()` → `share.mp3` (0.55 vol),
+  same pattern as other cues (mute-gated, graceful fallback, primed on gesture). On `useSoundFx()` API.
+- **MODIFIED** `src/components/studio/JobCard.tsx` — `handleShare()` now tracks a `succeeded` flag:
+  true only when `navigator.share()` resolves OR clipboard copy succeeds; cancel/reject → no
+  celebration. On success: `playShare()` + new `onShareSuccess?(job)` prop callback.
+- **MODIFIED** `src/components/studio/StudioImageGenerator.tsx` — `handleShareSuccess()` opens a
+  fixed bottom-right celebration toast: celebrating Nix + 4 rotating encouraging lines (`SHARE_MESSAGES`,
+  3s rotation, 8s auto-dismiss) + 6-sparkle burst (skipped under reduced-motion) + orange
+  "✨ Create something new" CTA (`handleShareKeepBuilding` → scroll to `#studio-form`) + Dismiss.
+  Honest-dopamine: fires only on a real share, one toast per share, no nag/FOMO/timer-pressure.
 
 ### 🎨 GOBLIN STUDIO — Phase 1.6 PUSHED ✅ (June 21, 2026) — commit `645802d`
 Phase 1 + 1.5 + 1.6 all complete and live. `tsc + npm run build` both clean.
@@ -386,6 +407,8 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `GOBLIN_STUDIO_PHASE_1_6_BRIEF.md` | Studio Phase 1.6 spec (BUILT/PUSHED `645802d`) — orange button, brand gallery, seed-pinning, more-like-this, Remove BG/Upscale, Share. |
 | `GOBLIN_STUDIO_PHASE_1_7_BRIEF.md` | ⭐ Studio Phase 1.7 spec (NOT built) — "Juice & Sound": real SFX pack, default-on, anticipation, escalating reveal. Honest-dopamine hard rule (no casino deception). Needs CC0 audio files in /public/sounds/. |
 | `GOBLIN_STUDIO_SHOWCASE_BRIEF.md` | ⭐ Live Showcase Wall spec (NOT built) — public embeddable /embed/showcase of featured real creations, iframe'd into Airo. Consent + moderation guardrails. |
+| `GOBLIN_STUDIO_PHASE_1_7_BRIEF.md` | Studio Phase 1.7 "Juice & Sound" (BUILT/PUSHED; sound pack placed). |
+| `GOBLIN_STUDIO_SHARE_CELEBRATION_BRIEF.md` | ⭐ Share Celebration spec (NOT built) — reward sharing with applause + Nix cheer + keep-building CTA. `share.mp3` already placed. Completes create→share→grow loop. |
 | `STUDIO_SETUP_RUNBOOK.md` | ⭐ External setup Fox must complete before Studio goes live — fal.ai + Replicate keys, 3 Stripe refill prices (metadata-driven), `studio-assets` bucket, env table, per-model license checks. |
 | `STUDIO_MODEL_COST_MAP.md` | ⭐ Green-lit models + energy pricing (energy = cost/0.0018 = 10× cost). Default image FLUX.1 schnell (NOT dev), default video Wan 2.6. fal prices verified June 20. |
 | `GOBLIN_STUDIO_BRIEF.md` | ⭐ Goblin Studio build spec — all decisions LOCKED June 20. Cost model (energy = USD cost ×10 markup, never on us), atomic energy reservation, refill packs $19/$49/$99, trial = 1 free image + video-CTA (render gated to Pro), bring-your-own-brand input, TikTok/Reels/Shorts. Providers: fal.ai primary / Replicate fallback / Higgsfield optional. Positioning: text unlimited, media = "energy powers your images & videos." |
@@ -493,7 +516,11 @@ src/
 
 ---
 
-*Last updated: June 21, 2026 (v6) — Goblin Studio Phase 1.6 BUILT + PUSHED (`645802d`): orange Conjure
+*Last updated: June 21, 2026 (v7) — Phase 1.7 "Juice & Sound" pushed + full 8-file sound pack placed in
+/public/sounds/ (Kenney + Mixkit, CC0/free). New `nudge.mp3` cue being wired (post-reveal continue-
+creating). `share.mp3` placed and Share Celebration spec'd (NOT built) to complete the create→share→
+grow loop. Queued builds: Share Celebration, Live Showcase Wall. — (v6 below)*
+*Earlier: June 21, 2026 (v6) — Goblin Studio Phase 1.6 BUILT + PUSHED (`645802d`): orange Conjure
 button, brand-scoped gallery, seed-pinning (on-brand quality tiers), "More like this", Remove BG +
 Upscale wired, Share. Two new phases spec'd (NOT built): Phase 1.7 "Juice & Sound" (real SFX pack,
 honest-dopamine guardrails) + Live Showcase Wall (embeddable /embed/showcase, iframe'd into Airo).

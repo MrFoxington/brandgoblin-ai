@@ -34,25 +34,27 @@
 - Agency dashboard
 - Waitlist: `agency_waitlist` table in Supabase
 
-### 🏗️ Goblin Studio — Phase 1.5 BUILT (June 21, 2026) — NOT YET PUSHED
-- **Phase 1 shipped:** atomic energy reservation, model registry, image generation (live)
-- **Phase 1.5 built (June 21):** all 5 features complete, `tsc + npm run build` clean:
-  - **Feature A:** `POST /api/studio/cook-prompt` — Nix (Claude Haiku) writes vivid on-brand
-    prompts from brand kit (FREE, Pro-gated, rate-limited). Editable prompt textarea auto-filled,
-    debounced auto-cook on brand/type change, Re-cook button. Client prompt sent directly to fal
-    (jobs route updated to accept `prompt` field, no longer builds template server-side).
-  - **Feature B:** Default quality = Standard (flux_schnell, ≈4 energy). Post-reveal CTAs:
-    "Try a variation · ⚡N" / "New style · ⚡N" / "Make another" — the addiction loop.
-  - **Feature C:** `NixCooking.tsx` — animated conjuring Nix + rotating status lines (every 2.5s)
-    + shimmer bar during active generation. Celebrating Nix + sparkle burst + sound + XP reveal.
-    +10 XP per creation (once-per-job ref guard). Streak from localStorage. `playComplete()` on reveal.
-  - **Feature D:** Idea sparks row — 4 clickable sparks that set imageType + cook a prompt.
-  - **Feature E:** Amber/gold glow on Studio button (Navbar + `shadow-studio-glow` + `animate-studio-glow`
-    + NEW badge). Same warm amber treatment on Creator Pro sidebar card and dashboard Studio card.
+### ✅ Goblin Studio — Phases 1 → 1.7 + Share Celebration LIVE (June 21, 2026)
+- **Phase 1 (live):** atomic energy reservation, model registry, image generation
+- **Phase 1.5 (live, `1fb7d08`):** cook-prompt (Nix/Haiku writes on-brand prompts), editable
+  prompt textarea + auto-cook + Re-cook, default Standard quality, NixCooking animation,
+  celebration reveal (+10 XP / streak), idea sparks, amber Studio glow.
+- **Phase 1.6 (live, `645802d`):** seed pinning (fresh seed on creative change, same on quality-
+  only), brand-scoped gallery, orange Conjure button, `/api/studio/process` (crash-safe Remove BG
+  + Upscale, derived jobs inherit brand_id), ✨ More like this, Share button (Web Share + clipboard),
+  PALETTE LOCK in cook-prompt, Seedream ALT-engine relabel.
+- **Phase 1.7 "Juice & Sound" (live, `8123a5a` + `1d500a6`):** real audio pack (8 CC0 files),
+  default-on sound with visible mute + one-time hint, anticipation swell during generation (rAF,
+  18s, honest time-based) with escalating Nix float + particle sparks, streak-scaled celebration
+  burst, streak chime that rises in pitch with the real streak, `nudge.mp3` on post-reveal CTAs.
+- **Share Celebration (built June 21, additive to 1.6 Share + 1.7 sound):** real-share-only trigger
+  (navigator.share resolves OR clipboard copy succeeds — never on cancel), `playShare()` →
+  `share.mp3` applause, celebrating-Nix toast with 4 rotating encouraging lines (3s rotation, 8s
+  auto-dismiss), orange "✨ Create something new" loop-back CTA → scrolls to generator. Closes the
+  create → share → grow → build loop. Honest-dopamine: celebrates only a genuine share, no nag/FOMO.
 - **Additive only** — no changes to energy reservation, Stripe, trial, or grant logic.
-- **Phase 1.6 next:** multi-variation gacha spread, share-to-grow virality, deeper gamification.
 - **Phase 2 later:** short-form video (Wan 2.6 / Kling 3.0 — mapped, not built)
-- **Phase 3 later:** background removal, upscale, bring-your-own-brand input
+- **Phase 3 later:** bring-your-own-brand input (Remove BG + Upscale already shipped in 1.6)
 
 ### 🔜 Goblin Labs
 - Experimental AI tools

@@ -63,6 +63,14 @@ const SPARKLES = [
 
 const POLL_INTERVAL_MS = 3000;
 
+// Nix's encouraging lines after a real share — warm, proud, a little cheeky
+const SHARE_MESSAGES = [
+  "Congrats — it looks amazing! 🎉",
+  "You just put your brand into the world. Let's keep building.",
+  "Looking good! What do you want to create next?",
+  "That's how brands grow — one share at a time. 🚀",
+];
+
 // Random seed in [0, 2^31-1] — safe for all fal models
 function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
@@ -90,6 +98,8 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   const [jobs, setJobs]             = useState<StudioJobRow[]>(initialJobs);
   const [celebratingJob, setCelebratingJob] = useState<StudioJobRow | null>(null);
   const [streak, setStreak]         = useState(1);
+  const [shareCelebrating, setShareCelebrating] = useState(false);
+  const [shareMsgIndex, setShareMsgIndex]       = useState(0);
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
@@ -116,6 +126,34 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     if (celebratingJob) playNudge();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [celebratingJob]);
+
+  // Share celebration: rotate Nix's line (3s) + auto-dismiss after 8s (no pressure)
+  useEffect(() => {
+    if (!shareCelebrating) return;
+    const rotate = reduce
+      ? undefined
+      : setInterval(() => setShareMsgIndex((i) => (i + 1) % SHARE_MESSAGES.length), 3000);
+    const dismiss = setTimeout(() => setShareCelebrating(false), 8000);
+    return () => {
+      if (rotate) clearInterval(rotate);
+      clearTimeout(dismiss);
+    };
+  }, [shareCelebrating, reduce]);
+
+  // Fired by JobCard ONLY on a genuine successful share (sound already played there)
+  function handleShareSuccess() {
+    setShareMsgIndex(0);
+    setShareCelebrating(true);
+  }
+
+  function handleShareKeepBuilding() {
+    setShareCelebrating(false);
+    requestAnimationFrame(() => {
+      document.getElementById("studio-form")?.scrollIntoView({
+        behavior: reduce ? "auto" : "smooth", block: "start",
+      });
+    });
+  }
 
   // Streak from localStorage
   useEffect(() => {
@@ -495,6 +533,68 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         )}
       </AnimatePresence>
 
+      {/* ── Share celebration toast ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {shareCelebrating && (
+          <motion.div
+            key="share-celebrate"
+            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, transition: { duration: 0.2 } }}
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 26 }}
+            className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-sm z-50"
+          >
+            <div className="relative rounded-2xl border border-[#FF8C42]/40 bg-card/95 backdrop-blur px-5 py-4 shadow-glow overflow-hidden">
+              {/* Sparkle burst — skipped under reduced motion */}
+              {!reduce && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  {SPARKLES.slice(0, 6).map((s, i) => (
+                    <motion.span key={i} className="absolute text-sm select-none"
+                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
+                      animate={{ opacity: [0, 1, 0], x: s.x * 0.5, y: s.y * 0.5, scale: [0.4, 1, 0.5] }}
+                      transition={{ duration: 1, delay: 0.1 + s.d, ease: "easeOut" }}
+                    >✦</motion.span>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative flex items-start gap-3">
+                <motion.div
+                  className="shrink-0"
+                  animate={reduce ? {} : { y: [0, -5, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Image src="/nix/celebrating-nix.png" alt="Nix celebrating"
+                    width={56} height={56}
+                    className="drop-shadow-[0_0_14px_rgba(255,140,66,0.45)]"
+                  />
+                </motion.div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white leading-snug mb-2.5">
+                    {SHARE_MESSAGES[shareMsgIndex]}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleShareKeepBuilding}
+                      className="rounded-xl px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+                    >
+                      ✨ Create something new
+                    </button>
+                    <button
+                      onClick={() => setShareCelebrating(false)}
+                      className="text-xs text-muted hover:text-white transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Generation panel ────────────────────────────────────────────────── */}
       <div id="studio-form" className="rounded-2xl border border-primary/20 bg-card p-6 space-y-6">
 
@@ -665,6 +765,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
                 job={job}
                 onMoreLikeThis={handleMoreLikeThis}
                 onProcess={handleProcess}
+                onShareSuccess={handleShareSuccess}
               />
             ))}
           </div>

@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
+import { useSoundFx } from "@/components/primitives/SoundFx";
 
 interface Props {
   job: StudioJobRow;
   onMoreLikeThis?: (job: StudioJobRow) => Promise<void>;
   onProcess?: (job: StudioJobRow, operation: "bg_removal" | "clarity_upscaler") => Promise<void>;
+  onShareSuccess?: (job: StudioJobRow) => void;
 }
 
 const IMAGE_TYPE_LABELS: Record<string, string> = {
@@ -33,7 +35,8 @@ const DERIVED_TAGS: Record<string, string> = {
   clarity_upscaler: "✨ Upscaled",
 };
 
-export default function JobCard({ job, onMoreLikeThis, onProcess }: Props) {
+export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess }: Props) {
+  const { playShare } = useSoundFx();
   const [downloading, setDownloading]   = useState(false);
   const [sharing, setSharing]           = useState(false);
   const [copied, setCopied]             = useState(false);
@@ -75,18 +78,27 @@ export default function JobCard({ job, onMoreLikeThis, onProcess }: Props) {
   async function handleShare() {
     if (!job.output_url || sharing) return;
     setSharing(true);
+    let succeeded = false;
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const nav = (typeof navigator !== "undefined" ? navigator : null) as any;
       if (nav?.share) {
+        // Resolves only on a real share; rejects on cancel (caught → no celebration)
         await nav.share({ title: "My creation — BrandGoblin Studio", text: "Made with Goblin Studio 🎨", url: job.output_url });
+        succeeded = true;
       } else if (nav?.clipboard?.writeText) {
         await nav.clipboard.writeText(job.output_url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+        succeeded = true;
       }
-    } catch { /* user cancelled or clipboard failed */ } finally {
+    } catch { /* user cancelled or clipboard failed — never celebrate */ } finally {
       setSharing(false);
+    }
+    // Celebrate ONLY a genuine successful share (still in gesture context for audio unlock)
+    if (succeeded) {
+      playShare();
+      onShareSuccess?.(job);
     }
   }
 
