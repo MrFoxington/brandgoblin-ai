@@ -7,6 +7,7 @@ import CreatorProHub from "@/components/CreatorProHub";
 import EnergyWidget from "@/components/EnergyWidget";
 import RefillCelebration from "@/components/RefillCelebration";
 import Link from "next/link";
+import Image from "next/image";
 import type { BrandGenerationRow, CreatorContentRow } from "@/types";
 
 export default async function CreatorProPage({
@@ -112,8 +113,28 @@ export default async function CreatorProPage({
             </div>
 
             {/* Energy sidebar */}
-            <div className="w-full xl:w-72 shrink-0">
+            <div className="w-full xl:w-72 shrink-0 space-y-4">
               <EnergyWidget />
+
+              {/* Goblin Studio entry */}
+              <Link
+                href="/dashboard/studio"
+                className="group flex items-center gap-3 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/8 to-pink-500/8 p-4 hover:border-purple-500/50 hover:from-purple-500/12 transition-all duration-200"
+              >
+                <div className="shrink-0">
+                  <Image
+                    src="/nix/conjuring-nix.png"
+                    alt="Nix conjuring magic"
+                    width={48}
+                    height={48}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold tracking-widest uppercase text-purple-400 mb-0.5">🎨 Goblin Studio</p>
+                  <p className="text-sm font-semibold text-white leading-snug">Turn your brand into real images</p>
+                </div>
+                <span className="text-muted group-hover:text-white transition-colors shrink-0">→</span>
+              </Link>
             </div>
           </div>
 

@@ -71,6 +71,9 @@ export default function Navbar() {
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
                 Dashboard
               </Link>
+              <Link href="/dashboard/studio" className="btn-ghost hidden lg:inline-flex">
+                🎨 Studio
+              </Link>
               <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-glow">
                 ✦ Generate
               </Link>

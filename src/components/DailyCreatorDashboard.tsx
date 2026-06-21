@@ -385,6 +385,31 @@ export default function DailyCreatorDashboard({
         </motion.div>
       )}
 
+      {/* ── Goblin Studio card — visible to all logged-in users ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.72 }}
+      >
+        <Link
+          href="/dashboard/studio"
+          className="group flex items-center gap-4 rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-500/8 via-transparent to-pink-500/8 px-6 py-5 hover:border-purple-500/50 hover:from-purple-500/12 transition-all duration-200"
+        >
+          <div className="shrink-0">
+            <NixPose pose="conjuring" size={56} glow={false} float={false} animated={false} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-xs font-bold tracking-widest uppercase text-purple-400">🎨 Goblin Studio</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/20">New</span>
+            </div>
+            <p className="font-display font-bold text-white text-sm">Turn your brand into real images</p>
+            <p className="text-xs text-muted mt-0.5">Generate logos, social graphics &amp; product art with AI</p>
+          </div>
+          <span className="text-muted group-hover:text-white transition-colors shrink-0 text-lg">→</span>
+        </Link>
+      </motion.div>
+
       {/* ── Upgrade banner (free) ── */}
       {!isPro && (
         <motion.div
