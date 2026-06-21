@@ -76,6 +76,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     playConjureStart,
     stopAnticipation,
     playStreak,
+    playNudge,
   } = useSoundFx();
   const reduce = useReducedMotion();
 
@@ -109,6 +110,12 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   useEffect(() => { stopAnticipationRef.current = stopAnticipation; }, [stopAnticipation]);
   useEffect(() => { playStreakRef.current = playStreak; }, [playStreak]);
   useEffect(() => { streakRef.current = streak; }, [streak]);
+
+  // Nudge — fires once when post-reveal CTAs first appear; never on hover/re-render
+  useEffect(() => {
+    if (celebratingJob) playNudge();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [celebratingJob]);
 
   // Streak from localStorage
   useEffect(() => {

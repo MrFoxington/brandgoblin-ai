@@ -36,6 +36,7 @@ const SOUND_FILES = {
   "reveal":            "/sounds/reveal.mp3",
   "streak-chime":      "/sounds/streak-chime.mp3",
   "level-up":          "/sounds/level-up.mp3",
+  "nudge":             "/sounds/nudge.mp3",
 } as const;
 
 type SoundName = keyof typeof SOUND_FILES;
@@ -57,6 +58,7 @@ interface SoundContextValue {
   startAnticipation: () => void;
   stopAnticipation: () => void;
   playStreak: (count: number) => void;
+  playNudge: () => void;
 }
 
 const noop = () => {};
@@ -74,6 +76,7 @@ const SoundContext = createContext<SoundContextValue>({
   startAnticipation: noop,
   stopAnticipation: noop,
   playStreak: noop,
+  playNudge: noop,
 });
 
 export function useSoundFx() {
@@ -239,6 +242,9 @@ function createAudioPlayer(getMuted: () => boolean) {
       const rate = Math.min(1.0 + Math.max(0, count - 1) * 0.1, 1.8);
       playOne("streak-chime", 0.5, rate);
     },
+
+    // Nudge — single magic ding when post-reveal CTAs appear (honest invite, not pressure)
+    playNudge() { ensurePrimed(); playOne("nudge", 0.55); },
   };
 }
 
@@ -299,6 +305,7 @@ export function SoundFxProvider({ children }: { children: ReactNode }) {
     startAnticipation: () => p()?.startAnticipation(),
     stopAnticipation:  () => p()?.stopAnticipation(),
     playStreak:        (n) => p()?.playStreak(n),
+    playNudge:         () => p()?.playNudge(),
   };
 
   // Keep module-level refs in sync for out-of-tree callers
