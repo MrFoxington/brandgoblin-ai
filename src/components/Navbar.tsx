@@ -15,6 +15,10 @@ const NAV_LINKS = [
   { label: "About", href: "/#about" },
 ];
 
+// Convenience link only — the real gate is server-side in /admin (redirects non-admins).
+// Matches the server's ADMIN_EMAIL fallback.
+const ADMIN_EMAIL = "joeherrington369@gmail.com";
+
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -68,6 +72,15 @@ export default function Navbar() {
           <SoundToggle />
           {user ? (
             <>
+              {user.email === ADMIN_EMAIL && (
+                <Link
+                  href="/admin"
+                  className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
+                  title="Admin dashboard"
+                >
+                  🧌 Admin
+                </Link>
+              )}
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
                 Dashboard
               </Link>
