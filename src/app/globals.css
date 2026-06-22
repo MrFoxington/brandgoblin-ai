@@ -290,3 +290,7 @@ body {
     print-color-adjust: exact !important;
   }
 }
+
+/* Hide scrollbar for the showcase marquee (still scrollable) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

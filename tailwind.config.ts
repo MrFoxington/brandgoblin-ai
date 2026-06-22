@@ -54,6 +54,7 @@ const config: Config = {
         particle: "particle 6s ease-in-out infinite",
         "studio-glow": "studio-glow 2s ease-in-out infinite",
         "conjure-pulse": "conjure-pulse 2s ease-in-out infinite",
+        marquee: "marquee 40s linear infinite",
       },
       keyframes: {
         float: {
@@ -67,6 +68,10 @@ const config: Config = {
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(200%)" },
+        },
+        marquee: {
+          "0%":   { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
         },
         particle: {
           "0%, 100%": { transform: "translateY(0px)", opacity: "0.3" },

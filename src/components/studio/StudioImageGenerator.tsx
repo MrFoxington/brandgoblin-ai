@@ -382,6 +382,9 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         error_message:   null,
         reservation_tx_id: null,
         favorite:        false,
+        featured:        false,
+        featured_order:  null,
+        featured_at:     null,
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       };

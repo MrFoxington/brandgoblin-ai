@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ShowcaseAdmin from "@/components/admin/ShowcaseAdmin";
+import { listAdminFeaturable } from "@/lib/studio/showcase";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joeherrington369@gmail.com";
 
@@ -72,6 +74,30 @@ export default async function AdminPage() {
     if (mode === "existing") existingCount++;
     else generatedCount++;
   }
+
+  // ── Showcase curation — the admin's OWN completed image jobs (consent rule) ──
+  const featurableJobs = await listAdminFeaturable(authData.user.id);
+  const showcaseBrandIds = Array.from(
+    new Set(featurableJobs.map((j) => j.brand_id).filter((b): b is string => !!b))
+  );
+  const showcaseBrandNames = new Map<string, string>();
+  if (showcaseBrandIds.length) {
+    const { data: scBrands } = await admin
+      .from("brand_generations")
+      .select("id, output_data")
+      .in("id", showcaseBrandIds);
+    for (const b of scBrands ?? []) {
+      const name = (b.output_data as { recommendedName?: string })?.recommendedName;
+      if (name) showcaseBrandNames.set(b.id as string, name);
+    }
+  }
+  const showcaseJobs = featurableJobs.map((j) => ({
+    id: j.id,
+    output_url: j.output_url,
+    image_type: j.image_type,
+    brand_name: (j.brand_id && showcaseBrandNames.get(j.brand_id)) || "Freeform",
+    featured: j.featured,
+  }));
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -175,6 +201,17 @@ export default async function AdminPage() {
             </div>
 
           </div>
+
+          {/* Showcase curation */}
+          <div className="bg-card p-6 rounded-2xl mt-6">
+            <h2 className="font-display text-lg font-bold text-white mb-1">⭐ Showcase Curation</h2>
+            <p className="text-xs text-muted mb-4">
+              Feature your best creations on the public wall (<span className="font-mono">/embed/showcase</span>,{" "}
+              <span className="font-mono">/showcase</span>). Only your own creations can be featured.
+            </p>
+            <ShowcaseAdmin jobs={showcaseJobs} />
+          </div>
+
         </div>
       </main>
       <Footer />

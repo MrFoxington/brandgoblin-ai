@@ -18,6 +18,9 @@ export interface StudioJobRow {
   error_message: string | null;
   reservation_tx_id: string | null;
   favorite: boolean;
+  featured: boolean;
+  featured_order: number | null;
+  featured_at: string | null;
   created_at: string;
   updated_at: string;
 }

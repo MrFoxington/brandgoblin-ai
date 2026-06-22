@@ -42,6 +42,37 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
+### 🖼 GOBLIN STUDIO LIVE SHOWCASE WALL (built June 22) — AWAITING REVIEW/PUSH
+Public, read-only, privacy-safe gallery of real Studio creations — embeddable on Airo via iframe.
+Additive. `tsc + npm run build` clean. **DB MIGRATION REQUIRED before live:**
+`supabase/migrations/20260622_studio_showcase.sql` (adds `featured` + `featured_order` + `featured_at`
++ partial index; includes an OPTIONAL seed snippet to feature your own jobs — replace `<YOUR_USER_ID>`).
+
+**Privacy/consent (hard rules, enforced structurally):**
+- Public API returns ONLY `{ id, imageUrl (short-lived signed, 30min), brandName, imageType }` — no
+  user IDs, emails, or prompts. Only `featured = true AND status = 'completed'` (moderation-passed;
+  NSFW → `moderation_blocked`, never completes, no asset).
+- Admin can feature ONLY their own jobs — `setJobFeatured()` + `listAdminFeaturable()` both filter
+  `user_id === admin.id`. Other users' work can never be featured in v1.
+
+**Files:**
+- **NEW** `supabase/migrations/20260622_studio_showcase.sql` — featured flags + index + seed snippet
+- **NEW** `src/lib/studio/showcase.ts` — `listFeaturedPublic()` (public-safe), `listAdminFeaturable()`, `setJobFeatured()`
+- **NEW** `src/app/api/showcase/route.ts` — public GET, `revalidate=120`, returns `{ items }`
+- **NEW** `src/app/api/admin/showcase-feature/route.ts` — admin POST, ADMIN_EMAIL-gated + ownership-enforced
+- **NEW** `src/app/embed/showcase/page.tsx` — chrome-less iframe page (noindex)
+- **NEW** `src/app/showcase/page.tsx` — full public page + orange "Start Creating — Free" CTA
+- **NEW** `src/components/showcase/ShowcaseMarquee.tsx` (always client-refreshes for live URLs) + `ShowcaseCard.tsx`
+- **NEW** `src/components/admin/ShowcaseAdmin.tsx` — ⭐ feature toggle grid (optimistic, reverts)
+- **MODIFIED** `src/app/admin/page.tsx` — Showcase Curation section
+- **MODIFIED** `src/lib/studio/jobs.ts` — `featured*` on StudioJobRow; `getSignedUrl(path, ttl?)` optional TTL
+- **MODIFIED** `src/types/index.ts` — `featured*` on duplicate StudioJobRow; `tailwind.config.ts` — marquee keyframe;
+  `src/app/globals.css` — `.no-scrollbar`
+- **ADMIN_EMAIL:** not set as env var but `/admin` + the feature route fall back to `joeherrington369@gmail.com`
+  (Fox's email) so it works out of the box. Set `ADMIN_EMAIL` in Vercel for cleanliness.
+- **Airo embed (Fox, after deploy):** `<iframe src="https://app.brandgoblinai.com/embed/showcase"
+  style="width:100%;border:0;height:420px;" loading="lazy">`
+
 ### ✨ NIX ZONE — free Nix goodies (built June 22) — AWAITING REVIEW/PUSH
 Free in-app distribution surface — wallpapers, sticker pack, gallery. Additive (no energy/Stripe/
 trial/generation). `tsc + npm run build` clean. NO DB migration needed. **NO Nix art generated —

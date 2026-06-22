@@ -23,6 +23,9 @@ export interface StudioJobRow {
   error_message: string | null;
   reservation_tx_id: string | null;
   favorite: boolean;
+  featured: boolean;
+  featured_order: number | null;
+  featured_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -147,11 +150,11 @@ export async function uploadAsset(
 // Always re-sign from storage_path; never treat the stored output_url as
 // canonical (it dies after an hour).
 
-export async function getSignedUrl(storagePath: string): Promise<string> {
+export async function getSignedUrl(storagePath: string, ttlSeconds = 60 * 60): Promise<string> {
   const supabase = createAdminClient();
   const { data, error } = await supabase.storage
     .from("studio-assets")
-    .createSignedUrl(storagePath, 60 * 60); // 1 hour
+    .createSignedUrl(storagePath, ttlSeconds); // default 1 hour
 
   if (error || !data?.signedUrl) throw new Error(`Signing failed: ${error?.message}`);
   return data.signedUrl;

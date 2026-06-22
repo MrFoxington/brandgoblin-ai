@@ -27,6 +27,20 @@
 
 ## Coming Soon
 
+### 🖼 Goblin Studio Live Showcase Wall (built June 22, 2026 — additive, awaiting push)
+- Public, read-only, privacy-safe gallery of real Studio creations — embeddable on Airo via iframe.
+- **Curation:** `studio_jobs.featured` (+ `featured_order`, `featured_at`, migration
+  `20260622_studio_showcase.sql`). Admin `/admin` ⭐ toggle features creations — **enforced
+  structurally to only Fox-owned jobs** (`user_id === admin.id`), so the consent rule can't be
+  violated in v1. Optional seed SQL to feature your own best jobs in one query.
+- **Public API** `GET /api/showcase` (no auth): returns ONLY `id / imageUrl (short-lived signed) /
+  brandName / imageType`. Zero private data — no user IDs, emails, or prompts. `s-maxage=120` cache.
+  Only `featured + completed` (moderation-passed — NSFW becomes `moderation_blocked`, never completes).
+- **Embed** `/embed/showcase`: chrome-less, noindex, seamless marquee (pause-on-hover, swipeable,
+  `prefers-reduced-motion` → static scroll row), lazy images, graceful empty state. Iframe-ready.
+- **Full page** `/showcase`: bold grid + prominent orange "✦ Start Creating — Free" → /signup.
+- Airo embed (Fox, after deploy): `<iframe src="https://app.brandgoblinai.com/embed/showcase" …>`.
+
 ### ✨ Nix Zone — free Nix goodies (built June 22, 2026 — additive, awaiting push)
 - Free, no Pro/energy gate — distribution + brand-affinity surface (`/dashboard/nix`, nav entry
   with purple FREE glow, NOT orange). Display-only: never AI-generates Nix art.
