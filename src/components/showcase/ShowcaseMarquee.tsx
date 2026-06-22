@@ -14,14 +14,15 @@ export default function ShowcaseMarquee({ initialItems }: Props) {
   // Consider "loaded" immediately if we have SSR data (instant paint); otherwise wait.
   const [loaded, setLoaded] = useState<boolean>(!!initialItems?.length);
 
-  // Always refresh on mount — guarantees live, non-expired signed URLs even if the
-  // SSR/ISR HTML was served stale (the embed can sit idle in an iframe).
+  // Always refresh on mount (never short-circuit on initialItems) — initialItems are
+  // for instant first paint only; this guarantees a stale/empty SSR render never sticks
+  // and signed URLs stay live even if the embed sits idle in an iframe.
   useEffect(() => {
     let active = true;
-    fetch("/api/showcase")
+    fetch("/api/showcase", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => { if (active && Array.isArray(d.items)) setItems(d.items); })
-      .catch(() => { /* keep SSR items / graceful empty */ })
+      .catch(() => { /* keep prior items — never blank the wall on error */ })
       .finally(() => { if (active) setLoaded(true); });
     return () => { active = false; };
   }, []);

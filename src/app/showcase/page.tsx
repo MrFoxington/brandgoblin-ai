@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   description: "A live wall of real brands, logos, and product art made with Goblin Studio. Start creating yours free.",
 };
 
-export const revalidate = 120;
+// Re-run listFeaturedPublic() on every request — never serve a frozen empty static render.
+export const dynamic = "force-dynamic";
 
 export default async function ShowcasePage() {
   const items = await listFeaturedPublic();

@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Re-fetch featured set periodically (matches the API cache window).
-export const revalidate = 120;
+// Re-run listFeaturedPublic() on every request — never serve a frozen empty static render.
+export const dynamic = "force-dynamic";
 
 export default async function EmbedShowcasePage() {
   const items = await listFeaturedPublic();
