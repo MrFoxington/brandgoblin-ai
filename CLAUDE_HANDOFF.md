@@ -42,10 +42,35 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
-### ⭐ GOBLIN STUDIO — Favorites + Button Hierarchy + Share-at-Reveal (built June 21) — AWAITING PUSH
-Built additive to Phase 1.6 + Share Celebration. `tsc + npm run build` clean. **DB MIGRATION REQUIRED
-before live:** run `supabase/migrations/20260621_studio_favorites.sql` in Supabase SQL editor
-(adds `studio_jobs.favorite BOOLEAN NOT NULL DEFAULT false` + partial index).
+### ✨ NIX ZONE — free Nix goodies (built June 22) — AWAITING REVIEW/PUSH
+Free in-app distribution surface — wallpapers, sticker pack, gallery. Additive (no energy/Stripe/
+trial/generation). `tsc + npm run build` clean. NO DB migration needed. **NO Nix art generated —
+display-only from `/public/nix/*`; empty manifests render graceful "coming soon."**
+
+**Files:**
+- **NEW** `src/lib/nix-assets.ts` — manifest (WALLPAPERS/STICKERS/GALLERY arrays, currently EMPTY) +
+  renamable `NIX_ZONE_LABEL` ("✨ Nix"). Adding a goodie = drop file in `/public/nix/<folder>/` + 1 line.
+- **NEW** `src/lib/nix-download.ts` — `downloadFile`, `downloadWallpaperBranded` (canvas corner mark
+  "Nix · brandgoblinai.com", source file untouched), `downloadStickersZip` (jszip dynamic-imported on click).
+- **NEW** `src/app/dashboard/nix/page.tsx` — page, auth-gated to logged-in only, NO Pro gate.
+- **NEW** `src/components/nix/NixZone.tsx` (orchestrator) + `NixWallpapers.tsx`, `NixStickers.tsx`,
+  `NixGallery.tsx`, `NixEmptyState.tsx` (waving Nix "coming soon").
+- **MODIFIED** `src/components/Navbar.tsx` — "✨ Nix" link (purple glow + FREE badge, NOT orange).
+- **MODIFIED** `src/lib/studio/share.ts` — `shareImage(url, opts?)` optional title/text (additive; existing
+  callers unchanged). Nix gallery shares "Meet Nix from BrandGoblin 🧙✨ brandgoblinai.com".
+- **DEP:** added `jszip` (dynamically imported — stays out of main bundle; shared JS unchanged at 87.2 kB).
+
+**FOX TODO — drop Nix art (page works empty until then), then add manifest lines:**
+- `/public/nix/wallpapers/` — desktop (1920×1080 / 2560×1440) + phone (1080×1920) PNGs
+- `/public/nix/stickers/` — transparent-bg PNGs (~512×512), clean die-cut poses
+- `/public/nix/gallery/` — "Nix doing cool stuff" images + optional short clips (.mp4/.webm)
+
+### ⭐ GOBLIN STUDIO — Favorites + Button Hierarchy + Share-at-Reveal — PUSHED ✅ LIVE (June 21) — `7fbf43d`
+Additive to Phase 1.6 + Share Celebration. `tsc + npm run build` clean. **DB migration RUN ✅**
+(`supabase/migrations/20260621_studio_favorites.sql` — added `studio_jobs.favorite` + partial index).
+Completes the create → keep → share → grow → repeat loop: gold-star favorites + Hoard sections
+(Studio tab + dashboard), Share=ORANGE / More-like-this=GREEN hierarchy, and "📣 Share it" surfaced at
+the reveal (peak intent). Share Celebration (`b7dc1d5`) + full 8-file sound pack also LIVE.
 
 **Files:**
 - **NEW** `supabase/migrations/20260621_studio_favorites.sql` — favorite flag + partial index (run it!)
@@ -428,7 +453,8 @@ All docs live at `/Users/foxximuss/Desktop/Claude Files/brandgoblin-ai/docs/`
 | `GOBLIN_STUDIO_PHASE_1_7_BRIEF.md` | ⭐ Studio Phase 1.7 spec (NOT built) — "Juice & Sound": real SFX pack, default-on, anticipation, escalating reveal. Honest-dopamine hard rule (no casino deception). Needs CC0 audio files in /public/sounds/. |
 | `GOBLIN_STUDIO_SHOWCASE_BRIEF.md` | ⭐ Live Showcase Wall spec (NOT built) — public embeddable /embed/showcase of featured real creations, iframe'd into Airo. Consent + moderation guardrails. |
 | `GOBLIN_STUDIO_PHASE_1_7_BRIEF.md` | Studio Phase 1.7 "Juice & Sound" (BUILT/PUSHED; sound pack placed). |
-| `GOBLIN_STUDIO_SHARE_CELEBRATION_BRIEF.md` | ⭐ Share Celebration spec (NOT built) — reward sharing with applause + Nix cheer + keep-building CTA. `share.mp3` already placed. Completes create→share→grow loop. |
+| `GOBLIN_STUDIO_SHARE_CELEBRATION_BRIEF.md` | Share Celebration (BUILT/LIVE `b7dc1d5`) — applause + Nix cheer + keep-building CTA on real share. |
+| `GOBLIN_STUDIO_FAVORITES_AND_SHARE_BRIEF.md` | Favorites + button hierarchy + share-at-reveal (BUILT/LIVE `7fbf43d`) — gold-star favorites, Hoard sections, Share=orange/More-like-this=green, "Share it" at the reveal. |
 | `STUDIO_SETUP_RUNBOOK.md` | ⭐ External setup Fox must complete before Studio goes live — fal.ai + Replicate keys, 3 Stripe refill prices (metadata-driven), `studio-assets` bucket, env table, per-model license checks. |
 | `STUDIO_MODEL_COST_MAP.md` | ⭐ Green-lit models + energy pricing (energy = cost/0.0018 = 10× cost). Default image FLUX.1 schnell (NOT dev), default video Wan 2.6. fal prices verified June 20. |
 | `GOBLIN_STUDIO_BRIEF.md` | ⭐ Goblin Studio build spec — all decisions LOCKED June 20. Cost model (energy = USD cost ×10 markup, never on us), atomic energy reservation, refill packs $19/$49/$99, trial = 1 free image + video-CTA (render gated to Pro), bring-your-own-brand input, TikTok/Reels/Shorts. Providers: fal.ai primary / Replicate fallback / Higgsfield optional. Positioning: text unlimited, media = "energy powers your images & videos." |
@@ -536,7 +562,12 @@ src/
 
 ---
 
-*Last updated: June 21, 2026 (v7) — Phase 1.7 "Juice & Sound" pushed + full 8-file sound pack placed in
+*Last updated: June 21, 2026 (v8) — Full Studio dopamine loop SHIPPED + LIVE: Phase 1.7 sound pack,
+Share Celebration (`b7dc1d5`), and Favorites + button hierarchy + share-at-reveal (`7fbf43d`, migration
+run). create → ⭐ keep → 🟠 share → 🎉 grow → 🟢 build → repeat is fully wired. NEXT: Live Showcase Wall
+(`docs/GOBLIN_STUDIO_SHOWCASE_BRIEF.md`) — the bridge to DISTRIBUTION (the real growth lever). Also
+pending: Airo landing nav-button-orange + example images + dead footer legal links. — (v7 below)*
+*Earlier: June 21, 2026 (v7) — Phase 1.7 "Juice & Sound" pushed + full 8-file sound pack placed in
 /public/sounds/ (Kenney + Mixkit, CC0/free). New `nudge.mp3` cue being wired (post-reveal continue-
 creating). `share.mp3` placed and Share Celebration spec'd (NOT built) to complete the create→share→
 grow loop. Queued builds: Share Celebration, Live Showcase Wall. — (v6 below)*

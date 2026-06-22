@@ -27,6 +27,22 @@
 
 ## Coming Soon
 
+### ✨ Nix Zone — free Nix goodies (built June 22, 2026 — additive, awaiting push)
+- Free, no Pro/energy gate — distribution + brand-affinity surface (`/dashboard/nix`, nav entry
+  with purple FREE glow, NOT orange). Display-only: never AI-generates Nix art.
+- **Manifest-driven** (`src/lib/nix-assets.ts`): wallpapers / stickers / gallery arrays — adding a
+  goodie = drop the file in `/public/nix/<folder>/` + one manifest line. Empty array → graceful
+  "coming soon" (waving Nix), never a placeholder.
+- **Wallpapers:** desktop + phone downloads, branded at download time with a tasteful
+  "Nix · brandgoblinai.com" corner mark via canvas (source file never modified).
+- **Stickers:** transparent-PNG grid, individual download + "Download all (zip)" (jszip, dynamically
+  imported on click), messenger how-to note.
+- **Gallery:** images + clips (`<video>`), each Share (reuses `lib/studio/share.ts`, Nix share text)
+  + Download.
+- Single renamable `NIX_ZONE_LABEL` (default "✨ Nix").
+- **LATER (deferred):** paid physical merch (hoodie, dolls) via print-on-demand — only once a
+  fanbase is asking. NOT built.
+
 ### 🔜 Agency Edition
 - Multi-client workspaces
 - White-label reports

@@ -8,7 +8,12 @@
 
 export type ShareResult = "shared" | "copied" | "cancelled" | "failed";
 
-export async function shareImage(url: string): Promise<ShareResult> {
+interface ShareOpts {
+  title?: string;
+  text?: string;
+}
+
+export async function shareImage(url: string, opts?: ShareOpts): Promise<ShareResult> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nav = (typeof navigator !== "undefined" ? navigator : null) as any;
   if (!nav) return "failed";
@@ -17,8 +22,8 @@ export async function shareImage(url: string): Promise<ShareResult> {
     try {
       // Resolves ONLY on a real share; rejects on cancel.
       await nav.share({
-        title: "My creation — BrandGoblin Studio",
-        text: "Made with Goblin Studio 🎨",
+        title: opts?.title ?? "My creation — BrandGoblin Studio",
+        text: opts?.text ?? "Made with Goblin Studio 🎨",
         url,
       });
       return "shared";

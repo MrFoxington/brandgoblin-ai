@@ -80,6 +80,15 @@ export default function Navbar() {
                   NEW
                 </span>
               </Link>
+              <Link
+                href="/dashboard/nix"
+                className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary-light hover:text-white hover:bg-primary/20 shadow-glow transition-colors"
+              >
+                ✨ Nix
+                <span className="absolute -top-1.5 -right-1.5 rounded-full bg-primary px-1 text-[9px] font-bold leading-4 text-white">
+                  FREE
+                </span>
+              </Link>
               <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-glow">
                 ✦ Generate
               </Link>
