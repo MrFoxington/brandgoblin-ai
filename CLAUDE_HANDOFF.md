@@ -31,7 +31,7 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ✅ HONEST STATUS (updated June 20, 2026) — READ FIRST
+## ✅ HONEST STATUS (updated June 22, 2026) — READ FIRST
 
 **REVENUE-CAPABLE AND WORKING END-TO-END IN LIVE MODE.** Real purchases, energy refills, the
 monthly Pro energy grant, dunning, and the customer portal all verified working with the live
@@ -42,11 +42,15 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
-### 🖼 GOBLIN STUDIO LIVE SHOWCASE WALL (built June 22) — AWAITING REVIEW/PUSH
+### 🖼 GOBLIN STUDIO LIVE SHOWCASE WALL — PUSHED ✅ LIVE + VERIFIED (June 22) — `d29c538`
 Public, read-only, privacy-safe gallery of real Studio creations — embeddable on Airo via iframe.
-Additive. `tsc + npm run build` clean. **DB MIGRATION REQUIRED before live:**
-`supabase/migrations/20260622_studio_showcase.sql` (adds `featured` + `featured_order` + `featured_at`
-+ partial index; includes an OPTIONAL seed snippet to feature your own jobs — replace `<YOUR_USER_ID>`).
+Additive. **DB migration RUN ✅** (`supabase/migrations/20260622_studio_showcase.sql`).
+**Live-verified June 22:** `/api/showcase` returns exactly 7 featured items with ONLY
+`{id, brandName, imageType, imageUrl}` — privacy scan found ZERO private fields; image URLs are
+signed from the private `studio-assets` bucket with a 30-min (1800s) JWT TTL. `/embed/showcase`
+returns 200, renders the marquee, and carries `<meta robots="noindex,nofollow">`. API has a ~120s
+CDN cache (`s-maxage=120`) so admin feature/unfeature changes take up to ~2 min to show publicly.
+**Fox's next step:** embed the iframe in Airo (snippet at the bottom of this section).
 
 **Privacy/consent (hard rules, enforced structurally):**
 - Public API returns ONLY `{ id, imageUrl (short-lived signed, 30min), brandName, imageType }` — no
@@ -68,15 +72,25 @@ Additive. `tsc + npm run build` clean. **DB MIGRATION REQUIRED before live:**
 - **MODIFIED** `src/lib/studio/jobs.ts` — `featured*` on StudioJobRow; `getSignedUrl(path, ttl?)` optional TTL
 - **MODIFIED** `src/types/index.ts` — `featured*` on duplicate StudioJobRow; `tailwind.config.ts` — marquee keyframe;
   `src/app/globals.css` — `.no-scrollbar`
-- **ADMIN_EMAIL:** not set as env var but `/admin` + the feature route fall back to `joeherrington369@gmail.com`
-  (Fox's email) so it works out of the box. Set `ADMIN_EMAIL` in Vercel for cleanliness.
-- **Airo embed (Fox, after deploy):** `<iframe src="https://app.brandgoblinai.com/embed/showcase"
-  style="width:100%;border:0;height:420px;" loading="lazy">`
+- **ADMIN_EMAIL:** Fox's real app account is **`joepro@hotmail.com`** (NOT the old gmail). Hardcoded
+  fallback fixed in all 3 spots (`07614cb`): `/admin` page, `/api/admin/showcase-feature`, and the
+  Navbar's admin-link constant. `ADMIN_EMAIL` env var is now SET in Vercel = `joepro@hotmail.com`.
+  A subtle "🧌 Admin" navbar link (`cd55503`) shows only for that email (client-side; real gate is
+  server-side in `/admin`, which redirects non-admins). NOTE: Navbar email is hardcoded — if the env
+  value ever changes, update the Navbar too (or migrate it to a `NEXT_PUBLIC_ADMIN_EMAIL`).
+- **Airo embed (Fox's pending step):** `<iframe src="https://app.brandgoblinai.com/embed/showcase"
+  style="width:100%;border:0;height:420px;" loading="lazy">` — tune height for mobile vs desktop.
+- **Curation:** `/admin` → ⭐ Showcase Curation grid (own completed image jobs only). 7 currently featured.
 
-### ✨ NIX ZONE — free Nix goodies (built June 22) — AWAITING REVIEW/PUSH
+### ✨ NIX ZONE — free Nix goodies — PUSHED ✅ LIVE (June 22) — `0972230`
 Free in-app distribution surface — wallpapers, sticker pack, gallery. Additive (no energy/Stripe/
-trial/generation). `tsc + npm run build` clean. NO DB migration needed. **NO Nix art generated —
-display-only from `/public/nix/*`; empty manifests render graceful "coming soon."**
+trial/generation). NO DB migration needed. **NO Nix art generated — display-only from `/public/nix/*`;
+empty manifests render graceful "coming soon."**
+**⏳ FOX TODO (live but empty until done):** drop Nix art into `/public/nix/{wallpapers,stickers,gallery}/`
++ add one manifest line per file in `src/lib/nix-assets.ts`. Folders exist (`.gitkeep`). Specs:
+wallpapers = desktop 1920×1080/2560×1440 + phone 1080×1920 PNGs; stickers = transparent ~512×512 PNGs;
+gallery = images + optional `.mp4`/`.webm` clips. Quality gate: green skin, purple hair, pointed ears,
+purple "NIX" hoodie w/ gold trim.
 
 **Files:**
 - **NEW** `src/lib/nix-assets.ts` — manifest (WALLPAPERS/STICKERS/GALLERY arrays, currently EMPTY) +
@@ -269,28 +283,22 @@ Phase 1 + 1.5 + 1.6 all complete and live. `tsc + npm run build` both clean.
   login to confirm the live animation/sound/scroll.
 
 ### 🌅 START HERE (next priorities, in order)
-1. **Drop 6 sound files into `/public/sounds/`** — Phase 1.7 is live but silent until files land.
-   Sources: Kenney.nl Interface Sounds (CC0), Mixkit, Freesound CC0. Files needed:
-   `button-press.mp3` · `conjure-start.mp3` · `anticipation-loop.mp3` · `reveal.mp3` · `streak-chime.mp3` · `level-up.mp3`
-   After dropping files: `git add public/sounds/ && git commit -m "Add Phase 1.7 CC0 sound pack" && git push`
-2. **Smoke-test Phase 1.7 live** (after sound files land): click Conjure, hear whoosh, watch Nix
-   swell, hear sparkle burst on reveal, see streak chime pitch rise, mute mid-gen stops loop.
-3. **Verify Phase 1.6 live** — also confirm brand gallery filter, orange Conjure, Remove BG/Upscale
-   variant cards, ✨ More like this, Share button, Seedream ALT badge.
-2. **NEXT STUDIO BUILDS — spec'd, NOT built yet (give to Claude Code one at a time):**
-   - **Phase 1.6 — DONE/PUSHED** (`645802d`) — verify live (item 1).
-   - **Phase 1.7 "Juice & Sound"** — `docs/GOBLIN_STUDIO_PHASE_1_7_BRIEF.md`. Real on-brand SFX pack
-     (current SoundFx.tsx is thin synth tones + defaults muted), default-sound-ON, anticipation build
-     during generation, escalating reveal, loop momentum. HARD RULE: honest dopamine only — NO
-     losses-disguised-as-wins / near-miss / loss-chasing (energy = real money). Audio files must be
-     sourced (CC0/royalty-free) and dropped in `/public/sounds/` — CC will output the exact file list.
-   - **Live Showcase Wall** — `docs/GOBLIN_STUDIO_SHOWCASE_BRIEF.md`. Public, embeddable, auto-rotating
-     `/embed/showcase` of REAL featured creations (iframe'd into Airo, which blocks JS but allows
-     iframes). `featured` flag + admin toggle; consent + moderation guardrails (only Fox-owned or
-     opt-in creations public); short-lived signed URLs from the private bucket. Updates auto-pull from
-     the app — no manual Airo edits.
-   - Later (Phase 1.7+ / Phase 2): multi-variation gacha spread, deeper gamification, short-form VIDEO
-     (Wan 2.6 / Kling 3.0 — registry-mapped, NOT built; do NOT advertise video anywhere until built).
+**Studio is feature-complete through Phases 1→1.7 + Share Celebration + Favorites + Showcase Wall +
+Nix Zone — all PUSHED + LIVE.** Sound pack (8 CC0 files) is live. The remaining work is mostly
+content-population + distribution, not new code:
+
+1. **Populate the Nix Zone** (live but empty) — drop Nix art into `/public/nix/{wallpapers,stickers,
+   gallery}/` + add manifest lines in `src/lib/nix-assets.ts`. See the Nix Zone section above for specs.
+2. **Embed the Showcase iframe in Airo** — Showcase is live + verified (7 featured items, privacy
+   clean). Paste `<iframe src="https://app.brandgoblinai.com/embed/showcase" …>` into an Airo HTML
+   section near the hero + orange CTA. Curate more via `/admin` → ⭐ Showcase Curation anytime.
+3. **GoDaddy / Airo landing — V3 finish** (see item 4 below): make top-nav button orange, add a
+   Studio "make real images" section, drop in 2–3 real Studio examples, embed the showcase iframe.
+4. **Smoke-test the full Studio loop live** if not already: Conjure → sound/anticipation → reveal →
+   ⭐ favorite → 📣 share → Share Celebration → Make another. Plus Remove BG/Upscale, More-like-this.
+5. **Later / not built (do NOT advertise until shipped):** multi-variation gacha spread, deeper
+   gamification, short-form VIDEO (Wan 2.6 / Kling 3.0 — registry-mapped only), paid physical merch
+   (Nix hoodie/dolls via print-on-demand — only once a fanbase is asking).
 3. **GoDaddy / Airo marketing landing — V2 LANDED ✅, V3 in progress.** `brandgoblinai.com` now matches
    the app: "Watch your idea become real" hero, idea sparks, "Logo Direction", two-tier pricing
    (Agency cut), addictive-loop section, demo-video/examples/Goblin-Labs sections gone, CTAs → `/signup`.
