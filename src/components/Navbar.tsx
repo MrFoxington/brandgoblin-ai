@@ -17,7 +17,7 @@ const NAV_LINKS = [
 
 // Convenience link only — the real gate is server-side in /admin (redirects non-admins).
 // Matches the server's ADMIN_EMAIL fallback.
-const ADMIN_EMAIL = "joeherrington369@gmail.com";
+const ADMIN_EMAIL = "joepro@hotmail.com";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);

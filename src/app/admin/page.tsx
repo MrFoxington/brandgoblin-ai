@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import ShowcaseAdmin from "@/components/admin/ShowcaseAdmin";
 import { listAdminFeaturable } from "@/lib/studio/showcase";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joeherrington369@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joepro@hotmail.com";
 
 export default async function AdminPage() {
   const supabase = createClient();

@@ -8,7 +8,7 @@ import { setJobFeatured } from "@/lib/studio/showcase";
 
 export const runtime = "nodejs";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joeherrington369@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joepro@hotmail.com";
 
 export async function POST(request: Request) {
   const supabase = createClient();
