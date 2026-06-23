@@ -8,6 +8,7 @@ import IdeaSparkSection from "@/components/IdeaSparkSection";
 import ComparisonSection from "@/components/ComparisonSection";
 import BrandKitPreview from "@/components/BrandKitPreview";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import ShowcaseMarquee from "@/components/showcase/ShowcaseMarquee";
 
 const FEATURES = [
   { emoji: "🏷️", title: "5 Brand Names", badge: "Naming",      sample: "Solace · Luminary · Drift · Vela · Cairn",            desc: "Nix picks a strategic favourite and tells you exactly why it wins." },
@@ -191,7 +192,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 6. How It Works ── */}
-      <section className="bg-section-alt py-28">
+      <section id="how-it-works" className="bg-section-alt py-28 scroll-mt-24">
         <div className="mx-auto max-w-5xl px-4 text-center">
           <span className="badge-purple mb-6">✦ How It Works</span>
           <h2 className="section-heading mb-4">
@@ -213,6 +214,30 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          <div className="mt-14">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_24px_rgba(255,107,53,0.5)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+            >
+              ✦ Try It Free →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6.5 Real brands wall (live Goblin Studio showcase) ── */}
+      <section className="py-24">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center mb-10">
+            <span className="badge-purple mb-6">✦ Made with BrandGoblin</span>
+            <h2 className="section-heading mb-4">
+              Real brands, <span className="gradient-text">really made here.</span>
+            </h2>
+            <p className="section-sub max-w-xl mx-auto">
+              Actual logos, social graphics, and product art people created with Goblin Studio — live.
+            </p>
+          </div>
+          <ShowcaseMarquee />
         </div>
       </section>
 
