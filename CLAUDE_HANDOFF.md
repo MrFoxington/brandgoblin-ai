@@ -42,6 +42,52 @@ is the landing page). Email verification + Resend transactional email are live.
 protected against abuse. What's missing is real users → acquisition → conversion → retention.
 See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
+---
+
+## 🆕 SESSION LOG — June 22, 2026 (Showcase fix + marketing/content engine groundwork)
+
+**1. Showcase static-render fix — SHIPPED ✅ (commits `7d3001d` + doc `7499910`, pushed to main).**
+The `/showcase` and `/embed/showcase` pages were statically generated as EMPTY (before anything was
+featured) and served frozen HTML even though `/api/showcase` returned the 7 items. Fix: added
+`export const dynamic = "force-dynamic"` to both `src/app/showcase/page.tsx` and
+`src/app/embed/showcase/page.tsx`, and made `ShowcaseMarquee` always refetch on mount with
+`{ cache: "no-store" }` (initialItems = instant paint only). **Live-verified June 22:** both pages now
+render all 7 Shroomadu creations; API still returns only `{id, imageUrl, brandName, imageType}`.
+**Fox's next step:** embed the Airo iframe (snippet in the Showcase section).
+
+**2. Rename audit — DECISION: KEEP "BrandGoblin AI". ✅** Explored renaming to Nix / a new name.
+Findings: "Nix" collides badly (means "reject/nothing"; Nix® lice-treatment trademark; NixOS/NYX SEO).
+Every good `.com` is taken or premium aftermarket — checked live: grimble.com $8,800, nixby.com $7,190,
+goblio.com $2,750, conjora.com / conjuri.com / brandgoblin.com all taken. Conclusion: name isn't the
+bottleneck (people click links/scan QR), a rename costs money + time, and BrandGoblin already carries
+Nix. **Verdict: stick with BrandGoblin AI; make Nix the face of marketing; pour energy into distribution.**
+
+**3. Nix-led TikTok / content engine — PLANNED + groundwork built. New docs in `docs/`:**
+- `NIX_TIKTOK_PLAYBOOK.md` — pillars, hooks, 2025/26 virality rules, CTA strategy, starter slate.
+- `NIX_CONTENT_AUTOMATION_PLAN.md` — the assembly-line workflow. **Approval is T-1 (approve tomorrow's
+  content today).** Robots do the labor; Fox is the taste/QC gate; posting via a **social scheduler**.
+- `NIX_CONTENT_QUEUE.md` — daily idea menu + approval tracker (the backbone doc).
+- `NIX_COMPANION_VISION.md` — north-star vision: Nix as a daily creative companion app. Capture-now,
+  build-portable, build-after-traction. Names: "Nix Companion" (product), "The Goblin Loop" (engine),
+  "GrowthGoblin" (if growth engine ships as a product).
+
+**4. Scheduled task created: `nix-daily-idea-engine`** — runs ~7am daily, scans trends, appends 3–5
+on-brand Nix concepts to `NIX_CONTENT_QUEUE.md`. (Runs only while the Claude app is open.)
+
+**5. Creative tooling (Higgsfield MCP) — first Nix composite tests generated.**
+Account: **free plan, ~9.88 credits** at session start. Model `nano_banana_pro` = **2 credits/1k render**.
+Generated 2 photoreal composites of Nix into Fox's real photos (from his approved Nix PNG, on-model):
+  - Christmas/shoulder — job `bb5c49a7-cbc1-400a-b577-67d14806c39e`
+  - Pattaya swing — job `123c1112-4757-4cca-9da1-565856bb73ea`
+Both `completed` and shown in the UI widget. Repo-copy failed (network block on the CDN download), so
+re-pull via `job_display`/`show_generations` next session. ~4 credits used → ~5.88 left.
+**Plan:** if Higgsfield nails the look, upgrade to Pro plan.
+
+**▶ NEXT SESSION PICK-UP:** (a) review the 2 composites + QC on-model; (b) try image-to-video to make
+Nix *move* (the real test); (c) embed the Showcase iframe in Airo; (d) optionally build the brand-agnostic
+"System Kit". Uploaded media_ids: Nix art `6f60e151-6181-4b63-862d-4d0db277d978`,
+Christmas photo `be7eb024-efad-4133-9882-67d86e727d91`, swing photo `44ca378b-854c-4c0f-abfb-362983067e98`.
+
 ### 🖼 GOBLIN STUDIO LIVE SHOWCASE WALL — PUSHED ✅ LIVE + VERIFIED (June 22) — `d29c538`
 Public, read-only, privacy-safe gallery of real Studio creations — embeddable on Airo via iframe.
 Additive. **DB migration RUN ✅** (`supabase/migrations/20260622_studio_showcase.sql`).
