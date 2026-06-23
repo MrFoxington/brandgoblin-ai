@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import type { BrandKit } from "@/types";
 import { useSoundFx } from "./primitives/SoundFx";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface ShareCardProps {
   kit: BrandKit;
@@ -114,12 +115,11 @@ export default function ShareCard({ kit }: ShareCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   async function handleCopyLink() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      playCopy();
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* noop */ }
+    const ok = await copyToClipboard(window.location.href);
+    if (!ok) return;
+    playCopy();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleDownload() {

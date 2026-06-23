@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { useToast } from "./NixToast";
 import { useSoundFx } from "./primitives/SoundFx";
 import { trackEvent, msOnPage } from "@/lib/analytics";
+import { copyToClipboard } from "@/lib/clipboard";
 import { useBrandId } from "./BrandKitView";
 
 // Track first-copy per brand page session (keyed by brandId)
@@ -38,21 +39,24 @@ export default function CopyButton({
   const effectiveBrandId = brandId ?? contextBrandId;
 
   async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      playCopy();
-      setTimeout(() => setCopied(false), 1500);
-      // Time-to-first-wow: fire once per brand page session
-      if (effectiveBrandId && !firstCopyFired.has(effectiveBrandId)) {
-        firstCopyFired.add(effectiveBrandId);
-        trackEvent("first_copy", { brandId: effectiveBrandId, timeOnPageMs: msOnPage() });
-      }
-      if (!silent) {
-        const quote = NIX_COPY_QUOTES[Math.floor(Math.random() * NIX_COPY_QUOTES.length)];
-        showToast(quote, "nix");
-      }
-    } catch {}
+    const ok = await copyToClipboard(text);
+    if (!ok) {
+      // Never fail silently — tell the user so they don't think a stale clipboard value worked.
+      showToast("Couldn't copy — please select the text and copy it manually.", "success", "⚠️");
+      return;
+    }
+    setCopied(true);
+    playCopy();
+    setTimeout(() => setCopied(false), 1500);
+    // Time-to-first-wow: fire once per brand page session
+    if (effectiveBrandId && !firstCopyFired.has(effectiveBrandId)) {
+      firstCopyFired.add(effectiveBrandId);
+      trackEvent("first_copy", { brandId: effectiveBrandId, timeOnPageMs: msOnPage() });
+    }
+    if (!silent) {
+      const quote = NIX_COPY_QUOTES[Math.floor(Math.random() * NIX_COPY_QUOTES.length)];
+      showToast(quote, "nix");
+    }
   }
 
   return (

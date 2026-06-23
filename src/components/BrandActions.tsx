@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { copyToClipboard } from "@/lib/clipboard";
 
 async function track(brandGenerationId: string, eventType: string) {
   await fetch("/api/brand/analytics", {
@@ -60,10 +61,9 @@ export default function BrandActions({
                 url: window.location.href,
               }).catch(() => {});
             } else {
-              navigator.clipboard
-                .writeText(window.location.href)
-                .then(() => alert("Link copied!"))
-                .catch(() => {});
+              copyToClipboard(window.location.href).then((ok) =>
+                alert(ok ? "Link copied!" : "Couldn't copy the link — please copy it from the address bar.")
+              );
             }
           }}
         />
