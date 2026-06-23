@@ -49,6 +49,15 @@ export default function BrandActions({
           }}
         />
         <ActionCard
+          emoji="👁"
+          title="Preview Website"
+          desc="See your copy as a real, downloadable landing page."
+          onClick={() => {
+            track(brandGenerationId, "preview_website_click");
+            window.open(`/brand/${brandGenerationId}/preview`, "_blank");
+          }}
+        />
+        <ActionCard
           emoji="📣"
           title="Share My Brand"
           desc="Show the world what you built."

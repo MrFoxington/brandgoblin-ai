@@ -95,11 +95,18 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
   "logoPrompt": string,
   "colorPalette": [ { "name": string, "hex": string, "usage": string } ],
   "websiteCopy": {
-    "heroHeadline": string,
-    "subheadline": string,
-    "ctaText": string,
-    "aboutSection": string,
-    "featureBullets": [ string ]
+    "heroHeadline": string,           // punchy, benefit-first, <= ~60 chars
+    "subheadline": string,            // 1 sentence expanding the promise
+    "ctaText": string,                // primary button label
+    "secondaryCtaText": string,       // lower-commitment, e.g. "See how it works"
+    "aboutSection": string,           // 2–4 sentences, brand voice
+    "featureBullets": [ string ],     // 4–6 (kept for compatibility)
+    "features": [ { "title": string, "description": string } ], // 4–6; title 2–4 words, desc 1 benefit-led sentence
+    "faqs": [ { "question": string, "answer": string } ],       // exactly 3, real buyer questions, 2–3 sentence answers
+    "seoTitle": string,               // <=60 chars, includes brand name + core value
+    "metaDescription": string,        // <=155 chars, benefit-driven, no fluff
+    "footerTagline": string,          // short memorable brand line
+    "emailCaptureHeadline": string    // short, e.g. "Get early access"
   },
   "socialKit": {
     "instagramBio": string,
@@ -130,6 +137,7 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
 Important rules:
 - nameStrengthCheck must be encouraging and constructive. Never insult the name. If the name is weak, say "This name has potential — here's how the Goblin would sharpen it."
 - All content must be built specifically around the provided brand name "${providedBrandName}".
+- Write all website copy in the brand's voice, specific and benefit-driven — never generic placeholder text. The copy must be ready to paste into a real site.
 - Respect the "things to avoid" list strictly.
 - Return ONLY the JSON object.`;
 }
@@ -188,11 +196,18 @@ no missing keys, no markdown fences):
   "logoPrompt": string, // a single detailed AI image-gen prompt for the logo: style, colors, mood, composition, what to avoid
   "colorPalette": [ { "name": string, "hex": string, "usage": string } ], // exactly 5 colors with usage notes
   "websiteCopy": {
-    "heroHeadline": string,
-    "subheadline": string,
-    "ctaText": string, // short CTA button label
-    "aboutSection": string, // 2-4 sentences
-    "featureBullets": [ string ] // 4-6 bullets
+    "heroHeadline": string,           // punchy, benefit-first, <= ~60 chars
+    "subheadline": string,            // 1 sentence expanding the promise
+    "ctaText": string,                // primary button label
+    "secondaryCtaText": string,       // lower-commitment, e.g. "See how it works"
+    "aboutSection": string,           // 2–4 sentences, brand voice
+    "featureBullets": [ string ],     // 4–6 (kept for compatibility)
+    "features": [ { "title": string, "description": string } ], // 4–6; title 2–4 words, desc 1 benefit-led sentence
+    "faqs": [ { "question": string, "answer": string } ],       // exactly 3, real buyer questions, 2–3 sentence answers
+    "seoTitle": string,               // <=60 chars, includes brand name + core value
+    "metaDescription": string,        // <=155 chars, benefit-driven, no fluff
+    "footerTagline": string,          // short memorable brand line
+    "emailCaptureHeadline": string    // short, e.g. "Get early access"
   },
   "socialKit": {
     "instagramBio": string, // <=150 chars, can include emoji
@@ -224,6 +239,8 @@ no missing keys, no markdown fences):
 }
 
 Make every field specific to THIS business idea — never generic placeholder content.
+Write all website copy in the brand's voice, specific and benefit-driven — never generic
+placeholder text. The copy must be ready to paste into a real site.
 Respect the "things to avoid" list strictly. Match the requested brand vibe in every
 section, especially tone, names, and taglines. Return ONLY the JSON object.`;
 }

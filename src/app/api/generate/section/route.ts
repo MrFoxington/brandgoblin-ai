@@ -63,9 +63,9 @@ Include style, colors, mood, composition, what to avoid.`,
 { "colorPalette": [ { "name": string, "hex": string, "usage": string } ] }
 Exactly 5 colors with hex codes and usage notes.`,
 
-    websiteCopy: `Write fresh website copy for this brand. Return ONLY:
-{ "websiteCopy": { "heroHeadline": string, "subheadline": string, "ctaText": string, "aboutSection": string, "featureBullets": [string] } }
-ctaText: short button label. aboutSection: 2-4 sentences. featureBullets: 4-6 bullets.`,
+    websiteCopy: `Write fresh, paste-ready website copy for this brand in the brand's voice — specific and benefit-driven, never generic. Return ONLY:
+{ "websiteCopy": { "heroHeadline": string, "subheadline": string, "ctaText": string, "secondaryCtaText": string, "aboutSection": string, "featureBullets": [string], "features": [ { "title": string, "description": string } ], "faqs": [ { "question": string, "answer": string } ], "seoTitle": string, "metaDescription": string, "footerTagline": string, "emailCaptureHeadline": string } }
+heroHeadline: punchy, benefit-first, <=~60 chars. subheadline: 1 sentence. ctaText: short primary button label. secondaryCtaText: lower-commitment label. aboutSection: 2-4 sentences. featureBullets: 4-6 bullets. features: 4-6 with a 2-4 word title + 1 benefit-led sentence. faqs: exactly 3 real buyer questions with 2-3 sentence answers. seoTitle: <=60 chars including brand name. metaDescription: <=155 chars. footerTagline: short memorable line. emailCaptureHeadline: short, e.g. "Get early access".`,
 
     socialKit: `Write fresh social media bios and launch posts for this brand. Return ONLY:
 { "socialKit": { "instagramBio": string, "twitterBio": string, "tiktokBio": string, "launchPosts": [string] } }

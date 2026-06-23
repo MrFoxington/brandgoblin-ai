@@ -64,6 +64,27 @@ function Chip({ children, green }: { children: React.ReactNode; green?: boolean 
   return <span className={green ? "badge-green" : "badge-purple"} style={{ fontSize: "0.7rem" }}>{children}</span>;
 }
 
+// "Copy whole section" text for Website Copy — includes any of the new optional fields that exist.
+function websiteCopyText(kit: BrandKit): string {
+  const w = kit.websiteCopy;
+  const parts: string[] = [w.heroHeadline, w.subheadline, "", `CTA: ${w.ctaText}`];
+  if (w.secondaryCtaText) parts.push(`Secondary CTA: ${w.secondaryCtaText}`);
+  parts.push("", w.aboutSection);
+  if (w.features && w.features.length > 0) {
+    parts.push("", "Features:", ...w.features.map((f) => `- ${f.title}: ${f.description}`));
+  } else {
+    parts.push("", "Features:", ...w.featureBullets.map((b) => `- ${b}`));
+  }
+  if (w.faqs && w.faqs.length > 0) {
+    parts.push("", "FAQ:", ...w.faqs.map((q) => `Q: ${q.question}\nA: ${q.answer}`));
+  }
+  if (w.seoTitle) parts.push("", `SEO Title: ${w.seoTitle}`);
+  if (w.metaDescription) parts.push(`Meta Description: ${w.metaDescription}`);
+  if (w.emailCaptureHeadline) parts.push("", `Email capture: ${w.emailCaptureHeadline}`);
+  if (w.footerTagline) parts.push(`Footer: ${w.footerTagline}`);
+  return parts.join("\n");
+}
+
 function NameStrengthCheckView({ nsc }: { nsc: NameStrengthCheck }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -282,22 +303,101 @@ export default function BrandKitView({
 
     // 10: Website Copy
     <SectionCard key="web" emoji="🌐" title="Website Copy" badge="Copy"
-      copyText={`${kit.websiteCopy.heroHeadline}\n${kit.websiteCopy.subheadline}\n\nCTA: ${kit.websiteCopy.ctaText}\n\n${kit.websiteCopy.aboutSection}`}
+      copyText={websiteCopyText(kit)}
       {...sp("websiteCopy")}>
       <RerollError sectionKey="websiteCopy" />
+      {brandGenerationId && (
+        <a
+          href={`/brand/${brandGenerationId}/preview`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-secondary inline-flex items-center gap-1.5 !py-1.5 !px-3 text-xs self-start"
+        >
+          👁 Preview as Webpage
+        </a>
+      )}
       <div className="space-y-4">
         <div><p className="label mb-1">Hero headline</p><p className="font-display text-xl font-extrabold text-white">{kit.websiteCopy.heroHeadline}</p></div>
         <div><p className="label mb-1">Subheadline</p><p className="text-sm text-muted">{kit.websiteCopy.subheadline}</p></div>
-        <div><p className="label mb-1">CTA button</p><span className="btn-primary inline-flex !py-2 !px-4 text-sm !animate-none">{kit.websiteCopy.ctaText}</span></div>
-        <div><p className="label mb-1">About section</p><p className="text-sm text-muted leading-relaxed">{kit.websiteCopy.aboutSection}</p></div>
-        <div>
-          <p className="label mb-2">Feature bullets</p>
-          <ul className="space-y-1.5">
-            {kit.websiteCopy.featureBullets.map((f, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-muted"><span className="text-secondary mt-0.5">✓</span>{f}</li>
-            ))}
-          </ul>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div><p className="label mb-1">CTA button</p><span className="btn-primary inline-flex !py-2 !px-4 text-sm !animate-none">{kit.websiteCopy.ctaText}</span></div>
+          {kit.websiteCopy.secondaryCtaText && (
+            <div><p className="label mb-1">Secondary CTA</p><span className="btn-secondary inline-flex !py-2 !px-4 text-sm">{kit.websiteCopy.secondaryCtaText}</span></div>
+          )}
         </div>
+        <div><p className="label mb-1">About section</p><p className="text-sm text-muted leading-relaxed">{kit.websiteCopy.aboutSection}</p></div>
+
+        {/* Features — rich rows if present, else bullets */}
+        {kit.websiteCopy.features && kit.websiteCopy.features.length > 0 ? (
+          <div>
+            <p className="label mb-2">Features</p>
+            <div className="space-y-2">
+              {kit.websiteCopy.features.map((f, i) => (
+                <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                  <p className="text-sm font-semibold text-white">{f.title}</p>
+                  <p className="text-sm text-muted mt-0.5 leading-relaxed">{f.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className="label mb-2">Feature bullets</p>
+            <ul className="space-y-1.5">
+              {kit.websiteCopy.featureBullets.map((f, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-muted"><span className="text-secondary mt-0.5">✓</span>{f}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* FAQs */}
+        {kit.websiteCopy.faqs && kit.websiteCopy.faqs.length > 0 && (
+          <div>
+            <p className="label mb-2">FAQs</p>
+            <div className="space-y-2">
+              {kit.websiteCopy.faqs.map((q, i) => (
+                <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                  <p className="text-sm font-semibold text-white">{q.question}</p>
+                  <p className="text-sm text-muted mt-0.5 leading-relaxed">{q.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SEO */}
+        {(kit.websiteCopy.seoTitle || kit.websiteCopy.metaDescription) && (
+          <div>
+            <p className="label mb-2">SEO</p>
+            <div className="space-y-2">
+              {kit.websiteCopy.seoTitle && (
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                  <div><p className="text-xs text-faint">Title tag</p><p className="text-sm text-white">{kit.websiteCopy.seoTitle}</p></div>
+                  <CopyButton text={kit.websiteCopy.seoTitle} label="" className="shrink-0" />
+                </div>
+              )}
+              {kit.websiteCopy.metaDescription && (
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                  <div><p className="text-xs text-faint">Meta description</p><p className="text-sm text-muted">{kit.websiteCopy.metaDescription}</p></div>
+                  <CopyButton text={kit.websiteCopy.metaDescription} label="" className="shrink-0" />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Footer + email capture */}
+        {(kit.websiteCopy.footerTagline || kit.websiteCopy.emailCaptureHeadline) && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {kit.websiteCopy.footerTagline && (
+              <div><p className="label mb-1">Footer tagline</p><p className="text-sm text-muted">{kit.websiteCopy.footerTagline}</p></div>
+            )}
+            {kit.websiteCopy.emailCaptureHeadline && (
+              <div><p className="label mb-1">Email capture headline</p><p className="text-sm text-muted">{kit.websiteCopy.emailCaptureHeadline}</p></div>
+            )}
+          </div>
+        )}
       </div>
     </SectionCard>,
 

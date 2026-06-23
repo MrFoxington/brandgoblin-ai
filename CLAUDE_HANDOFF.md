@@ -44,6 +44,34 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🆕 FEATURE — "Preview as a Live Webpage" + Richer Website Copy (built June 22, 2026 — additive, awaiting push)
+
+Turns "we generate copy" into "we hand you a real, downloadable website." Per
+`docs/WEBSITE_PREVIEW_AND_COPY_BRIEF.md`. Additive only — no energy/Stripe/auth/trial changes; all
+new `WebsiteCopy` fields are OPTIONAL so existing brands typecheck, render, preview, and export.
+
+- **One renderer (source of truth):** `src/lib/website/renderSite.ts` → `renderBrandSiteHTML(kit)`
+  returns a complete, self-contained HTML doc (inline `<style>`, escaped text, conditional sections,
+  `<title>`/`meta description`, `prefers-reduced-motion`-safe). `pickTheme(colors)` derives a
+  **contrast-safe** theme from `kit.colorPalette` using WCAG relative luminance + contrast ratios
+  (auto dark/light, guaranteed-readable text + accent) — verified readable on both dark (REPLICATE)
+  and light palettes.
+- **Preview route** `src/app/brand/[id]/preview/page.tsx` — mirrors the print page's auth + ownership
+  load, then renders `<iframe srcDoc={html} sandbox="allow-same-origin">` so the preview is
+  byte-identical to the download.
+- **`PreviewActions`** (`src/components/preview/PreviewActions.tsx`) — Download HTML (Blob), Copy HTML
+  (`copyToClipboard` + toast), Back to kit.
+- **Entry points:** 👁 Preview as Webpage link in the Website Copy section of `BrandKitView`; a
+  "Preview Website" action card in `BrandActions`.
+- **Richer copy:** `WebsiteCopy` gains optional `seoTitle`, `metaDescription`, `secondaryCtaText`,
+  `features[]`, `faqs[]`, `footerTagline`, `emailCaptureHeadline`. Both `prompts.ts` schema blocks +
+  the `websiteCopy` section-reroll schema generate them; `BrandKitView` renders each (with copy
+  buttons) only when present.
+- **Status:** `tsc` + `npm run build` clean. **Deferred:** featuring live previews in the showcase.
+  **Out of scope:** custom domains / hosting (user downloads the HTML).
+
+---
+
 ## 🆕 SESSION LOG — June 22, 2026 (Showcase fix + marketing/content engine groundwork)
 
 **1. Showcase static-render fix — SHIPPED ✅ (commits `7d3001d` + doc `7499910`, pushed to main).**

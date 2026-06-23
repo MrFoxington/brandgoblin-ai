@@ -157,12 +157,30 @@ export interface ColorSwatch {
   usage: string;
 }
 
+export interface WebsiteFeature {
+  title: string;
+  description: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface WebsiteCopy {
   heroHeadline: string;
   subheadline: string;
   ctaText: string;
   aboutSection: string;
-  featureBullets: string[];
+  featureBullets: string[];          // keep — backward compat
+  // NEW (optional — old brands must still typecheck & render):
+  seoTitle?: string;                 // <=60 chars
+  metaDescription?: string;          // <=155 chars
+  secondaryCtaText?: string;         // short, lower-commitment
+  features?: WebsiteFeature[];       // 4–6, richer than bullets
+  faqs?: FaqItem[];                  // 3
+  footerTagline?: string;            // short brand line for footer
+  emailCaptureHeadline?: string;     // e.g. "Be the first to know"
 }
 
 export interface SocialKit {

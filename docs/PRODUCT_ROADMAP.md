@@ -27,6 +27,23 @@
 
 ## Coming Soon
 
+### 🌐 Preview as a Live Webpage + Richer Website Copy (built June 22, 2026 — additive, awaiting push)
+- One-click renders a brand's generated copy as a real, responsive, **downloadable** landing page.
+  Single renderer `src/lib/website/renderSite.ts` (`renderBrandSiteHTML(kit)`) is the one source of
+  truth — the `/brand/[id]/preview` `<iframe srcDoc>` shows the exact string the user downloads/copies
+  (WYSIWYG, byte-identical). `pickTheme()` derives a **contrast-safe** palette from the brand colors
+  (WCAG luminance + contrast ratios; auto dark/light) so it reads on both a dark brand (REPLICATE) and
+  a light brand (skincare).
+- Preview route mirrors the print page's auth + ownership load. `PreviewActions` bar: Download HTML /
+  Copy HTML (reuses `copyToClipboard`) / Back to kit. Entry points: 👁 Preview as Webpage in the
+  Website Copy section + a "Preview Website" action card.
+- **Richer copy:** `WebsiteCopy` gains optional `seoTitle`, `metaDescription`, `secondaryCtaText`,
+  `features[]`, `faqs[]`, `footerTagline`, `emailCaptureHeadline` (all optional → old brands still
+  typecheck, render, preview, export). Prompt + section-reroll schemas updated to generate them.
+- **Deferred (later phase):** featuring these live-site previews in the admin/showcase wall — NOT built.
+- **Out of scope (for now):** custom domains / hosting the page for the user — they download the HTML.
+
+
 ### 🖼 Goblin Studio Live Showcase Wall (built June 22, 2026 — additive, awaiting push)
 - Public, read-only, privacy-safe gallery of real Studio creations — embeddable on Airo via iframe.
 - **Curation:** `studio_jobs.featured` (+ `featured_order`, `featured_at`, migration
