@@ -92,10 +92,13 @@ export interface SiteTheme {
 
 // Contrast-safe theme derived from the brand palette. Falls back to a clean dark theme
 // if the palette is missing or unparseable, so it never produces unreadable output.
+interface Swatch { rgb: Rgb; usage: string; name: string; }
+
 export function pickTheme(colors: ColorSwatch[] | undefined): SiteTheme {
-  const swatches = (colors ?? [])
-    .map((c) => parseHex(c.hex))
-    .filter((c): c is Rgb => c !== null);
+  const entries: Swatch[] = (colors ?? [])
+    .map((c) => ({ rgb: parseHex(c.hex), usage: (c.usage ?? "").toLowerCase(), name: (c.name ?? "").toLowerCase() }))
+    .filter((e): e is Swatch => e.rgb !== null);
+  const swatches = entries.map((e) => e.rgb);
 
   if (swatches.length === 0) {
     // Default dark theme.
@@ -109,20 +112,38 @@ export function pickTheme(colors: ColorSwatch[] | undefined): SiteTheme {
   const sorted = [...swatches].sort((a, b) => luminance(a) - luminance(b));
   const darkest = sorted[0];
   const lightest = sorted[sorted.length - 1];
-  const avgLum = swatches.reduce((s, c) => s + luminance(c), 0) / swatches.length;
 
-  // Decide page mode: dark page if the palette has a genuinely dark anchor, else light page.
-  const isDark = luminance(darkest) < 0.16 || avgLum < 0.4;
+  // Choose the page mode from the palette's INTENDED background color — not from "is any swatch
+  // dark?" (almost every palette ships a dark text/ink swatch, which used to force dark mode even
+  // on a cream-backgrounded brand). Priority:
+  //   1) a swatch whose usage/name calls itself the background/canvas/base/backdrop, or
+  //   2) the dominant low-saturation "canvas" neutral = the most extreme-luminance neutral swatch.
+  const isBackgroundNote = (s: Swatch) =>
+    /\b(background|backdrop|canvas|base|page)\b/.test(s.usage) || /\b(background|canvas)\b/.test(s.name);
+
+  let bgEntry = entries.find(isBackgroundNote);
+  if (!bgEntry) {
+    const neutrals = entries.filter((e) => saturation(e.rgb) < 0.2);
+    const pool = neutrals.length > 0 ? neutrals : entries;
+    // "Most extreme luminance" = closest to pure black or pure white (farthest from mid-gray).
+    bgEntry = pool.reduce((best, e) =>
+      Math.abs(luminance(e.rgb) - 0.5) > Math.abs(luminance(best.rgb) - 0.5) ? e : best
+    );
+  }
+  const bgSwatch = bgEntry.rgb;
+
+  // Light vs dark follows from THAT background color's luminance.
+  const isDark = luminance(bgSwatch) < 0.5;
 
   let bgRgb: Rgb;
   let textRgb: Rgb;
   if (isDark) {
-    // Anchor on the darkest swatch, but ensure it is dark enough to be a readable base.
-    bgRgb = luminance(darkest) < 0.12 ? darkest : mix(darkest, BLACK, 0.6);
+    // Anchor on the chosen background, but ensure it is dark enough to be a readable base.
+    bgRgb = luminance(bgSwatch) < 0.12 ? bgSwatch : mix(bgSwatch, BLACK, 0.6);
     textRgb = NEAR_WHITE;
   } else {
-    // Anchor on the lightest swatch, but ensure it is light enough.
-    bgRgb = luminance(lightest) > 0.88 ? lightest : mix(lightest, WHITE, 0.7);
+    // Anchor on the chosen background, but ensure it is light enough.
+    bgRgb = luminance(bgSwatch) > 0.88 ? bgSwatch : mix(bgSwatch, WHITE, 0.7);
     textRgb = BLACK;
   }
 
