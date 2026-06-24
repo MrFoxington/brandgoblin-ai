@@ -69,6 +69,16 @@ new `WebsiteCopy` fields are OPTIONAL so existing brands typecheck, render, prev
   buttons) only when present.
 - **Status:** `tsc` + `npm run build` clean. **Deferred:** featuring live previews in the showcase.
   **Out of scope:** custom domains / hosting (user downloads the HTML).
+- **Template polish (June 24, 2026 — per `docs/PREVIEW_TEMPLATE_POLISH_BRIEF.md`):** the preview
+  template now looks *designed*, not generic. Thin wide-tracked heading type + a short uppercase
+  accent **kicker**; the loud solid CTA is gone — primary CTA is now an **outlined accent button**
+  with a faint tint + soft glow, secondary is a text link with an arrow; faint radial hero glow,
+  hairline section dividers, subtle `bg2→bg` top gradient; clean 2-col features grid with
+  accent-tinted numbered markers; static-accordion FAQ; minimal footer. `pickTheme` now returns
+  `bg/bg2/text/muted/accent/accentRgb/border` and uses the accent ONLY for borders/text/tints/glow
+  (never a solid fill); the accent is auto-nudged toward the text pole until it clears WCAG AA on the
+  bg. Verified in Chrome on REPLICATE (dark), an all-light pastel palette, and a legacy bullets-only
+  kit. **One renderer unchanged** → preview iframe == downloaded HTML.
 
 ---
 
