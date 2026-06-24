@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useSoundFx } from "@/components/primitives/SoundFx";
-import { shareImage } from "@/lib/studio/share";
+import { shareImageFile, canShareFiles } from "@/lib/studio/share";
+import StudioLightbox from "./StudioLightbox";
 
 interface Props {
   job: StudioJobRow;
@@ -42,7 +43,9 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
   const reduce = useReducedMotion();
   const [downloading, setDownloading]   = useState(false);
   const [sharing, setSharing]           = useState(false);
+  const [saving, setSaving]             = useState(false);
   const [copied, setCopied]             = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [processing, setProcessing]     = useState<"bg_removal" | "clarity_upscaler" | null>(null);
   const [moreLikeThis, setMoreLikeThis] = useState(false);
   const [fav, setFav]                   = useState<boolean>(job.favorite);
@@ -80,11 +83,14 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
     }
   }
 
+  const saveFilename = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.jpg`;
+
   async function handleShare() {
     if (!job.output_url || sharing) return;
     setSharing(true);
-    // Single real-share-only flow shared with the reveal celebration.
-    const result = await shareImage(job.output_url);
+    // File-first share — puts the actual creation on the native sheet
+    // (IG / TikTok / X / Save to Photos), URL → clipboard as the fallback.
+    const result = await shareImageFile(job.output_url, { filename: saveFilename });
     if (result === "copied") {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -94,6 +100,22 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
     if (result === "shared" || result === "copied") {
       playShare();
       onShareSuccess?.(job);
+    }
+  }
+
+  // Phone-first "Save to Photos": on mobile, open the OS sheet (offers "Save
+  // Image" → camera roll); on desktop, fall back to the blob download.
+  async function handleSave() {
+    if (!job.output_url || saving) return;
+    if (!canShareFiles()) {
+      await handleDownload();
+      return;
+    }
+    setSaving(true);
+    try {
+      await shareImageFile(job.output_url, { filename: saveFilename });
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -144,19 +166,26 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
       animate={{ opacity: 1, scale: 1 }}
       className="rounded-2xl border border-primary/20 bg-card overflow-hidden"
     >
-      {/* Image */}
+      {/* Image — click to open the full-screen viewer */}
       <div className="relative aspect-square bg-black/30">
-        <Image
-          src={job.output_url}
-          alt={`${typeLabel} by Goblin Studio`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, 50vw"
-          unoptimized
-        />
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          aria-label={`View ${typeLabel} full screen`}
+          className="absolute inset-0 z-0 cursor-zoom-in group"
+        >
+          <Image
+            src={job.output_url}
+            alt={`${typeLabel} by Goblin Studio`}
+            fill
+            className="object-cover transition-transform duration-200 motion-safe:group-hover:scale-[1.03]"
+            sizes="(max-width: 640px) 100vw, 50vw"
+            unoptimized
+          />
+        </button>
         {/* Derived variant tag */}
         {derivedTag && (
-          <span className="absolute top-2 left-2 rounded-lg bg-black/70 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+          <span className="absolute top-2 left-2 z-10 rounded-lg bg-black/70 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
             {derivedTag}
           </span>
         )}
@@ -167,7 +196,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
             disabled={favBusy}
             aria-pressed={fav}
             title={fav ? "Remove from Favorites" : "Add to Favorites"}
-            className="absolute top-2 right-2 rounded-full bg-black/55 backdrop-blur-sm p-1.5 leading-none hover:bg-black/70 transition-colors disabled:opacity-70"
+            className="absolute top-2 right-2 z-10 rounded-full bg-black/55 backdrop-blur-sm p-1.5 leading-none hover:bg-black/70 transition-colors disabled:opacity-70"
           >
             <motion.span
               key={fav ? "on" : "off"}
@@ -211,14 +240,15 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
             </button>
           )}
 
-          {/* Download — neutral/subtle (ends the loop; don't glamorize) */}
+          {/* Save to Photos — phone-first (sheet → camera roll), desktop downloads.
+              The #1 phone action; neutral styling so it doesn't fight Share. */}
           <button
-            onClick={handleDownload}
-            disabled={downloading}
-            title="Download"
-            className="shrink-0 rounded-xl px-2.5 py-2 text-xs border border-white/10 text-faint hover:text-muted hover:border-white/20 disabled:opacity-60 transition-colors"
+            onClick={handleSave}
+            disabled={saving || downloading}
+            title="Save to Photos"
+            className="shrink-0 rounded-xl px-2.5 py-2 text-xs font-semibold border border-white/12 text-muted hover:text-white hover:border-white/25 disabled:opacity-60 transition-colors"
           >
-            {downloading ? "…" : "↓"}
+            {saving || downloading ? "…" : "⤓ Save"}
           </button>
         </div>
 
@@ -242,6 +272,30 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           </div>
         )}
       </div>
+
+      {/* Full-screen viewer — reuses this card's own handlers + state. */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <StudioLightbox
+            job={job}
+            typeLabel={typeLabel}
+            onClose={() => setLightboxOpen(false)}
+            onShare={handleShare}
+            onSave={handleSave}
+            onDownload={handleDownload}
+            onMoreLikeThis={onMoreLikeThis ? handleMoreLikeThis : undefined}
+            onToggleFavorite={onToggleFavorite ? handleToggleFavorite : undefined}
+            isFavorite={fav}
+            sharing={sharing}
+            copied={copied}
+            saving={saving}
+            downloading={downloading}
+            moreLikeThis={moreLikeThis}
+            favBusy={favBusy}
+            canMoreLikeThis={isOriginalImage}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
