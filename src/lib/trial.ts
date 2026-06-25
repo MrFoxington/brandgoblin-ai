@@ -1,106 +1,117 @@
-// Trial lifecycle helpers — async, DB-writing counterparts to src/lib/access.ts.
+// Free-tier onboarding helpers — async, DB-writing counterparts to src/lib/access.ts.
 // Kept separate to avoid circular imports with src/lib/energy.ts.
+//
+// Freemium model: brand-new free users get a ONE-TIME Goblin Studio starter
+// energy grant (no 7-day Pro trial, no day-7 revoke). The grant is gated by the
+// has_received_free_studio_grant flag + anti-abuse guards, and is race-proof via
+// an atomic flag claim.
 
 import { createHash } from "crypto";
 import { createAdminClient } from "@/lib/supabase/server";
-import { grantMonthlyEnergy, revokeEnergy } from "@/lib/energy";
+import { grantStudioStarterEnergy } from "@/lib/energy";
 import { normalizeEmail } from "@/lib/email-normalize";
+import { ENERGY_CONFIG } from "@/lib/energy-config";
 import type { UserAccess } from "@/lib/access";
 
-const TRIAL_DAYS = 7;
-// Max trials allowed from one IP hash within the lookback window
-const IP_TRIAL_LIMIT = 3;
+// Max free-starter grants allowed from one IP hash within the lookback window
+const IP_GRANT_LIMIT = 3;
 const IP_WINDOW_HOURS = 24;
 
 export function hashIp(ip: string): string {
   return createHash("sha256").update(ip).digest("hex");
 }
 
-export interface TrialStartContext {
+export interface StarterGrantContext {
   email: string;
   emailConfirmedAt: string | null;
   ipHash?: string;
 }
 
-export type TrialStartResult =
-  | { started: true }
-  | { started: false; reason: "already_used" | "unverified" | "ip_limit" | "paid" | "normalized_email_used" };
+export type StarterGrantResult =
+  | { granted: true }
+  | { granted: false; reason: "already_granted" | "unverified" | "ip_limit" | "paid" | "normalized_email_used" };
 
 /**
- * Starts a 7-day trial for a brand-new user.
+ * Grants a one-time free Goblin Studio starter energy allotment to a brand-new
+ * free user. Replaces the old 7-day reverse trial.
  * Guards: email verification, one-per-normalized-email, IP rate limit.
- * Idempotent: safe to call on every authenticated page load.
+ * Idempotent + race-proof via an atomic flag claim — safe to call on every
+ * authenticated page load.
  */
-export async function startTrialIfEligible(
+export async function grantFreeStudioStarterIfEligible(
   userId: string,
-  ctx: TrialStartContext
-): Promise<TrialStartResult> {
+  ctx: StarterGrantContext
+): Promise<StarterGrantResult> {
   const supabase = createAdminClient();
 
   const { data } = await supabase
     .from("users")
-    .select("has_used_trial, plan")
+    .select("has_received_free_studio_grant, plan")
     .eq("id", userId)
     .single();
 
-  if (!data) return { started: false, reason: "already_used" };
-  if (data.plan === "pro" || data.plan === "agency") return { started: false, reason: "paid" };
-  if (data.has_used_trial) return { started: false, reason: "already_used" };
+  if (!data) return { granted: false, reason: "already_granted" };
+  if (data.plan === "pro" || data.plan === "agency") return { granted: false, reason: "paid" };
+  if (data.has_received_free_studio_grant) return { granted: false, reason: "already_granted" };
 
-  // Layer 4a: email must be verified to start a trial
-  if (!ctx.emailConfirmedAt) return { started: false, reason: "unverified" };
+  // Guard A: email must be verified to receive free energy
+  if (!ctx.emailConfirmedAt) return { granted: false, reason: "unverified" };
 
-  // Layer 4b: one trial per normalized email (catches +aliases and Gmail dot tricks)
+  // Guard B: one grant per normalized email (catches +aliases and Gmail dot tricks)
   const normalized = normalizeEmail(ctx.email);
   const { data: existingNorm } = await supabase
     .from("users")
     .select("id")
     .eq("normalized_email", normalized)
-    .eq("has_used_trial", true)
+    .eq("has_received_free_studio_grant", true)
     .neq("id", userId)
     .limit(1)
     .single();
 
-  if (existingNorm) return { started: false, reason: "normalized_email_used" };
+  if (existingNorm) return { granted: false, reason: "normalized_email_used" };
 
-  // Layer 4c: soft IP rate limit — flag/deny when >IP_TRIAL_LIMIT trials from same IP in window
+  // Guard C: soft IP rate limit — deny when >IP_GRANT_LIMIT grants from same IP in window
   if (ctx.ipHash) {
     const windowStart = new Date(Date.now() - IP_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
     const { count } = await supabase
       .from("users")
       .select("id", { count: "exact", head: true })
       .eq("signup_ip_hash", ctx.ipHash)
-      .eq("has_used_trial", true)
+      .eq("has_received_free_studio_grant", true)
       .gte("created_at", windowStart);
 
-    if ((count ?? 0) >= IP_TRIAL_LIMIT) {
-      console.warn(`[trial] IP limit hit for hash ${ctx.ipHash.slice(0, 8)}…`);
-      return { started: false, reason: "ip_limit" };
+    if ((count ?? 0) >= IP_GRANT_LIMIT) {
+      console.warn(`[starter] IP limit hit for hash ${ctx.ipHash.slice(0, 8)}…`);
+      return { granted: false, reason: "ip_limit" };
     }
   }
 
-  // All guards passed — start the trial
-  const now = new Date();
-  const trialEnd = new Date(now.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
-
-  await supabase
+  // Atomic claim — only the request that flips the flag false→true grants energy.
+  // This is the idempotency lock: concurrent page loads can never double-grant.
+  const { data: claimed } = await supabase
     .from("users")
     .update({
-      is_trial: true,
-      has_used_trial: true,
-      trial_ends_at: trialEnd,
+      has_received_free_studio_grant: true,
       normalized_email: normalized,
       signup_ip_hash: ctx.ipHash ?? null,
     })
-    .eq("id", userId);
+    .eq("id", userId)
+    .eq("has_received_free_studio_grant", false)
+    .select("id");
 
-  await grantMonthlyEnergy(userId, now.toISOString(), trialEnd);
-  return { started: true };
+  if (!claimed || claimed.length === 0) {
+    // Lost the race — another request already claimed and granted.
+    return { granted: false, reason: "already_granted" };
+  }
+
+  await grantStudioStarterEnergy(userId, ENERGY_CONFIG.FREE_STUDIO_STARTER_ENERGY);
+  return { granted: true };
 }
 
 /**
- * Lazily expires a trial that has passed its end date.
- * Idempotent: safe to call on every gated request.
+ * Lazily clears a stale legacy trial flag for the mid-transition cohort.
+ * Energy is NO LONGER revoked — free users keep whatever energy they have until
+ * it runs out. Idempotent; safe to call on every gated request.
  */
 export async function expireTrialIfNeeded(userId: string, u: UserAccess): Promise<void> {
   if (!u.is_trial || !u.trial_ends_at) return;
@@ -112,6 +123,4 @@ export async function expireTrialIfNeeded(userId: string, u: UserAccess): Promis
     .from("users")
     .update({ is_trial: false })
     .eq("id", userId);
-
-  await revokeEnergy(userId);
 }

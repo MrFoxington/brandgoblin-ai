@@ -1,9 +1,10 @@
-// Daily sweep — expires stale trials for users who haven't returned.
+// Daily sweep — clears the stale legacy trial flag for the mid-transition cohort.
+// Freemium model: energy is NEVER revoked here — free users keep what they have.
+// Becomes a no-op once all legacy trials have aged out.
 // Call via cron: GET /api/trial/expire?secret=<CRON_SECRET>
 
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { revokeEnergy } from "@/lib/energy";
 
 export async function GET(request: Request) {
   const secret = new URL(request.url).searchParams.get("secret");
@@ -32,15 +33,12 @@ export async function GET(request: Request) {
 
   const ids = expiredUsers.map((u: { id: string }) => u.id);
 
-  // Mark trials as expired
+  // Clear the stale trial flag only — energy is preserved (freemium model).
   await supabase
     .from("users")
     .update({ is_trial: false })
     .in("id", ids);
 
-  // Revoke energy for each (idempotent)
-  await Promise.all(ids.map((id: string) => revokeEnergy(id)));
-
-  console.log(`[trial/expire] expired ${ids.length} trial(s)`);
+  console.log(`[trial/expire] cleared ${ids.length} stale trial flag(s)`);
   return NextResponse.json({ expired: ids.length });
 }

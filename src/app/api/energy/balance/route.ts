@@ -17,43 +17,49 @@ export async function GET() {
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || getEffectivePlan(userRow) === "free") {
+  const isPro   = !!userRow && getEffectivePlan(userRow) === "pro";
+  const balance = await getUserEnergyBalance(authData.user.id);
+
+  // Free users without any energy — show the empty/upsell state.
+  if (!balance || (!isPro && balance.totalRemaining <= 0)) {
+    if (isPro) {
+      // Pro user without an initialized energy row yet — full shape with safe defaults.
+      return NextResponse.json({
+        plan:             "pro",
+        monthlyTotal:     0,
+        monthlyRemaining: 0,
+        refillRemaining:  0,
+        totalRemaining:   0,
+        monthlyAllowance: ENERGY_CONFIG.MONTHLY_ALLOWANCE,
+        percentRemaining: 0,
+        warningLevel:     null,
+        estimates:        [],
+        periodEnd:        null,
+        uninitialized:    true,
+      });
+    }
     return NextResponse.json({ plan: "free", totalRemaining: 0 });
   }
 
-  const balance = await getUserEnergyBalance(authData.user.id);
+  // Bar denominator: Pro uses the monthly allowance; free uses its own granted
+  // total (starter + any top-ups) so the gauge reads sensibly on the free tier.
+  const allowance = isPro
+    ? ENERGY_CONFIG.MONTHLY_ALLOWANCE
+    : Math.max(balance.monthlyTotal + balance.refillTotal, balance.totalRemaining, 1);
 
-  if (!balance) {
-    // Pro user without an initialized energy row yet — return the FULL shape with
-    // safe defaults so the dashboard never reads an undefined field (e.g. .toLocaleString()).
-    return NextResponse.json({
-      plan:             "pro",
-      monthlyTotal:     0,
-      monthlyRemaining: 0,
-      refillRemaining:  0,
-      totalRemaining:   0,
-      monthlyAllowance: ENERGY_CONFIG.MONTHLY_ALLOWANCE,
-      percentRemaining: 0,
-      warningLevel:     null,
-      estimates:        [],
-      periodEnd:        null,
-      uninitialized:    true,
-    });
-  }
-
-  const warningLevel = getEnergyWarningLevel(balance.totalRemaining, ENERGY_CONFIG.MONTHLY_ALLOWANCE);
+  const warningLevel = getEnergyWarningLevel(balance.totalRemaining, allowance);
   const estimates    = getCapacityEstimates(balance.totalRemaining);
 
   return NextResponse.json({
-    plan:             "pro",
+    plan:             isPro ? "pro" : "free",
     monthlyTotal:     balance.monthlyTotal,
     monthlyRemaining: balance.monthlyRemaining,
     refillRemaining:  balance.refillRemaining,
     totalRemaining:   balance.totalRemaining,
-    monthlyAllowance: ENERGY_CONFIG.MONTHLY_ALLOWANCE,
-    percentRemaining: Math.round((balance.totalRemaining / ENERGY_CONFIG.MONTHLY_ALLOWANCE) * 100),
+    monthlyAllowance: allowance,
+    percentRemaining: Math.round((balance.totalRemaining / allowance) * 100),
     warningLevel,
     estimates,
-    periodEnd:        balance.periodEnd,
+    periodEnd:        isPro ? balance.periodEnd : null,
   });
 }

@@ -8,6 +8,11 @@ export const ENERGY_CONFIG = {
   // Amount added when a user purchases a $19 refill
   REFILL_AMOUNT: parseInt(process.env.CREATOR_PRO_REFILL_ENERGY ?? "1000"),
 
+  // One-time Creative Energy granted to a brand-new FREE user so they can taste
+  // Goblin Studio without paying. Granted once per user (anti-abuse guarded);
+  // does NOT refill. Tune freely — this is the single knob for the free taste.
+  FREE_STUDIO_STARTER_ENERGY: parseInt(process.env.FREE_STUDIO_STARTER_ENERGY ?? "250"),
+
   // Warning thresholds (as fraction of monthly allowance)
   LOW_THRESHOLD: 0.25,      // ⚡ Show "running low" warning
   CRITICAL_THRESHOLD: 0.10, // ⚡ Show "almost empty" warning

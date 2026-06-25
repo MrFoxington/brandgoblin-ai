@@ -60,7 +60,8 @@ export async function checkEnergyForGeneration(
 
   if (!userRow) return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
 
-  // Lazy trial expiry — inline to avoid circular import with trial.ts
+  // Lazily clear a stale legacy trial flag — but DO NOT revoke energy anymore.
+  // Free users keep whatever energy they have until it runs out (freemium model).
   if (
     userRow.is_trial &&
     userRow.trial_ends_at &&
@@ -69,7 +70,6 @@ export async function checkEnergyForGeneration(
     userRow.plan !== "agency"
   ) {
     await supabase.from("users").update({ is_trial: false }).eq("id", userId);
-    await revokeEnergy(userId);
     return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
   }
 
@@ -412,7 +412,82 @@ export async function addRefillEnergy(
   }
 }
 
-// ── Revoke energy on plan downgrade ───────────────────────────────────────
+// ── Free Studio starter grant (one-time freemium taste) ───────────────────
+// Adds a one-time energy allotment to the persistent REFILL bucket (it never
+// auto-refills) and leaves the user on the free tier. Idempotency is owned by
+// the caller's atomic flag claim (grantFreeStudioStarterIfEligible), so this is
+// only ever invoked once per user.
+
+export async function grantStudioStarterEnergy(userId: string, amount: number): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { data: existing } = await supabase
+    .from("user_energy_balances")
+    .select("id, monthly_energy_remaining, refill_energy_total, refill_energy_remaining")
+    .eq("user_id", userId)
+    .single();
+
+  const newRefillTotal     = (existing?.refill_energy_total     ?? 0) + amount;
+  const newRefillRemaining = (existing?.refill_energy_remaining ?? 0) + amount;
+  const balanceAfter       = (existing?.monthly_energy_remaining ?? 0) + newRefillRemaining;
+
+  if (existing) {
+    await supabase
+      .from("user_energy_balances")
+      .update({ refill_energy_total: newRefillTotal, refill_energy_remaining: newRefillRemaining })
+      .eq("user_id", userId);
+  } else {
+    await supabase.from("user_energy_balances").insert({
+      user_id:                  userId,
+      plan:                     "free",
+      monthly_energy_total:     0,
+      monthly_energy_remaining: 0,
+      refill_energy_total:      newRefillTotal,
+      refill_energy_remaining:  newRefillRemaining,
+    });
+  }
+
+  await supabase.from("energy_transactions").insert({
+    user_id:          userId,
+    transaction_type: "starter_grant",
+    amount,
+    balance_after:    balanceAfter,
+    description:      "Free Goblin Studio starter energy",
+  });
+}
+
+// ── Soft downgrade to free on Pro cancellation ────────────────────────────
+// Flips the balance to the free tier and stops future monthly refills, but
+// PRESERVES all remaining energy (leftover monthly + paid top-ups). No harsh
+// revoke-to-zero — a churned user keeps what they had; it simply stops refilling.
+
+export async function downgradeToFree(userId: string): Promise<void> {
+  const supabase = createAdminClient();
+
+  const { data } = await supabase
+    .from("user_energy_balances")
+    .select("monthly_energy_remaining, refill_energy_remaining")
+    .eq("user_id", userId)
+    .single();
+
+  await supabase
+    .from("user_energy_balances")
+    .update({ plan: "free", current_period_end: new Date().toISOString() })
+    .eq("user_id", userId);
+
+  const remaining = (data?.monthly_energy_remaining ?? 0) + (data?.refill_energy_remaining ?? 0);
+  await supabase.from("energy_transactions").insert({
+    user_id:          userId,
+    transaction_type: "plan_downgrade",
+    amount:           0,
+    balance_after:    remaining,
+    description:      "Subscription ended — moved to Free tier (energy preserved)",
+  });
+}
+
+// ── Revoke energy on plan downgrade (legacy hard reset — no longer wired) ──
+// Retained for admin/manual use only. The freemium model uses downgradeToFree()
+// which preserves remaining energy. Do not re-wire this into the cancel path.
 
 export async function revokeEnergy(userId: string): Promise<void> {
   const supabase = createAdminClient();

@@ -51,19 +51,18 @@ const PLANS = [
     name: "Free",
     price: "$0",
     period: "forever",
-    desc: "Taste the magic. No card needed.",
+    desc: "Create your brand free. No card needed.",
     highlight: false,
-    comingSoon: false,
     badge: null,
     subtext: null,
-    cta: "Start free — 7 days of everything",
+    cta: "Start Creating — Free",
     href: "/signup",
     features: [
-      "7 days of full Creator Pro — free",
-      "3 complete brand generations after trial",
-      "All 9 core deliverables",
-      "Color palette + brand voice",
-      "Social media kit + launch plan",
+      "Generate your brand — names, story, voice, colors, logo direction",
+      "Try Goblin Studio free — real logos, social graphics & product art",
+      "Creative Energy included to get started",
+      "Free Nix stickers & wallpapers",
+      "No credit card, ever",
     ],
   },
   {
@@ -74,33 +73,14 @@ const PLANS = [
     badge: "Most popular",
     subtext: "Never stare at a blank caption again.",
     highlight: true,
-    comingSoon: false,
-    cta: "Get Creator Pro",
+    cta: "Upgrade to Creator Pro",
     href: "/pricing",
     features: [
       "Unlimited brand generations",
-      "20 content types (posts, blogs, emails, ads)",
-      "7 brand voice modes",
-      "Content history & regeneration",
-      "Creator Pro hub dashboard",
-    ],
-  },
-  {
-    name: "Agency Edition",
-    price: "Coming Soon",
-    period: "",
-    desc: "For agencies managing multiple brands.",
-    badge: null,
-    subtext: null,
-    highlight: false,
-    comingSoon: true,
-    cta: "Join Waitlist",
-    href: "/pricing",
-    features: [
-      "Multi-client workspaces",
-      "White-label brand reports",
-      "Team collaboration tools",
-      "Priority generation queue",
+      "Full content engine — social, blogs, emails, ad copy",
+      "Monthly Creative Energy for Goblin Studio",
+      "Ongoing marketing ideas",
+      "Top up energy anytime",
     ],
   },
 ];
@@ -171,7 +151,7 @@ export default function LandingPage() {
             No designer, no copywriter, no agency. Nix delivers everything you need to look and sound like a real brand — on day one.
           </p>
           <p className="text-sm text-secondary font-semibold mb-16">
-            All of it included in your 7-day free trial. No card required.
+            Generate your first brand free. No credit card required.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
@@ -275,62 +255,36 @@ export default function LandingPage() {
           <h2 className="section-heading mb-4">
             Simple, <span className="gradient-text">goblin-fair</span> pricing
           </h2>
-          <p className="section-sub mb-4">Start with 7 days of everything — free. No card. No catch.</p>
+          <p className="section-sub mb-4">Start creating for free — no card, no catch.</p>
           <p className="text-sm text-secondary font-semibold mb-16">
             Upgrade when you're ready. Cancel any time.
           </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {PLANS.map((plan) =>
-              plan.comingSoon ? (
-                <div
-                  key={plan.name}
-                  className="relative flex flex-col p-6 text-left rounded-2xl border-2 border-dashed border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,15,0.6)]"
-                >
-                  <span className="mb-4 self-start rounded-full border border-yellow-500/40 bg-yellow-500/10 px-3 py-0.5 text-xs font-bold text-yellow-400 tracking-widest uppercase">
-                    🚧 Coming Soon
-                  </span>
-                  <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
-                  <p className="mt-1 mb-4 text-sm text-muted">{plan.desc}</p>
-                  <div className="mb-6">
-                    <span className="font-display text-2xl font-black text-faint">{plan.price}</span>
-                  </div>
-                  <ul className="mb-8 flex-1 space-y-2">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-muted/70">
-                        <span className="text-primary/50 mt-0.5 shrink-0">✦</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={plan.href} className="w-full rounded-xl border border-primary/30 bg-primary/10 py-3 text-center text-sm font-semibold text-primary-light transition hover:bg-primary/20">
-                    {plan.cta}
-                  </Link>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`bg-card bg-card-hover flex flex-col p-6 text-left ${plan.highlight ? "border-primary/50 shadow-glow" : ""}`}
+              >
+                {plan.badge && <span className="badge-purple mb-4 self-start">{plan.badge}</span>}
+                <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
+                <p className="mt-1 mb-1 text-sm text-muted">{plan.desc}</p>
+                {plan.subtext && <p className="mb-4 text-xs font-semibold text-secondary">{plan.subtext}</p>}
+                <div className="mb-6 flex items-baseline gap-1">
+                  <span className="font-display text-4xl font-black text-white">{plan.price}</span>
+                  <span className="text-sm text-faint">{plan.period}</span>
                 </div>
-              ) : (
-                <div
-                  key={plan.name}
-                  className={`bg-card bg-card-hover flex flex-col p-6 text-left ${plan.highlight ? "border-primary/50 shadow-glow" : ""}`}
-                >
-                  {plan.badge && <span className="badge-purple mb-4 self-start">{plan.badge}</span>}
-                  <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
-                  <p className="mt-1 mb-1 text-sm text-muted">{plan.desc}</p>
-                  {plan.subtext && <p className="mb-4 text-xs font-semibold text-secondary">{plan.subtext}</p>}
-                  <div className="mb-6 flex items-baseline gap-1">
-                    <span className="font-display text-4xl font-black text-white">{plan.price}</span>
-                    <span className="text-sm text-faint">{plan.period}</span>
-                  </div>
-                  <ul className="mb-8 flex-1 space-y-2">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                        <span className="text-secondary mt-0.5 shrink-0">✓</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={plan.href} className={plan.highlight ? "btn-primary" : "btn-secondary"}>
-                    {plan.cta}
-                  </Link>
-                </div>
-              )
-            )}
+                <ul className="mb-8 flex-1 space-y-2">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-muted">
+                      <span className="text-secondary mt-0.5 shrink-0">✓</span>{f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={plan.href} className={plan.highlight ? "btn-primary" : "btn-secondary"}>
+                  {plan.cta}
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -360,7 +314,7 @@ export default function LandingPage() {
                 Your brand is one <span className="gradient-text">idea away.</span>
               </h2>
               <p className="section-sub mb-3 text-lg max-w-xl mx-auto">
-                7 days of unlimited creating with Nix — free. No card, no catch.
+                Create your brand free with Nix — no card, no catch.
               </p>
               <p className="text-sm text-faint mb-10">
                 Names, colors, voice, story, launch plan. Everything. Yours to keep.
@@ -368,7 +322,7 @@ export default function LandingPage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/signup" className="btn-primary px-10 py-4 text-lg">
-                  ✦ Start free — 7 days of everything →
+                  ✦ Start Creating — Free →
                 </Link>
                 <Link href="/pricing" className="btn-secondary px-8 py-4 text-base">
                   See what's included

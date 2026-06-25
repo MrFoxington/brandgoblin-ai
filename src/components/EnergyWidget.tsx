@@ -39,16 +39,37 @@ export default function EnergyWidget() {
     );
   }
 
-  if (!energy || energy.plan === "free") {
+  const isFree   = !energy || energy.plan === "free";
+  const hasEnergy = (energy?.totalRemaining ?? 0) > 0;
+
+  // Free tier with no energy left — upsell: upgrade OR top up $19 (top-ups work
+  // for free users too, so keep that path available even at zero).
+  if (!energy || (isFree && !hasEnergy)) {
     return (
-      <div className="rounded-2xl border border-white/8 bg-white/3 p-6 text-center">
-        <p className="text-2xl mb-2">⚡</p>
-        <p className="text-sm font-semibold text-white mb-1">Creative Energy</p>
-        <p className="text-xs text-muted mb-4">Upgrade to Creator Pro to unlock monthly Creative Energy.</p>
-        <a href="/pricing" className="btn-primary text-sm px-4 py-2 inline-block">
-          Upgrade to Creator Pro
-        </a>
-      </div>
+      <>
+        <div className="rounded-2xl border border-white/8 bg-white/3 p-6 text-center">
+          <p className="text-2xl mb-2">⚡</p>
+          <p className="text-sm font-semibold text-white mb-1">Out of Creative Energy</p>
+          <p className="text-xs text-muted mb-4">
+            Upgrade to Creator Pro for monthly Creative Energy, or top up $19 to keep creating.
+          </p>
+          <a href="/pricing" className="btn-primary text-sm px-4 py-2 block mb-2">
+            Upgrade to Creator Pro
+          </a>
+          <button
+            onClick={() => setShowModal(true)}
+            className="w-full rounded-xl bg-primary/15 border border-primary/30 py-2 text-sm font-semibold text-primary-light hover:bg-primary/25 transition-colors"
+          >
+            ⚡ Top up energy — $19
+          </button>
+        </div>
+        <EnergyRefillModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => { setShowModal(false); fetchEnergy(); }}
+          isEmpty
+        />
+      </>
     );
   }
 
@@ -74,7 +95,7 @@ export default function EnergyWidget() {
             <span className="text-lg">⚡</span>
             <span className="text-sm font-bold text-white">Creative Energy</span>
           </div>
-          <span className="text-xs text-faint">Creator Pro</span>
+          <span className="text-xs text-faint">{isFree ? "Free" : "Creator Pro"}</span>
         </div>
 
         {/* Warning banner */}
@@ -123,8 +144,14 @@ export default function EnergyWidget() {
           onClick={() => setShowModal(true)}
           className="mt-4 w-full rounded-xl bg-primary/15 border border-primary/30 py-2.5 text-sm font-semibold text-primary-light hover:bg-primary/25 transition-colors"
         >
-          ⚡ Refill Energy — $19
+          ⚡ {isFree ? "Top up energy" : "Refill Energy"} — $19
         </button>
+
+        {isFree && (
+          <a href="/pricing" className="mt-2 block text-center text-xs text-faint hover:text-white transition-colors">
+            or upgrade to Creator Pro for monthly energy →
+          </a>
+        )}
 
         {energy.periodEnd && (
           <p className="mt-2 text-center text-xs text-faint">

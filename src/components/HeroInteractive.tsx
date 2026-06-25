@@ -98,7 +98,7 @@ export default function HeroInteractive() {
     <div className="flex-1 text-center lg:text-left">
       {/* Badge */}
       <div className="mb-6 flex justify-center lg:justify-start">
-        <span className="badge-purple">✦ 7 days of everything — free, no card</span>
+        <span className="badge-purple">✦ Create your brand free — no credit card</span>
       </div>
 
       {/* Headline */}
@@ -171,13 +171,13 @@ export default function HeroInteractive() {
             <p className="text-secondary font-medium text-sm mb-4">"{result.tagline}"</p>
             <div className="border-t border-white/10 pt-4">
               <p className="text-xs text-muted mb-3">
-                That's 1 of 12. The full kit has names, colors, voice, story, launch plan — and it's yours free for 7 days.
+                That's 1 of 12. The full kit has names, colors, voice, story, launch plan — and it's yours, free.
               </p>
               <Link
                 href="/signup"
                 className="btn-primary text-sm px-6 py-2.5 inline-flex"
               >
-                ✦ Get the full kit — 7 days free →
+                ✦ Get the full kit — free →
               </Link>
             </div>
           </motion.div>
@@ -203,7 +203,7 @@ export default function HeroInteractive() {
       {!result && !loading && (
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start mb-8">
           <Link href="/signup" className="btn-primary w-full sm:w-auto px-8 py-4 text-lg">
-            ✦ Start free — 7 days of everything →
+            ✦ Start Creating — Free →
           </Link>
           <Link href="/pricing" className="btn-secondary w-full sm:w-auto px-6 py-4 text-base">
             See what's included

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/server";
-import { grantMonthlyEnergy, addRefillEnergy, revokeEnergy } from "@/lib/energy";
+import { grantMonthlyEnergy, addRefillEnergy, downgradeToFree } from "@/lib/energy";
 
 const PRO_CREDITS = 999999;
 const FREE_CREDITS = 3;
@@ -103,7 +103,8 @@ export async function POST(request: Request) {
           .eq("stripe_customer_id", customerId)
           .single();
 
-        if (userRow) await revokeEnergy(userRow.id);
+        // Soft downgrade — preserve any remaining energy (no harsh revoke-to-zero).
+        if (userRow) await downgradeToFree(userRow.id);
 
       } else if (sub.status === "active" || sub.status === "trialing") {
         // Active/renewed — make sure Pro access is granted
@@ -151,7 +152,8 @@ export async function POST(request: Request) {
         .eq("stripe_customer_id", customerId)
         .single();
 
-      if (userRow) await revokeEnergy(userRow.id);
+      // Soft downgrade — preserve any remaining energy (no harsh revoke-to-zero).
+      if (userRow) await downgradeToFree(userRow.id);
 
       await supabase
         .from("users")

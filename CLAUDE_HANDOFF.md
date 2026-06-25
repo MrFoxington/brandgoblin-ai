@@ -44,6 +44,43 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🔁 FREEMIUM CONVERSION — killed 7-day trial + Agency tier (built June 24, 2026 — ⚠️ awaiting push, NEEDS MIGRATION)
+
+Per `docs/APP_FREEMIUM_CONVERSION_BRIEF.md`. Moves the app from a 7-day full-Pro trial → a lasting
+free tier. **Touches access/billing/Stripe — review before pushing.**
+
+**⚠️ MIGRATION REQUIRED (run first):** `supabase/migrations/20260624_free_studio_starter.sql` adds
+`users.has_received_free_studio_grant boolean default false`. A separate flag from `has_used_trial`
+on purpose — existing free users already have `has_used_trial=true`, so reusing it would strand them.
+
+**Model now:**
+- **Free (no clock):** brand kits + a ONE-TIME Goblin Studio starter energy grant
+  (`FREE_STUDIO_STARTER_ENERGY`, default 250, env-tunable) added to the persistent refill bucket +
+  free Nix goodies. No 7-day Pro window, no day-7 revoke.
+- **Creator Pro ($19/mo):** unchanged — unlimited brands, content engine, monthly energy, top-ups.
+- **$19 top-up:** now available to free users too (EnergyWidget surfaces it).
+
+**Key behaviour changes:**
+- `lib/trial.ts`: `startTrialIfEligible` → `grantFreeStudioStarterIfEligible` (same anti-abuse guards:
+  verified email, one-per-normalized-email, IP cap — re-keyed to the new flag). Atomic flag claim =
+  race-proof, no double-grants. `expireTrialIfNeeded` no longer revokes energy.
+- `lib/energy.ts`: new `grantStudioStarterEnergy` (refill bucket, `starter_grant` ledger) +
+  `downgradeToFree` (Pro cancel PRESERVES all remaining energy — no revoke-to-zero). Legacy
+  `revokeEnergy` retained but unwired.
+- **Goblin Studio is now open to anyone with energy** (was paid-Pro-only). `/api/studio/jobs` drops the
+  plan gate; `reserveEnergy`'s 402 is the gate. `/api/energy/balance` + `EnergyWidget` show free-tier
+  balance. Content engine stays Pro-only.
+- Stripe webhook cancel/delete paths → `downgradeToFree`. `/api/trial/expire` cron no longer revokes.
+- **Removed UI:** Agency Edition tier (landing PLANS + pricing page + waitlist modal usage),
+  `TrialCountdownBanner` + `TrialEndScreen` (deleted). All "7 days / 7-day trial" copy rewritten to the
+  freemium framing across HeroInteractive, `page.tsx`, `pricing/page.tsx`, studio page. (`AgencyWaitlistModal.tsx`
+  + `/api/agency/waitlist` left orphaned; `"agency"` kept in the `Plan` type.)
+- **Migration of existing users:** Pro untouched; existing free/expired get the 250 once via the flag;
+  mid-trial cohort reads as Pro until `trial_ends_at`, then `is_trial` clears with energy preserved.
+- **Post-merge TEST:** new signup grant, free out-of-energy upsell, Pro upgrade, Pro cancel→free (energy kept).
+
+---
+
 ## 🆕 FEATURE — "Preview as a Live Webpage" + Richer Website Copy (built June 22, 2026 — additive, awaiting push)
 
 Turns "we generate copy" into "we hand you a real, downloadable website." Per
@@ -459,12 +496,12 @@ content-population + distribution, not new code:
 | `/dashboard/brand/[id]` | Individual brand kit view | ✅ Live |
 | `/admin` | Analytics dashboard | ✅ Live |
 
-### Subscription Tiers
+### Subscription Tiers (freemium — June 24, 2026)
 | Plan | Price | Features |
 |---|---|---|
-| Free | $0 | 3 brand generations, 9 core deliverables |
-| Creator Pro | $19/month | Unlimited generations, 20 content types, 7 voice modes |
-| Agency Edition | Coming Soon | Multi-client, white-label, waitlist only |
+| Free | $0 forever | Brand generation, try Goblin Studio with a one-time Creative Energy starter (250, tunable), free Nix stickers/wallpapers. No 7-day trial, no day-7 lockout. |
+| Creator Pro | $19/month | Unlimited generations, full content engine, monthly Creative Energy, top-ups. |
+| ~~Agency Edition~~ | — | **Removed from all UI** June 24, 2026. `"agency"` retained in the `Plan` type for safety only. |
 
 ### Key Features Built
 - Brand generation: 9 deliverables (names, taglines, story, voice, mascot, colors, website copy, social kit, launch plan)

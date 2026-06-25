@@ -9,7 +9,7 @@ import GoblinFeedback from "@/components/GoblinFeedback";
 import BrandActions from "@/components/BrandActions";
 import ContentEngine from "@/components/ContentEngine";
 import { headers } from "next/headers";
-import { startTrialIfEligible, hashIp } from "@/lib/trial";
+import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan } from "@/lib/access";
 import type { BrandGenerationRow, Plan } from "@/types";
 
@@ -20,7 +20,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
   if (!authData.user) redirect("/login");
 
   const rawIp = headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
-  await startTrialIfEligible(authData.user.id, {
+  await grantFreeStudioStarterIfEligible(authData.user.id, {
     email: authData.user.email ?? "",
     emailConfirmedAt: authData.user.email_confirmed_at ?? null,
     ipHash: rawIp ? hashIp(rawIp) : undefined,

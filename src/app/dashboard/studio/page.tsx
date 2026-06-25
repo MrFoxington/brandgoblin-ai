@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { listUserJobs, sweepStaleJobs } from "@/lib/studio/jobs";
+import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import Link from "next/link";
-import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EnergyWidget from "@/components/EnergyWidget";
@@ -14,77 +15,18 @@ export default async function StudioPage() {
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) redirect("/login");
 
-  const { data: userRow } = await supabase
-    .from("users")
-    .select("plan, is_trial, trial_ends_at")
-    .eq("id", authData.user.id)
-    .single();
+  // One-time free starter energy so any new free user can taste Studio
+  // (idempotent + race-proof — guarded by has_received_free_studio_grant).
+  const rawIp = headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  await grantFreeStudioStarterIfEligible(authData.user.id, {
+    email: authData.user.email ?? "",
+    emailConfirmedAt: authData.user.email_confirmed_at ?? null,
+    ipHash: rawIp ? hashIp(rawIp) : undefined,
+  });
 
-  // Studio is PAID Pro only — trial users see the upgrade prompt.
-  // We do NOT use getEffectivePlan() here because that counts active trials as Pro;
-  // trial energy is an unpaid grant and must not fund media generation.
-  const isPaidPro = userRow?.plan === "pro" || userRow?.plan === "agency";
-  const isTrial   = !!(userRow?.is_trial);
-
-  if (!isPaidPro) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center px-4 py-24">
-          <div className="bg-card w-full max-w-md rounded-2xl border border-primary/20 p-10 text-center">
-            <div className="mb-6 flex justify-center">
-              <Image
-                src="/nix/conjuring-nix.png"
-                alt="Nix conjuring"
-                width={100}
-                height={100}
-                className="object-contain"
-              />
-            </div>
-            <h1 className="font-display text-2xl font-extrabold text-white mb-2">
-              Goblin Studio
-            </h1>
-            <p className="text-sm font-semibold text-secondary mb-4">
-              ⚡ Images & video, powered by Creative Energy
-            </p>
-
-            {isTrial ? (
-              <p className="text-sm text-muted mb-6 leading-relaxed">
-                Studio is available on Creator Pro. Your free trial gives you unlimited text content
-                — upgrade to start generating real images with Nix.
-              </p>
-            ) : (
-              <p className="text-sm text-muted mb-6 leading-relaxed">
-                Turn your brand kit into real images. Nix already knows your palette, voice, and
-                logo direction — just pick a template and conjure it.
-              </p>
-            )}
-
-            <div className="space-y-2 text-left mb-8">
-              {[
-                "Logo concepts from your brand kit",
-                "Social graphics in your palette",
-                "Product & hero art",
-                "⚡ Creative Energy powers every generation",
-              ].map((f) => (
-                <div key={f} className="flex items-center gap-2 text-sm text-muted">
-                  <span className="text-secondary shrink-0">✓</span>{f}
-                </div>
-              ))}
-            </div>
-
-            <Link href="/pricing" className="btn-primary w-full py-3 block text-center mb-3">
-              ✦ {isTrial ? "Upgrade to Creator Pro" : "Get Creator Pro — $19/mo"}
-            </Link>
-            <Link href="/dashboard" className="text-sm text-muted hover:text-white transition-colors">
-              Back to Dashboard
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  // Studio is open to everyone — Creative Energy is the gate, not the plan.
+  // Free users spend their starter/top-up energy; the EnergyWidget surfaces the
+  // Upgrade / $19 top-up upsell when they run low or out.
 
   // Fetch brands for the brand selector
   const { data: brands } = await supabase
@@ -118,7 +60,7 @@ export default async function StudioPage() {
               🎨 Goblin Studio
             </h1>
             <p className="text-sm text-muted">
-              ⚡ Creative Energy powers your images — text content stays unlimited.
+              ⚡ Creative Energy powers every creation — logos, social graphics & product art.
             </p>
           </div>
 

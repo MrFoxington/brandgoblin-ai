@@ -24,27 +24,10 @@ export async function POST(request: Request) {
   }
 
   const adminSb = createAdminClient();
-  const { data: userRow } = await adminSb
-    .from("users")
-    .select("plan, is_trial")
-    .eq("id", authData.user.id)
-    .single();
 
-  // Studio is PAID Pro only — trial users are explicitly excluded even though
-  // getEffectivePlan() would count them as Pro (trial energy grant must not fund media).
-  if (!userRow || userRow.plan !== "pro") {
-    const isTrial = userRow?.is_trial ?? false;
-    return NextResponse.json(
-      {
-        error: isTrial
-          ? "Goblin Studio is available on Creator Pro. Upgrade to unlock image generation."
-          : "Creator Pro subscription required to use Goblin Studio.",
-        requiresUpgrade: true,
-        isTrial,
-      },
-      { status: 403 }
-    );
-  }
+  // Studio is open to ANYONE with Creative Energy — paid Pro (monthly) or free
+  // (one-time starter / top-ups). The atomic reserveEnergy() call below is the
+  // real gate: it returns a 402 upsell when the balance can't cover the cost.
 
   let body: unknown;
   try {
