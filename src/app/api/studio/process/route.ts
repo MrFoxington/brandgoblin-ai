@@ -228,6 +228,7 @@ export async function POST(request: Request) {
     featured:         false,
     featured_order:   null,
     featured_at:      null,
+    official_logo:    false,
     created_at:       new Date().toISOString(),
     updated_at:       new Date().toISOString(),
   };

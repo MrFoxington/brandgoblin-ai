@@ -21,6 +21,7 @@ export interface StudioJobRow {
   featured: boolean;
   featured_order: number | null;
   featured_at: string | null;
+  official_logo: boolean;
   created_at: string;
   updated_at: string;
 }

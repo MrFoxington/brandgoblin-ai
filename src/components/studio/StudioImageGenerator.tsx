@@ -179,6 +179,36 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     }
   }
 
+  // Set / unset this logo as the brand's official logo. Optimistic: setting one
+  // clears any other official logo for the same brand. Reverts on failure.
+  async function handleSetOfficialLogo(job: StudioJobRow, next: boolean): Promise<boolean> {
+    setJobs((prev) =>
+      prev.map((j) => {
+        if (j.id === job.id) return { ...j, official_logo: next };
+        // Setting a new official logo unsets the brand's previous one.
+        if (next && j.image_type === "logo_concept" && j.brand_id === job.brand_id) {
+          return { ...j, official_logo: false };
+        }
+        return j;
+      })
+    );
+    try {
+      const res = await fetch("/api/studio/official-logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, official: next }),
+      });
+      if (!res.ok) {
+        setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, official_logo: !next } : j)));
+        return false;
+      }
+      return true;
+    } catch {
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, official_logo: !next } : j)));
+      return false;
+    }
+  }
+
   // Share from the reveal — same real-share-only flow as the card.
   async function handleRevealShare(job: StudioJobRow) {
     if (!job.output_url) return;
@@ -385,6 +415,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         featured:        false,
         featured_order:  null,
         featured_at:     null,
+        official_logo:   false,
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       };
@@ -849,6 +880,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
                   onProcess={handleProcess}
                   onShareSuccess={handleShareSuccess}
                   onToggleFavorite={handleToggleFavorite}
+                  onSetOfficialLogo={handleSetOfficialLogo}
                 />
               ))}
             </div>

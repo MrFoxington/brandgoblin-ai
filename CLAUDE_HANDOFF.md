@@ -44,6 +44,56 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — June 26, 2026 (Studio product-art fixes + Official Logo overlay) — ⏳ NEEDS PUSH + MIGRATION
+
+Fox flagged two Studio product-art bugs (hex color codes printed on the artwork like "#D41208" /
+"2CCC22", and the brand name either missing or garbled), plus requested an "official logo" feature.
+All built, typechecks clean. **NOT pushed yet, and a DB migration must be run.**
+
+**Root cause of the junk codes:** the cook-prompt system prompt had a "PALETTE LOCK" rule that forced
+the LITERAL hex codes into the image prompt — and image models print any "#"/numbers they see as text
+on the artwork. A second leak lived in the `jobs` fallback builder (raw `c.hex`). The brand name was
+also explicitly suppressed ("no brand names embedded in the image").
+
+**Fixed (Bugs):**
+- **NEW** `src/lib/studio/color-names.ts` — `hexToColorName()` + `paletteToWords()`. Converts the brand
+  palette to plain WORDS (e.g. "deep crimson, charcoal, gold"). Hex never reaches an image prompt again.
+- `src/app/api/studio/cook-prompt/route.ts` — palette now passed as words; PALETTE LOCK replaced with a
+  plain-words colour rule + an explicit "no hex/#/numbers/gibberish" ban. For **product_art** and
+  **social_graphic** the model is now told to render the brand name spelled EXACTLY as the brand's name,
+  as the ONLY text. Logo concepts stay icon-only (in-image text garbles).
+- `src/app/api/studio/jobs/route.ts` — fallback builder uses `paletteToWords` (no hex), renders the exact
+  brand name on product/social, bans junk; Seedream negative prompt extended (hex codes, gibberish,
+  watermark, qr/barcode).
+
+**NEW FEATURE — Official Logo overlay (exact logo on product art):**
+Text-to-image can't reuse an exact logo, so we STAMP it on after generation.
+- **MIGRATION TO RUN:** `supabase/migrations/20260626_studio_official_logo.sql` — adds
+  `studio_jobs.official_logo` + a partial unique index (one official logo per user+brand). Run it in the
+  Supabase SQL editor BEFORE the deploy goes live.
+- **NEW DEP:** `sharp` added to `package.json` (Vercel installs on deploy; image compositing).
+- **NEW** `src/lib/studio/logo-overlay.ts` — `compositeLogoBadge()`: places the saved logo on a clean
+  white rounded badge, bottom-right (~18% width). Works for transparent OR opaque logos.
+- `src/lib/studio/jobs.ts` — `official_logo` on `StudioJobRow`; `setOfficialLogo()` (one-per-brand,
+  ownership + completed-logo_concept checks), `getOfficialLogoStoragePath()`, and `completeJob()` now
+  stamps the official logo onto ORIGINAL `product_art`/`social_graphic` jobs (non-fatal; sharp is
+  dynamically imported). Overlay only on originals (`job_type === "image"`), never bg-removal/upscale.
+- **NEW** `src/app/api/studio/official-logo/route.ts` — POST `{ jobId, official }`, Pro-gated.
+- **UI:** `JobCard.tsx` gets a GOLD "⭐ Make this my official logo" / "✓ Official logo" button on
+  completed original **logo concepts**; `StudioImageGenerator.tsx` wires `handleSetOfficialLogo`
+  (optimistic, clears the brand's previous official logo). `src/types/index.ts` + the two full
+  `StudioJobRow` literals (generator newJob, process route) updated with `official_logo: false`.
+
+**▶ FOX MUST DO (in order):**
+1. Run the migration `supabase/migrations/20260626_studio_official_logo.sql` in Supabase.
+2. Delete the 3 sandbox temp files (typecheck helpers, untracked): `.sharp-shim.d.ts`,
+   `tsconfig.verify.json`, `src/__rmtest.tmp`.
+3. Commit + push (Vercel installs sharp + deploys).
+4. Live test: generate product art with no official logo (clean name, no codes), then set an official
+   logo on a logo concept and regenerate product art (logo badge appears bottom-right).
+
+---
+
 ## 🗓️ SESSION LOG — June 26, 2026 (app conversion overhaul + 2 LIVE bug fixes + website/growth)
 
 Focus: align the APP with the new website conversion system (orange = action, GOLD = premium Studio)

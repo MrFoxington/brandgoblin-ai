@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { reserveEnergy, refundEnergy } from "@/lib/energy";
 import { STUDIO_MODELS, IMAGE_TYPE_SIZES, computeStudioEnergyCost, getPinnedSize } from "@/lib/energy-config";
 import { submitImageJob } from "@/lib/studio/provider";
+import { paletteToWords } from "@/lib/studio/color-names";
 import {
   getUserActiveJobCount,
   createJobRow,
@@ -123,17 +124,19 @@ export async function POST(request: Request) {
       .single();
 
     if (brand?.output_data) {
-      const kit = brand.output_data as { logoPrompt?: string; recommendedName?: string; colorPalette?: Array<{ hex: string }> };
+      const kit = brand.output_data as { logoPrompt?: string; recommendedName?: string; colorPalette?: Array<{ hex?: string; name?: string }> };
       const baseLogo   = kit.logoPrompt ?? "";
       const brandName  = kit.recommendedName ?? "";
-      const palette    = kit.colorPalette?.slice(0, 3).map((c) => c.hex).join(", ") ?? "";
+      // Plain color WORDS only — never raw hex (image models print hex as text).
+      const colors     = paletteToWords(kit.colorPalette, 3);
+      const noJunk     = "Do not render any color codes, hex values, '#' symbols, hashtags, random numbers, or gibberish text.";
 
       if (imageType === "logo_concept") {
-        prompt = `${baseLogo}${brandName ? `, brand name: ${brandName}` : ""}${palette ? `, color palette: ${palette}` : ""}. Clean logo concept, icon mark, professional quality.`;
+        prompt = `${baseLogo || `Logo concept for ${brandName}`}. Clean icon / symbol mark, professional quality, symbol only — no text, letters, or numbers.${colors ? ` Color palette: ${colors}.` : ""}`;
       } else if (imageType === "social_graphic") {
-        prompt = `A branded social media graphic for ${brandName}. ${palette ? `Use colors: ${palette}.` : ""} Clean, modern design for social media post.`;
+        prompt = `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
       } else {
-        prompt = `Product photography for ${brandName}. ${palette ? `Color palette: ${palette}.` : ""} Professional brand imagery.`;
+        prompt = `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
       }
     }
   }
@@ -183,9 +186,10 @@ export async function POST(request: Request) {
       height:         pinnedSize.height,
       webhookUrl,
       seed,
-      // Seedream: discourage off-brand palette drift; FLUX doesn't accept negative_prompt
+      // Seedream: discourage off-brand palette drift + junk text (hex codes,
+      // gibberish, watermarks). FLUX doesn't accept negative_prompt.
       negativePrompt: modelKey === "seedream_v45"
-        ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry"
+        ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry, hex color codes, color code text, '#' symbols, hashtags, random numbers, gibberish text, misspelled text, scrambled letters, watermark, qr code, barcode"
         : undefined,
     });
   } catch (err) {

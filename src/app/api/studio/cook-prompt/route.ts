@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { paletteToWords } from "@/lib/studio/color-names";
 import type { ImageType } from "@/lib/energy-config";
 import type { BrandKit } from "@/types";
 
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
 
   // Build brand context from saved kit
   let brandContext = "";
+  let brandName = "";
   if (brandId) {
     const { data: brand } = await adminSb
       .from("brand_generations")
@@ -77,17 +79,19 @@ export async function POST(request: Request) {
 
     if (brand?.output_data) {
       const kit = brand.output_data as BrandKit;
-      const palette = kit.colorPalette?.map((c) => `${c.hex} (${c.name})`).join(", ") ?? "";
+      // Plain color WORDS only — never raw hex (image models print hex as text).
+      const palette = paletteToWords(kit.colorPalette);
       const traits  = kit.brandVoice?.personalityTraits?.slice(0, 4).join(", ") ?? "";
       const tagline = kit.taglines?.[0] ?? "";
       const mission = kit.brandStory?.mission ?? "";
+      brandName = kit.recommendedName ?? "";
 
       brandContext = [
-        `Brand name: ${kit.recommendedName}`,
+        `Brand name: ${brandName}`,
         tagline  ? `Tagline: ${tagline}`               : "",
         mission  ? `Mission: ${mission}`                : "",
         traits   ? `Personality: ${traits}`             : "",
-        palette  ? `Color palette: ${palette}`          : "",
+        palette  ? `Color palette (in words): ${palette}` : "",
         kit.logoPrompt ? `Logo direction: ${kit.logoPrompt}` : "",
       ].filter(Boolean).join("\n");
     }
@@ -102,18 +106,27 @@ export async function POST(request: Request) {
     "\nWrite ONE image-generation prompt now.",
   ].join("");
 
+  // Products and social graphics should carry the real brand name as clean
+  // typography. Logo concepts stay icon-only (in-image text garbles badly).
+  const wantsBrandName =
+    (imageType === "product_art" || imageType === "social_graphic") && brandName.trim().length > 0;
+
+  const textRule = wantsBrandName
+    ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
+    : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only.`;
+
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 400,
     system: `You are an expert image-prompt engineer for text-to-image AI models (FLUX, Seedream).
 Given a brand's identity and the requested asset type, write ONE vivid, concrete image-generation prompt.
 Rules:
-- Describe subject, composition, lighting, style, and mood with specific visual detail
-- PALETTE LOCK: if hex colors are provided, you MUST name every primary color as its exact hex value (e.g. "#3B82F6 cobalt blue") — never substitute other colors. The output image must look like this brand's palette.
-- Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic
-- VISUAL DESCRIPTION ONLY — no marketing copy, no slogans, no text-in-image instructions, no brand names embedded in the image
-- One short paragraph, 2-3 sentences max
-- Output must be ready to paste directly into a text-to-image model with no editing`,
+- Describe subject, composition, lighting, style, and mood with specific visual detail.
+- COLORS: describe the palette using plain color WORDS only (e.g. "deep crimson, charcoal, warm gold"). NEVER write hex codes, "#" symbols, or numbers to specify color — image models print those characters as literal text on the artwork.
+- Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic.
+- ${textRule}
+- One short paragraph, 2-3 sentences max.
+- Output must be ready to paste directly into a text-to-image model with no editing.`,
     messages: [{ role: "user", content: userMsg }],
   });
 

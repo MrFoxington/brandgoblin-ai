@@ -26,6 +26,7 @@ export interface StudioJobRow {
   featured: boolean;
   featured_order: number | null;
   featured_at: string | null;
+  official_logo: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -175,8 +176,22 @@ export async function completeJob(params: {
   txId: string | null;
   energyReserved: number;
 }): Promise<string> {
+  // Stamp the brand's official logo onto original product art / social graphics.
+  // Non-fatal: if anything goes wrong we store the un-stamped image.
+  let buffer = params.buffer;
+  let mimeType = params.mimeType;
+  try {
+    const stamped = await maybeApplyOfficialLogo(params.userId, params.jobId, buffer);
+    if (stamped) {
+      buffer = stamped;
+      mimeType = "image/jpeg"; // compositeLogoBadge always returns JPEG
+    }
+  } catch (err) {
+    console.error("[studio/jobs] official-logo overlay failed (storing original):", err);
+  }
+
   // Upload first — idempotent via upsert, safe for concurrent callers.
-  const storagePath = await uploadAsset(params.userId, params.jobId, params.buffer, params.mimeType);
+  const storagePath = await uploadAsset(params.userId, params.jobId, buffer, mimeType);
   const signedUrl   = await getSignedUrl(storagePath);
 
   const supabase = createAdminClient();
@@ -326,4 +341,100 @@ export async function setJobFavorite(
     .eq("user_id", userId) // ownership guard
     .select("id");
   return !error && !!data && data.length > 0;
+}
+
+// ── Official logo (one per brand) ───────────────────────────────────────────
+
+// Mark / unmark a completed logo concept as the brand's official logo.
+// Enforces: ownership, the job is a completed logo_concept, and at most one
+// official logo per brand (clears the previous one first to satisfy the unique
+// index). Returns true on success.
+export async function setOfficialLogo(
+  jobId: string,
+  userId: string,
+  official: boolean
+): Promise<boolean> {
+  const supabase = createAdminClient();
+
+  const { data: job } = await supabase
+    .from("studio_jobs")
+    .select("id, brand_id, image_type, status")
+    .eq("id", jobId)
+    .eq("user_id", userId) // ownership guard
+    .single();
+
+  if (!job) return false;
+  if (job.image_type !== "logo_concept" || job.status !== "completed") return false;
+
+  // Clear any existing official logo for this brand before setting a new one.
+  if (official && job.brand_id) {
+    await supabase
+      .from("studio_jobs")
+      .update({ official_logo: false })
+      .eq("user_id", userId)
+      .eq("brand_id", job.brand_id)
+      .eq("official_logo", true);
+  }
+
+  const { data, error } = await supabase
+    .from("studio_jobs")
+    .update({ official_logo: official })
+    .eq("id", jobId)
+    .eq("user_id", userId)
+    .select("id");
+
+  return !error && !!data && data.length > 0;
+}
+
+// Storage path of the brand's official logo asset, or null if none set.
+export async function getOfficialLogoStoragePath(
+  userId: string,
+  brandId: string
+): Promise<string | null> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("studio_jobs")
+    .select("storage_path")
+    .eq("user_id", userId)
+    .eq("brand_id", brandId)
+    .eq("official_logo", true)
+    .eq("status", "completed")
+    .limit(1)
+    .maybeSingle();
+  return data?.storage_path ?? null;
+}
+
+// If this job is an ORIGINAL product art / social graphic for a brand that has an
+// official logo set, return the base image with that logo stamped on. Otherwise
+// null (caller stores the original). Sharp is dynamically imported so it never
+// loads on paths that don't need it.
+async function maybeApplyOfficialLogo(
+  userId: string,
+  jobId: string,
+  baseBuf: Buffer
+): Promise<Buffer | null> {
+  const supabase = createAdminClient();
+
+  const { data: job } = await supabase
+    .from("studio_jobs")
+    .select("brand_id, image_type, job_type")
+    .eq("id", jobId)
+    .single();
+
+  if (!job) return null;
+  if (job.job_type !== "image") return null; // originals only — not bg_removal/upscale
+  if (!job.brand_id) return null;
+  if (job.image_type !== "product_art" && job.image_type !== "social_graphic") return null;
+
+  const logoPath = await getOfficialLogoStoragePath(userId, job.brand_id);
+  if (!logoPath) return null;
+
+  const { data: blob, error } = await supabase.storage
+    .from("studio-assets")
+    .download(logoPath);
+  if (error || !blob) return null;
+
+  const logoBuf = Buffer.from(await blob.arrayBuffer());
+  const { compositeLogoBadge } = await import("./logo-overlay");
+  return compositeLogoBadge(baseBuf, logoBuf);
 }

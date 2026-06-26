@@ -16,6 +16,7 @@ interface Props {
   onProcess?: (job: StudioJobRow, operation: "bg_removal" | "clarity_upscaler") => Promise<void>;
   onShareSuccess?: (job: StudioJobRow) => void;
   onToggleFavorite?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
+  onSetOfficialLogo?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
 }
 
 const IMAGE_TYPE_LABELS: Record<string, string> = {
@@ -38,7 +39,7 @@ const DERIVED_TAGS: Record<string, string> = {
   clarity_upscaler: "✨ Upscaled",
 };
 
-export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite }: Props) {
+export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite, onSetOfficialLogo }: Props) {
   const { playShare, playButtonPress } = useSoundFx();
   const reduce = useReducedMotion();
   const [downloading, setDownloading]   = useState(false);
@@ -50,6 +51,8 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
   const [moreLikeThis, setMoreLikeThis] = useState(false);
   const [fav, setFav]                   = useState<boolean>(job.favorite);
   const [favBusy, setFavBusy]           = useState(false);
+  const [official, setOfficial]         = useState<boolean>(job.official_logo);
+  const [officialBusy, setOfficialBusy] = useState(false);
 
   const pinnedSize = job.image_type
     ? IMAGE_TYPE_SIZES[job.image_type as ImageType] ?? IMAGE_TYPE_SIZES.logo_concept
@@ -136,6 +139,22 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
       await onMoreLikeThis(job);
     } finally {
       setMoreLikeThis(false);
+    }
+  }
+
+  async function handleSetOfficial() {
+    if (!onSetOfficialLogo || officialBusy) return;
+    const next = !official;
+    setOfficial(next);     // optimistic
+    setOfficialBusy(true);
+    playButtonPress();
+    try {
+      const ok = await onSetOfficialLogo(job, next);
+      if (!ok) setOfficial(!next); // revert on API failure
+    } catch {
+      setOfficial(!next);          // revert on network failure
+    } finally {
+      setOfficialBusy(false);
     }
   }
 
@@ -270,6 +289,23 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
               {processing === "clarity_upscaler" ? "Upscaling…" : `↑ Upscale · ⚡${upscaleCost}`}
             </button>
           </div>
+        )}
+
+        {/* Official logo — GOLD (Studio's premium signature). Once set, generated
+            product art + social graphics reuse this exact logo automatically. */}
+        {job.image_type === "logo_concept" && isOriginalImage && onSetOfficialLogo && (
+          <button
+            onClick={handleSetOfficial}
+            disabled={officialBusy}
+            title={official ? "This is your brand's official logo" : "Use this logo on all generated product art"}
+            className={
+              official
+                ? "w-full rounded-xl px-3 py-2 text-xs font-bold text-center border border-[#D4AF37]/60 bg-[#D4AF37]/15 text-[#E9C75A] disabled:opacity-70 transition-colors"
+                : "w-full rounded-xl px-3 py-2 text-xs font-semibold text-center border border-white/12 text-muted hover:text-white hover:border-[#D4AF37]/50 disabled:opacity-60 transition-colors"
+            }
+          >
+            {officialBusy ? "…" : official ? "✓ Official logo" : "⭐ Make this my official logo"}
+          </button>
         )}
       </div>
 
