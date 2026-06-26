@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { XPBar } from "./XPSystem";
 import NixPose from "./primitives/NixPose";
+import EnergyRefillModal from "@/components/EnergyRefillModal";
 import type { BrandKit, BrandGenerationRow } from "@/types";
 import { trackEvent } from "@/lib/analytics";
 
@@ -138,6 +139,7 @@ export default function DailyCreatorDashboard({
   const [mounted, setMounted] = useState(false);
   const [streak, setStreak] = useState(1);
   const [energy, setEnergy] = useState<EnergyData | null>(null);
+  const [showRefill, setShowRefill] = useState(false);
   const [ideaDismissed, setIdeaDismissed] = useState(false);
 
   const dailyIdea = getDailyIdea(latestBrand?.output_data);
@@ -302,6 +304,17 @@ export default function DailyCreatorDashboard({
                 : "Less than 25% remaining this month."}
             </p>
           )}
+
+          {/* Refill CTA — orange = action */}
+          <div className="flex justify-end pt-1">
+            <button
+              type="button"
+              onClick={() => setShowRefill(true)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] hover:opacity-90 active:opacity-80 transition-opacity"
+            >
+              ⚡ Refill Creative Energy
+            </button>
+          </div>
         </motion.div>
       )}
 
@@ -449,6 +462,19 @@ export default function DailyCreatorDashboard({
           </Link>
         </motion.div>
       )}
+
+      <EnergyRefillModal
+        isOpen={showRefill}
+        onClose={() => setShowRefill(false)}
+        onSuccess={() => {
+          setShowRefill(false);
+          fetch("/api/energy/balance")
+            .then((r) => r.json())
+            .then((d: EnergyData) => setEnergy(d))
+            .catch(() => {});
+        }}
+        isEmpty={(energy?.totalRemaining ?? 0) <= 0}
+      />
     </div>
   );
 }
