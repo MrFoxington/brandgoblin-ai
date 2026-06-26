@@ -60,7 +60,7 @@ export default function EnergyWidget() {
             onClick={() => setShowModal(true)}
             className="w-full rounded-xl border border-[#FF6B35]/50 bg-[#FF6B35]/5 py-2 text-sm font-semibold text-[#FF8C42] hover:bg-[#FF6B35]/15 transition-colors"
           >
-            ⚡ Top up energy — $19
+            ⚡ Top up energy
           </button>
         </div>
         <EnergyRefillModal
@@ -144,7 +144,7 @@ export default function EnergyWidget() {
           onClick={() => setShowModal(true)}
           className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] py-2.5 text-sm font-bold text-white shadow-[0_0_12px_rgba(255,107,53,0.4)] hover:opacity-90 transition-opacity"
         >
-          ⚡ {isFree ? "Top up energy" : "Refill Energy"} — $19
+          ⚡ {isFree ? "Top up energy" : "Refill Energy"}
         </button>
 
         {isFree && (

@@ -27,7 +27,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  // Normalize: strip any trailing dots or slashes so a stray char in the env var
+  // (e.g. "https://app.brandgoblinai.com.") can't produce an unreachable redirect URL.
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/[./]+$/, "");
   if (!appUrl) {
     return NextResponse.json(
       { error: "App URL isn't configured. (Set NEXT_PUBLIC_APP_URL.)" },
