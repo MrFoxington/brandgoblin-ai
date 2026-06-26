@@ -44,11 +44,12 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — June 26, 2026 (Studio product-art fixes + Official Logo overlay) — ⏳ NEEDS PUSH + MIGRATION
+## 🗓️ SESSION LOG — June 26, 2026 (Studio product-art fixes + Official Logo overlay) — ✅ SHIPPED + DEPLOYED (commit `4abc816`)
 
 Fox flagged two Studio product-art bugs (hex color codes printed on the artwork like "#D41208" /
 "2CCC22", and the brand name either missing or garbled), plus requested an "official logo" feature.
-All built, typechecks clean. **NOT pushed yet, and a DB migration must be run.**
+**All built, migration run in Supabase, pushed (`c2101a7..4abc816`), and Vercel deployed GREEN.**
+The only thing left is the live in-browser test (deferred — see FOX TODO below).
 
 **Root cause of the junk codes:** the cook-prompt system prompt had a "PALETTE LOCK" rule that forced
 the LITERAL hex codes into the image prompt — and image models print any "#"/numbers they see as text
@@ -84,13 +85,15 @@ Text-to-image can't reuse an exact logo, so we STAMP it on after generation.
   (optimistic, clears the brand's previous official logo). `src/types/index.ts` + the two full
   `StudioJobRow` literals (generator newJob, process route) updated with `official_logo: false`.
 
-**▶ FOX MUST DO (in order):**
-1. Run the migration `supabase/migrations/20260626_studio_official_logo.sql` in Supabase.
-2. Delete the 3 sandbox temp files (typecheck helpers, untracked): `.sharp-shim.d.ts`,
-   `tsconfig.verify.json`, `src/__rmtest.tmp`.
-3. Commit + push (Vercel installs sharp + deploys).
-4. Live test: generate product art with no official logo (clean name, no codes), then set an official
-   logo on a logo concept and regenerate product art (logo badge appears bottom-right).
+**✅ DONE June 26:** migration run in Supabase, temp files deleted, pushed (`4abc816`), Vercel deployed green.
+
+**▶ FOX TODO NEXT SESSION (live test — the only open item here):**
+1. Generate a product art for a brand with NO official logo set → confirm clean brand name + zero hex
+   codes/gibberish (the bug fix).
+2. On a finished logo concept, click the gold "⭐ Make this my official logo" button, then regenerate
+   product art for that brand → confirm the logo badge appears bottom-right (the new feature).
+3. Tip if a name still looks rough: the "Premium" engine renders text best. For the cleanest logo badge,
+   run "Remove BG" on the logo before setting it official (transparent logo).
 
 ---
 
