@@ -156,14 +156,13 @@ export default function DailyCreatorDashboard({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch energy for pro users
+  // Fetch energy for all users (free users have starter energy too)
   useEffect(() => {
-    if (!isPro) return;
     fetch("/api/energy/balance")
       .then((r) => r.json())
       .then((d: EnergyData) => setEnergy(d))
       .catch(() => null);
-  }, [isPro]);
+  }, []);
 
   const resetDays = daysUntil(energy?.periodEnd);
 
@@ -247,8 +246,8 @@ export default function DailyCreatorDashboard({
         </motion.div>
       )}
 
-      {/* ── Energy meter (Creator Pro only) ── */}
-      {isPro && energy && (
+      {/* ── Energy meter (free + pro) ── */}
+      {energy && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -300,8 +299,8 @@ export default function DailyCreatorDashboard({
           {energy.warningLevel && energy.warningLevel !== "ok" && (
             <p className={`text-xs ${energy.warningLevel === "critical" ? "text-red-400" : "text-yellow-400"}`}>
               {energy.warningLevel === "critical"
-                ? "Running low — top up to keep creating."
-                : "Less than 25% remaining this month."}
+                ? "Running low. Top up to keep creating."
+                : "Less than 25% remaining."}
             </p>
           )}
 
@@ -423,21 +422,41 @@ export default function DailyCreatorDashboard({
         </Link>
       </motion.div>
 
-      {/* ── Upgrade banner (free) ── */}
+      {/* ── Upgrade pitch (free) — full perks ── */}
       {!isPro && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.75 }}
-          className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 px-6 py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/12 via-transparent to-secondary/10 px-6 py-6"
         >
-          <div>
-            <p className="font-display font-bold text-white">Unlock your AI Marketing Department</p>
-            <p className="text-xs text-muted mt-0.5">Monthly Creative Energy · Social posts · Blogs · Emails · Ads · $19/month</p>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+            <div className="shrink-0">
+              <NixPose pose="conjuring" size={64} glow={false} float={false} animated={false} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="badge-purple text-xs">✨ Creator Pro · $19/mo</span>
+              <p className="font-display font-bold text-white text-lg mt-1">Unlock your full AI Marketing Department</p>
+              <p className="text-xs text-muted mt-0.5">Everything in Free, plus the tools that actually grow a brand:</p>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-1.5 mt-3 text-sm text-muted">
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Unlimited brand generations</li>
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Full content engine: posts, blogs, emails, ads</li>
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Monthly Creative Energy for the Studio</li>
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Re-conjure any section, anytime</li>
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Priority brand generation</li>
+                <li className="flex items-center gap-2"><span className="text-secondary shrink-0">✓</span> Ongoing marketing ideas &amp; campaigns</li>
+              </ul>
+              <div className="flex flex-wrap items-center gap-3 mt-5">
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] hover:opacity-90 active:opacity-80 transition-opacity"
+                >
+                  ✦ Upgrade to Creator Pro
+                </Link>
+                <span className="text-xs text-faint">Cancel anytime · No contracts</span>
+              </div>
+            </div>
           </div>
-          <Link href="/pricing" className="btn-primary !py-2.5 !px-6 text-sm shrink-0">
-            ✦ Upgrade to Creator Pro
-          </Link>
         </motion.div>
       )}
 
