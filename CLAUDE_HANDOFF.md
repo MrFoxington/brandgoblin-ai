@@ -44,14 +44,114 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🔁 FREEMIUM CONVERSION — killed 7-day trial + Agency tier (built June 24, 2026 — ⚠️ awaiting push, NEEDS MIGRATION)
+## 🗓️ SESSION LOG — June 26, 2026 (app conversion overhaul + 2 LIVE bug fixes + website/growth)
 
-Per `docs/APP_FREEMIUM_CONVERSION_BRIEF.md`. Moves the app from a 7-day full-Pro trial → a lasting
-free tier. **Touches access/billing/Stripe — review before pushing.**
+Focus: align the APP with the new website conversion system (orange = action, GOLD = premium Studio)
+and maximize the refill / Pro-upgrade money path. Fox worked the Nix rig in parallel.
 
-**⚠️ MIGRATION REQUIRED (run first):** `supabase/migrations/20260624_free_studio_starter.sql` adds
-`users.has_received_free_studio_grant boolean default false`. A separate flag from `has_used_trial`
-on purpose — existing free users already have `has_used_trial=true`, so reusing it would strand them.
+**Shipped + LIVE (pushed to main, Vercel deployed, visually verified in-browser):**
+- **Orange "Refill Creative Energy" CTA on the dashboard energy bar** (`DailyCreatorDashboard.tsx`,
+  commit `f2a9cf2`) opens the existing `EnergyRefillModal`. Connected to the bar so it catches users at
+  the moment they check balance. Pro + free.
+- **Free users now see the energy meter + orange refill button** (was Pro-only; energy is now fetched
+  for everyone since free users hold starter energy), plus a **rebuilt free upgrade card** with Nix +
+  the full Creator Pro perks list + orange upgrade CTA (commit `266b66f`).
+- **Color system standardized app-wide to match the website** (commit `4685484`): `btn-primary` flipped
+  from the purple-green gradient to ORANGE (`#FF6B35` to `#FF8C42`) + orange `pulse-glow` keyframe;
+  Generate-button glow orange; `EnergyWidget` refill button now solid orange (was soft purple),
+  zero-state top-up outlined orange so the solid-orange Upgrade stays dominant. Purple stays the BRAND
+  color (glows, borders, badges, XP bar); GOLD stays Studio's signature. Rule now: orange = clickable
+  action only.
+- **Refill modal optimized for AOV** (`EnergyRefillModal.tsx`, in `4685484`): now defaults to the **$49
+  "Best Value" pack** (was the cheapest $19), with savings tags ("Save 14%", "Save 26%") + human
+  capacity ("~100 / ~300 / ~700 social posts").
+
+**Two LIVE bugs found via in-browser testing + fixed:**
+1. **$49 and $99 refill packs threw "Invalid refill pack."** The Stripe prices existed but the Vercel
+   env vars `STRIPE_PRICE_ID_ENERGY_3000` / `STRIPE_PRICE_ID_ENERGY_7000` were not wired. **Fox set both
+   env vars (and confirmed each price carries metadata `energy_amount` = 3000 / 7000 so the webhook
+   grants the right energy) and redeployed. Verified: the $49 pack now creates a live Stripe checkout
+   session.**
+2. **Post-checkout redirect dead-ended on ERR_CONNECTION_CLOSED.** `NEXT_PUBLIC_APP_URL` had a trailing
+   dot (`https://app.brandgoblinai.com.`), so the success_url failed SSL host matching. **Fox fixed the
+   env var (removed the dot) + redeployed. Verified: the success URL loads.** Also hardened in code so a
+   stray trailing dot/slash is stripped automatically (`src/app/api/stripe/checkout/route.ts`).
+   ✅ PUSHED June 26 (commit `f958566`, `4685484..f958566`) — Fox committed + pushed from his Mac.
+
+**Website (Airo) — new doc `docs/GODADDY_LANDING_BRIEF_V5_PASTEINS.md`** = source of truth for the
+remaining Airo edits, fed ONE block at a time. Audited the live site: Blocks 1/2/4/6 already done.
+**Still to feed Airo:** Block 3 (add 3 real Studio images), Block 5 (dead footer legal links — MUST do
+before paid traffic), Block 7 (FAQ still names the killed "Agency" tier), Block 8 (move the showcase
+wall down to just before Pricing — fixes two orange sections back-to-back + puts social proof at peak
+intent), Block 10 (orange = buttons / GOLD for the Goblin Studio "Make it." highlight + badge),
+Block 11 ("Sign In" should link to /login not /signup). Block 9 optional (merge the 2 duplicate value
+sections). NOTE: feed Airo one block at a time; it ignores multi-part prompts.
+
+**Growth strategy (talked through, no doc — organic-first, under $300/mo, Fox on QC):** the flywheel is
+"Nix brands a stranger's idea on camera in under 2 min" → comment-bait content engine (the audience
+fills the queue) → free signup → magic reveal → one-tap share (carries the watermark) → repeat. Blocked
+on the Nix rig (Fox's current task). Channels: short-form video (TikTok/Reels/Shorts) is ~80%; the
+built-in share loop is already live; public brand pages for SEO are the next build; gift-energy referral
+is the multiplier; spend the $300 only on TikTok Spark Ads boosting a proven organic winner.
+
+**▶ STILL OPEN going into next session:** Studio + pricing-page visual audit not yet done.
+
+**✅ CLOSED June 26 (commit `f958566`, pushed `4685484..f958566`):** (a) checkout-hardening commit is
+now pushed + live; (b) `EnergyWidget` refill button no longer hardcodes "$19" — price dropped from the
+label so it matches the $49-default modal. Both touched only `src/app/api/stripe/checkout/route.ts` +
+`src/components/EnergyWidget.tsx`.
+
+---
+
+## 🗓️ SESSION LOG — June 23–24, 2026 (shipped a LOT; app is in strong shape)
+
+**Shipped + live this session:**
+- **Preview as a Live Webpage + richer website copy** (`renderSite.ts`, `/brand/[id]/preview`,
+  PreviewActions) + **template polish** (premium/editorial; `pickTheme` now picks light/dark from the
+  brand's *background swatch*, contrast-safe on dark+light). Verified by headless-Chrome render pass.
+- **Phone-first Studio sharing** (`5feee15`): `shareImageFile()` (native share sheet with the real FILE →
+  IG/TikTok/X/Save-to-Photos), Save-to-Photos button, and a full-screen **StudioLightbox** (click a
+  creation → big view with Share/Save/More/Favorite/Download in it). ▶ NEEDS a real-phone test.
+- **Robust clipboard** fix across all copy buttons (`src/lib/clipboard.ts`).
+- **Homepage**: How-It-Works anchor + orange "Try It Free" CTA + live showcase wall. **Airo landing**:
+  showcase wall embedded + "Real brands, really made by Nix" header.
+- **Freemium conversion** (`d40520b`) — see section below. SHIPPED; smoke test pending.
+
+**Decisions locked:**
+- **Keep the name "BrandGoblin AI"** (rename audit: good `.com`s all taken/premium; name isn't the bottleneck).
+- **Freemium model** (no 7-day trial): free tier + Studio taste (250 energy) + Pro $19/mo + $19 top-ups.
+  Free starter grant cost ≈ $0.45 max/user. Pro-cancel **preserves** remaining energy (friendliest).
+
+**Marketing / growth groundwork (docs/):** `NIX_TIKTOK_PLAYBOOK`, `NIX_CONTENT_AUTOMATION_PLAN`,
+`NIX_CONTENT_QUEUE` (daily Idea Engine scheduled ~7am — already producing batches), `NIX_COMPANION_VISION`,
+`NIX_ANIMATION_RESEARCH`, `NIX_RIG_WALKTHROUGH`, `LAUNCH_YOUR_BRAND_NEXT_STEPS`, plus a `nix-animator`
+Claude Code agent + output style (in `.claude/`). `CREATIVE_CHECKLIST.md` (repo root) = Fox's shared
+checkbox board.
+
+**▶ QUEUED, NOT YET BUILT (briefs ready in docs/):**
+- `LAUNCH_NEXT_STEPS_BUILD_BRIEF.md` — in-app "Now what?" launch guide + printable fact sheet.
+- `GODADDY_LANDING_BRIEF_V4_FREEMIUM.md` — Airo landing reposition (publish AFTER app freemium smoke-tests).
+- `STUDIO_FREE_TASTE_AND_UPSELL_BRIEF.md` — superseded/absorbed by the freemium build (the Nix "Create in
+  Studio" upsell CTA can still be added).
+- `GOBLIN_STUDIO_MEMES_AND_PRODUCT_ART.md` — fix category-blind product art + add a Meme Generator (backlog).
+- `STUDIO_UX_AND_MONETIZATION_BACKLOG.md` — remaining Studio polish (juice, etc.).
+
+**THE REAL NEXT MOVE (Fox's hands, not CC's):** the **Nix rig** (`NIX_RIG_WALKTHROUGH.md`). The whole
+content/distribution engine is blocked on Nix being animatable. App is great; growth needs the goblin moving.
+
+---
+
+## 🔁 FREEMIUM CONVERSION — killed 7-day trial + Agency tier (SHIPPED ✅ June 24, 2026 — commit `d40520b`)
+
+Per `docs/APP_FREEMIUM_CONVERSION_BRIEF.md`. Moved the app from a 7-day full-Pro trial → a lasting
+free tier. **Pushed to main; migration applied in Supabase BEFORE deploy (correct order).**
+**▶ Next: run the 4-flow smoke test once Vercel is green** (new signup gets 250 → free out-of-energy
+upsell → Pro upgrade → Pro cancel keeps energy), THEN publish the Airo V4 landing copy so site matches.
+
+**✅ MIGRATION APPLIED:** `supabase/migrations/20260624_free_studio_starter.sql` added
+`users.has_received_free_studio_grant boolean default false` (run in Supabase June 24, before the push).
+A separate flag from `has_used_trial` on purpose — existing free users already have `has_used_trial=true`,
+so reusing it would strand them.
 
 **Model now:**
 - **Free (no clock):** brand kits + a ONE-TIME Goblin Studio starter energy grant
