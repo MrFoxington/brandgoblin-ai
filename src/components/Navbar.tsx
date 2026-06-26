@@ -102,7 +102,7 @@ export default function Navbar() {
                   FREE
                 </span>
               </Link>
-              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-glow">
+              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-[0_0_20px_rgba(255,107,53,0.5)]">
                 ✦ Generate
               </Link>
             </>

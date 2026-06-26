@@ -8,6 +8,8 @@ interface RefillPack {
   price: string;
   label: string;
   badge?: string;
+  savings?: string;
+  capacity: string;
 }
 
 interface Props {
@@ -20,9 +22,7 @@ interface Props {
 export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty }: Props) {
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState<string | null>(null);
-  const [selectedPack, setSelectedPack] = useState<string>(
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_ID_ENERGY_REFILL ?? "starter"
-  );
+  const [selectedPack, setSelectedPack] = useState<string>("value");
 
   if (!isOpen) return null;
 
@@ -33,6 +33,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
       energy:  1000,
       price:   "$19",
       label:   "Starter",
+      capacity: "~100 social posts",
     },
     {
       priceId: "value",     // resolved server-side to STRIPE_PRICE_ID_ENERGY_3000
@@ -40,12 +41,16 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
       price:   "$49",
       label:   "Value",
       badge:   "Best Value",
+      savings: "Save 14%",
+      capacity: "~300 social posts",
     },
     {
       priceId: "creator",   // resolved server-side to STRIPE_PRICE_ID_ENERGY_7000
       energy:  7000,
       price:   "$99",
       label:   "Creator",
+      savings: "Save 26%",
+      capacity: "~700 social posts",
     },
   ];
 
@@ -135,8 +140,13 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
                         {pack.badge}
                       </span>
                     )}
+                    {pack.savings && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6B35]/15 text-[#FF8C42] font-semibold">
+                        {pack.savings}
+                      </span>
+                    )}
                   </div>
-                  <span className="text-xs text-faint">⚡ {pack.energy.toLocaleString()} energy</span>
+                  <span className="text-xs text-faint">⚡ {pack.energy.toLocaleString()} energy · {pack.capacity}</span>
                 </div>
               </div>
               <span className="font-display text-xl font-black text-white">{pack.price}</span>

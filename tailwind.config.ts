@@ -62,8 +62,8 @@ const config: Config = {
           "50%": { transform: "translateY(-6px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 28px rgba(124,58,237,0.45)" },
-          "50%": { boxShadow: "0 0 48px rgba(124,58,237,0.75)" },
+          "0%, 100%": { boxShadow: "0 0 28px rgba(255,107,53,0.45)" },
+          "50%": { boxShadow: "0 0 48px rgba(255,107,53,0.7)" },
         },
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
