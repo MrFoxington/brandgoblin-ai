@@ -43,13 +43,18 @@ export async function POST(request: Request) {
     brandId,
     prompt: clientPrompt,
     seed: clientSeed,
+    stampLogo: clientStampLogo,
   } = body as {
     modelKey: string;
     imageType: string;
     brandId?: string;
     prompt?: string;
     seed?: number;
+    stampLogo?: boolean;
   };
+
+  // Per-job official-logo stamp opt-out (defaults to true = stamp when set).
+  const stampLogo = clientStampLogo !== false;
 
   // Validate seed if provided: must be a safe positive integer
   const seed = (typeof clientSeed === "number" && Number.isInteger(clientSeed) && clientSeed >= 0 && clientSeed <= 2147483647)
@@ -163,6 +168,7 @@ export async function POST(request: Request) {
       energyReserved:  energyCost,
       prompt,
       reservationTxId: reservation.txId!,
+      stampLogo,
     });
   } catch (err) {
     // No job row exists yet — refund directly; markJobFailed requires a row.

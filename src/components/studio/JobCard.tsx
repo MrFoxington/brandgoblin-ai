@@ -76,9 +76,12 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
     try {
       const res = await fetch(job.output_url);
       const blob = await res.blob();
+      // Keep the real format — bg-removed images are transparent PNGs and must
+      // NOT be renamed .jpg (that loses the transparency promise of the file).
+      const ext = blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.jpg`;
+      a.download = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.${ext}`;
       a.click();
       URL.revokeObjectURL(a.href);
     } catch { /* non-fatal */ } finally {
@@ -86,7 +89,11 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
     }
   }
 
-  const saveFilename = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.jpg`;
+  // Best-effort extension for the share-sheet filename (actual blob type wins
+  // in handleDownload). bg-removal outputs are PNG.
+  const saveExt =
+    job.job_type === "bg_removal" || /\.png(\?|$)/i.test(job.output_url ?? "") ? "png" : "jpg";
+  const saveFilename = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.${saveExt}`;
 
   async function handleShare() {
     if (!job.output_url || sharing) return;

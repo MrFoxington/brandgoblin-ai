@@ -44,11 +44,50 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — July 3, 2026 (backlog bug sweep — 5 fixes CODED, awaiting commit + push + live verify)
+## 🗓️ SESSION LOG — July 3, 2026 PART 2 (logo watermark overhaul — ⚠️ MIGRATION REQUIRED BEFORE DEPLOY)
 
-Cowork session. Knocked out the July 2 bug backlog. **All changes coded + typechecked clean
-(tsc exit 0 with sharp stubbed — the sandbox npm registry blocks the sharp package, so the real
-build check happens on Vercel). NOT yet committed/pushed — that's step 1 next session.**
+Fox flagged: (1) logos aren't transparent PNGs, (2) the official-logo stamp puts an ugly white
+square around the logo on product art/social graphics, and it stamps EVERY time with no opt-out.
+All three addressed; typecheck clean (tsc exit 0, sharp stubbed).
+
+**⚠️ RUN THIS MIGRATION IN SUPABASE **BEFORE** PUSHING/DEPLOYING** (createJobRow now inserts the
+new column — deploying first would break ALL new generations):
+`supabase/migrations/20260703_studio_stamp_logo.sql` — adds `studio_jobs.stamp_logo boolean
+not null default true`.
+
+**1. Watermark-style overlay (`logo-overlay.ts` rewritten).** Order of preference:
+(a) logo already has real transparency (e.g. after Remove BG) → composited directly, NO white
+panel; (b) opaque logo on a pure-white bg → `sharp().unflatten()` strips the white, then
+composited as a watermark; (c) only a logo on a COLORED bg falls back to the white rounded badge.
+"Real transparency" = alpha min < 128 && mean < 250 (ignores stray pixels). Still ~12% width,
+bottom-right.
+
+**2. Per-creation stamp opt-out.** `stamp_logo` threads: gold "⭐ Stamp my official logo" checkbox
+in the Studio form (shows ONLY when the selected brand has an official logo AND the type is
+product_art/social_graphic; default ON) → POST /api/studio/jobs `stampLogo` → `createJobRow` →
+`maybeApplyOfficialLogo` bails when false. `stamp_logo` added to both StudioJobRow interfaces +
+both full job literals (generator newJob, process route).
+
+**3. PNG downloads.** `JobCard.handleDownload` now names the file by the REAL blob type
+(png/webp/jpg — bg-removed images keep transparency instead of being renamed .jpg); share
+filename uses .png for bg_removal jobs. Storage upload already handled PNG correctly.
+NOTE for Fox: generated logo concepts are inherently JPEGs (image models can't output alpha) —
+a true transparent PNG = run "Remove BG" on the logo (this is also what makes the watermark
+stamp cleanest).
+
+**▶ NEXT: 1) migration in Supabase → 2) push → 3) live test:** generate product art for Juicy Hazy
+(official logo set, ideally bg-removed first) → logo should sit directly on the art, no white box;
+untick the stamp checkbox → no logo; download a bg-removed image → lands as .png.
+
+---
+
+## 🗓️ SESSION LOG — July 3, 2026 (backlog bug sweep — 5 fixes SHIPPED, commit `3d103d1`, deployed + partially verified)
+
+Cowork session. Knocked out the July 2 bug backlog. **Committed `3d103d1`, Fox pushed from his
+Mac (sandbox network blocks GitHub), Vercel deployed. LIVE-VERIFIED: /dashboard/creator-pro
+console is CLEAN (hydration errors gone) and the energy widget now reads "Fully charged ·
+1,520 ⚡ / 0 monthly + 1,520 refill". Still needs Fox's hands: Save to Photos click test,
+official-logo hover state, smaller badge on a fresh product art.**
 
 **1. 🔴 Hydration errors were NOT fully fixed — found + fixed the real remaining source.**
 Verified live in Chrome: /dashboard console is CLEAN, but /dashboard/creator-pro still threw
@@ -90,12 +129,12 @@ shows "✕ Remove official logo" (red tint) so unsetting is discoverable. No API
 `lib/studio/logo-overlay.ts`.
 
 **▶ NEXT SESSION — START HERE:**
-1. Commit + push the 7 files above. Vercel build = the real build verification (local sandbox
-   couldn't install sharp).
-2. Live-verify after deploy: (a) /dashboard/creator-pro console clean; (b) Save to Photos drops a
-   file in Downloads on desktop Chrome; (c) energy meter breakdown reads right; (d) hover a gold
-   "✓ Official logo" → shows the remove state; (e) generate one product art with an official logo
-   set → badge noticeably smaller (~12% width).
+1. ~~Commit + push~~ ✅ DONE (`3d103d1`, pushed by Fox, Vercel deployed green).
+2. Live-verify: (a) ~~creator-pro console clean~~ ✅ VERIFIED; (b) ~~Save to Photos on desktop
+   Chrome~~ ✅ VERIFIED by Fox (file downloads); (c) ~~energy meter breakdown~~ ✅ VERIFIED
+   ("Fully charged · 1,520 ⚡ / 0 monthly + 1,520 refill"); (d) hover a gold "✓ Official logo" →
+   shows the remove state (Fox); (e) generate one product art with an official logo set → badge
+   noticeably smaller (~12% width) (costs energy — Fox's call).
 3. Backlog still open: spark links silently switch What-to-Create (consider a visible flash/toast
    on type change); Studio Lightbox real-phone test.
 

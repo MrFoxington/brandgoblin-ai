@@ -27,6 +27,7 @@ export interface StudioJobRow {
   featured_order: number | null;
   featured_at: string | null;
   official_logo: boolean;
+  stamp_logo: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +55,7 @@ export async function createJobRow(params: {
   energyReserved: number;
   prompt: string;
   reservationTxId: string;
+  stampLogo?: boolean;
 }): Promise<string> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -69,6 +71,7 @@ export async function createJobRow(params: {
       provider:          "fal",
       prompt:            params.prompt,
       reservation_tx_id: params.reservationTxId,
+      stamp_logo:        params.stampLogo ?? true,
     })
     .select("id")
     .single();
@@ -417,7 +420,7 @@ async function maybeApplyOfficialLogo(
 
   const { data: job } = await supabase
     .from("studio_jobs")
-    .select("brand_id, image_type, job_type")
+    .select("brand_id, image_type, job_type, stamp_logo")
     .eq("id", jobId)
     .single();
 
@@ -425,6 +428,7 @@ async function maybeApplyOfficialLogo(
   if (job.job_type !== "image") return null; // originals only — not bg_removal/upscale
   if (!job.brand_id) return null;
   if (job.image_type !== "product_art" && job.image_type !== "social_graphic") return null;
+  if (job.stamp_logo === false) return null; // user opted out for this creation
 
   const logoPath = await getOfficialLogoStoragePath(userId, job.brand_id);
   if (!logoPath) return null;

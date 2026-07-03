@@ -104,6 +104,8 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   const [shareCelebrating, setShareCelebrating] = useState(false);
   const [shareMsgIndex, setShareMsgIndex]       = useState(0);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  // Per-creation opt-out for the official-logo stamp (default ON = stamp).
+  const [stampLogo, setStampLogo] = useState(true);
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
@@ -310,6 +312,13 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     ? ((brands.find((b) => b.id === selectedBrandId)?.output_data as { recommendedName?: string })?.recommendedName ?? "Brand")
     : "Freeform";
 
+  // Does the selected brand have an official logo? (drives the stamp toggle)
+  const brandHasOfficialLogo = !!selectedBrandId && jobs.some(
+    (j) => j.brand_id === selectedBrandId && j.official_logo && j.status === "completed"
+  );
+  const stampToggleVisible =
+    brandHasOfficialLogo && (imageType === "product_art" || imageType === "social_graphic");
+
   const celebratingJobCost = celebratingJob
     ? computeStudioEnergyCost(
         celebratingJob.model_key as StudioModelKey,
@@ -375,6 +384,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
           brandId: selectedBrandId || undefined,
           prompt: jobPrompt,
           seed: seedRef.current,
+          stampLogo,
         }),
       });
 
@@ -416,6 +426,7 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         featured_order:  null,
         featured_at:     null,
         official_logo:   false,
+        stamp_logo:      stampLogo,
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       };
@@ -730,6 +741,23 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
               </button>
             ))}
           </div>
+
+          {/* Official-logo stamp toggle — only when the brand has an official
+              logo and this creation type would get stamped. */}
+          {stampToggleVisible && (
+            <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 px-4 py-2.5">
+              <input
+                type="checkbox"
+                checked={stampLogo}
+                onChange={(e) => setStampLogo(e.target.checked)}
+                className="h-4 w-4 accent-[#D4AF37]"
+              />
+              <span className="text-xs text-muted">
+                <span className="font-semibold text-[#E9C75A]">⭐ Stamp my official logo</span>
+                {" "}on this creation (bottom-right watermark)
+              </span>
+            </label>
+          )}
         </div>
 
         {/* Prompt textarea */}

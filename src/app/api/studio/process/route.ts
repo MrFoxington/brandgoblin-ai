@@ -229,6 +229,7 @@ export async function POST(request: Request) {
     featured_order:   null,
     featured_at:      null,
     official_logo:    false,
+    stamp_logo:       true,
     created_at:       new Date().toISOString(),
     updated_at:       new Date().toISOString(),
   };
