@@ -146,13 +146,19 @@ export default function DailyCreatorDashboard({
   const [showRefill, setShowRefill] = useState(false);
   const [ideaDismissed, setIdeaDismissed] = useState(false);
 
-  const dailyIdea = getDailyIdea(latestBrand?.output_data);
+  // Day-of-year differs between the server (UTC) and the user's browser for
+  // part of every day, so computing the daily idea during render caused the
+  // same hydration mismatch as the greeting. Start stable, set after mount.
+  const [dailyIdea, setDailyIdea] = useState<{ idea: string; brandName?: string }>(
+    { idea: FALLBACK_IDEAS[0] }
+  );
 
   useEffect(() => {
     setMounted(true);
     setStreak(loadAndUpdateStreak());
     setGreeting(getTimeOfDay());
     setNixSays(NIX_GREETINGS[Math.floor(Math.random() * NIX_GREETINGS.length)]);
+    setDailyIdea(getDailyIdea(latestBrand?.output_data));
 
     // D1/D7 return tracking — fires once per session on dashboard load
     const daysSinceSignup = signupDate
