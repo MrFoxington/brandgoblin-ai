@@ -44,6 +44,129 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 2, 2026 (DEEP DIVE AUDIT — live walkthrough of landing + app, all in-browser)
+
+Full fresh-eyes audit of brandgoblinai.com and app.brandgoblinai.com in Chrome on Fox's logged-in
+account. Complete findings in `docs/DEEP_DIVE_AUDIT_JULY_2_2026.md`. Summary:
+
+**✅ VERIFIED WORKING (closed these open items):**
+- **Hex-code bug fix + brand-name rendering CONFIRMED** (the June 26 FOX TODO): generated a live
+  Product Art for Juicy Hazy. Clean brand name "JUICY HAZY" on the art, zero hex/gibberish.
+- **Official Logo feature CONFIRMED end to end:** gold star set on a logo concept, regenerated
+  product art, exact logo badge composited bottom-right. Works.
+- **Refill modal defaults to $49 Value pack** with savings tags. Works.
+- **Teaser hero works** ("a candle brand for book lovers" → "Bookwick" in seconds).
+- **Landing:** FAQ + pricing Agency-free (Block 7 ✅), legal footer links live at /privacy /terms
+  /refund (Block 5 ✅ — paid traffic unblocked), showcase iframe embedded before Pricing (Block 8 ✅).
+
+**🔴 NEW BUGS FOUND (fix-first list):**
+1. Landing **"Sign In" links to /signup** not /login (both nav + mobile). Block 11 still NOT done.
+2. Landing Goblin Studio section shows **3 broken images** (airo-assets nix-visuals-example-1/2/3
+   don't load) right under the hero. Block 3 half-done: tags exist, files missing. Re-upload in Airo.
+3. **Refill celebration never appears** on /dashboard/creator-pro?refill=success (tested 3x live).
+   Needs code look at RefillCelebration mount conditions.
+4. **React hydration errors (#425/#418/#423)** in console on /dashboard/creator-pro — likely the
+   server-rendered time-of-day greeting; may be related to bug 3.
+
+**⚠️ Minor:** dead "#" social icons in landing footer; energy meter shows "1,790 / 1,000 · 100%
+remaining" (confusing over-max display); pricing-page "top up for $19" vs $49-default modal copy
+mismatch; duplicate Studio pitch sections on landing (Block 9 optional); some showcase art reads
+black-on-black in the dark marquee.
+
+**Spent:** 8 energy (2 Standard product arts) on Fox's account for the live test.
+
+---
+
+## 🗓️ SESSION LOG — June 29, 2026 (NIX RIG — puppet LIVE in Character Animator ✅, next = webcam test)
+
+Massive session. The rigged Nix is now imported and auto-tagged inside Adobe Character Animator, one
+step from moving on camera. Voice plan + strategy locked. Read this whole entry before resuming.
+
+**DONE this session:**
+- **PSD cleaned + grouped + re-saved** (`brandgoblin-ai/nix-puppet.psd`, ~7.1MB):
+  - Deleted the redundant `Layer 1` backup. KEPT one full-Nix copy at the very bottom, renamed
+    **`Nix Full`**, as a static backstop/fill so no white gaps show when parts move (this is the fix
+    for the "paint behind the limbs" problem, done the easy pro way with a fill layer).
+  - Reordered so eyes + eyebrows sit ABOVE the `Head` base art.
+  - Grouped into a **`Head`** group (Head base + Right/Left Eye + Right/Left Eyebrow) and a **`Body`**
+    group (Torso + Right/Left Arm + Right/Left Leg). Verified with ImageMagick: both groups present,
+    all 10 pieces + fill, correct stacking.
+- **Expressive-face DECISION locked.** Test-composited a harvested mouth onto the front face = looked
+  BAD (warmer skin patch, scale/lighting mismatch, original smile ghosting through). So NO per-mouth
+  lip-sync for v1. Approach = **expression swaps** (whole on-model poses: neutral / grin / shocked /
+  celebrating) + rig motion (head bob, eyes, eyebrows, blinks) + **voiceover**. True synced talking
+  mouth = a later rung (drawn viseme set for 2D, or Live2D / 3D).
+- **Strategy for "fully alive, Pixar-level, speaking Nix" (Fox's north star) mapped — 3 rungs:**
+  1. NOW: 2D puppet (this) for TikTok/Shorts. Cheap, this week.
+  2. NEXT: proper expressive rig + real voice. For the **Nix Creative Companion app**, the right tech
+     is **Live2D** (real-time talking avatar). For 2D video lip-sync, a small drawn mouth set (paid
+     illustrator). Voice via **ElevenLabs** is the easy, already-solved part.
+  3. LATER (true Pixar): a **3D Nix model + rig** (hire a 3D artist or learn Blender), audio-driven
+     facial lip-sync. Real money/time, funded by the audience built on rungs 1-2.
+  Key point: don't skip rungs; each funds the next; today's 2D work is the foundation, not throwaway.
+- **VOICE plan + new doc `docs/NIX_VOICE_BIBLE.md`.** Nix = ~13-year-old goblin: young, charismatic,
+  funny, positive, a little magical, Pixar-sidekick energy. PLAN: Fox records his own Nix performance
+  (he has VO skills) and CLONES it in ElevenLabs = an ownable, unique voice that also auto-generates
+  lines for automated content. Bible has full voice direction, a recording script, and ElevenLabs
+  setting tips. Don't over-pitch when recording (clones cleaner).
+- **TOOL research (Mac reality, learned the hard way):**
+  - **Cartoon Animator 5 is WINDOWS-ONLY** (v4 was the last Mac build). Ruled out.
+  - Adobe Character Animator **Starter mode is free but CANNOT import a custom PSD** (Pro-only).
+  - Fox already has an Adobe account (Lightroom) → **chose Adobe Character Animator (Pro)**. Note:
+    the Photography plan may not include it, so it may run on the 7-day trial / need a single-app sub.
+- **IN CHARACTER ANIMATOR NOW:** installed, imported `nix-puppet.psd`, opened in Rig. **Auto-tagging
+  SUCCEEDED** — `Head` and `Body` both got the crown (recognized as independent groups), all 5 face
+  parts recognized inside Head (8 tagged items total). Nix renders whole + on-model. `Nix Full` sits
+  at the bottom untagged as the static backstop.
+
+**▶ NEXT SESSION — START HERE (in Character Animator):**
+1. Click **Record** (top). Allow webcam + mic. If the stage is empty, drag `nix-puppet` from the
+   Project panel into a new Scene.
+2. Sit facing the webcam, neutral face centered, and **Set Rest Pose** to calibrate.
+3. Test the performance: head turn/tilt, eyes, eyebrows, blinks should mirror you. EXPECTED LIMITATION:
+   there is no `Mouth` viseme layer, so the mouth won't lip-sync in v1 (by design). Record a short take.
+4. Then: set up **expression-swap triggers** from the full poses; export a first clip; composite onto a
+   real scene in CapCut (walkthrough Part 4); add the ElevenLabs voice.
+
+**Open task list:** #4 install/import CA (basically done), #5 dances (superseded by CA path), #6 CapCut
+composite, #7 expression-swap set, #8 record+clone Nix voice.
+
+---
+
+## 🗓️ SESSION LOG — June 28, 2026 (NIX RIG — puppet cut + saved ✅, expressive face NEXT)
+
+Big progress on the Nix rig (the distribution blocker). Followed `docs/NIX_RIG_WALKTHROUGH.md` Part 1.
+
+**DONE this session:**
+- **New rig base art.** Fox generated a clean front-facing Nix (straight on, arms slightly out,
+  neutral mouth) and saved it transparent. File: `brandgoblin-ai/Nix-front.PNG` (1024x1536, true
+  alpha, on-model: green skin / purple hair / pointed ears / purple NIX hoodie / gold trim). Verified
+  the cutout edges are clean (no glow halo). This replaces the old "need a clean front pose" art ask.
+- **Cut Nix into 10 named layers in Photopea**, all on-model, names verified with correct capitals:
+  `Head`, `Right Eye`, `Left Eye`, `Right Eyebrow`, `Left Eyebrow`, `Torso`, `Right Arm`, `Left Arm`,
+  `Right Leg`, `Left Leg`. (Left/Right = character's own, mirrored from viewer.) Method used =
+  beginner-safe copy-part-onto-its-own-layer off two full-Nix backup copies (`Layer 1` + `Background`,
+  both still in the file). Torso cut generous at shoulders/hips/neck so limbs+head overlap with no gaps.
+- **Saved checkpoint PSD:** `brandgoblin-ai/nix-puppet.psd` (~11.5MB, all layers intact). Confirmed
+  via ImageMagick that every named layer is present as its own piece.
+
+**DECISION:** Fox wants the FULL DELUXE expressive face (blinking eyes + talking mouth + personality/
+humor/range), not the simple 6-piece puppet. He wants Nix to "feel fully alive."
+
+**▶ NEXT SESSION (do this first):**
+1. **Build the expressive face WITHOUT freehand drawing.** Harvest on-model mouth shapes
+   (Neutral, Smile, Surprised, Aa, Oh) and extra expression poses from Fox's EXISTING approved Nix art
+   (`/public/nix/nix-master-sheet.png` has a 12-expression sticker row; plus `happy-waving`, `thinking`,
+   `working`, `celebrating`, `sleeping`, `conjuring` pose PNGs). This keeps everything on-model and
+   respects the "never redraw Nix" rule. Align harvested mouths over the puppet's mouth area in Photopea.
+2. Add `Left Blink` / `Right Blink` closed-eye shapes (simple lid over each eye).
+3. Group into `Head` group (head, hair if split, ears, eyes, eyebrows, blinks, mouths) + `Body` group.
+4. Hide/delete the two full-Nix backup layers (`Layer 1`, `Background`) before the Character Animator
+   import. Original art is safe in `Nix-front.PNG` so deleting is fine.
+5. Re-save `nix-puppet.psd`, then move to Part 2 (prove the rig in Adobe Character Animator).
+
+---
+
 ## 🗓️ SESSION LOG — June 26, 2026 (Studio product-art fixes + Official Logo overlay) — ✅ SHIPPED + DEPLOYED (commit `4abc816`)
 
 Fox flagged two Studio product-art bugs (hex color codes printed on the artwork like "#D41208" /
