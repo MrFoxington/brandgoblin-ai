@@ -44,6 +44,52 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 2, 2026 PART 2 (audit fixes SHIPPED: landing images live, celebration fixed, hydration fixed)
+
+Same day as the audit below — Fox + Claude knocked out the fix-first list. Status:
+
+**✅ DONE + VERIFIED LIVE:**
+1. **Landing "Sign In" → /login** — fixed via Airo paste-in, verified live (was /signup).
+2. **3 broken landing images REPLACED + LIVE** — the "Now Nix designs the visuals, too" section
+   now shows real Studio art: Fossil Fuel coffee bag, Velour serum, Juicy Hazy surfboard.
+   Files also saved on Fox's Mac: `~/Desktop/brandgoblin products/`. NOTE: if they ever look
+   broken in a browser, it's cached 404s — the files serve 200 fine.
+3. **Refill celebration FIXED + VERIFIED LIVE** (commit `594db10`): root cause was
+   `router.replace` stripping ?refill=success which re-rendered the server page and unmounted
+   the overlay instantly. Now `window.history.replaceState`. Verified in-browser: Nix, sparkles,
+   bar fill, Let's build CTA all work at /dashboard/creator-pro?refill=success.
+4. **Dashboard hydration errors FIXED** (commits `594db10` + `c781374`): greeting
+   (getTimeOfDay), random Nix line (Math.random), and Today's Idea (local day-of-year) were all
+   computed during SSR AND client render with different results (server=UTC, Fox=UTC+7) →
+   React #418/#423/#425. All three now render stable values on the server and set real values
+   in the mount effect. First fix verified live; `c781374` pushed at session end —
+   **▶ verify console is clean on /dashboard next session.**
+
+**🎨 NEW PRODUCT ART generated this session (Premium tier, in `~/Desktop/brandgoblin products/`):**
+- `fossil-fuel-primal-brew-bag.jpg` — FOSSIL FUEL brand + PRIMAL BREW amber banner (T-Rex skull).
+  Tiny fine-print slop remains at the bag bottom, invisible at web size.
+- `velour-product-art.jpg` — golden serum bottle, marble, silk, VELOUR label. Flawless.
+- `juicy-hazy-product-art.jpg` — the surfboard shot (clean, no badge).
+- Surfer-wearing-shirt experiments (v1 badged, v2 all-orange logo) REJECTED by Fox — skip that
+  concept. LESSON LEARNED for prompts: multiple small text lines garble; two big text elements
+  max, spell them out explicitly, ban fine print.
+
+**🐛 NEW BUGS SPOTTED (not yet fixed, add to backlog):**
+- Studio "Save to Photos" button does nothing on desktop Chrome (no file lands in Downloads).
+- Official-logo badge is stamped fairly large (~18% width) and can cover subject matter;
+  consider smaller badge or per-job opt-out toggle.
+- Energy meter shows "1,520 / 1,000 · 100% remaining" when refill bucket exceeds monthly
+  allowance — confusing display math.
+- Switching brand in Studio resets What-to-Create back to Logo Concept (one bag job got saved
+  as job_type logo_concept because of this).
+- Official logo can only be SET from the UI; unsetting required a direct API POST
+  (`/api/studio/official-logo` with `official:false`). Consider a toggle-off in JobCard.
+
+**Energy spent:** ~278 total (audit tests 8 + Premium bag 45 + garbled bag retry 45 + Velour 45 +
+surfer v1 45 + surfer v2 45 + first Standard bag test 4 + misc). Balance ~1,520.
+
+---
+
 ## 🗓️ SESSION LOG — July 2, 2026 (DEEP DIVE AUDIT — live walkthrough of landing + app, all in-browser)
 
 Full fresh-eyes audit of brandgoblinai.com and app.brandgoblinai.com in Chrome on Fox's logged-in
