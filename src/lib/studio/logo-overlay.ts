@@ -19,6 +19,28 @@ async function hasRealTransparency(pngBuf: Buffer): Promise<boolean> {
   return !!alpha && alpha.min < 128 && alpha.mean < 250;
 }
 
+// Make near-white pixels transparent. Logo concepts are generated on white OR
+// warm off-white/cream backgrounds (brand palettes love cream), so a pure-white
+// pass like sharp's unflatten() misses them — this uses a tolerance instead:
+// any pixel with r, g AND b at/above the threshold goes transparent. 225 keeps
+// real brand colors (golds, teals, oranges) untouched while catching cream.
+async function makeNearWhiteTransparent(pngBuf: Buffer, threshold = 225): Promise<Buffer> {
+  const { data, info } = await sharp(pngBuf)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] >= threshold && data[i + 1] >= threshold && data[i + 2] >= threshold) {
+      data[i + 3] = 0;
+    }
+  }
+  return sharp(data, {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  })
+    .png()
+    .toBuffer();
+}
+
 export async function compositeLogoBadge(baseBuf: Buffer, logoBuf: Buffer): Promise<Buffer> {
   const base = sharp(baseBuf, { failOn: "none" });
   const meta = await base.metadata();
@@ -38,12 +60,12 @@ export async function compositeLogoBadge(baseBuf: Buffer, logoBuf: Buffer): Prom
   if (await hasRealTransparency(resizedLogo)) {
     watermark = resizedLogo; // already a proper transparent PNG (e.g. after Remove BG)
   } else {
-    // Opaque logo — most logo concepts sit on a plain white background, and
-    // sharp's unflatten() turns pure-white pixels transparent. Keep the result
-    // only if it actually produced real transparency (i.e. the bg WAS white).
+    // Opaque logo — logo concepts sit on white OR cream/off-white backgrounds.
+    // Strip near-white with a tolerance and keep the result only if it actually
+    // produced real transparency (i.e. the background WAS white-ish).
     try {
-      const unflattened = await sharp(resizedLogo).unflatten().png().toBuffer();
-      if (await hasRealTransparency(unflattened)) watermark = unflattened;
+      const stripped = await makeNearWhiteTransparent(resizedLogo);
+      if (await hasRealTransparency(stripped)) watermark = stripped;
     } catch {
       /* fall through to the badge */
     }

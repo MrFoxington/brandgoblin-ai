@@ -75,9 +75,25 @@ NOTE for Fox: generated logo concepts are inherently JPEGs (image models can't o
 a true transparent PNG = run "Remove BG" on the logo (this is also what makes the watermark
 stamp cleanest).
 
-**▶ NEXT: 1) migration in Supabase → 2) push → 3) live test:** generate product art for Juicy Hazy
-(official logo set, ideally bg-removed first) → logo should sit directly on the art, no white box;
-untick the stamp checkbox → no logo; download a bg-removed image → lands as .png.
+**✅ SHIPPED July 3:** migration run in Supabase FIRST (Fox), pushed (`1738793`), Vercel deployed.
+**Live-verified:** stamp checkbox appears on Product Art for Juicy Hazy (gold, default ON),
+console clean, energy widget breakdown correct.
+
+**🔴 HOTFIX (same night):** Fox's first live generations still got the white badge. Root cause:
+the white-removal used sharp `unflatten()`, which only strips PURE white — Juicy Hazy logo
+concepts sit on CREAM/off-white (brand palettes love cream). Replaced with
+`makeNearWhiteTransparent()` (raw pixel pass, r/g/b all ≥ 225 → transparent) so white AND cream
+backgrounds strip; brand colors (golds/teals/oranges) untouched. Also: Seedream negative prompt
+extended (cut-off text, cropped letters, white banner/panel) after an Artistic-engine social
+graphic drew a giant clipped "Juicy Haz" white banner into the art itself. TWO separate issues
+in Fox's screenshots: (1) badge = the cream bug (fixed); (2) big white band with clipped brand
+name = the ARTISTIC ENGINE drawing text (mitigated via negative prompt — Premium is still the
+text-safe engine). NOTE: gallery thumbnails crop landscape social graphics square (object-cover),
+so a bottom-right stamp can LOOK clipped in the grid — the stored image is fine (lightbox/download).
+Old creations are baked — regenerate to get the watermark.
+**▶ REMAINING LIVE TEST (costs energy — Fox):** generate product art with the official logo set
+(ideally Remove-BG the logo + re-set official first) → logo should sit directly on the art, NO
+white box; untick the checkbox → no logo; download a bg-removed image → lands as .png.
 
 ---
 

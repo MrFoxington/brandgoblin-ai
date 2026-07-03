@@ -195,7 +195,7 @@ export async function POST(request: Request) {
       // Seedream: discourage off-brand palette drift + junk text (hex codes,
       // gibberish, watermarks). FLUX doesn't accept negative_prompt.
       negativePrompt: modelKey === "seedream_v45"
-        ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry, hex color codes, color code text, '#' symbols, hashtags, random numbers, gibberish text, misspelled text, scrambled letters, watermark, qr code, barcode"
+        ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry, hex color codes, color code text, '#' symbols, hashtags, random numbers, gibberish text, misspelled text, scrambled letters, cut-off text, cropped letters, text extending past the edge, large white banner, solid white panel, watermark, qr code, barcode"
         : undefined,
     });
   } catch (err) {
