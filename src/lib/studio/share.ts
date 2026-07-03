@@ -61,6 +61,18 @@ export function canShareFiles(): boolean {
   }
 }
 
+// Coarse-pointer / touch check — the OS share sheet is only the right "Save"
+// experience on phones and tablets. Desktop browsers may claim file-share
+// support but reject the actual call, so desktop should download instead.
+export function isTouchDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia?.("(pointer: coarse)")?.matches === true ||
+    "ontouchstart" in window ||
+    (navigator.maxTouchPoints ?? 0) > 0
+  );
+}
+
 interface ShareFileOpts extends ShareOpts {
   filename?: string;
 }

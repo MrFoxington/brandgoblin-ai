@@ -7,7 +7,7 @@ import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useSoundFx } from "@/components/primitives/SoundFx";
-import { shareImageFile, canShareFiles } from "@/lib/studio/share";
+import { shareImageFile, canShareFiles, isTouchDevice } from "@/lib/studio/share";
 import StudioLightbox from "./StudioLightbox";
 
 interface Props {
@@ -108,15 +108,24 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
 
   // Phone-first "Save to Photos": on mobile, open the OS sheet (offers "Save
   // Image" → camera roll); on desktop, fall back to the blob download.
+  //
+  // Desktop Chrome reports canShare({files}) = true, but rejects the actual
+  // share() call because the user-gesture window expires while we fetch the
+  // image — so the old code silently did nothing. Fix: only take the share-
+  // sheet path on touch devices, and if the sheet never really opened, still
+  // hand the user their file via download.
   async function handleSave() {
     if (!job.output_url || saving) return;
-    if (!canShareFiles()) {
+    if (!canShareFiles() || !isTouchDevice()) {
       await handleDownload();
       return;
     }
     setSaving(true);
     try {
-      await shareImageFile(job.output_url, { filename: saveFilename });
+      const result = await shareImageFile(job.output_url, { filename: saveFilename });
+      // "cancelled" = user closed the sheet on purpose — respect that.
+      // "failed"/"copied" = no real file share happened — download instead.
+      if (result === "failed" || result === "copied") await handleDownload();
     } finally {
       setSaving(false);
     }
@@ -297,14 +306,23 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           <button
             onClick={handleSetOfficial}
             disabled={officialBusy}
-            title={official ? "This is your brand's official logo" : "Use this logo on all generated product art"}
+            title={official ? "Click to remove as your official logo" : "Use this logo on all generated product art"}
             className={
               official
-                ? "w-full rounded-xl px-3 py-2 text-xs font-bold text-center border border-[#D4AF37]/60 bg-[#D4AF37]/15 text-[#E9C75A] disabled:opacity-70 transition-colors"
+                ? "group/official w-full rounded-xl px-3 py-2 text-xs font-bold text-center border border-[#D4AF37]/60 bg-[#D4AF37]/15 text-[#E9C75A] hover:border-red-400/50 hover:text-red-300 disabled:opacity-70 transition-colors"
                 : "w-full rounded-xl px-3 py-2 text-xs font-semibold text-center border border-white/12 text-muted hover:text-white hover:border-[#D4AF37]/50 disabled:opacity-60 transition-colors"
             }
           >
-            {officialBusy ? "…" : official ? "✓ Official logo" : "⭐ Make this my official logo"}
+            {officialBusy ? (
+              "…"
+            ) : official ? (
+              <>
+                <span className="group-hover/official:hidden">✓ Official logo</span>
+                <span className="hidden group-hover/official:inline">✕ Remove official logo</span>
+              </>
+            ) : (
+              "⭐ Make this my official logo"
+            )}
           </button>
         )}
       </div>

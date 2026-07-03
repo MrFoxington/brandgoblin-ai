@@ -13,8 +13,10 @@ export async function compositeLogoBadge(baseBuf: Buffer, logoBuf: Buffer): Prom
   const W = meta.width ?? 1024;
   const H = meta.height ?? 1024;
 
-  // Logo sized to ~18% of the image width (min 96px so it's never tiny).
-  const logoTargetW = Math.max(96, Math.round(W * 0.18));
+  // Logo sized to ~12% of the image width (min 80px so it's never tiny).
+  // Was 18%, which covered subject matter on product shots — a watermark-style
+  // corner badge should read as a signature, not a sticker.
+  const logoTargetW = Math.max(80, Math.round(W * 0.12));
   const resizedLogo = await sharp(logoBuf, { failOn: "none" })
     .resize({ width: logoTargetW, withoutEnlargement: false })
     .png()

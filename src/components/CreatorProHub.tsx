@@ -122,6 +122,20 @@ const CONTENT_TYPE_LABELS: Partial<Record<CreatorContentType, string>> = {
   brand_voice_suggestions: "Voice",
 };
 
+// Format a timestamp identically on the server and in the browser.
+// toLocaleDateString() with no arguments uses the machine's own locale and
+// timezone, so the server (UTC) and the user's browser could print different
+// dates for the same timestamp — a React hydration mismatch (#418/#423/#425).
+// Pinning the locale and timezone makes the output deterministic everywhere.
+function formatCreatedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 interface GenerationResult {
@@ -447,7 +461,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{item.title}</p>
                       <p className="text-xs text-faint">
-                        {CONTENT_TYPE_LABELS[item.content_type]} · {new Date(item.created_at).toLocaleDateString()}
+                        {CONTENT_TYPE_LABELS[item.content_type]} · {formatCreatedDate(item.created_at)}
                       </p>
                     </div>
                   </div>

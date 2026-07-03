@@ -6,6 +6,8 @@ import EnergyRefillModal from "@/components/EnergyRefillModal";
 interface EnergyData {
   plan: string;
   totalRemaining: number;
+  monthlyRemaining?: number;
+  refillRemaining?: number;
   monthlyAllowance: number;
   percentRemaining: number;
   warningLevel: "low" | "critical" | "empty" | null;
@@ -73,7 +75,11 @@ export default function EnergyWidget() {
     );
   }
 
-  const pct = Math.max(0, Math.min(100, energy.percentRemaining));
+  // When the refill bucket pushes the balance past the monthly allowance,
+  // "1,520 / 1,000 · 100% remaining" reads as broken math. Show a full bar
+  // with an honest breakdown instead.
+  const overMax = energy.totalRemaining > energy.monthlyAllowance;
+  const pct = overMax ? 100 : Math.max(0, Math.min(100, energy.percentRemaining));
   const barColor =
     energy.warningLevel === "empty"    ? "#ef4444" :
     energy.warningLevel === "critical" ? "#f97316" :
@@ -114,8 +120,12 @@ export default function EnergyWidget() {
         {/* Progress bar */}
         <div className="mb-2">
           <div className="flex justify-between mb-1.5">
-            <span className="text-xs text-muted">{pct}% remaining</span>
-            <span className="text-xs text-faint">{(energy.totalRemaining ?? 0).toLocaleString()} / {(energy.monthlyAllowance ?? 0).toLocaleString()}</span>
+            <span className="text-xs text-muted">{overMax ? "Fully charged" : `${pct}% remaining`}</span>
+            <span className="text-xs text-faint">
+              {overMax
+                ? `${(energy.totalRemaining ?? 0).toLocaleString()} ⚡`
+                : `${(energy.totalRemaining ?? 0).toLocaleString()} / ${(energy.monthlyAllowance ?? 0).toLocaleString()}`}
+            </span>
           </div>
           <div className="h-2 w-full rounded-full bg-white/8 overflow-hidden">
             <div
@@ -123,6 +133,11 @@ export default function EnergyWidget() {
               style={{ width: `${pct}%`, backgroundColor: barColor }}
             />
           </div>
+          {overMax && (
+            <p className="mt-1.5 text-xs text-faint text-right">
+              {(energy.monthlyRemaining ?? 0).toLocaleString()} monthly + {(energy.refillRemaining ?? 0).toLocaleString()} refill
+            </p>
+          )}
         </div>
 
         {/* Capacity estimates */}

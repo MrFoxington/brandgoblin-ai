@@ -80,6 +80,8 @@ function daysUntil(dateStr?: string): number | null {
 
 interface EnergyData {
   totalRemaining: number;
+  monthlyRemaining?: number;
+  refillRemaining?: number;
   monthlyAllowance: number;
   percentRemaining: number;
   periodEnd?: string;
@@ -177,6 +179,9 @@ export default function DailyCreatorDashboard({
   }, []);
 
   const resetDays = daysUntil(energy?.periodEnd);
+  // Refill bucket can push the balance past the monthly allowance — showing
+  // "1,520 / 1,000" reads as broken math, so switch to an honest breakdown.
+  const energyOverMax = !!energy && energy.totalRemaining > energy.monthlyAllowance;
 
   return (
     <div className="space-y-8">
@@ -280,7 +285,11 @@ export default function DailyCreatorDashboard({
             <div className="flex items-center gap-3 text-xs text-muted">
               <span className="tabular-nums font-semibold text-white">
                 {(energy.totalRemaining ?? 0).toLocaleString()}
-                <span className="text-faint font-normal"> / {(energy.monthlyAllowance ?? 0).toLocaleString()}</span>
+                <span className="text-faint font-normal">
+                  {energyOverMax
+                    ? ` ⚡ (${(energy.monthlyRemaining ?? 0).toLocaleString()} monthly + ${(energy.refillRemaining ?? 0).toLocaleString()} refill)`
+                    : ` / ${(energy.monthlyAllowance ?? 0).toLocaleString()}`}
+                </span>
               </span>
               {resetDays !== null && (
                 <span className={`px-2 py-0.5 rounded-full border text-xs font-semibold ${
@@ -303,7 +312,7 @@ export default function DailyCreatorDashboard({
                 "bg-gradient-to-r from-primary to-secondary"
               }`}
               initial={{ width: 0 }}
-              animate={{ width: `${Math.max(2, energy.percentRemaining)}%` }}
+              animate={{ width: `${Math.min(100, Math.max(2, energy.percentRemaining))}%` }}
               transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
             />
           </div>

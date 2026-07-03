@@ -828,11 +828,13 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
         {/* Conjure button — orange, magnetic, the most visible thing on the page */}
         <button
           onClick={handleGenerate}
-          disabled={generating || activeJobs.length >= 2}
+          disabled={generating || isCooking || activeJobs.length >= 2}
           className="w-full rounded-2xl py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_20px_rgba(255,107,53,0.45),0_0_40px_rgba(255,107,53,0.2)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90 active:opacity-80"
         >
           {generating
             ? "Submitting…"
+            : isCooking
+            ? "✨ Nix is writing your prompt…"
             : activeJobs.length >= 2
             ? "⏳ Generating… (2 active)"
             : `⚡ Conjure for ${energyCost} energy`}

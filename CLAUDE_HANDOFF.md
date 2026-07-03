@@ -44,6 +44,63 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 3, 2026 (backlog bug sweep — 5 fixes CODED, awaiting commit + push + live verify)
+
+Cowork session. Knocked out the July 2 bug backlog. **All changes coded + typechecked clean
+(tsc exit 0 with sharp stubbed — the sandbox npm registry blocks the sharp package, so the real
+build check happens on Vercel). NOT yet committed/pushed — that's step 1 next session.**
+
+**1. 🔴 Hydration errors were NOT fully fixed — found + fixed the real remaining source.**
+Verified live in Chrome: /dashboard console is CLEAN, but /dashboard/creator-pro still threw
+React #425/#418/#423 on load. Root cause: `CreatorProHub.tsx` Recent Generations rendered
+`new Date(item.created_at).toLocaleDateString()` — server (UTC) and Fox's browser (UTC+7)
+print different strings. Fixed with `formatCreatedDate()` (pinned en-US locale + UTC timezone =
+deterministic on both sides). EnergyWidget's date is safe (renders only after client fetch).
+**▶ verify /dashboard/creator-pro console clean after deploy.**
+
+**2. Studio "Save to Photos" dead on desktop Chrome — FIXED.** Desktop Chrome reports
+`canShare({files})` = true, but rejects the real `share()` call because the user-gesture window
+expires during our image fetch → old code silently fell through to copying the URL. Now:
+new `isTouchDevice()` in `share.ts`; `JobCard.handleSave` only takes the share-sheet path on
+touch devices, desktop always downloads, and if the sheet never truly opened ("failed"/"copied")
+it downloads as a safety net ("cancelled" respected, no download).
+
+**3. Energy meter over-max display — FIXED in both meters.** When the refill bucket pushes the
+balance past the monthly allowance ("1,520 / 1,000 · 100% remaining"): EnergyWidget now shows
+"Fully charged · 1,520 ⚡" + a "1,000 monthly + 520 refill" breakdown line; the dashboard meter
+(DailyCreatorDashboard) shows "1,520 ⚡ (1,000 monthly + 520 refill)"; bar width capped at 100%.
+API untouched (it already returns monthlyRemaining/refillRemaining).
+
+**4. "Brand switch resets What-to-Create" — NOT REPRODUCIBLE.** Tested live in Chrome: selected
+Product Art, switched Fossil Fuel → Velour → free-form → Juicy Hazy; the selection survived every
+switch, and no code path resets it. Likely real cause of the mislabeled bag job: the "Not sure?
+Try:" spark links — "playful mascot scene" / "minimalist logo card" silently switch the type to
+logo_concept. ALSO fixed a real adjacent hazard: after a brand switch the prompt box still holds
+the PREVIOUS brand's prompt until Nix re-cooks (saw a FOSSIL FUEL bag prompt under Velour) —
+Conjure is now disabled while `isCooking` ("✨ Nix is writing your prompt…") so you can't
+generate cross-brand art in that window.
+
+**5. Official-logo badge — shrunk 18% → 12% width** (min 96→80px) in `logo-overlay.ts`; reads as
+a signature, not a sticker. **Unset toggle:** backend always supported official:false — the UI
+button toggles too, but "✓ Official logo" read as a status label, not a button. Now hovering it
+shows "✕ Remove official logo" (red tint) so unsetting is discoverable. No API change.
+
+**Files touched:** `CreatorProHub.tsx`, `EnergyWidget.tsx`, `DailyCreatorDashboard.tsx`,
+`studio/JobCard.tsx`, `studio/StudioImageGenerator.tsx`, `lib/studio/share.ts`,
+`lib/studio/logo-overlay.ts`.
+
+**▶ NEXT SESSION — START HERE:**
+1. Commit + push the 7 files above. Vercel build = the real build verification (local sandbox
+   couldn't install sharp).
+2. Live-verify after deploy: (a) /dashboard/creator-pro console clean; (b) Save to Photos drops a
+   file in Downloads on desktop Chrome; (c) energy meter breakdown reads right; (d) hover a gold
+   "✓ Official logo" → shows the remove state; (e) generate one product art with an official logo
+   set → badge noticeably smaller (~12% width).
+3. Backlog still open: spark links silently switch What-to-Create (consider a visible flash/toast
+   on type change); Studio Lightbox real-phone test.
+
+---
+
 ## 🗓️ SESSION LOG — July 2, 2026 PART 2 (audit fixes SHIPPED: landing images live, celebration fixed, hydration fixed)
 
 Same day as the audit below — Fox + Claude knocked out the fix-first list. Status:
