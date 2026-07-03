@@ -13,7 +13,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { getCapacityEstimates } from "@/lib/energy-config";
 import { useSoundFx } from "@/components/primitives/SoundFx";
@@ -37,7 +36,6 @@ const SPARKLES = [
 ];
 
 export default function RefillCelebration({ contentGeneratorId = "content-generator" }: { contentGeneratorId?: string }) {
-  const router = useRouter();
   const reduce = useReducedMotion();
   const { playLevelUp } = useSoundFx();
 
@@ -62,9 +60,13 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
   }, []);
 
   // Strip ?refill=success so a refresh won't replay the celebration.
+  // IMPORTANT: use history.replaceState, NOT router.replace. router.replace
+  // re-renders the server page without the query param, which unmounted this
+  // overlay before the user ever saw it (the "celebration never shows" bug).
+  // history.replaceState updates the URL only, so the overlay stays up.
   useEffect(() => {
-    router.replace("/dashboard/creator-pro");
-  }, [router]);
+    window.history.replaceState(null, "", "/dashboard/creator-pro");
+  }, []);
 
   // Play the celebration fanfare once the balance is in (respects global mute).
   useEffect(() => {

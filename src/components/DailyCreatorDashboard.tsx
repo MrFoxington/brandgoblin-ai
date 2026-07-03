@@ -134,8 +134,12 @@ export default function DailyCreatorDashboard({
 }) {
   const isPro = plan === "pro" || plan === "agency";
   const firstName = getFirstName(email);
-  const [greeting] = useState(getTimeOfDay());
-  const [nixSays] = useState(NIX_GREETINGS[Math.floor(Math.random() * NIX_GREETINGS.length)]);
+  // Start with stable values so the server and client render the same HTML
+  // (time-of-day and random picks differ between server and browser, which
+  // caused React hydration errors #418/#423/#425). Real values land right
+  // after mount, before the user can notice.
+  const [greeting, setGreeting] = useState("Welcome back");
+  const [nixSays, setNixSays] = useState(NIX_GREETINGS[0]);
   const [mounted, setMounted] = useState(false);
   const [streak, setStreak] = useState(1);
   const [energy, setEnergy] = useState<EnergyData | null>(null);
@@ -147,6 +151,8 @@ export default function DailyCreatorDashboard({
   useEffect(() => {
     setMounted(true);
     setStreak(loadAndUpdateStreak());
+    setGreeting(getTimeOfDay());
+    setNixSays(NIX_GREETINGS[Math.floor(Math.random() * NIX_GREETINGS.length)]);
 
     // D1/D7 return tracking — fires once per session on dashboard load
     const daysSinceSignup = signupDate
