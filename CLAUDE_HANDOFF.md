@@ -69,6 +69,11 @@ every backdrop color collides with some brand's palette, and prompt gymnastics d
 **tsc exit 0. Files: cook-prompt route, jobs route, lib/studio/jobs.ts, JobCard.tsx,
 StudioLightbox.tsx.** Baked bad creations (gray-eaten Velour, anti-white Juicy Hazy) — regenerate.
 
+**✅ SHIPPED + LIVE-VERIFIED BY FOX (July 3, late night, commit `e34e2ae`):** new logos come out
+clean in the white brand-board style, Remove BG produces good transparent versions, and the
+official-logo watermark on brand content "looks really good" for Juicy Hazy. This logo pipeline
+is DONE — don't touch it unless something new breaks.
+
 ---
 
 ## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — SHIPPED, then HOTFIX v2 — BOTH SUPERSEDED BY THE ENTRY ABOVE)
