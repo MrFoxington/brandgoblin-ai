@@ -113,7 +113,7 @@ export async function POST(request: Request) {
 
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
-    : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: the mark sits on a solid, uniform, flat LIGHT GRAY background — no white background, no gradients, no vignette, no drop shadows, no texture. The logo design itself must NOT use that same light gray (the gray backdrop is removed afterward to produce a transparent logo, so white and cream INSIDE the design are safe).`;
+    : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",

@@ -4,6 +4,18 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import type { StudioJobRow } from "@/lib/studio/jobs";
+import type { CSSProperties } from "react";
+
+// Light checkerboard (Photoshop-style) behind transparent images so dark logos
+// stay visible on the dark UI. Shared with JobCard.
+export const CHECKERBOARD_STYLE: CSSProperties = {
+  backgroundColor: "#e9e9e9",
+  backgroundImage:
+    "linear-gradient(45deg, #cccccc 25%, transparent 25%, transparent 75%, #cccccc 75%), " +
+    "linear-gradient(45deg, #cccccc 25%, transparent 25%, transparent 75%, #cccccc 75%)",
+  backgroundSize: "20px 20px",
+  backgroundPosition: "0 0, 10px 10px",
+};
 
 // Full-screen viewer for a single creation. Keeps every action IN the viewer so
 // the user never has to exit to share/save/iterate. Closes via X, Esc, backdrop.
@@ -151,7 +163,10 @@ export default function StudioLightbox({
               className="max-h-[70vh] w-auto max-w-full rounded-xl bg-black"
             />
           ) : (
-            <div className="relative h-[70vh] w-full">
+            <div
+              className="relative h-[70vh] w-full rounded-xl overflow-hidden"
+              style={job.job_type === "bg_removal" ? CHECKERBOARD_STYLE : undefined}
+            >
               <Image
                 src={job.output_url}
                 alt={`${typeLabel} by Goblin Studio`}

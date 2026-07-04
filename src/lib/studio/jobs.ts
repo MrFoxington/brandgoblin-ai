@@ -193,19 +193,11 @@ export async function completeJob(params: {
     console.error("[studio/jobs] official-logo overlay failed (storing original):", err);
   }
 
-  // Logo concepts ship as TRANSPARENT PNGs from the start: image models can only
-  // output flat JPEGs, so we strip the white/cream backdrop ourselves via
-  // edge-connected flood fill (keeps white INSIDE the logo). Non-fatal: if the
-  // strip produces no real transparency (colored backdrop), store the original.
-  try {
-    const transparent = await maybeMakeLogoTransparent(params.jobId, buffer);
-    if (transparent) {
-      buffer = transparent;
-      mimeType = "image/png";
-    }
-  } catch (err) {
-    console.error("[studio/jobs] logo transparency pass failed (storing original):", err);
-  }
+  // NOTE (July 3, 2026): logo concepts are stored EXACTLY as generated (white
+  // brand-board backdrop). Forcing transparency at generation backfired — dark
+  // logos vanish on the dark UI and prompt gymnastics distorted designs. The
+  // transparent version is opt-in via Remove BG (logo-aware smart strip in
+  // /api/studio/process), and the official-logo watermark strips at stamp time.
 
   // Upload first — idempotent via upsert, safe for concurrent callers.
   const storagePath = await uploadAsset(params.userId, params.jobId, buffer, mimeType);
@@ -419,32 +411,6 @@ export async function getOfficialLogoStoragePath(
     .limit(1)
     .maybeSingle();
   return data?.storage_path ?? null;
-}
-
-// If this job is an ORIGINAL logo concept, return a transparent-PNG version of
-// the image (background flood-filled away from the edges). Returns null when the
-// job isn't an original logo concept OR the strip produced no real transparency
-// (e.g. the model drew a colored backdrop) — caller stores the original then.
-// Sharp is dynamically imported so it never loads on paths that don't need it.
-async function maybeMakeLogoTransparent(
-  jobId: string,
-  baseBuf: Buffer
-): Promise<Buffer | null> {
-  const supabase = createAdminClient();
-
-  const { data: job } = await supabase
-    .from("studio_jobs")
-    .select("image_type, job_type")
-    .eq("id", jobId)
-    .single();
-
-  if (!job) return null;
-  if (job.job_type !== "image") return null;           // originals only
-  if (job.image_type !== "logo_concept") return null;  // logos only
-
-  const { stripLogoBackground, hasRealTransparency } = await import("./logo-overlay");
-  const stripped = await stripLogoBackground(baseBuf);
-  return (await hasRealTransparency(stripped)) ? stripped : null;
 }
 
 // If this job is an ORIGINAL product art / social graphic for a brand that has an

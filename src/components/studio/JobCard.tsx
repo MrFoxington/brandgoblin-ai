@@ -8,7 +8,7 @@ import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useSoundFx } from "@/components/primitives/SoundFx";
 import { shareImageFile, canShareFiles, isTouchDevice } from "@/lib/studio/share";
-import StudioLightbox from "./StudioLightbox";
+import StudioLightbox, { CHECKERBOARD_STYLE } from "./StudioLightbox";
 
 interface Props {
   job: StudioJobRow;
@@ -201,8 +201,12 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
       animate={{ opacity: 1, scale: 1 }}
       className="rounded-2xl border border-primary/20 bg-card overflow-hidden"
     >
-      {/* Image — click to open the full-screen viewer */}
-      <div className="relative aspect-square bg-black/30">
+      {/* Image — click to open the full-screen viewer. Transparent (bg-removed)
+          images sit on a light checkerboard so dark logos stay visible. */}
+      <div
+        className="relative aspect-square bg-black/30"
+        style={job.job_type === "bg_removal" ? CHECKERBOARD_STYLE : undefined}
+      >
         <button
           type="button"
           onClick={() => setLightboxOpen(true)}

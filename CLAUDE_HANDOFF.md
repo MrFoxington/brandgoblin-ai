@@ -44,7 +44,34 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — SHIPPED, then HOTFIX v2)
+## 🗓️ SESSION LOG — July 3, 2026 PART 3 FINAL PLAN (forced transparency REVERTED — transparency is opt-in now)
+
+**🔴 v2 (gray backdrop) ALSO failed Fox's live test:** (a) the "design must not use that gray"
+prompt language made models avoid WHITE in designs entirely; (b) Velour's silver/metallic logo
+matched the gray backdrop and the strip ATE the metallic parts; (c) transparent dark logos are
+INVISIBLE on the dark gallery UI. LESSON: forcing transparency at generation is the wrong plan —
+every backdrop color collides with some brand's palette, and prompt gymnastics distort designs.
+
+**FINAL ARCHITECTURE (Fox-approved direction: "go back to white OR a better plan" — this is both):**
+1. **Logo prompts reverted to a clean solid WHITE brand-board backdrop, zero color restrictions**
+   on the design ("may freely use any colors, including white"). Logos look like they used to.
+2. **NO strip at generation** — `maybeMakeLogoTransparent()` deleted from jobs.ts; originals are
+   stored exactly as generated.
+3. **Transparency = opt-in via Remove BG**, which for logo sources runs the local
+   `stripLogoBackground()` (adaptive border-sampled color, TOL 16, feathered edge — unchanged
+   from v2, it's good tech pointed at the right job now). The original is never destroyed; both
+   cards coexist. White touching the backdrop still strips (physics), but the user chooses.
+4. **Official-logo watermark path unchanged** — strips at stamp time from whichever version is set.
+5. **NEW: checkerboard display** — `CHECKERBOARD_STYLE` exported from `StudioLightbox.tsx`, applied
+   to `job_type === "bg_removal"` images in both JobCard (grid tile) and the lightbox, so
+   transparent/dark logos are actually visible on the dark UI (defined in StudioLightbox and
+   imported by JobCard to avoid a circular import).
+**tsc exit 0. Files: cook-prompt route, jobs route, lib/studio/jobs.ts, JobCard.tsx,
+StudioLightbox.tsx.** Baked bad creations (gray-eaten Velour, anti-white Juicy Hazy) — regenerate.
+
+---
+
+## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — SHIPPED, then HOTFIX v2 — BOTH SUPERSEDED BY THE ENTRY ABOVE)
 
 **🔴 HOTFIX v2 (same session, after Fox's live test):** the first flood-fill version stripped ALL
 white from logos. Two root causes: (a) the loose global "near white ≥ 225" threshold let the fill

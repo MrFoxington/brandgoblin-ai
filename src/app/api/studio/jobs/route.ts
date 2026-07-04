@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       const noJunk     = "Do not render any color codes, hex values, '#' symbols, hashtags, random numbers, or gibberish text.";
 
       if (imageType === "logo_concept") {
-        prompt = `${baseLogo || `Logo concept for ${brandName}`}. Clean icon / symbol mark, professional quality, symbol only — no text, letters, or numbers.${colors ? ` Color palette: ${colors}.` : ""} On a solid, uniform, flat light gray background — no white backdrop, no gradients, vignette, or drop shadows; the design itself must not use that same light gray.`;
+        prompt = `${baseLogo || `Logo concept for ${brandName}`}. Clean icon / symbol mark, professional quality, symbol only — no text, letters, or numbers.${colors ? ` Color palette: ${colors}.` : ""} Presented on a clean, solid white background.`;
       } else if (imageType === "social_graphic") {
         prompt = `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
       } else {
@@ -149,7 +149,7 @@ export async function POST(request: Request) {
   if (!prompt) {
     // Fallback generic prompt per image type
     const defaults: Record<ImageType, string> = {
-      logo_concept:   "A clean, professional logo concept icon mark for a modern brand, on a solid flat light gray background.",
+      logo_concept:   "A clean, professional logo concept icon mark for a modern brand, on a clean solid white background.",
       social_graphic: "A bold, eye-catching social media graphic with modern design.",
       product_art:    "Professional product photography with clean background.",
     };
