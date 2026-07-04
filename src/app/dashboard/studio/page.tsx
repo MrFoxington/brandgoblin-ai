@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { listUserJobs, sweepStaleJobs } from "@/lib/studio/jobs";
 import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import Link from "next/link";
@@ -27,6 +27,15 @@ export default async function StudioPage() {
   // Studio is open to everyone — Creative Energy is the gate, not the plan.
   // Free users spend their starter/top-up energy; the EnergyWidget surfaces the
   // Upgrade / $19 top-up upsell when they run low or out.
+
+  // Plan check — powers the "Bring your own logo" Pro perk (locked upsell for free)
+  const adminSb = createAdminClient();
+  const { data: userRow } = await adminSb
+    .from("users")
+    .select("plan")
+    .eq("id", authData.user.id)
+    .single();
+  const isPro = userRow?.plan === "pro" || userRow?.plan === "agency";
 
   // Fetch brands for the brand selector
   const { data: brands } = await supabase
@@ -70,6 +79,7 @@ export default async function StudioPage() {
               <StudioImageGenerator
                 brands={brandRows}
                 initialJobs={recentJobs}
+                isPro={isPro}
               />
             </div>
 

@@ -31,12 +31,14 @@ const MODEL_LABELS: Record<string, string> = {
   seedream_v45:    "Artistic",
   bg_removal:      "BG Removed",
   clarity_upscaler: "Upscaled",
+  upload:          "Your file",
 };
 
-// Tags for derived (post-processed) jobs
+// Tags for derived (post-processed / uploaded) jobs
 const DERIVED_TAGS: Record<string, string> = {
   bg_removal:      "Background removed",
   clarity_upscaler: "✨ Upscaled",
+  upload:          "⤴ Uploaded",
 };
 
 export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite, onSetOfficialLogo }: Props) {
@@ -68,7 +70,13 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
   });
 
   const isOriginalImage = job.job_type === "image";
+  const isUpload        = job.job_type === "upload";
   const derivedTag = DERIVED_TAGS[job.job_type] ?? null;
+  // Uploaded logos + bg-removed logo variants can be the brand's official logo
+  // (backend allows any completed logo_concept — these UI gates just match it).
+  const canBeOfficial =
+    job.image_type === "logo_concept" &&
+    (isOriginalImage || isUpload || job.job_type === "bg_removal");
 
   async function handleDownload() {
     if (!job.output_url || downloading) return;
@@ -205,7 +213,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           images sit on a light checkerboard so dark logos stay visible. */}
       <div
         className="relative aspect-square bg-black/30"
-        style={job.job_type === "bg_removal" ? CHECKERBOARD_STYLE : undefined}
+        style={job.job_type === "bg_removal" || isUpload ? CHECKERBOARD_STYLE : undefined}
       >
         <button
           type="button"
@@ -254,7 +262,9 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
       <div className="p-4 space-y-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white truncate">{typeLabel}</p>
-          <p className="text-xs text-faint">{modelLabel} · ⚡ {job.energy_reserved} used</p>
+          <p className="text-xs text-faint">
+            {isUpload ? "Your file · no energy used" : <>{modelLabel} · ⚡ {job.energy_reserved} used</>}
+          </p>
         </div>
 
         {/* Primary loop actions — only Share (orange) + More like this (green) get bold color */}
@@ -292,8 +302,9 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           </button>
         </div>
 
-        {/* Quiet utility chips — paid upsells, must NOT compete with the loop actions */}
-        {isOriginalImage && (
+        {/* Quiet utility chips — paid upsells, must NOT compete with the loop actions.
+            Uploads get them too (Remove BG on an uploaded logo is a common need). */}
+        {(isOriginalImage || isUpload) && (
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => handleProcess("bg_removal")}
@@ -315,9 +326,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
         {/* Official logo — GOLD (Studio's premium signature). Once set, generated
             product art + social graphics reuse this exact logo automatically.
             Bg-removed logo variants qualify too (transparent = cleanest stamp). */}
-        {job.image_type === "logo_concept" &&
-          (isOriginalImage || job.job_type === "bg_removal") &&
-          onSetOfficialLogo && (
+        {canBeOfficial && onSetOfficialLogo && (
           <button
             onClick={handleSetOfficial}
             disabled={officialBusy}

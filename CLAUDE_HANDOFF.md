@@ -44,6 +44,44 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 4, 2026 (NEW FEATURE: "Bring Your Own Logo" — Pro perk, READY TO PUSH, no migration)
+
+Fox greenlit logo uploads after a brutal-audit discussion. DECISIONS: Pro-gated (consistent with
+the already-Pro-gated official-logo feature), visible-but-locked for free users (sells the
+upgrade), no energy charge, moderation from day one. Customer acquisition is Fox's next focus —
+this feature exists to convert future traffic, not to move the needle alone.
+
+**Built (tsc exit 0, NO migration — `job_type`/`model_key` are free TEXT columns):**
+1. **NEW `/api/studio/upload-logo`** — multipart POST (file, brandId, rights). Auth → Pro gate →
+   rights-checkbox check → PNG/JPG/WebP only, ≤5MB, 128–6000px (sharp metadata also proves it's a
+   real image) → **Claude haiku VISION moderation, fail-closed** (SAFE/UNSAFE; rejects on anything
+   else or on API error) → brand ownership check → inserts a COMPLETED `studio_jobs` row
+   (`job_type "upload"`, `model_key "upload"`, `image_type "logo_concept"`, energy 0, provider
+   "upload") → `uploadAsset` to studio-assets → **auto-`setOfficialLogo`** so stamping works with
+   zero extra clicks. Bypasses `completeJob` on purpose (no reservation to finalize).
+2. **Studio UI** (`StudioImageGenerator.tsx`): gold "⭐ Bring your own logo" panel under the Brand
+   Kit selector (shows only when a brand is selected). Pro: rights checkbox gates the Upload
+   button (PNG/JPG/WebP picker) → optimistic gallery insert + clears the brand's previous official
+   logo in state. Free: same gold panel but a 🔒 "Creator Pro" link to /pricing. New `isPro` prop
+   threaded from `studio/page.tsx` (server-side plan lookup).
+3. **JobCard**: `job_type "upload"` handled — "⤴ Uploaded" tag, "Your file · no energy used" meta,
+   checkerboard backdrop (uploads may be transparent PNGs), Remove BG/Upscale chips enabled
+   (Remove BG on an uploaded white-bg logo is a common need), and official-logo button via new
+   `canBeOfficial` (image/bg_removal/upload + logo_concept).
+4. **Pricing page**: Pro features list gains "Bring your own logo — stamped on every product art &
+   social graphic".
+
+**▶ NEXT SESSION / FOX:**
+1. Push + deploy, then live test: (a) upload a real logo as Pro → lands in gallery tagged
+   Uploaded, official gold state ON → generate product art → stamped; (b) upload without ticking
+   rights → blocked; (c) try a >5MB file and a non-image → clean errors; (d) log into a free
+   account → panel shows 🔒 Creator Pro and links to /pricing.
+2. LANDING PAGE (Airo) still needs the "Already have a brand?" line so existing businesses know
+   this exists — feature is half-shipped without it.
+3. Phase 2 idea (parked): upload PRODUCT PHOTOS + AI scenes around them (image-to-image).
+
+---
+
 ## 🗓️ SESSION LOG — July 3, 2026 PART 3 FINAL PLAN (forced transparency REVERTED — transparency is opt-in now)
 
 **🔴 v2 (gray backdrop) ALSO failed Fox's live test:** (a) the "design must not use that gray"

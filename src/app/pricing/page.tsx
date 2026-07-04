@@ -19,6 +19,7 @@ const PRO_FEATURES = [
   "Unlimited brand generations",
   "Full content engine — social, blogs, emails & ads",
   "Monthly Creative Energy for Goblin Studio",
+  "Bring your own logo — stamped on every product art & social graphic",
   "Product descriptions, headlines & campaign ideas",
   "Content calendars & brand voice tools",
   "Top up energy anytime for $19",

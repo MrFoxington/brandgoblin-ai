@@ -17,6 +17,7 @@ import { FAVORITES_LABEL } from "@/lib/studio/favorites";
 interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
   initialJobs: StudioJobRow[];
+  isPro?: boolean;
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
@@ -78,7 +79,7 @@ function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
 }
 
-export default function StudioImageGenerator({ brands, initialJobs }: Props) {
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -106,9 +107,15 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
+  // Bring-your-own-logo upload (Pro perk)
+  const [uploadBusy, setUploadBusy]       = useState(false);
+  const [uploadRights, setUploadRights]   = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
+  // Hidden file input for the bring-your-own-logo upload
+  const fileInputRef    = useRef<HTMLInputElement>(null);
   // Stable refs — prevent stale closures in timers
   const awardedXPJobs        = useRef<Set<string>>(new Set());
   const cookDebounceRef      = useRef<ReturnType<typeof setTimeout>>();
@@ -460,6 +467,57 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
     }
   }
 
+  // Bring your own logo (Pro): validate → POST multipart → new job lands in the
+  // gallery already set as the brand's official logo (previous official cleared).
+  async function handleUploadLogo(file: File) {
+    if (!selectedBrandId || uploadBusy) return;
+    setUploadMessage(null);
+
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setUploadMessage("Only PNG, JPG, or WebP images, please.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadMessage("Logo must be 5MB or smaller.");
+      return;
+    }
+
+    setUploadBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("brandId", selectedBrandId);
+      fd.append("rights", "true");
+
+      const res  = await fetch("/api/studio/upload-logo", { method: "POST", body: fd });
+      const data = (await res.json().catch(() => ({}))) as { job?: StudioJobRow; error?: string };
+
+      if (!res.ok || !data.job) {
+        setUploadMessage(data.error ?? "Upload failed. Please try again.");
+        return;
+      }
+
+      const newJob = data.job;
+      setJobs((prev) => [
+        newJob,
+        ...prev.map((j) =>
+          newJob.official_logo &&
+          j.image_type === "logo_concept" &&
+          j.brand_id === newJob.brand_id
+            ? { ...j, official_logo: false }
+            : j
+        ),
+      ]);
+      setUploadRights(false);
+      setUploadMessage("✓ Logo uploaded and set as your official logo!");
+      playComplete();
+    } catch {
+      setUploadMessage("Connection error during upload. Please try again.");
+    } finally {
+      setUploadBusy(false);
+    }
+  }
+
   async function handleMoreLikeThis(job: StudioJobRow) {
     seedRef.current = generateSeed();
     // Derived jobs (bg_removal / clarity_upscaler) carry a processing model_key,
@@ -725,6 +783,71 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
                 return <option key={b.id} value={b.id}>{name}</option>;
               })}
             </select>
+
+            {/* Bring your own logo — GOLD Pro perk. Uploads become the brand's
+                official logo and stamp onto product art / social graphics. */}
+            {selectedBrandId && (
+              <div className="mt-3 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 p-3">
+                {isPro ? (
+                  <>
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-[#E9C75A]">⭐ Bring your own logo</p>
+                        <p className="text-[11px] text-faint mt-0.5">
+                          Already have a logo? Upload it and Nix stamps it on every product art & social graphic.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadBusy || !uploadRights}
+                        title={uploadRights ? "Upload your logo (PNG, JPG, or WebP, up to 5MB)" : "Confirm you own the rights first"}
+                        className="shrink-0 rounded-lg border border-[#D4AF37]/50 bg-[#D4AF37]/10 px-3 py-1.5 text-[11px] font-bold text-[#E9C75A] hover:bg-[#D4AF37]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {uploadBusy ? "Uploading…" : "⤴ Upload logo"}
+                      </button>
+                    </div>
+                    <label className="mt-2 flex items-center gap-2 text-[11px] text-muted cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={uploadRights}
+                        onChange={(e) => setUploadRights(e.target.checked)}
+                        className="accent-[#D4AF37]"
+                      />
+                      I own the rights to this image
+                    </label>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUploadLogo(f);
+                        e.target.value = "";
+                      }}
+                    />
+                    {uploadMessage && (
+                      <p className={`mt-2 text-[11px] ${uploadMessage.startsWith("✓") ? "text-secondary" : "text-red-400"}`}>
+                        {uploadMessage}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <a href="/pricing" className="flex items-center justify-between gap-3 group">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-[#E9C75A]">⭐ Bring your own logo</p>
+                      <p className="text-[11px] text-faint mt-0.5">
+                        Upload your real logo and stamp it on everything you create.
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-lg border border-[#D4AF37]/50 px-2.5 py-1.5 text-[11px] font-bold text-[#E9C75A] group-hover:bg-[#D4AF37]/15 transition-colors">
+                      🔒 Creator Pro
+                    </span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         )}
 
