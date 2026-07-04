@@ -19,13 +19,19 @@ export async function hasRealTransparency(pngBuf: Buffer): Promise<boolean> {
   return !!alpha && alpha.min < 128 && alpha.mean < 250;
 }
 
-// Strip a logo's white/cream background via EDGE-CONNECTED FLOOD FILL.
-// Unlike a global near-white pass, this only removes near-white pixels that are
-// reachable from the image border — so white/cream shapes INSIDE the logo
-// (wave foam, highlights, negative space enclosed by the mark) survive.
-// Threshold 225 catches white AND warm cream backdrops while leaving real brand
-// colors (golds, teals, oranges) untouched. Output is always PNG with alpha.
-export async function stripLogoBackground(inputBuf: Buffer, threshold = 225): Promise<Buffer> {
+// Strip a logo's backdrop via ADAPTIVE, EDGE-CONNECTED FLOOD FILL.
+// 1. The actual backdrop color is SAMPLED from the image border (median), so
+//    white, cream AND light-gray backdrops all work.
+// 2. Only pixels CLOSE to that sampled color (tight tolerance) AND reachable
+//    from the border go transparent — light shapes inside the logo survive, and
+//    the fill can no longer leak through soft almost-white gradients (the bug
+//    that ate whole logos when the threshold was a loose global "near white").
+// 3. A 1px feather pass softens the anti-aliased fringe left along the cut so
+//    the logo doesn't carry a bright halo onto dark art.
+// If the sampled backdrop is NOT light (a colored backdrop), the image is
+// returned untouched — callers detect "no real transparency" and fall back.
+// Output is always PNG.
+export async function stripLogoBackground(inputBuf: Buffer): Promise<Buffer> {
   const { data, info } = await sharp(inputBuf, { failOn: "none" })
     .ensureAlpha()
     .raw()
@@ -34,32 +40,69 @@ export async function stripLogoBackground(inputBuf: Buffer, threshold = 225): Pr
   const W = info.width;
   const H = info.height;
 
-  const isNearWhite = (p: number): boolean => {
+  const toPng = () =>
+    sharp(data, { raw: { width: W, height: H, channels: 4 } })
+      .png()
+      .toBuffer();
+
+  // ── 1. Sample the backdrop color from the border (median per channel) ─────
+  const rs: number[] = [];
+  const gs: number[] = [];
+  const bs: number[] = [];
+  const sampleAt = (p: number) => {
     const i = p * 4;
-    return data[i] >= threshold && data[i + 1] >= threshold && data[i + 2] >= threshold;
+    rs.push(data[i]);
+    gs.push(data[i + 1]);
+    bs.push(data[i + 2]);
+  };
+  for (let x = 0; x < W; x++) {
+    sampleAt(x);               // top row
+    sampleAt((H - 1) * W + x); // bottom row
+  }
+  for (let y = 1; y < H - 1; y++) {
+    sampleAt(y * W);           // left column
+    sampleAt(y * W + (W - 1)); // right column
+  }
+  const median = (arr: number[]) => {
+    arr.sort((a, b) => a - b);
+    return arr[arr.length >> 1];
+  };
+  const bgR = median(rs);
+  const bgG = median(gs);
+  const bgB = median(bs);
+
+  // Colored backdrop → leave untouched (caller falls back to badge/original).
+  if (Math.min(bgR, bgG, bgB) < 180) return toPng();
+
+  // ── 2. Flood fill from the border, tight match to the SAMPLED color ───────
+  const TOL = 16; // max per-channel distance from the sampled backdrop color
+  const distFromBg = (p: number): number => {
+    const i = p * 4;
+    return Math.max(
+      Math.abs(data[i] - bgR),
+      Math.abs(data[i + 1] - bgG),
+      Math.abs(data[i + 2] - bgB)
+    );
   };
 
-  const visited = new Uint8Array(W * H);
+  const removed = new Uint8Array(W * H);
   const stack: number[] = [];
-
   const seed = (p: number) => {
-    if (!visited[p] && isNearWhite(p)) {
-      visited[p] = 1;
+    if (!removed[p] && distFromBg(p) <= TOL) {
+      removed[p] = 1;
       stack.push(p);
     }
   };
 
-  // Seed every border pixel that is near-white.
   for (let x = 0; x < W; x++) {
-    seed(x);                 // top row
-    seed((H - 1) * W + x);   // bottom row
+    seed(x);
+    seed((H - 1) * W + x);
   }
   for (let y = 0; y < H; y++) {
-    seed(y * W);             // left column
-    seed(y * W + (W - 1));   // right column
+    seed(y * W);
+    seed(y * W + (W - 1));
   }
 
-  // Flood inward: only near-white pixels CONNECTED to the border go transparent.
   while (stack.length > 0) {
     const p = stack.pop()!;
     data[p * 4 + 3] = 0; // alpha → 0
@@ -71,11 +114,27 @@ export async function stripLogoBackground(inputBuf: Buffer, threshold = 225): Pr
     if (p < W * (H - 1)) seed(p + W);
   }
 
-  return sharp(data, {
-    raw: { width: W, height: H, channels: 4 },
-  })
-    .png()
-    .toBuffer();
+  // ── 3. Feather the cut edge (kill the bright anti-aliased fringe) ─────────
+  const FEATHER = TOL * 2.5;
+  for (let p = 0; p < W * H; p++) {
+    if (removed[p]) continue;
+    const x = p % W;
+    const nextToCut =
+      (x > 0 && removed[p - 1]) ||
+      (x < W - 1 && removed[p + 1]) ||
+      (p >= W && removed[p - W]) ||
+      (p < W * (H - 1) && removed[p + W]);
+    if (!nextToCut) continue;
+
+    const d = distFromBg(p);
+    if (d < FEATHER) {
+      const alpha = Math.round((255 * Math.max(0, d - TOL)) / (FEATHER - TOL));
+      const i = p * 4;
+      if (alpha < data[i + 3]) data[i + 3] = alpha;
+    }
+  }
+
+  return toPng();
 }
 
 export async function compositeLogoBadge(baseBuf: Buffer, logoBuf: Buffer): Promise<Buffer> {

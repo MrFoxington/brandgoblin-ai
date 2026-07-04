@@ -44,7 +44,27 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — READY TO PUSH, no migration)
+## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — SHIPPED, then HOTFIX v2)
+
+**🔴 HOTFIX v2 (same session, after Fox's live test):** the first flood-fill version stripped ALL
+white from logos. Two root causes: (a) the loose global "near white ≥ 225" threshold let the fill
+LEAK through soft almost-white gradients into the design; (b) white-on-white is fundamentally
+unsolvable — when the logo's own white touches a white backdrop, no pixel method can separate them.
+Fix, two parts:
+1. `stripLogoBackground()` rewritten ADAPTIVE: samples the actual backdrop color from the image
+   border (median), flood-fills only pixels within a TIGHT per-channel tolerance (16) of THAT
+   color, then feathers the 1px cut fringe (no bright halo on dark art). Colored backdrops are
+   returned untouched (callers fall back). No `threshold` param anymore. Handles white, cream AND
+   gray backdrops. Verified with 3 simulated unit tests: foam touching a gray backdrop survives,
+   the soft-gradient leak path is blocked, colored backdrop skipped.
+2. Logo prompts now demand a solid flat LIGHT GRAY backdrop (not white) in all 3 spots (cook-prompt
+   textRule, jobs-route kit fallback, generic default) — so white/cream INSIDE the design can never
+   match the backdrop color. Gray gets sampled + stripped; design whites are safe by construction.
+**tsc exit 0. Commit pending push at time of writing — see git log.**
+
+---
+
+## 🗓️ SESSION LOG — July 3, 2026 PART 3-original (transparent logos from the start)
 
 Fox flagged after live testing: (1) Remove BG (fal rembg, a PHOTO cutout model) butchers logo art —
 it ate the white wave foam inside the Juicy Hazy logo; (2) bg-removed jobs lose the Official Logo +
