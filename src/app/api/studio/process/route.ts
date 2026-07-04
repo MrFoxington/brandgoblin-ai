@@ -146,45 +146,85 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Could not read source image. Energy returned." }, { status: 500 });
   }
 
-  // ── Call fal synchronously ────────────────────────────────────────────────
-  let resultUrl: string;
-  try {
-    const falInput: Record<string, unknown> = { image_url: sourceUrl };
-    if (op === "clarity_upscaler") {
-      falInput.scale       = 2;
-      falInput.creativity  = 0.35;
-      falInput.resemblance = 0.6;
+  // ── Produce the processed image ───────────────────────────────────────────
+  // Logo concepts get OUR edge-connected flood-fill strip (keeps white INSIDE
+  // the logo, e.g. wave foam) — the fal rembg model is photo-oriented and eats
+  // white logo parts. Everything else (photo-style art) still goes to fal.
+  const useLocalLogoStrip = op === "bg_removal" && sourceJob.image_type === "logo_concept";
+
+  let buffer: Buffer;
+  let mimeType: string;
+
+  if (useLocalLogoStrip) {
+    try {
+      const sourceBuf = await downloadAsset(sourceUrl);
+      const { stripLogoBackground } = await import("@/lib/studio/logo-overlay");
+      buffer = await stripLogoBackground(sourceBuf);
+      mimeType = "image/png";
+    } catch (err) {
+      console.error("[studio/process] local logo strip failed:", err);
+      await markJobFailed(
+        newJobId,
+        authData.user.id,
+        energyCost,
+        "Processing failed — energy returned",
+        reservation.txId
+      );
+      return NextResponse.json({ error: "Processing failed. Your energy has been returned." }, { status: 502 });
+    }
+  } else {
+    // ── Call fal synchronously ──────────────────────────────────────────────
+    let resultUrl: string;
+    try {
+      const falInput: Record<string, unknown> = { image_url: sourceUrl };
+      if (op === "clarity_upscaler") {
+        falInput.scale       = 2;
+        falInput.creativity  = 0.35;
+        falInput.resemblance = 0.6;
+      }
+
+      const result = await fal.subscribe(falEndpoint, {
+        input: falInput,
+        logs: false,
+      });
+
+      const output = result.data as FalProcessOutput;
+      const url = output?.image?.url;
+      if (!url) throw new Error("No image URL in fal response");
+      resultUrl = url;
+    } catch (err) {
+      console.error(`[studio/process] fal ${op} failed:`, err);
+      await markJobFailed(
+        newJobId,
+        authData.user.id,
+        energyCost,
+        "Processing failed — energy returned",
+        reservation.txId
+      );
+      return NextResponse.json({ error: "Processing failed. Your energy has been returned." }, { status: 502 });
     }
 
-    const result = await fal.subscribe(falEndpoint, {
-      input: falInput,
-      logs: false,
-    });
-
-    const output = result.data as FalProcessOutput;
-    const url = output?.image?.url;
-    if (!url) throw new Error("No image URL in fal response");
-    resultUrl = url;
-  } catch (err) {
-    console.error(`[studio/process] fal ${op} failed:`, err);
-    await markJobFailed(
-      newJobId,
-      authData.user.id,
-      energyCost,
-      "Processing failed — energy returned",
-      reservation.txId
-    );
-    return NextResponse.json({ error: "Processing failed. Your energy has been returned." }, { status: 502 });
+    try {
+      buffer = await downloadAsset(resultUrl);
+      mimeType = resultUrl.includes(".png") ? "image/png"
+        : resultUrl.includes(".webp") ? "image/webp"
+        : "image/jpeg";
+    } catch (err) {
+      console.error(`[studio/process] result download failed:`, err);
+      await markJobFailed(
+        newJobId,
+        authData.user.id,
+        energyCost,
+        "Failed to store result — energy returned",
+        reservation.txId
+      );
+      return NextResponse.json({ error: "Failed to store result. Your energy has been returned." }, { status: 500 });
+    }
   }
 
   // ── Store result + finalize ───────────────────────────────────────────────
   let signedUrl: string;
   try {
-    const buffer = await downloadAsset(resultUrl);
-    const mimeType = resultUrl.includes(".png") ? "image/png"
-      : resultUrl.includes(".webp") ? "image/webp"
-      : "image/jpeg";
-
     signedUrl = await completeJob({
       jobId:          newJobId,
       userId:         authData.user.id,

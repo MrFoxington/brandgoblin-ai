@@ -44,6 +44,53 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 3, 2026 PART 3 (transparent logos from the start — READY TO PUSH, no migration)
+
+Fox flagged after live testing: (1) Remove BG (fal rembg, a PHOTO cutout model) butchers logo art —
+it ate the white wave foam inside the Juicy Hazy logo; (2) bg-removed jobs lose the Official Logo +
+More Like This buttons (only Share/Save shown); (3) logos should be transparent PNGs from the start.
+All three fixed. **tsc exit 0 (sharp stubbed). NO migration needed. Not yet pushed/deployed.**
+
+**1. NEW `stripLogoBackground()` in `logo-overlay.ts` — edge-connected FLOOD FILL.** Replaces the
+global `makeNearWhiteTransparent()` (now deleted). Only near-white (r/g/b ≥ 225, same white+cream
+tolerance) pixels REACHABLE FROM THE IMAGE BORDER go transparent — white shapes INSIDE the logo
+(wave foam, enclosed negative space) survive. `hasRealTransparency()` now exported. The watermark
+stamp path uses the flood fill too. Algorithm verified with a simulated-image unit test (border
+white removed, colored ring kept, interior white kept). Known limit: white touching the border
+through an open gap in the mark still strips (rare; noted for support).
+
+**2. Logo concepts are now TRANSPARENT PNGs at generation.** `completeJob()` (jobs.ts) gained
+`maybeMakeLogoTransparent()`: original (`job_type === "image"`) logo_concept jobs get the flood-fill
+strip + store as image/png; if the strip yields no real transparency (colored backdrop), the
+original is stored (non-fatal). Prompts now force the backdrop: cook-prompt icon textRule +
+the jobs-route fallback logo prompt + the generic default all demand "solid pure white background,
+no gradients/drop shadows". Manual Remove BG on logos is now mostly unnecessary.
+
+**3. Remove BG is logo-aware.** `/api/studio/process`: when the SOURCE job is a logo_concept,
+bg_removal skips fal rembg entirely and runs our local `stripLogoBackground()` (energy flow
+unchanged). Photo-style art (product_art etc.) still uses fal rembg, where it belongs.
+
+**4. Buttons restored on bg-removed logos.** `JobCard.tsx`: Official Logo + More Like This now also
+show when `job_type === "bg_removal"` (backend `setOfficialLogo` always allowed it — it was a pure
+UI gate). `StudioImageGenerator.handleMoreLikeThis` falls back to the currently selected engine
+when the job's model_key is bg_removal/clarity_upscaler (was passing "bg_removal" as an art engine).
+
+**Files touched:** `lib/studio/logo-overlay.ts`, `lib/studio/jobs.ts`,
+`app/api/studio/process/route.ts`, `app/api/studio/cook-prompt/route.ts`,
+`app/api/studio/jobs/route.ts`, `components/studio/JobCard.tsx`,
+`components/studio/StudioImageGenerator.tsx`.
+
+**▶ NEXT SESSION — START HERE:**
+1. Commit + push (Fox pushes from his Mac if the sandbox blocks GitHub), Vercel deploy.
+2. Live test (costs energy): (a) generate a fresh logo concept → should arrive ALREADY transparent
+   (checkerboard in lightbox, downloads as .png); (b) Remove BG on an OLD logo → foam/interior
+   whites intact now; (c) bg-removed logo card shows the gold Official Logo button → set it →
+   generate product art → clean watermark, no white box; (d) More Like This on a bg-removed logo
+   generates with the selected engine.
+3. Old creations are baked — regenerate to get transparent versions.
+
+---
+
 ## 🗓️ SESSION LOG — July 3, 2026 PART 2 (logo watermark overhaul — ⚠️ MIGRATION REQUIRED BEFORE DEPLOY)
 
 Fox flagged: (1) logos aren't transparent PNGs, (2) the official-logo stamp puts an ugly white

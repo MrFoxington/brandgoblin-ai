@@ -264,8 +264,9 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
             {copied ? "✓ Copied" : sharing ? "…" : "Share it ✨"}
           </button>
 
-          {/* More like this — GREEN, solid (the create-again action) */}
-          {isOriginalImage && onMoreLikeThis && (
+          {/* More like this — GREEN, solid (the create-again action).
+              Also shown on bg-removed variants (prompt is inherited). */}
+          {(isOriginalImage || job.job_type === "bg_removal") && onMoreLikeThis && (
             <button
               onClick={handleMoreLikeThis}
               disabled={moreLikeThis}
@@ -308,8 +309,11 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
         )}
 
         {/* Official logo — GOLD (Studio's premium signature). Once set, generated
-            product art + social graphics reuse this exact logo automatically. */}
-        {job.image_type === "logo_concept" && isOriginalImage && onSetOfficialLogo && (
+            product art + social graphics reuse this exact logo automatically.
+            Bg-removed logo variants qualify too (transparent = cleanest stamp). */}
+        {job.image_type === "logo_concept" &&
+          (isOriginalImage || job.job_type === "bg_removal") &&
+          onSetOfficialLogo && (
           <button
             onClick={handleSetOfficial}
             disabled={officialBusy}

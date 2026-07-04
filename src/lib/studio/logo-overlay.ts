@@ -13,29 +13,66 @@ import sharp from "sharp";
 // True when the PNG buffer has a meaningful amount of transparent area — not
 // just an alpha channel that happens to be fully opaque, and not a few stray
 // pixels. mean < 250 ≈ at least ~2% of the image is see-through.
-async function hasRealTransparency(pngBuf: Buffer): Promise<boolean> {
+export async function hasRealTransparency(pngBuf: Buffer): Promise<boolean> {
   const stats = await sharp(pngBuf).stats();
   const alpha = stats.channels[3];
   return !!alpha && alpha.min < 128 && alpha.mean < 250;
 }
 
-// Make near-white pixels transparent. Logo concepts are generated on white OR
-// warm off-white/cream backgrounds (brand palettes love cream), so a pure-white
-// pass like sharp's unflatten() misses them — this uses a tolerance instead:
-// any pixel with r, g AND b at/above the threshold goes transparent. 225 keeps
-// real brand colors (golds, teals, oranges) untouched while catching cream.
-async function makeNearWhiteTransparent(pngBuf: Buffer, threshold = 225): Promise<Buffer> {
-  const { data, info } = await sharp(pngBuf)
+// Strip a logo's white/cream background via EDGE-CONNECTED FLOOD FILL.
+// Unlike a global near-white pass, this only removes near-white pixels that are
+// reachable from the image border — so white/cream shapes INSIDE the logo
+// (wave foam, highlights, negative space enclosed by the mark) survive.
+// Threshold 225 catches white AND warm cream backdrops while leaving real brand
+// colors (golds, teals, oranges) untouched. Output is always PNG with alpha.
+export async function stripLogoBackground(inputBuf: Buffer, threshold = 225): Promise<Buffer> {
+  const { data, info } = await sharp(inputBuf, { failOn: "none" })
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i] >= threshold && data[i + 1] >= threshold && data[i + 2] >= threshold) {
-      data[i + 3] = 0;
+
+  const W = info.width;
+  const H = info.height;
+
+  const isNearWhite = (p: number): boolean => {
+    const i = p * 4;
+    return data[i] >= threshold && data[i + 1] >= threshold && data[i + 2] >= threshold;
+  };
+
+  const visited = new Uint8Array(W * H);
+  const stack: number[] = [];
+
+  const seed = (p: number) => {
+    if (!visited[p] && isNearWhite(p)) {
+      visited[p] = 1;
+      stack.push(p);
     }
+  };
+
+  // Seed every border pixel that is near-white.
+  for (let x = 0; x < W; x++) {
+    seed(x);                 // top row
+    seed((H - 1) * W + x);   // bottom row
   }
+  for (let y = 0; y < H; y++) {
+    seed(y * W);             // left column
+    seed(y * W + (W - 1));   // right column
+  }
+
+  // Flood inward: only near-white pixels CONNECTED to the border go transparent.
+  while (stack.length > 0) {
+    const p = stack.pop()!;
+    data[p * 4 + 3] = 0; // alpha → 0
+
+    const x = p % W;
+    if (x > 0) seed(p - 1);
+    if (x < W - 1) seed(p + 1);
+    if (p >= W) seed(p - W);
+    if (p < W * (H - 1)) seed(p + W);
+  }
+
   return sharp(data, {
-    raw: { width: info.width, height: info.height, channels: 4 },
+    raw: { width: W, height: H, channels: 4 },
   })
     .png()
     .toBuffer();
@@ -61,10 +98,10 @@ export async function compositeLogoBadge(baseBuf: Buffer, logoBuf: Buffer): Prom
     watermark = resizedLogo; // already a proper transparent PNG (e.g. after Remove BG)
   } else {
     // Opaque logo — logo concepts sit on white OR cream/off-white backgrounds.
-    // Strip near-white with a tolerance and keep the result only if it actually
+    // Flood-fill strip from the edges and keep the result only if it actually
     // produced real transparency (i.e. the background WAS white-ish).
     try {
-      const stripped = await makeNearWhiteTransparent(resizedLogo);
+      const stripped = await stripLogoBackground(resizedLogo);
       if (await hasRealTransparency(stripped)) watermark = stripped;
     } catch {
       /* fall through to the badge */

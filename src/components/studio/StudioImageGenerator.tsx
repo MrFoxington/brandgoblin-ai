@@ -462,9 +462,15 @@ export default function StudioImageGenerator({ brands, initialJobs }: Props) {
 
   async function handleMoreLikeThis(job: StudioJobRow) {
     seedRef.current = generateSeed();
+    // Derived jobs (bg_removal / clarity_upscaler) carry a processing model_key,
+    // not an art engine — fall back to the currently selected engine for those.
+    const engine =
+      job.model_key === "bg_removal" || job.model_key === "clarity_upscaler"
+        ? modelKey
+        : (job.model_key as StudioModelKey);
     await submitJob(
       job.prompt ?? prompt,
-      job.model_key as StudioModelKey,
+      engine,
       (job.image_type ?? imageType) as ImageType
     );
   }
