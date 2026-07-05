@@ -1,6 +1,14 @@
 # BrandGoblin AI — Claude Handoff Document
 > Paste this entire file into a new Claude chat to resume exactly where we left off.
 
+> **📖 READ `docs/NIX_MANIFESTO.md` — the founding document (July 2026).** It governs every build
+> decision. The short version: amplify creators, never replace them. Every decision must
+> strengthen at least one of: Revenue, Customer Success, Automation, Retention, Long-Term
+> Advantage — everything else waits. Systems over services (every hour creates a compounding
+> asset). Taste is the moat. Simplicity wins. Be honest, best idea wins. Think in decades:
+> BrandGoblin is the proving ground for a bigger vision — every creator with an intelligent
+> creative partner.
+
 ---
 
 ## 1. WHO YOU ARE IN THIS PROJECT
@@ -71,11 +79,15 @@ this feature exists to convert future traffic, not to move the needle alone.
 4. **Pricing page**: Pro features list gains "Bring your own logo — stamped on every product art &
    social graphic".
 
-**▶ NEXT SESSION / FOX:**
-1. Push + deploy, then live test: (a) upload a real logo as Pro → lands in gallery tagged
-   Uploaded, official gold state ON → generate product art → stamped; (b) upload without ticking
-   rights → blocked; (c) try a >5MB file and a non-image → clean errors; (d) log into a free
-   account → panel shows 🔒 Creator Pro and links to /pricing.
+**✅ PUSHED + DEPLOYED July 4 (`1d1573a`).** Same session: Fox shared **The Nix Manifesto** →
+saved as `docs/NIX_MANIFESTO.md` + pointer added at the top of this file. Fox is pausing the Nix
+rig; a BIGGER project is coming that he'll reveal soon. Next focus after that: CUSTOMER ACQUISITION.
+
+**▶ NEXT SESSION / FOX — START HERE:**
+1. LIVE TEST Bring Your Own Logo (not yet done): (a) upload a real logo as Pro → lands in gallery
+   tagged Uploaded, official gold state ON → generate product art → stamped; (b) upload without
+   ticking rights → blocked; (c) try a >5MB file and a non-image → clean errors; (d) log into a
+   free account → panel shows 🔒 Creator Pro and links to /pricing.
 2. LANDING PAGE (Airo) still needs the "Already have a brand?" line so existing businesses know
    this exists — feature is half-shipped without it.
 3. Phase 2 idea (parked): upload PRODUCT PHOTOS + AI scenes around them (image-to-image).
