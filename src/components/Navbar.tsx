@@ -50,8 +50,17 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center group">
+        <Link href="/" className="flex items-center gap-2.5 group">
           <NixAvatar size="lg" />
+          <span className="hidden sm:flex flex-col leading-tight">
+            <span className="font-display text-sm font-extrabold">
+              <span className="text-primary-light">Brand</span>
+              <span className="text-secondary">Goblin</span>
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300/90">
+              Powered by NIX ✨
+            </span>
+          </span>
         </Link>
 
         {/* Nav links */}

@@ -29,7 +29,9 @@ export default function Footer() {
                 <span className="text-secondary">AI</span>
               </span>
             </div>
-            <p className="text-xs text-faint">Powered by Nix ✨</p>
+            <p className="text-xs font-semibold tracking-wide text-amber-300/90">
+              BrandGoblin - Powered by NIX ✨
+            </p>
             <p className="text-xs text-faint italic max-w-[220px] text-center sm:text-left">
               Everyone Has An Idea.<br />BrandGoblin Helps Bring It To Life.
             </p>
@@ -70,7 +72,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <p className="text-center text-xs text-faint border-t border-[rgba(45,45,78,0.4)] pt-6">
-          Built with magic (and Claude). © 2026 BrandGoblin AI · Nix says hi 🧙
+          Built with magic (and Claude). © 2026 BrandGoblin AI · Powered by NIX · Nix says hi 🧙
         </p>
       </div>
     </footer>

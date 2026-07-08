@@ -52,6 +52,116 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 5, 2026 (DEEP DIVE AUDIT #2 + "BrandGoblin - Powered by NIX" + BYOL LIVE TEST ✅)
+
+Cowork session. Full fresh audit of landing + app (report: `docs/DEEP_DIVE_AUDIT_JULY_5_2026.md`),
+plus Fox's new brand directive: **"BrandGoblin - Powered by NIX" must be clearly stated on both
+the website and the app — it's the future of what he's building.** Placement decision (Fox):
+header + footer on both. Zero energy spent.
+
+**1. ✅ BRING YOUR OWN LOGO LIVE TEST — PASSED (the July 4 open item).** Rights gate blocks
+until ticked; real 2.4MB PNG upload lands tagged "⤴ Uploaded · no energy used", checkerboard,
+Remove BG/Upscale chips, official logo auto-set with working hover-remove; >5MB → "Logo must be
+5MB or smaller."; fake .png → "That file doesn't look like a valid image." NOT tested: free-account
+locked panel (no free login available). Juicy Hazy's official logo was auto-replaced by the test
+upload — RESTORED to the transparent sun/wave mark afterward. Cosmetic: big upload tiles decode
+slowly (blank checkerboard at first) — note if users report "blank uploads".
+
+**2. ✅ "Powered by NIX" IN THE APP (code done, tsc exit 0, ⚠️ NOT YET PUSHED).**
+`Navbar.tsx`: "BrandGoblin / POWERED BY NIX ✨" text lockup next to the logo (hidden on
+mobile-width). `Footer.tsx`: brand line is now "BrandGoblin - Powered by NIX ✨" (semibold gold)
+and the bottom copyright line includes "Powered by NIX".
+
+**3. 🌐 LANDING (Airo): NEW `docs/AIRO_POWERED_BY_NIX_PASTEINS.md`** — Block A (header tagline)
++ Block B (footer statement), one at a time as always.
+
+**4. AUDIT FINDINGS (details in the report):** Landing: Sign In→/login FIXED ✅, 3 Studio images
+live ✅, legal links live ✅; 🔴 React #418 hydration error in console on every load (Airo site);
+⚠️ social icons still "#"; ⚠️ "Already have a brand?" line STILL missing. App: consoles CLEAN on
+dashboard/creator-pro/studio/pricing ✅, energy widget sane (368/1,000 · 37%) ✅, pricing lists
+BYOL ✅; ⚠️ bare /studio 404s (add redirect?); ⚠️ pricing "top up for $19" vs $49-default modal
+copy mismatch still there; ⚠️ app footer shows Sign In/Sign Up while logged in.
+
+**5. (Same session, part 2) 🔧 NEW `docs/AIRO_FIX_PACK_JULY_5_2026.md`** — paste-in blocks for
+the 3 audit errors: Block 1 = "Already have a brand?" BYOL line (do first), Block 2 = REMOVE the
+dead social icons (Fox's call — no real profiles yet), Block 3 = best-effort hydration fix
+(Airo's own code; if it doesn't take, drop it — cosmetic only).
+
+**6. 🚀 NEW `docs/CUSTOMER_ACQUISITION_PLAN_100_USERS_30_DAYS.md`** — deep-research-backed
+(spun off a research agent, ~40 sourced URLs). Goal: 100 ACTIVE users in 30 days, $300 budget.
+Core bets: multi-platform seeding (Reddit/communities 40-60 + launch-tour platforms 25-40 +
+free AI directories 10-20 + short-form video 15-30 + $150 TikTok Spark Ads ONLY on a video that
+already won organically 20-40) → ~150 signups × 65% activation ≈ 100 active. Free→Pro month-1
+reality: 3-8 subs (2-5% benchmark). **NIX RIG VERDICT: NOT essential** — mascots outperform on
+personality, not animation (Duolingo = costume + writing); static Nix + Fox's voiceover over
+screen demos captures most of the value; rig = week-8 amplifier, built in parallel, never a
+blocker. Week 1 is day-by-day; hook bank has 14 ready lines. Explicit skip list: Meta/Reddit
+ads, referral build, SEO, cold email.
+
+**7. (Same session, part 3) 📱 TIKTOK MASTERY + SPECIALIZED AGENT.** Fox doesn't use TikTok;
+we're making the AI the expert so he doesn't have to be. Second research agent produced
+**`docs/TIKTOK_MASTERY_FROM_SCRATCH_2026.md`** (~100 sourced links): how the algorithm actually
+works (followers barely matter — every video gets its own 200-500-person test; 65%+ hold past
+second 3 + 60%+ completion = escalation), myths busted (#fyp hashtags dead, posting times
+nearly irrelevant, no cross-post penalty; REAL: watermarked reposts suppressed, engagement bait
+-70% reach), realistic month-1 (50-500 views/video is NORMAL, "200-view jail" = calibration),
+formats ranked for BrandGoblin with full timestamped scripts, weekly batch system, kill/keep/
+boost decision rules, 30-day calendar that slots into the acquisition plan (first posts Day 4,
+Spark decision Day 18). Flags where it supersedes the old NIX_TIKTOK_PLAYBOOK (hashtags demoted,
+15-30s beats 7-15s now). **PDFs generated** for both the acquisition plan and the TikTok guide
+(same filenames, .pdf, in docs/). **NEW `docs/AGENT_TIKTOK_STRATEGIST.md`** — specialized
+tiktok-strategist agent definition; Cowork can't write .claude/ so INSTALL = copy its fenced
+block to `.claude/agents/tiktok-strategist.md` (instructions in the file).
+
+**8. (Same session, part 4) 📣 X + YOUTUBE MASTERY + AGENTS (same treatment as TikTok).**
+Two more research agents produced **`docs/X_MASTERY_FROM_SCRATCH_2026.md`** (~60 sources) and
+**`docs/YOUTUBE_MASTERY_FROM_SCRATCH_2026.md`** (~96 links), both with PDFs. X key findings:
+posting into the void doesn't work (no stranger test audience like TikTok) — the engine is
+10-15 quality replies/day under niche accounts; links in post body = near-zero reach (Buffer
+18.8M-post study) so links go in first reply/bio only; PAY for Premium ($8/mo, from the $50
+tools buffer, 6-10x impressions); post as FOX, Nix = co-star; X Communities shut down May 2026;
+honest verdict: X is the LIGHT channel (~4.5 hrs/wk, 5-15 signups). YouTube key findings:
+month 1 = Shorts-only, 100% repurposed from TikTok (+3-5 min/video); NEVER upload watermarked
+files (documented ~25x view penalty); Shorts titles = search listings, not captions; links not
+clickable near Shorts — verbal CTA + banner/About links, phone-verify day one; judge Shorts at
+7 days not 48 hrs; expected 3-10 signups. **NEW agent installs: `docs/AGENT_X_STRATEGIST.md` +
+`docs/AGENT_YOUTUBE_STRATEGIST.md`** (copy fenced blocks to `.claude/agents/`, same as the
+TikTok one). The three strategist agents + mastery docs = the social expert bench.
+
+**9. (Same session, part 5) 🎁 SHAREABLE GENERIC GUIDES — `docs/share/`.** Fox wanted the
+research shareable with friends: all 3 mastery guides rewritten for ANY beginner (zero
+BrandGoblin/Nix/Fox traces, verified by keyword sweep; examples rotate home bakery / finance
+coach / indie app dev; all research + sources kept). Files: `TikTok_From_Scratch_2026`,
+`X_Twitter_From_Scratch_2026`, `YouTube_From_Scratch_2026` (.md + .pdf each). Safe to send
+anywhere.
+
+**10. (Same session, part 6) ✅ AGENTS INSTALLED ON FOX'S MAC + FIRST SCRIPTS READY.**
+Fox installed Claude Code (v2.1.191, Max plan, logged in) and ran `docs/install_agents.sh` —
+`.claude/agents/` now has all 4: nix-animator, tiktok-strategist, x-strategist,
+youtube-strategist (verified). First test drive: the tiktok-strategist wrote the FIRST 3
+SCRIPTS (static Nix + voiceover + screen-record, NO rig needed) into `docs/NIX_CONTENT_QUEUE.md`
+under a pinned "🎬 READY TO FILM THIS WEEK" section, above the (rig-dependent) daily batches.
+Shooting packet PDF: `docs/FIRST_3_SCRIPTS_READY_TO_FILM.pdf`. Post order per plan: Scripts
+1+2 on Day 4, Script 3 on Day 6; Script 2 starts the comment-loop that feeds the Day 8-14
+reply-video engine. Prep before filming: generate + screen-record 3-4 brand kits in the app.
+
+**▶ NEXT SESSION / FOX — START HERE:**
+1. FILM SCRIPT 1 (packet: `docs/FIRST_3_SCRIPTS_READY_TO_FILM.pdf`). Prep the screen
+   recordings first. Then Scripts 2 + 3 in the same batch session.
+2. Push + deploy the Navbar/Footer "Powered by NIX" change (edited locally, NOT pushed —
+   Claude Code can do it: "commit and push my changes"). Also commit the new docs + agents.
+3. Feed Airo the fix pack (`docs/AIRO_FIX_PACK_JULY_5_2026.md`, Block 1 first) + the Powered by
+   NIX blocks (`docs/AIRO_POWERED_BY_NIX_PASTEINS.md`), one block at a time.
+4. START THE ACQUISITION PLAN — Week 1 Day 1 is the funnel check
+   (`docs/CUSTOMER_ACQUISITION_PLAN_100_USERS_30_DAYS.md`). This is now THE priority per the
+   manifesto (distribution is the constraint).
+5. TikTok: do the account setup checklist (mastery guide section 3) + 3-5 day warm-up so the
+   account is ready when the plan hits Day 4 (first posts).
+6. ~~Install agents~~ ✅ DONE July 5 (all 4 verified in `.claude/agents/`).
+7. Free-account BYOL check when convenient: locked gold panel + 🔒 Creator Pro link to /pricing.
+
+---
+
 ## 🗓️ SESSION LOG — July 4, 2026 (NEW FEATURE: "Bring Your Own Logo" — Pro perk, READY TO PUSH, no migration)
 
 Fox greenlit logo uploads after a brutal-audit discussion. DECISIONS: Pro-gated (consistent with
@@ -80,8 +190,9 @@ this feature exists to convert future traffic, not to move the needle alone.
    social graphic".
 
 **✅ PUSHED + DEPLOYED July 4 (`1d1573a`).** Same session: Fox shared **The Nix Manifesto** →
-saved as `docs/NIX_MANIFESTO.md` + pointer added at the top of this file. Fox is pausing the Nix
-rig; a BIGGER project is coming that he'll reveal soon. Next focus after that: CUSTOMER ACQUISITION.
+saved as `docs/NIX_MANIFESTO.md` + pointer added at the top of this file (pushed `f4163f3`).
+Fox is pausing the Nix rig; a BIGGER project is coming that he'll reveal soon. Next focus after
+that: CUSTOMER ACQUISITION. Session closed clean — everything committed + pushed through `f4163f3`.
 
 **▶ NEXT SESSION / FOX — START HERE:**
 1. LIVE TEST Bring Your Own Logo (not yet done): (a) upload a real logo as Pro → lands in gallery
@@ -142,7 +253,7 @@ Fix, two parts:
 2. Logo prompts now demand a solid flat LIGHT GRAY backdrop (not white) in all 3 spots (cook-prompt
    textRule, jobs-route kit fallback, generic default) — so white/cream INSIDE the design can never
    match the backdrop color. Gray gets sampled + stripped; design whites are safe by construction.
-**tsc exit 0. Commit pending push at time of writing — see git log.**
+**tsc exit 0. Pushed as `9e26f70`, later superseded by the FINAL PLAN entry above (`e34e2ae`).**
 
 ---
 

@@ -18,8 +18,206 @@
 
 ---
 
+## 🎬 READY TO FILM THIS WEEK — First 3 Scripts
+*(Written by the tiktok-strategist July 5, 2026 from TIKTOK_MASTERY_FROM_SCRATCH_2026.md. These are the beginner opening set: static Nix PNG + Fox voiceover + screen recording, so they need NO rig. Every one shows the brand-kit reveal. Filming order below adds one new skill per video. Post order per the acquisition plan: Scripts 1 and 2 on Day 4, Script 3 on Day 6. CTA is written for pre-1,000-followers, so "search BrandGoblin AI" + pinned comment. Swap in "link in bio" once the clickable link is live. No em dashes, plain punctuation.)*
+
+**Before you record:** have 3 to 4 brand kits already generated and screen-recorded in the app (one absurd, one normal-but-cute like the dog coffee shop, one for the before/after), plus the approved static Nix PNG and a scrap-paper bad logo drawing. Then you are only recording voiceover and editing.
+
+---
+
+### 🎥 SCRIPT 1 — "The world's dumbest business idea"
+**Format:** Format 1, absurd-idea demo (your bread and butter, post 3 to 4x/week). Pure screen-record + voiceover, no props, no face on camera. **Length:** ~23s.
+
+**On-screen hook (frame 1):**
+```
+I gave an AI goblin the dumbest business idea I could think of.
+```
+
+**Shot by shot:**
+- 0:00-0:03 App idea box, finger typing "gym... for ghosts." Trending sound at 15% under.
+- 0:03-0:05 Tap Generate, cut to loading beat.
+- 0:05-0:16 Reveal montage, one element every 2s: name, tagline, palette, logo, sample post. Zoom the best detail.
+- 0:16-0:21 Finished kit sits, static Nix PNG slides in from bottom corner.
+- 0:21-0:23 Hard cut to black on Nix's last word. No outro.
+
+**Voiceover:**
+```
+(Fox, natural, slightly fast) I typed "a gym for ghosts" into this thing. Watch.
+(Fox, reacting as it reveals) Okay the name is actually good. There's a tagline. It picked colors. It made a logo. It wrote a whole social post. This took like ninety seconds.
+(Nix, bright and cheeky, on the pop-in) Told you. Next idea.
+```
+
+**Spoken CTA (over last shot):**
+```
+(Fox) It's free, no card. Search BrandGoblin AI.
+```
+
+**Caption:**
+```
+A full brand from one dumb sentence. What should Nix build next? Drop your idea below. #smallbusiness #aitools #branding #entrepreneur
+```
+
+**Pinned comment (post right after):**
+```
+Made this in the app, it's free and there's no card. brandgoblinai.com. Comment an idea and I'll have Nix brand it.
+```
+
+---
+
+### 🎥 SCRIPT 2 — "Comment an idea and Nix will brand it"
+**Format:** Format 1 variant, comment-loop starter. This is the bait that fills your comment section, which becomes your week-2 content supply (your best conversion format). Same easy shoot as Script 1. **Length:** ~20s.
+
+**On-screen hook (frame 1):**
+```
+Comment a business idea. Any idea. Nix will brand the whole thing.
+```
+
+**Shot by shot:**
+- 0:00-0:03 Idea box, typing "a coffee shop for dogs." Sound low under.
+- 0:03-0:05 Tap Generate, cut to loading beat.
+- 0:05-0:14 Reveal montage: name, tagline, colors, logo, sample post, one every 2s. Quick zoom on the logo.
+- 0:14-0:18 Full kit on screen, static Nix PNG pops in the corner.
+- 0:18-0:20 Cut.
+
+**Voiceover:**
+```
+(Fox, inviting, like starting a game) Here is the deal. You comment a business idea, and Nix builds the entire brand. I did "a coffee shop for dogs" to show you.
+(Fox, reacting) Name, tagline, colors, logo, even a social post. That fast.
+(Nix, hyped) Ooh, your turn. Give me a good one.
+```
+
+**Spoken CTA (doubles as the game):**
+```
+(Fox) Comment your idea below and I'll brand it in the next video. It's free, search BrandGoblin AI.
+```
+
+**Caption:**
+```
+Seriously, comment any business idea and Nix builds the brand. The weirder the better. Free, no card. #smallbusiness #branding #aitools #startup
+```
+
+**Pinned comment:**
+```
+Drop your idea here and I'll reply with Nix's version. Free to try yourself at brandgoblinai.com, no card.
+```
+
+---
+
+### 🎥 SCRIPT 3 — "A designer quoted me $3,000. The goblin did it in 2 minutes."
+**Format:** Format 4, before/after transformation. The 34,635-clip study found this is the strongest hook type there is, roughly 2x the views of the weakest. One new prop: a bad hand-drawn logo. Film it third, once you are warmed up. **Length:** ~22s.
+
+**On-screen hook (frame 1):**
+```
+POV: you have a business idea but can't afford a designer.
+```
+
+**Shot by shot:**
+- 0:00-0:03 A genuinely bad hand-drawn logo on a napkin, held to the phone in window light. Sound low.
+- 0:03-0:05 Cut to the app, typing that same idea into the box.
+- 0:05-0:07 Tap Generate, loading beat.
+- 0:07-0:16 Reveal montage: name, tagline, colors, logo, sample post, one every 2s. Big zoom on the finished logo next to a tiny inset of the napkin for contrast.
+- 0:16-0:20 Full kit, static Nix PNG slides in.
+- 0:20-0:22 Cut to black.
+
+**Voiceover:**
+```
+(Fox, a little self-deprecating) This is the logo I could afford. A real designer quoted me three grand.
+(Fox) So I typed the same idea into this instead.
+(Fox, as it reveals) Name, colors, a real logo, a launch plan. Two minutes. Zero dollars.
+(Nix, warm and proud) See? You had it in you the whole time.
+```
+
+**Spoken CTA:**
+```
+(Fox) It's free, no card. Search BrandGoblin AI.
+```
+
+**Caption:**
+```
+$3,000 designer quote vs a goblin and 2 minutes. Free, no card. What would you build? #smallbusiness #branding #logodesign #aitools #entrepreneur
+```
+
+**Pinned comment:**
+```
+The goblin is free to try, no card. brandgoblinai.com. Comment your idea and I'll brand it next.
+```
+
+---
+
+**Filming order (one batch session):** Script 1 first (learn CapCut, reveal montage, auto-captions, Nix pop-in), Script 2 second (same workflow, fast, starts feeding you comments), Script 3 third (same workflow plus the napkin photo). Export each clean from CapCut and repost to Reels and Shorts. Never download from TikTok, the watermark gets buried.
+
+**What's next:** the moment Script 2 collects its first few "brand my idea" comments, film a true comment-reply, screen-record Nix branding that person's idea with their comment sticker on top, title "Branding your ideas, part 1." That is your Day 8 to 14 engine.
+
+---
+
 ## 📥 INCOMING BATCHES
 <!-- The Idea Engine appends new dated batches directly below this line. Newest on top. -->
+
+### Batch — July 7, 2026
+*(Trend read: the July 4th audios are cooling and the big recycled ones are all used in prior batches, so skipping Bangladesh, Legally Blonde hot dog, Food Jutsu, and Dr. Dog then-vs-now. Fresh and unused right now: the "I Treated You Bad" MJ remix dance, the trace.young "I don't like being nonchalant, why would I hide the joy God gave me" audio, the feel-good uplifting-audio-plus-text-overlay day-clips format, and the FYP flood of absurd AI animal videos, which is a perfect setup for a "here's what AI can ACTUALLY do" flip. World Cup Final is July 19, hold the big squad play for July 16-18. PRODUCTION NOTE: rig still paused, all four concepts are shootable with the static approved Nix PNG, CapCut cuts and zooms, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 5 / 2 / 3 / 1, no pillar repeated in-batch and pillar 2 returns after sitting out since July 3. Posted Log still empty, no winner data to bias toward yet.)*
+
+**1. Pillar 5 · Trend Hijack** *(trace.young "why would I hide the joy God gave me" audio, Nix cannot be nonchalant)*
+- Hook (0–3s): first frame text: "trying to teach my goblin to be nonchalant about finishing another brand 😤" over Fox deadpan at the desk, Nix PNG beside the screen.
+- Script: Fox models the nonchalant face to camera; on "why would I hide the joy God gave me" hard-cut to the static Nix celebrating pose, arms up, full beam, next to a finished brand kit on screen. One more cut back to Fox cracking. The pose swap on the line IS the joke. Nix on-model, straight from Fox's approved art.
+- Sound: trace.young "I don't like being nonchalant" audio · Length: ~9s
+- CTA: caption "he will never be chill about your idea 🫠 search BrandGoblin AI"
+- **Status:** —
+
+**2. Pillar 2 · Mirror Mode** *("I Treated You Bad" MJ remix dance, static pose-swap version, no rig needed)*
+- Hook (0–3s): "POV: your goblin learned the MJ dance before you did 😤" burned into frame one as the remix kicks in.
+- Script: Fox hits each beat of the dance; on every hit, cut to the static Nix PNG in a matching approved pose (waving, conjuring, celebrating), snap zooms selling the sync. Final beat: side-by-side split, Fox mid-move and Nix frozen in the sharpest pose like he nailed it first. Pose-swap-on-beat, same trick as the Janice concept, zero rig. Nix on-model from approved art only.
+- Sound: "I Treated You Bad" MJ remix (dance challenge audio) · Length: ~10s
+- CTA: caption "he's got better moves AND better logos 💀 Nix lives in the app 👇"
+- **Status:** —
+
+**3. Pillar 3 · Conjure It** *(rides the absurd-AI-video wave with a flip: this is what AI is actually for)*
+- Hook (0–3s): first frame text: "the internet taught AI to make cats do backflips. I taught a goblin to build businesses." over a beat of one of those absurd AI animal clips vibes, then cut to the app idea box.
+- Script: finger types a real idea ("a plant shop that texts you when to water"), tap Generate, reveal montage lands one element per beat: name, tagline, palette, logo, sample post. Static Nix PNG slides in at the end like he's unimpressed by backflipping cats. Screen record plus PNG pop-in, same shoot as Script 1.
+- Sound: trending absurd-AI-video audio of the day, picked at edit time · Length: ~14s
+- CTA: caption "comment an idea and Nix builds it next 👇" + pinned link comment
+- **Status:** —
+
+**4. Pillar 1 · Nix Lives Here** *(feel-good uplifting-audio day-clips format, a day in the goblin's life)*
+- Hook (0–3s): "a day in the life of the goblin who lives on my desk 🧌" over Nix PNG beside the morning coffee cup, window light.
+- Script: soft montage of real photos with the static Nix PNG composited in: by the coffee cup, on the keyboard "reading" the screen, on the window sill in the afternoon light, tucked by the lamp at night. Gentle text overlays per clip: "clocked in" → "supervising" → "thinking big" → "we did good today". Zero pitch, pure love. Every frame from Fox's approved art, on-model.
+- Sound: feel-good uplifting audio (the aesthetic day-clips trend sound of the week) · Length: ~12s
+- CTA: caption "he believes in the dream more than I do 🥹"
+- **Status:** —
+
+---
+
+### Batch — July 6, 2026
+*(Trend read: the July 4th wave is done, so this batch pivots to what's rising now. Fresh + unused in prior batches: the Netflix-documentary interview format ("imagine the stories ___ would tell if they had a Netflix documentary"), Drake's "Janice STFU" reaction audio, the AI-powered "A Million Colors" sound (a literal gift for a brand-palette reveal), and Dr. Dog "Where'd All the Time Go?" then-vs-now nostalgia. Skipping Bangladesh / Legally Blonde / Food Jutsu — all used in earlier batches. World Cup Final lands July 19; save the big squad play for the July 16-18 window. PRODUCTION NOTE: the rig is paused, so all four concepts below are shootable with the static approved Nix PNG + CapCut cuts/zooms + Fox voiceover — no rig needed, same workflow as the pinned Scripts 1-3. Rotation 5 / 3 / 4 / 1 — none repeated from the July 3 batch. Posted Log still empty, so no winner data to bias toward yet.)*
+
+**1. Pillar 5 · Trend Hijack** *(Netflix-documentary interview format — Nix gets his documentary)*
+- Hook (0–3s): first frame text: "imagine the stories my goblin would tell if he had a Netflix documentary 💀" — Nix PNG seated dead-center in moody "interview" lighting (dark backdrop, slow CapCut push-in).
+- Script: pure text-overlay testimony beats over the slow zoom, one per cut: "Day 12: he typed 'gym for ghosts.' I said nothing." → "Day 30: he called a $3,000 designer. I built it in two minutes." → "Day 47: he still thinks he's the founder." Static Nix, deadpan, never moves — the stillness IS the joke. Nix stays on-model, straight from Fox's approved art.
+- Sound: the Netflix documentary interview trend audio · Length: ~12s
+- CTA: caption "the documentary drops never. the app is real though 👇 search BrandGoblin AI"
+- **Status:** —
+
+**2. Pillar 3 · Conjure It** *("A Million Colors" AI sound — the palette reveal this audio was born for)*
+- Hook (0–3s): "POV: you give a goblin one sentence and he gives you every color your brand will ever need 🎨" over the app idea box, finger typing.
+- Script: screen-record reveal cut to the sound — each palette swatch lands on a beat, one by one, then the logo + tagline + full kit snap in as the audio blooms. End on static Nix PNG sliding into the corner like he's admiring his work. Same easy shoot as Script 1: screen record + PNG pop-in.
+- Sound: "A Million Colors" (AI-powered trending sound) · Length: ~11s
+- CTA: caption "comment a business idea and Nix picks YOUR colors next 👇" + pinned link comment
+- **Status:** —
+
+**3. Pillar 4 · Fox the Founder** *(Dr. Dog "Where'd All the Time Go?" then-vs-now nostalgia)*
+- Hook (0–3s): "then:" over a photo of a sad napkin scribble / blank doc at 2am — the idea before it was anything.
+- Script: two-beat then-vs-now — "then" holds 3 seconds (napkin, empty screen, Fox's tired desk), the beat drops to "now": the live app generating a full kit, Nix PNG waving proudly beside the finished brand. One line of Fox VO: "I just wanted the idea to look as good as it felt." Honest founder heart, zero hard sell.
+- Sound: Dr. Dog "Where'd All the Time Go?" (then-vs-now trend) · Length: ~10s
+- CTA: caption "everyone has an idea. this is mine 👇 search BrandGoblin AI"
+- **Status:** —
+
+**4. Pillar 1 · Nix Lives Here** *(Drake "Janice STFU" reaction audio — Nix has heard the pitch before)*
+- Hook (0–3s): "my goblin when I start explaining the business plan for the 40th time 😤" over Fox mid-ramble at the desk, whiteboard energy.
+- Script: Fox rambles passionately (muted under the audio); hard cut to the static Nix PNG deadpan pose on the "Janice STFU" beat — hold it — then one more cut to Fox, still going, and back to Nix, closer zoom, same face. The pose-swap-on-beat carries it; no rig required. Pure sibling-energy love, zero pitch.
+- Sound: Drake "Janice STFU" (reaction audio) · Length: ~9s
+- CTA: caption "he's heard it 40 times. he's still here 🫠"
+- **Status:** —
+
+---
 
 ### Batch — July 3, 2026
 *(Trend read: tomorrow IS July 4th, so this batch is built to shoot today and post into the holiday window. Fresh + unused in prior batches: the "when the fireworks go off" jersey-club fireworks-reaction meme (peaks tomorrow night), the Timmy Turner / Fairly OddParents remix dance challenge (blowing up right now — and a magical-sidekick show is a perfect Nix fit), hot dogs as a full summer aesthetic (hot dog parties, merch, nails — bigger than the Legally Blonde audio we already used July 2), and the "Aura Farming Boat Kid" slow-mo presence format set to "Young Black & Rich." Ariana's "hate that i made u love me" is re-surging (+27%/day) but we used it June 23, so skipping. Rotation 5 / 2 / 3 / 1 — none repeated from yesterday. Note: concept 1 is time-locked — approve today, post July 4 evening.)*
