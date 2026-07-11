@@ -52,6 +52,91 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 10, 2026 (CHANNEL IDENTITY DECIDED: FILM AS FOX + THE 0-100K MASTER PLAN)
+
+Cowork session. Fox pushed the July 5 commit from his Mac (Powered by NIX + docs + agents).
+Then the big strategic session: WHO is the face of the channels?
+
+**1. NAME RESEARCH (deep dive).** Checked NIX handles across platforms: @nix, @heynix, @nixai,
+@asknix, @itsnix, @nixofficial all TAKEN on YouTube. **@nixthegoblin is owned by an existing
+artist** (YouTube + Instagram) — that name is permanently off the table. @nixgoblin was
+available on YouTube + Instagram and **nixgoblin.com was unregistered (~$13)** as of July 10 —
+Fox may grab it as insurance. nix.com is corporate-owned via MarkMonitor since 2001, not
+buyable. NIX namespace is legally crowded: NixOS (trademarked), NIX United (owns nix-ai.com),
+Nix lice treatment. Plain "NIX" as a software brand = trademark + SEO problems.
+
+**2. ✅ DECISION (FINAL, Fox's words): CHANNELS ARE CREATOR/FOUNDER NAMED AND FOCUSED —
+FOREVER.** "BrandGoblin may change, Nix may change, the names or products will evolve, but
+Fox will always be Fox. I am always going to be the heart and soul of whatever I do."
+Research backs it: founder content gets ~46% higher engagement, person-posted content gets
+5-6x company-page reach, faceless brand accounts don't work without years of equity. Setup:
+Fox-named handles, display name "Fox | BrandGoblin AI" for now (the part after the | is a
+swappable product tag), Nix = Duolingo-style co-star (never channel owner),
+@brandgoblinai registered as quiet product home base. Fresh accounts unless Foxximuss accounts
+are dormant (old unrelated content poisons TikTok's 2026 follower-first testing).
+NOTE: this supersedes the mastery guides' "product-named account" advice — same scripts,
+same calendar, delivered by Fox.
+
+**3. 📊 NEW `docs/ZERO_TO_1M_FOLLOWERS_PLAYBOOK_2026.md`** (research agent, ~45 sources).
+Submagic autopsy dated precisely (May-Aug 2023, 3 years old; affiliates were the real engine,
+their TikTok only has ~559K followers at $8M ARR), 8 more case studies, the math of 1M
+(0.06% of channels; ~4 years + ~490 videos average), 2026 platform mechanics, phased playbook.
+**VERDICT Fox agreed with: 1M followers is the WRONG primary goal** — chase qualified views +
+signups, let followers accumulate, re-decide at 100K. Marc Lou is the model (100K subs in
+10 months, ~30 videos, <10 hrs/wk, $100K+ attributed revenue).
+
+**4. 🎯 NEW MASTER PLAN: `docs/FOX_0_TO_100K_PLAN.md` + `.pdf`** (8-page styled PDF).
+Goal: 0-100K followers (YouTube+TikTok) + $100K product revenue ($8.4K MRR run rate).
+Contains: setup week checklist, the 4 content formats (Live Demo / Build-in-Public Diary /
+Hot Take / Nix Bit 1x-week max), 3 phases with kill/keep/boost rules, weekly operating system
+(10-12 hrs), monthly scoreboard, revenue milestones ($500 → $2K → $8.4K/mo). The 30-day
+acquisition plan runs INSIDE Phase 1. Affiliate program (Submagic's engine) is the Phase 3
+unlock.
+
+**5. (Same session, part 2) 🔍 DEEP DIVE AUDIT #3 — `docs/APP_AUDIT_JULY_10_2026.md`.**
+Verified: July 5 push deployed (Powered by NIX live in app navbar + both footers), app consoles
+CLEAN everywhere, dashboard/Studio/pricing healthy, BYOL live. Found 6 code issues + confirmed
+the pending Airo items (hydration #418 still fires, social icons still dead, BYOL line still
+missing, header tagline Block A not applied). BIG PRODUCT FIND: landing promises "Download your
+complete brand kit" — one-click Brand Kit export needs verifying/building (audit item 11).
+Also unaudited: fresh signup → first brand flow (item 12, do before acquisition Day 1).
+
+**6. (Same session, part 3) ✅ ALL 6 AUDIT FIXES SHIPPED (tsc exit 0, ⚠️ NOT YET PUSHED):**
+1. `Footer.tsx` → client component; logged-in users see Dashboard + Sign Out (real signOut)
+   instead of Sign In/Sign Up; ecosystem chips: Goblin Studio now LIVE + linked (was "Soon"),
+   Creator Pro linked too.
+2. NEW `src/app/studio/page.tsx` → bare /studio redirects to /dashboard/studio (was naked 404).
+3. NEW `src/app/not-found.tsx` → branded 404 ("This page got goblin'd", thinking Nix, Brand
+   Vault + homepage buttons).
+4. Pricing copy: "Top up energy anytime — packs from $19" (pricing page) + "top up from $19"
+   (EnergyWidget zero-state) — kills the $19-vs-$49-modal mismatch.
+5. `Navbar.tsx` → logged-in users get APP nav (Brand Vault / Creator Pro / Pricing); marketing
+   anchors (Features/How It Works/About) only for visitors.
+6. GREETING NAME SYSTEM ("Jopro" bug): email-derived names deleted. Greeting is nameless until
+   the user sets a name via a one-time inline "What should Nix call you?" ask on the dashboard
+   (saves to supabase user_metadata.display_name, ✕ dismissable via localStorage, no signup
+   friction — decided via e-commerce/UX psychology: wrong name < no name < asked-for name).
+   `dashboard/page.tsx` passes displayName; new "display_name_set" analytics event.
+Files: Footer.tsx, Navbar.tsx, DailyCreatorDashboard.tsx, dashboard/page.tsx, pricing/page.tsx,
+EnergyWidget.tsx, lib/analytics.ts, + 2 new pages.
+
+**▶ NEXT SESSION / FOX — START HERE:**
+1. PUSH the 6 audit fixes (Claude Code: "commit and push my changes"). Then live-verify:
+   footer while logged in, /studio redirect, a garbage URL shows the goblin 404, pricing copy,
+   app navbar links, and the "What should Nix call you?" ask (set name → greeting updates).
+2. Fox homework (accounts): Setup Week from FOX_0_TO_100K_PLAN.pdf — Fox handles (TikTok
+   personal, YouTube phone-verified), park @brandgoblinai, optionally nixgoblin.com (~$13).
+3. Airo paste-ins still pending (fix pack Blocks 1-3 + header Powered by NIX tagline). NOTE:
+   once Fox's real social accounts exist, the dead footer icons can become real links instead
+   of being removed.
+4. Brand Kit download (audit item 11): verify it exists; if not, build it — biggest product
+   win on the list.
+5. VIDEO: script the "I audited my own app and fixed everything in a day" build-in-public
+   video from this session's material (Fox requested it — waiting on the fixes being live).
+6. Acquisition plan Day 1 funnel check when accounts are live.
+
+---
+
 ## 🗓️ SESSION LOG — July 5, 2026 (DEEP DIVE AUDIT #2 + "BrandGoblin - Powered by NIX" + BYOL LIVE TEST ✅)
 
 Cowork session. Full fresh audit of landing + app (report: `docs/DEEP_DIVE_AUDIT_JULY_5_2026.md`),

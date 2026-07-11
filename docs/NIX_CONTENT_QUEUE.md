@@ -153,6 +153,84 @@ The goblin is free to try, no card. brandgoblinai.com. Comment your idea and I'l
 ## 📥 INCOMING BATCHES
 <!-- The Idea Engine appends new dated batches directly below this line. Newest on top. -->
 
+### Batch — July 10, 2026
+*(Trend read: the week's DOMINANT pattern isn't a song — it's TikTok Shop "pocket change" price-disbelief hooks ("before you ask, no it's not a typo," "your card won't decline," "literal pennies") and text/voiceover-first openers beating music across the board. That's a gift for a free app. Fresh and unused audios/formats: Ken Eurich's "maybe the program I'm running isn't too strict" (self-imposed rules you cave on — pure founder material), the "What Sound Does It Make?" original-sound guessing format (huge for business accounts right now), and Olivia Rodrigo's "u + me = <3" ("I know everybody changes, but I hope that we don't" — a beautiful future Pillar 1, holding it since Pillar 1 led yesterday). Skipped: Tung Tung Sahur / Italian brainrot (peaking, but chaotic-brainrot energy clashes with lovable on-model Nix), Bangladesh / hot dog / nonchalant / MJ remix / Netflix doc — all used in prior batches. Calendar watch: The Odyssey opens July 17 and the World Cup Final is July 19 at MetLife — the parked squad play stays parked for the July 16-18 window as planned. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut text layers, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 3 / 4 / 5 — Pillars 1 and 2 both led yesterday, Pillar 4 last led July 8, Pillar 5 hasn't led since July 7. Going 3-for-quality. Posted Log still empty, no winner data to bias toward yet.)*
+
+**1. Pillar 3 · Conjure It** *(the "pocket change / not a typo" deal-disbelief hook — the week's #1 pattern, and ours is actually true)*
+- Hook (0–3s): first frame text, urgency style: "before you ask — no, it's not a typo. the entire brand kit costs $0." over the app idea box, finger already typing.
+- Script: text-led like the winning Shop posts, sound low under. Finger types "a taco truck for night owls," taps Generate, loading beat, then the reveal montage lands one element per beat — name, tagline, palette, logo, sample post — each with a short disbelief overlay: "this can't be free" → "it's free" → "no card. it can't decline." Static Nix PNG slides in at the end next to the finished kit like the deal-hunter who found the glitch. One Fox VO line: "Your card won't decline. There is no card." Screen record + PNG pop-in, same shoot as Script 1.
+- Sound: trending low-key urgency/voiceover-style audio of the day, quiet under the VO (text carries this one) · Length: ~13s
+- CTA: caption "the goblin works for literal pennies. actually less. comment an idea and he builds it next 👇" + pinned link comment
+- **Status:** —
+
+**2. Pillar 4 · Fox the Founder** *(Ken Eurich "maybe the program I'm running isn't too strict" — founder rules were made to be caved on)*
+- Hook (0–3s): first frame text: "me after saying NO new features until we get users 🔒" over Fox deadpan at the desk, Nix PNG propped by the monitor, judging.
+- Script: Fox lip-syncs the exasperated "maybe the program I am running isn't too strict... just please give me a break you guys" line straight to camera; jump cuts between him cracking ("okay but what if the goblin could ALSO—") and the static Nix PNG in a deadpan pose holding the line like the only disciplined one in the company. Last cut: Fox back to work, overlay "fine. users first." Honest build-in-public energy, zero hard sell. Nix on-model from approved art.
+- Sound: Ken Eurich "maybe the program I'm running isn't too strict" audio · Length: ~9s
+- CTA: caption "the goblin is the only one with discipline here. day 3 of building in public — what should we brand tomorrow? 👇"
+- **Status:** —
+
+**3. Pillar 5 · Trend Hijack** *("What Sound Does It Make?" original-sound guessing format — blowing up for business accounts this week)*
+- Hook (0–3s): first frame text: "what sound does a goblin make when he finishes your entire brand?" over Fox holding the mic-to-camera stance.
+- Script: Fox commits to 3 escalating guesses straight to camera, 2-3s each, fully confident and fully wrong ("tiny thunder?" → a gremlin cackle → a wet "bloop") — solo version of the ask-your-coworkers format; if friends/family are around, use their guesses instead, even better. Then the payoff cut: the real app generating a kit, and on the finished-kit frame the ACTUAL sound — one clean magical ding — as the static Nix PNG pops in, smug, like "obviously." The gap between the guesses and the tiny polite ding is the joke.
+- Sound: original sound (that's the format — the guesses + the ding ARE the audio) · Length: ~14s
+- CTA: caption "wrong answers only: what sound does he make? 👇 search BrandGoblin AI"
+- **Status:** —
+
+---
+
+### Batch — July 9, 2026
+*(Trend read: the big July audios in the roundups are all recycled from prior batches — Food Jutsu, Janice STFU, A Million Colors, Bangladesh, Legally Blonde hot dog, and yesterday's Lock-In / Love Island / text-feature plays — so all skipped. Fresh and unused right now: "Summer Days" by Emmit Fenn is this week's #1 trending song (warm, nostalgic summer vibe — a gift for a Pillar 1 love piece), "Big Boom In The Room" (big bass techno the roundups literally describe as "ideal for showcasing something big" — built for snap pose-swaps and slam reveals), and super-short jump-cut clips continue to outperform storytimes. World Cup Final squad play still parked for July 16-18. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut cuts and text overlays, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 1 / 2 / 3 — Pillars 1 and 2 last led July 7, and yesterday's batch (4/3/5) left both out. Going 3-for-quality today. Posted Log still empty, no winner data to bias toward yet.)*
+
+**1. Pillar 1 · Nix Lives Here** *("Summer Days" by Emmit Fenn — this week's top sound, pure golden-hour goblin love)*
+- Hook (0–3s): first frame text: "took my goblin outside for the first time this summer 🌅🧌" over the static Nix PNG propped in real golden-hour window light.
+- Script: soft montage of real evening photos with the Nix PNG composited in — next to a sweating glass of lemonade on the porch step, peeking out of a shirt pocket on a walk, "watching" the sunset from the grass, back inside by the lamp. Gentle text overlays per clip: "first fresh air in weeks" → "he liked the lemonade" → "little guy's first sunset" → "okay back to work tomorrow". Zero pitch, pure love — this is a follow-farmer, not a click-farmer. Every frame from Fox's approved art, on-model.
+- Sound: "Summer Days" — Emmit Fenn (this week's #1 trending) · Length: ~12s
+- CTA: caption "he says we're taking every sunset off from now on 🥹"
+- **Status:** —
+
+**2. Pillar 2 · Mirror Mode** *("Big Boom In The Room" — bass hits made for the pose-swap trick)*
+- Hook (0–3s): "POV: the bass drops and your goblin has been waiting for this all week 😤" burned into frame one as the track builds.
+- Script: Fox hits a sharp pose on every bass BOOM; on each hit, hard cut to the static Nix PNG in a matching approved pose (arms crossed, conjuring, celebrating), snap zooms selling the sync. Each boom cuts closer on Nix until the final hit lands a side-by-side split — Fox mid-pose, Nix frozen sharper, smug. Same pose-swap-on-beat trick as the MJ concept, zero rig. Duet-bait. Nix on-model from approved art only.
+- Sound: "Big Boom In The Room" (bass-drop trending audio) · Length: ~9s
+- CTA: caption "he doesn't dance. he arrives. 💀 Nix lives in the app 👇"
+- **Status:** —
+
+**3. Pillar 3 · Conjure It** *(summer nostalgia flip — the lemonade stand gets a corporate rebrand)*
+- Hook (0–3s): first frame text: "I gave a kid's lemonade stand a full corporate rebrand 🍋" over the app idea box, finger typing "a lemonade stand".
+- Script: tap Generate, loading beat, then the reveal montage lands one element per beat — name, tagline, sunny palette, logo, sample post — with a quick zoom on the logo next to a hand-drawn "LEMONADE 50¢" scrap-paper sign for the before/after contrast. Static Nix PNG slides in at the end holding the vibe of a proud franchise owner. One Fox VO line: "This lemonade stand is now more professionally branded than most startups." Screen record + PNG pop-in, same shoot as Script 1.
+- Sound: trending upbeat summer audio of the day (pick at edit time, low under VO) · Length: ~14s
+- CTA: caption "what was YOUR first business idea as a kid? comment it and Nix brands it next 👇" + pinned link comment
+- **Status:** —
+
+---
+
+### Batch — July 8, 2026
+*(Trend read: the recycled July audios (Bangladesh, Legally Blonde hot dog, Dr. Dog then-vs-now) are all used in prior batches, so skipped. Fresh and unused right now: "The Great Lock-In" discipline/routine wave (hashtags lockedin / daily / joblife — TikTok is pivoting from delulu escapism to accountability content, a perfect founder fit), the Love Island "it'll only take 10 minutes" audio (about lying that something will be quick — a gift-wrapped flip for a 2-minute brand kit), and the meta viral tip flooding the FYP: "use the TikTok text feature if you want to go viral" plus super-short jump-cut text-overlay clips outperforming storytimes. AI-choreography dance challenges are also rising but Pillar 2 ran yesterday, so holding that. World Cup Final squad play still parked for July 16-18. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut cuts and text overlays, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 4 / 3 / 5 — Pillars 1 and 2 both ran July 7, and Pillar 4 hasn't led a batch since July 6. Going 3-for-quality today. Posted Log still empty, no winner data to bias toward yet.)*
+
+**1. Pillar 4 · Fox the Founder** *("The Great Lock-In" — the accountability trend was built for build-in-public)*
+- Hook (0–3s): first frame text: "the great lock-in, day 1: building a startup with a goblin 🔒🧌" over Fox at the desk, morning light, Nix PNG propped beside the keyboard.
+- Script: rapid jump-cut routine beats with text overlays, one per cut: "5 ideas branded before coffee" (screen record flash) → "replied to every comment" → "the goblin doesn't take days off" (Nix PNG by the monitor, determined pose) → last cut: the finished kit on screen, "we're locked in." One Fox VO line: "No excuses this summer. Me and the goblin are locked in." Honest, disciplined, zero hard sell — pure lockedin-tag energy. Nix on-model from approved art.
+- Sound: trending lock-in / disciplined-routine audio of the day (pick at edit time, low under VO) · Length: ~12s
+- CTA: caption "day 1 of building in public with a goblin. what should we brand tomorrow? 👇 #lockedin"
+- **Status:** —
+
+**2. Pillar 3 · Conjure It** *(Love Island "it'll only take 10 minutes" audio — the one time it's actually true)*
+- Hook (0–3s): first frame text: "'rebranding your business will only take 10 minutes' — everyone who has ever lied to you" over the app idea box.
+- Script: the audio plays its "it'll only take 10 minutes" line; hard cut to a real on-screen timer starting as a finger types "a candle shop for plant people" and taps Generate. Reveal montage lands one element per beat — name, tagline, palette, logo, sample post — and the timer freezes at 1:54. Static Nix PNG slides in next to the timer, smug. The flip is the joke: the goblin is the only one who under-promised. Screen record + PNG pop-in, same shoot as Script 1.
+- Sound: Love Island "it'll only take 10 minutes" audio · Length: ~13s
+- CTA: caption "under 2 minutes, receipts on screen ⏱️ comment an idea and Nix times himself next 👇" + pinned link comment
+- **Status:** —
+
+**3. Pillar 5 · Trend Hijack** *(the "use the text feature to go viral" meta-tip — Nix takes it literally)*
+- Hook (0–3s): first frame text: "apparently you go viral if you use the text feature. my goblin heard that." over the static Nix PNG dead-center, deadpan.
+- Script: jump cuts on beat — each cut adds MORE text boxes crowding around the unmoving Nix: "hi" → "hello" → "look at him" → "he makes brands" → "in 2 minutes" → "for free" → until the screen is a wall of text with one goblin face peeking through a gap. Final cut: all text vanishes except one line, "did it work?" The stillness plus escalating text IS the joke — zero rig, pure CapCut text layers. Nix on-model from approved art.
+- Sound: trending jump-cut / punchline audio of the day (pick at edit time) · Length: ~9s
+- CTA: caption "if this goes viral he gets a raise. he works for free. search BrandGoblin AI"
+- **Status:** —
+
+---
+
 ### Batch — July 7, 2026
 *(Trend read: the July 4th audios are cooling and the big recycled ones are all used in prior batches, so skipping Bangladesh, Legally Blonde hot dog, Food Jutsu, and Dr. Dog then-vs-now. Fresh and unused right now: the "I Treated You Bad" MJ remix dance, the trace.young "I don't like being nonchalant, why would I hide the joy God gave me" audio, the feel-good uplifting-audio-plus-text-overlay day-clips format, and the FYP flood of absurd AI animal videos, which is a perfect setup for a "here's what AI can ACTUALLY do" flip. World Cup Final is July 19, hold the big squad play for July 16-18. PRODUCTION NOTE: rig still paused, all four concepts are shootable with the static approved Nix PNG, CapCut cuts and zooms, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 5 / 2 / 3 / 1, no pillar repeated in-batch and pillar 2 returns after sitting out since July 3. Posted Log still empty, no winner data to bias toward yet.)*
 

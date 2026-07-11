@@ -66,6 +66,7 @@ export default async function DashboardPage() {
           {/* Daily Creator Dashboard — greeting, XP, quick actions */}
           <DailyCreatorDashboard
             email={email}
+            displayName={(authData.user.user_metadata?.display_name as string | undefined) ?? null}
             plan={effectivePlan}
             brandCount={rows.length}
             latestBrand={rows[0]}

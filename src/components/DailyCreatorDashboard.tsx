@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { XPBar } from "./XPSystem";
 import NixPose from "./primitives/NixPose";
 import EnergyRefillModal from "@/components/EnergyRefillModal";
+import { createClient } from "@/lib/supabase/client";
 import type { BrandKit, BrandGenerationRow } from "@/types";
 import { trackEvent } from "@/lib/analytics";
 
@@ -115,27 +116,33 @@ function getTimeOfDay() {
   return "Good evening";
 }
 
-function getFirstName(email: string) {
-  const local = email.split("@")[0].replace(/[^a-zA-Z]/g, "").slice(0, 12);
-  return local ? local.charAt(0).toUpperCase() + local.slice(1) : "Creator";
-}
+// Email-derived names ("Jopro" from joepro@...) read as wrong/robotic and
+// break trust — worse than no name at all. We greet namelessly until the
+// user tells Nix their actual name (personalization by invitation: no
+// signup friction, real personalization once given). Audit fix July 10 2026.
+const NAME_ASK_DISMISSED_KEY = "brandgoblin_name_ask_dismissed_v1";
 
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function DailyCreatorDashboard({
-  email,
+  displayName,
   plan,
   brandCount,
   latestBrand,
   signupDate,
 }: {
+  /** kept in the contract for future use (support links, receipts) */
   email: string;
+  displayName?: string | null;
   plan: string;
   brandCount: number;
   latestBrand?: BrandGenerationRow;
   signupDate?: string;
 }) {
   const isPro = plan === "pro" || plan === "agency";
-  const firstName = getFirstName(email);
+  const [name, setName] = useState<string | null>(displayName?.trim() || null);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const [askDismissed, setAskDismissed] = useState(true); // stable for SSR; real value on mount
   // Start with stable values so the server and client render the same HTML
   // (time-of-day and random picks differ between server and browser, which
   // caused React hydration errors #418/#423/#425). Real values land right
@@ -161,6 +168,11 @@ export default function DailyCreatorDashboard({
     setGreeting(getTimeOfDay());
     setNixSays(NIX_GREETINGS[Math.floor(Math.random() * NIX_GREETINGS.length)]);
     setDailyIdea(getDailyIdea(latestBrand?.output_data));
+    try {
+      setAskDismissed(localStorage.getItem(NAME_ASK_DISMISSED_KEY) === "1");
+    } catch {
+      /* localStorage unavailable — keep the ask hidden */
+    }
 
     // D1/D7 return tracking — fires once per session on dashboard load
     const daysSinceSignup = signupDate
@@ -183,6 +195,33 @@ export default function DailyCreatorDashboard({
   // "1,520 / 1,000" reads as broken math, so switch to an honest breakdown.
   const energyOverMax = !!energy && energy.totalRemaining > energy.monthlyAllowance;
 
+  async function handleSaveName() {
+    const cleaned = nameInput.trim().slice(0, 24);
+    if (!cleaned || savingName) return;
+    setSavingName(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ data: { display_name: cleaned } });
+      if (!error) {
+        setName(cleaned);
+        trackEvent("display_name_set", {});
+      }
+    } catch {
+      /* non-fatal — greeting stays nameless */
+    } finally {
+      setSavingName(false);
+    }
+  }
+
+  function handleDismissAsk() {
+    setAskDismissed(true);
+    try {
+      localStorage.setItem(NAME_ASK_DISMISSED_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+  }
+
   return (
     <div className="space-y-8">
 
@@ -200,12 +239,43 @@ export default function DailyCreatorDashboard({
           <div>
             <p className="text-xs font-bold tracking-widest uppercase text-primary-light mb-1">✦ Brand Vault</p>
             <h1 className="font-display text-3xl sm:text-4xl font-black text-white">
-              {greeting}, {firstName} 👋
+              {greeting}{name ? `, ${name}` : ""} 👋
             </h1>
             <p className="text-sm text-muted mt-1 flex items-center gap-2">
               <span className="text-primary-light">🧌</span>
               Nix says: &ldquo;{nixSays}&rdquo;
             </p>
+            {/* One-time ask — only when no name is set and not dismissed */}
+            {mounted && !name && !askDismissed && (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted">What should Nix call you?</span>
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+                  maxLength={24}
+                  placeholder="Your name"
+                  className="w-32 rounded-lg border border-[rgba(45,45,78,0.8)] bg-white/5 px-2.5 py-1.5 text-xs text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveName}
+                  disabled={savingName || !nameInput.trim()}
+                  className="rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-light transition-colors hover:bg-primary/20 hover:text-white disabled:opacity-40"
+                >
+                  {savingName ? "Saving…" : "Save"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDismissAsk}
+                  className="text-xs text-faint transition-colors hover:text-white"
+                  title="Don't ask again"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
 

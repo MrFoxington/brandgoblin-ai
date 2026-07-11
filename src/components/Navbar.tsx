@@ -7,12 +7,20 @@ import type { User } from "@supabase/supabase-js";
 import NixAvatar from "@/components/NixAvatar";
 import { SoundToggle } from "@/components/primitives/SoundFx";
 
-const NAV_LINKS = [
+// Marketing links sell the product to visitors. Logged-in users are already
+// sold — they get app navigation instead (audit fix, July 10 2026).
+const VISITOR_LINKS = [
   { label: "Features", href: "/#features" },
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Examples", href: "/dashboard" },
   { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/#about" },
+];
+
+const APP_LINKS = [
+  { label: "Brand Vault", href: "/dashboard" },
+  { label: "Creator Pro", href: "/dashboard/creator-pro" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 // Convenience link only — the real gate is server-side in /admin (redirects non-admins).
@@ -65,10 +73,10 @@ export default function Navbar() {
 
         {/* Nav links */}
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted lg:flex">
-          {NAV_LINKS.map((link) => (
+          {(user ? APP_LINKS : VISITOR_LINKS).map((link) => (
             <Link
               key={link.label}
-              href={user && link.label === "Examples" ? "/dashboard" : link.href}
+              href={link.href}
               className="transition-colors hover:text-white"
             >
               {link.label}

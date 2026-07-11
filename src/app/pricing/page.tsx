@@ -22,7 +22,7 @@ const PRO_FEATURES = [
   "Bring your own logo — stamped on every product art & social graphic",
   "Product descriptions, headlines & campaign ideas",
   "Content calendars & brand voice tools",
-  "Top up energy anytime for $19",
+  "Top up energy anytime — packs from $19",
 ];
 
 function PlanButton({

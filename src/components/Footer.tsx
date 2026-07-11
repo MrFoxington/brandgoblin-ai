@@ -1,9 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import NixAvatar from "@/components/NixAvatar";
 
-const ECOSYSTEM = [
-  { label: "✨ Creator Pro",      active: true  },
-  { label: "🎨 Goblin Studio",    active: false },
+const ECOSYSTEM: { label: string; active: boolean; href?: string }[] = [
+  { label: "✨ Creator Pro",      active: true, href: "/dashboard/creator-pro" },
+  { label: "🎨 Goblin Studio",    active: true, href: "/dashboard/studio" },
   { label: "🧪 Goblin Labs",      active: false },
   { label: "🌐 Goblin Sites",     active: false },
   { label: "📈 Goblin Growth",    active: false },
@@ -12,6 +17,22 @@ const ECOSYSTEM = [
 ];
 
 export default function Footer() {
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, [supabase]);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
+
   return (
     <footer className="border-t border-[rgba(45,45,78,0.8)] pt-12 pb-8">
       <div className="mx-auto max-w-6xl px-4 space-y-8">
@@ -37,12 +58,27 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Links */}
+          {/* Links — app links for logged-in users, auth links for visitors */}
           <div className="flex gap-6 text-sm text-muted">
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link href="/dashboard/creator-pro" className="hover:text-white transition-colors">Creator Pro</Link>
-            <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-            <Link href="/signup" className="hover:text-white transition-colors">Sign Up</Link>
+            {user ? (
+              <>
+                <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="hover:text-white transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
+                <Link href="/signup" className="hover:text-white transition-colors">Sign Up</Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -52,21 +88,25 @@ export default function Footer() {
             BrandGoblin Ecosystem
           </p>
           <div className="flex flex-wrap gap-2">
-            {ECOSYSTEM.map((item) => (
-              <span
-                key={item.label}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                  item.active
-                    ? "border-primary/40 bg-primary/10 text-primary-light"
-                    : "border-[rgba(45,45,78,0.6)] text-faint cursor-default"
-                }`}
-              >
-                {item.label}
-                {!item.active && (
+            {ECOSYSTEM.map((item) =>
+              item.active && item.href ? (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary-light transition hover:bg-primary/20 hover:text-white"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  key={item.label}
+                  className="rounded-full border border-[rgba(45,45,78,0.6)] px-3 py-1 text-xs font-medium text-faint cursor-default transition"
+                >
+                  {item.label}
                   <span className="ml-1.5 text-[10px] opacity-60">Soon</span>
-                )}
-              </span>
-            ))}
+                </span>
+              )
+            )}
           </div>
         </div>
 

@@ -53,7 +53,7 @@ export default function EnergyWidget() {
           <p className="text-2xl mb-2">⚡</p>
           <p className="text-sm font-semibold text-white mb-1">Out of Creative Energy</p>
           <p className="text-xs text-muted mb-4">
-            Upgrade to Creator Pro for monthly Creative Energy, or top up $19 to keep creating.
+            Upgrade to Creator Pro for monthly Creative Energy, or top up from $19 to keep creating.
           </p>
           <a href="/pricing" className="btn-primary text-sm px-4 py-2 block mb-2">
             Upgrade to Creator Pro

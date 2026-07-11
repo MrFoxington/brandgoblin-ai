@@ -12,7 +12,8 @@ export type AnalyticsEvent =
   | "session_start"          // dashboard loaded (used for D1/D7 return)
   | "content_generated"      // Creator Pro content piece generated
   | "upgrade_nudge_shown"    // free user saw UpgradeNudge
-  | "upgrade_cta_clicked";   // any upgrade button clicked
+  | "upgrade_cta_clicked"    // any upgrade button clicked
+  | "display_name_set";      // user told Nix their name (greeting personalization)
 
 export interface AnalyticsProperties {
   brandId?: string;
