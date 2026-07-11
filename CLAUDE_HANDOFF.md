@@ -226,8 +226,18 @@ so run it in the Supabase SQL editor FIRST).**
   (new), JobCard.tsx, StudioImageGenerator.tsx (tab state + handler + literals),
   types/index.ts, process/upload-logo routes (literals), WebsitePreview.tsx (filter).
 
+**13. (Same session, part 10) 🎲 DUPLICATE-IMAGE FIX (Fox: hitting Conjure again sometimes
+produced the EXACT same image = wasted energy; More Like This was a near-clone).**
+ROOT CAUSE: the seed only refreshed on creative-intent changes (brand/type/prompt edits,
+special buttons) but NOT on a repeat Conjure click — same prompt + same seed = pixel-identical
+image at full energy cost. FIXED (tsc exit 0, StudioImageGenerator.tsx): (1) the seed is now
+BURNED immediately after every submission (every Conjure = fresh dice; costs the old
+same-composition engine-compare trick, worth it); (2) More Like This now COOKS a real
+variation prompt (same subject + brand style, new composition/angle/setting, original prompt
+passed as context; free text op, falls back to original prompt if the cook fails).
+
 **▶ NEXT SESSION / FOX — START HERE:**
-1. ⚠️ RUN THE MIGRATION FIRST (20260711_studio_archived.sql in Supabase SQL editor), THEN
+1. ⚠️ MIGRATION 20260711_studio_archived.sql ✅ ALREADY RUN (July 11). THEN
    push everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
    GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2 + REFILL PAYMENT FIX + ADMIN TYPO FIX +
    HIDE/ARCHIVE.

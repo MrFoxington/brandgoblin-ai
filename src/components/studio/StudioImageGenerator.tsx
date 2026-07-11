@@ -421,6 +421,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         }),
       });
 
+      // Burn the seed the moment it's spent (July 11 2026): same prompt + same
+      // seed = the model paints the IDENTICAL image, so re-hitting Conjure was
+      // charging full energy for a pixel-perfect duplicate. Every submission
+      // now rolls fresh dice for the next one.
+      seedRef.current = generateSeed();
+
       const data = (await res.json()) as {
         jobId?: string; provider?: string; error?: string;
         requiresRefill?: boolean; requiresUpgrade?: boolean; totalRemaining?: number;
@@ -553,10 +559,22 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       job.model_key === "bg_removal" || job.model_key === "clarity_upscaler"
         ? modelKey
         : (job.model_key as StudioModelKey);
+    const jobType = (job.image_type ?? imageType) as ImageType;
+    // July 11 2026: reusing the exact prompt with only a new seed produced
+    // near-clones. Cook a REAL variation — same concept and brand style, new
+    // composition. Free (text op); falls back to the original prompt if the
+    // cook fails.
+    let variedPrompt = "";
+    if (job.prompt) {
+      variedPrompt = await cookPrompt(
+        jobType,
+        `a fresh variation of this exact concept — keep the same subject and brand style but change the composition, angle, or setting: "${job.prompt.slice(0, 300)}"`
+      );
+    }
     await submitJob(
-      job.prompt ?? prompt,
+      variedPrompt || job.prompt || prompt,
       engine,
-      (job.image_type ?? imageType) as ImageType
+      jobType
     );
   }
 
