@@ -398,6 +398,35 @@ export default function BrandKitView({
             )}
           </div>
         )}
+
+        {/* Where to launch this — close the loop between copy and a live site */}
+        <div className="rounded-xl border border-secondary/25 bg-secondary/5 p-4 space-y-1.5">
+          <p className="text-xs font-bold tracking-widest uppercase text-secondary">🚀 Where to launch this</p>
+          <p className="text-sm text-muted leading-relaxed">
+            Paste this copy into a free{" "}
+            <a
+              href="https://carrd.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-white underline decoration-secondary/50 underline-offset-2 hover:decoration-secondary"
+            >
+              Carrd
+            </a>{" "}
+            one-page site and your brand can be LIVE in about 20 minutes — no account needed to start building.
+          </p>
+          <p className="text-xs text-faint leading-relaxed">
+            Ready for a full website? Nix recommends{" "}
+            <a
+              href="https://www.godaddy.com/airo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-muted underline decoration-white/20 underline-offset-2 hover:text-white"
+            >
+              GoDaddy Airo
+            </a>{" "}
+            — brandgoblinai.com was built with Airo, powered by Nix. Seeing your idea live changes everything. 🧌
+          </p>
+        </div>
       </div>
     </SectionCard>,
 

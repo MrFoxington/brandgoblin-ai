@@ -140,8 +140,24 @@ generate the mascot image"). Built (tsc exit 0, NO migration — image_type is f
   cutout — right tool; local strip stays logo-only). No official-logo button on mascots (by
   design), no stamping on mascots (by design).
 
+**8. (Same session, part 5) 🚀 "WHERE TO LAUNCH THIS" TIP + WEBSITE PREVIEW ROADMAP.**
+Fox's insight: seeing HIS site live (GoDaddy Airo) is what kept him building — users need that
+moment too. Shipped (tsc exit 0): teal "🚀 Where to launch this" tip box at the bottom of the
+brand kit's Website Copy section — free path = Carrd (live in ~20 min, no account to start),
+upgrade path = "Nix recommends GoDaddy Airo — brandgoblinai.com was built with Airo, powered
+by Nix." File: BrandKitView.tsx.
+**AFFILIATE NOTE (researched, parked):** GoDaddy affiliate program exists via CJ Affiliate
+(10-15% commission, 45-day cookie, $100 min payout; join at cj.com then email CID to
+affiliates@godaddy.com). Worth doing ONCE THERE'S TRAFFIC — don't build monetization plumbing
+before users. When joined, swap the plain Airo link for the tagged link.
+**🗺️ ROADMAP (order):** (1) Brand Kit download (audit item 11 — verify/build), (2) **WEBSITE
+PREVIEW**: render the kit's real copy + palette + official logo into a live homepage mockup
+in-app. Zero AI cost (template + kit data), hugely shareable, makes website copy feel real,
+and it's the stepping stone to the "Goblin Sites" ecosystem promise.
+
 **▶ NEXT SESSION / FOX — START HERE:**
-1. PUSH the 6 audit fixes + MASCOT GENERATOR (Claude Code: "commit and push my changes").
+1. PUSH the 6 audit fixes + MASCOT GENERATOR + LAUNCH TIP (Claude Code: "commit and push my
+   changes").
    LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
    recommended for the first) → expect ONE full-body character on white, no text; Remove BG
    → clean cutout. Then live-verify:
