@@ -270,6 +270,7 @@ export async function POST(request: Request) {
     featured_at:      null,
     official_logo:    false,
     stamp_logo:       true,
+    archived:         false,
     created_at:       new Date().toISOString(),
     updated_at:       new Date().toISOString(),
   };

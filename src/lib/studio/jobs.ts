@@ -23,6 +23,7 @@ export interface StudioJobRow {
   error_message: string | null;
   reservation_tx_id: string | null;
   favorite: boolean;
+  archived: boolean;
   featured: boolean;
   featured_order: number | null;
   featured_at: string | null;
@@ -315,6 +316,7 @@ export async function listUserFavoriteJobs(userId: string, limit = 6): Promise<S
     .select("*")
     .eq("user_id", userId)
     .eq("favorite", true)
+    .eq("archived", false) // hidden creations never surface in the stash
     .eq("status", "completed")
     .order("updated_at", { ascending: false })
     .limit(limit);
@@ -346,6 +348,25 @@ export async function setJobFavorite(
   const { data, error } = await supabase
     .from("studio_jobs")
     .update({ favorite })
+    .eq("id", jobId)
+    .eq("user_id", userId) // ownership guard
+    .select("id");
+  return !error && !!data && data.length > 0;
+}
+
+// ── Toggle the archived (hidden) flag (ownership-checked) ────────────────────
+// Soft-hide: archived creations vanish from the gallery, favorites, dashboard
+// stash, and website preview — restorable from the "Hidden" tab. (July 11 2026)
+
+export async function setJobArchived(
+  jobId: string,
+  userId: string,
+  archived: boolean
+): Promise<boolean> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("studio_jobs")
+    .update({ archived })
     .eq("id", jobId)
     .eq("user_id", userId) // ownership guard
     .select("id");

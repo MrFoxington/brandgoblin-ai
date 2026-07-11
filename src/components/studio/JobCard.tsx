@@ -16,6 +16,7 @@ interface Props {
   onProcess?: (job: StudioJobRow, operation: "bg_removal" | "clarity_upscaler") => Promise<void>;
   onShareSuccess?: (job: StudioJobRow) => void;
   onToggleFavorite?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
+  onToggleArchive?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
   onSetOfficialLogo?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
 }
 
@@ -42,7 +43,7 @@ const DERIVED_TAGS: Record<string, string> = {
   upload:          "⤴ Uploaded",
 };
 
-export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite, onSetOfficialLogo }: Props) {
+export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite, onToggleArchive, onSetOfficialLogo }: Props) {
   const { playShare, playButtonPress } = useSoundFx();
   const reduce = useReducedMotion();
   const [downloading, setDownloading]   = useState(false);
@@ -56,6 +57,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
   const [favBusy, setFavBusy]           = useState(false);
   const [official, setOfficial]         = useState<boolean>(job.official_logo);
   const [officialBusy, setOfficialBusy] = useState(false);
+  const [archiveBusy, setArchiveBusy]   = useState(false);
 
   const pinnedSize = job.image_type
     ? IMAGE_TYPE_SIZES[job.image_type as ImageType] ?? IMAGE_TYPE_SIZES.logo_concept
@@ -183,6 +185,19 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
     }
   }
 
+  // Hide (archive) / restore — the parent flips job.archived optimistically,
+  // which removes the card from the current tab, so no local state to sync.
+  async function handleToggleArchive() {
+    if (!onToggleArchive || archiveBusy) return;
+    setArchiveBusy(true);
+    playButtonPress();
+    try {
+      await onToggleArchive(job, !job.archived);
+    } finally {
+      setArchiveBusy(false);
+    }
+  }
+
   async function handleToggleFavorite() {
     if (!onToggleFavorite || favBusy) return;
     const next = !fav;
@@ -236,6 +251,17 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           <span className="absolute top-2 left-2 z-10 rounded-lg bg-black/70 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
             {derivedTag}
           </span>
+        )}
+        {/* Hide / restore — gray, quiet, next to the star. Soft-archive only. */}
+        {onToggleArchive && (
+          <button
+            onClick={handleToggleArchive}
+            disabled={archiveBusy}
+            title={job.archived ? "Restore this creation" : "Hide this creation (find it under Hidden)"}
+            className="absolute top-2 right-11 z-10 rounded-full bg-black/55 backdrop-blur-sm p-1.5 leading-none text-white/50 hover:text-white hover:bg-black/70 transition-colors disabled:opacity-60"
+          >
+            <span className="block text-base">{job.archived ? "↩" : "✕"}</span>
+          </button>
         )}
         {/* Favorite star — gold pop when set */}
         {onToggleFavorite && (

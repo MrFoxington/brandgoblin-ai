@@ -24,6 +24,7 @@ interface StudioJobLite {
   job_type: string | null;
   output_url: string | null;
   official_logo?: boolean;
+  archived?: boolean;
 }
 
 // ── Color engine ──────────────────────────────────────────────────────────────
@@ -168,7 +169,7 @@ export default function WebsitePreview({
       .then((r) => r.json())
       .then((d: { jobs?: StudioJobLite[] }) => {
         const done = (d.jobs ?? []).filter(
-          (j) => j.status === "completed" && j.brand_id === brandId && j.output_url
+          (j) => j.status === "completed" && j.brand_id === brandId && j.output_url && !j.archived
         );
         const firstOf = (pred: (j: StudioJobLite) => boolean) => done.find(pred)?.output_url ?? undefined;
         setAssets({

@@ -105,7 +105,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [streak, setStreak]         = useState(1);
   const [shareCelebrating, setShareCelebrating] = useState(false);
   const [shareMsgIndex, setShareMsgIndex]       = useState(0);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  // Gallery tab: All (visible) / Favorites (visible favs) / Hidden (archived, restorable)
+  const [galleryTab, setGalleryTab] = useState<"all" | "favorites" | "hidden">("all");
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Bring-your-own-logo upload (Pro perk)
@@ -167,6 +168,26 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         behavior: reduce ? "auto" : "smooth", block: "start",
       });
     });
+  }
+
+  // Optimistic archive (hide/restore) toggle — reverts on API failure.
+  async function handleToggleArchive(job: StudioJobRow, next: boolean): Promise<boolean> {
+    setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, archived: next } : j)));
+    try {
+      const res = await fetch("/api/studio/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, archived: next }),
+      });
+      if (!res.ok) {
+        setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, archived: !next } : j)));
+        return false;
+      }
+      return true;
+    } catch {
+      setJobs((prev) => prev.map((j) => (j.id === job.id ? { ...j, archived: !next } : j)));
+      return false;
+    }
   }
 
   // Optimistic favorite toggle — reverts on API failure. Returns success to JobCard.
@@ -309,11 +330,15 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     selectedBrandId ? j.brand_id === selectedBrandId : !j.brand_id;
   // Brand-scoped completed jobs (drives the section + tab counts)
   const brandCompletedJobs = jobs.filter((j) => j.status === "completed" && filterByBrand(j));
-  const favoriteCount = brandCompletedJobs.filter((j) => j.favorite).length;
-  // Favorites filter composes with the brand filter
-  const completedJobs = showFavoritesOnly
-    ? brandCompletedJobs.filter((j) => j.favorite)
-    : brandCompletedJobs;
+  const favoriteCount = brandCompletedJobs.filter((j) => j.favorite && !j.archived).length;
+  const hiddenCount   = brandCompletedJobs.filter((j) => j.archived).length;
+  // Tab filter composes with the brand filter; archived stays out of All + Favorites
+  const completedJobs =
+    galleryTab === "favorites"
+      ? brandCompletedJobs.filter((j) => j.favorite && !j.archived)
+      : galleryTab === "hidden"
+      ? brandCompletedJobs.filter((j) => j.archived)
+      : brandCompletedJobs.filter((j) => !j.archived);
   const failedJobs    = jobs.filter((j) => (j.status === "failed" || j.status === "moderation_blocked") && filterByBrand(j));
 
   const selectedBrandName = selectedBrandId
@@ -435,6 +460,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         featured_at:     null,
         official_logo:   false,
         stamp_logo:      stampLogo,
+        archived:        false,
         created_at:      new Date().toISOString(),
         updated_at:      new Date().toISOString(),
       };
@@ -1009,24 +1035,35 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             <h2 className="text-xs uppercase tracking-widest text-primary-light font-bold">
               {selectedBrandId ? `${selectedBrandName} Creations` : "Freeform Creations"} ({brandCompletedJobs.length})
             </h2>
-            {/* All / Favorites filter tabs */}
+            {/* All / Favorites / Hidden filter tabs */}
             <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-0.5">
               <button
-                onClick={() => setShowFavoritesOnly(false)}
+                onClick={() => setGalleryTab("all")}
                 className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  !showFavoritesOnly ? "bg-white/10 text-white" : "text-muted hover:text-white"
+                  galleryTab === "all" ? "bg-white/10 text-white" : "text-muted hover:text-white"
                 }`}
               >
                 All
               </button>
               <button
-                onClick={() => setShowFavoritesOnly(true)}
+                onClick={() => setGalleryTab("favorites")}
                 className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  showFavoritesOnly ? "bg-amber-400/15 text-amber-300" : "text-muted hover:text-white"
+                  galleryTab === "favorites" ? "bg-amber-400/15 text-amber-300" : "text-muted hover:text-white"
                 }`}
               >
                 {FAVORITES_LABEL} ({favoriteCount})
               </button>
+              {hiddenCount > 0 && (
+                <button
+                  onClick={() => setGalleryTab("hidden")}
+                  className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                    galleryTab === "hidden" ? "bg-white/10 text-white/70" : "text-faint hover:text-white"
+                  }`}
+                  title="Creations you've hidden — restore any time"
+                >
+                  Hidden ({hiddenCount})
+                </button>
+              )}
             </div>
           </div>
 
@@ -1040,13 +1077,16 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   onProcess={handleProcess}
                   onShareSuccess={handleShareSuccess}
                   onToggleFavorite={handleToggleFavorite}
+                  onToggleArchive={handleToggleArchive}
                   onSetOfficialLogo={handleSetOfficialLogo}
                 />
               ))}
             </div>
           ) : (
             <p className="text-sm text-faint py-6 text-center">
-              No favorites yet — tap the ☆ on any creation to add it to {FAVORITES_LABEL}.
+              {galleryTab === "hidden"
+                ? "Nothing hidden — tap the ✕ on any creation to tuck it away here."
+                : `No favorites yet — tap the ☆ on any creation to add it to ${FAVORITES_LABEL}.`}
             </p>
           )}
         </div>

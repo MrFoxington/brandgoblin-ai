@@ -209,12 +209,32 @@ worked for Fox. All 3 fixed to jopro@hotmail.com (tsc exit 0). ⚠️ ALSO CHECK
 ADMIN_EMAIL env var exists in Vercel with the joepro typo, it overrides the code — correct
 it there too.
 
+**12. (Same session, part 9) 🗂️ HIDE/ARCHIVE STUDIO CREATIONS (Fox: bad generations — the
+"rip curl avenue" shirt — clog the feed with no way to remove them; deflating). Built as
+SOFT-ARCHIVE, never delete (tsc exit 0). ⚠️ **MIGRATION REQUIRED BEFORE DEPLOY:**
+`supabase/migrations/20260711_studio_archived.sql` (adds `studio_jobs.archived boolean
+not null default false` + index — the archive API and favorites query reference the column,
+so run it in the Supabase SQL editor FIRST).**
+- JobCard: quiet gray ✕ next to the favorite star = hide; in the Hidden tab it becomes ↩
+  restore. Optimistic with revert-on-failure (matches the favorite pattern).
+- Gallery tabs now All / Favorites / **Hidden (n)** — Hidden tab only appears when n > 0.
+  All + Favorites exclude archived; counts updated.
+- Excluded everywhere: dashboard favorites stash (listUserFavoriteJobs), Website Preview
+  asset picker, gallery. NEW `/api/studio/archive` (ownership-checked, NOT Pro-gated —
+  free users can hide their duds too).
+- Files: migration, lib/studio/jobs.ts (archived field + setJobArchived), api/studio/archive
+  (new), JobCard.tsx, StudioImageGenerator.tsx (tab state + handler + literals),
+  types/index.ts, process/upload-logo routes (literals), WebsitePreview.tsx (filter).
+
 **▶ NEXT SESSION / FOX — START HERE:**
-1. PUSH everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
-   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2 + THE REFILL PAYMENT FIX (part 11 — push
-   this one ASAP, it's live-revenue correctness). Then Fox eyeballs the Juicy Hazy preview
-   again — the verdict on v2 decides if the preview button stays primary.
-2. Run the make-whole SQL + add Stripe price metadata (see part 11).
+1. ⚠️ RUN THE MIGRATION FIRST (20260711_studio_archived.sql in Supabase SQL editor), THEN
+   push everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
+   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2 + REFILL PAYMENT FIX + ADMIN TYPO FIX +
+   HIDE/ARCHIVE.
+2. Live test after deploy: hide the rip-curl-avenue shirt (✕) → vanishes from All/Favorites
+   → appears under Hidden → restore works → hidden art absent from Website Preview.
+3. Fox eyeballs the Juicy Hazy Website Preview v2 — verdict decides if the preview button
+   stays primary.
    LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
    recommended for the first) → expect ONE full-body character on white, no text; Remove BG
    → clean cutout. Then live-verify:
