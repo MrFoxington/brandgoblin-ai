@@ -578,7 +578,7 @@ export default function BrandKitView({
       </RevealCard>
 
       {/* 🌐 Website Preview modal — the kit's copy + palette as a live homepage */}
-      <WebsitePreview kit={kit} isOpen={showWebPreview} onClose={() => setShowWebPreview(false)} />
+      <WebsitePreview kit={kit} brandId={brandGenerationId} isOpen={showWebPreview} onClose={() => setShowWebPreview(false)} />
     </RevealProvider>
     </BrandIdContext.Provider>
   );

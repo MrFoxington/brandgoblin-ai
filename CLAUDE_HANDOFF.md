@@ -167,9 +167,27 @@ BrandGoblin AI 🧌"). Degrades gracefully for old kits. Zero AI cost. Wire-up: 
 tip), new `website_preview_opened` analytics event. Files: WebsitePreview.tsx (new),
 BrandKitView.tsx, analytics.ts.
 
+**10. (Same session, part 7) 🔴→✅ WEBSITE PREVIEW v2 — Fox rejected v1 ("flat, empty,
+worse than not showing it" — a lame preview deflates the 'my idea is real' high). Full
+rebuild (tsc exit 0):**
+- **Layered palette glows** (3 radial gradients from the brand's own accent colors) instead
+  of flat paint; accents now picked by CHROMA (most vivid), not just brightness.
+- **THEIR STUDIO ART pulled in live** (fetches /api/studio/jobs, filters completed + brand):
+  official logo in the site nav, latest product_art as a floating glowing hero image,
+  mascot peeking over the email-capture card. Their brand, not a wireframe.
+- **Big type**: hero at 7xl with gradient-ink accent words (splitHeadline), tagline as an
+  eyebrow chip, buttons with glow shadows.
+- **Motion**: whileInView reveals per section, staggered feature cards, hero art floats in.
+- **"✨ Copy website prompt" button** in the top bar: builds a paste-ready brief from the
+  whole kit (copy + hexes + personality + SEO) for GoDaddy Airo / Framer / any AI builder.
+  New analytics event `website_prompt_copied`. Chip renamed MOCKUP → "Concept".
+- AGREED FALLBACK: if v2 still doesn't spark on Fox's live look, demote the preview button
+  and lead with the copy-prompt path instead.
+
 **▶ NEXT SESSION / FOX — START HERE:**
 1. PUSH everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
-   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW.
+   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2. Then Fox eyeballs the Juicy Hazy preview
+   again — the verdict on v2 decides if the preview button stays primary.
    LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
    recommended for the first) → expect ONE full-body character on white, no text; Remove BG
    → clean cutout. Then live-verify:

@@ -14,7 +14,8 @@ export type AnalyticsEvent =
   | "upgrade_nudge_shown"    // free user saw UpgradeNudge
   | "upgrade_cta_clicked"    // any upgrade button clicked
   | "display_name_set"       // user told Nix their name (greeting personalization)
-  | "website_preview_opened"; // user opened the live homepage mockup
+  | "website_preview_opened"  // user opened the live homepage mockup
+  | "website_prompt_copied";  // user copied the AI-builder brief from the preview
 
 export interface AnalyticsProperties {
   brandId?: string;
