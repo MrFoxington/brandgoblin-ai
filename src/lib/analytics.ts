@@ -13,7 +13,8 @@ export type AnalyticsEvent =
   | "content_generated"      // Creator Pro content piece generated
   | "upgrade_nudge_shown"    // free user saw UpgradeNudge
   | "upgrade_cta_clicked"    // any upgrade button clicked
-  | "display_name_set";      // user told Nix their name (greeting personalization)
+  | "display_name_set"       // user told Nix their name (greeting personalization)
+  | "website_preview_opened"; // user opened the live homepage mockup
 
 export interface AnalyticsProperties {
   brandId?: string;

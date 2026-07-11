@@ -155,9 +155,21 @@ PREVIEW**: render the kit's real copy + palette + official logo into a live home
 in-app. Zero AI cost (template + kit data), hugely shareable, makes website copy feel real,
 and it's the stepping stone to the "Goblin Sites" ecosystem promise.
 
+**9. (Same session, part 6) 🌐 WEBSITE PREVIEW SHIPPED — BUILT LIVE ON CAMERA (founder build
+video #1 🎬, tsc exit 0).** The roadmap item got built same-day. NEW `WebsitePreview.tsx`:
+full-screen modal rendering the kit's REAL copy as a homepage inside a fake browser frame
+(traffic-light dots + brandname.com address bar). Auto-themes from the brand's OWN palette:
+darkest swatch = page background, brightest = buttons, luminance math keeps text readable on
+any palette. Sections: nav + hero (headline/subheadline/both CTAs/tagline), features grid
+(new `features` or legacy `featureBullets`), about, email capture, footer ("Made with
+BrandGoblin AI 🧌"). Degrades gracefully for old kits. Zero AI cost. Wire-up: gold→purple
+"🌐 See it live — preview your website" button in the Website Copy section (above the launch
+tip), new `website_preview_opened` analytics event. Files: WebsitePreview.tsx (new),
+BrandKitView.tsx, analytics.ts.
+
 **▶ NEXT SESSION / FOX — START HERE:**
-1. PUSH the 6 audit fixes + MASCOT GENERATOR + LAUNCH TIP (Claude Code: "commit and push my
-   changes").
+1. PUSH everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
+   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW.
    LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
    recommended for the first) → expect ONE full-body character on white, no text; Remove BG
    → clean cutout. Then live-verify:

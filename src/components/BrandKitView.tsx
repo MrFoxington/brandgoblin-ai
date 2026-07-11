@@ -13,6 +13,7 @@ import UpgradeNudge from "./UpgradeNudge";
 import NixPose from "./primitives/NixPose";
 import Sparkles from "./primitives/Sparkles";
 import { RevealProvider, RevealCard, SkipRevealButton } from "./primitives/Reveal";
+import WebsitePreview from "./WebsitePreview";
 import { useSoundFx, SoundToggle } from "./primitives/SoundFx";
 import { trackEvent } from "@/lib/analytics";
 import { createContext, useContext } from "react";
@@ -143,6 +144,7 @@ export default function BrandKitView({
   const [rerolling, setRerolling] = useState<string | null>(null);
   const [rerollErrors, setRerollErrors] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<"reveal" | "complete" | "done">("reveal");
+  const [showWebPreview, setShowWebPreview] = useState(false); // 🌐 Website Preview modal
   const { playReveal } = useSoundFx();
   const shouldReduce = useReducedMotion();
 
@@ -399,6 +401,15 @@ export default function BrandKitView({
           </div>
         )}
 
+        {/* 🌐 Website Preview — see the copy as a real homepage (zero energy) */}
+        <button
+          type="button"
+          onClick={() => { setShowWebPreview(true); trackEvent("website_preview_opened", {}); }}
+          className="w-full rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 text-sm font-bold text-primary-light transition-colors hover:bg-primary/20 hover:text-white"
+        >
+          🌐 See it live — preview your website
+        </button>
+
         {/* Where to launch this — close the loop between copy and a live site */}
         <div className="rounded-xl border border-secondary/25 bg-secondary/5 p-4 space-y-1.5">
           <p className="text-xs font-bold tracking-widest uppercase text-secondary">🚀 Where to launch this</p>
@@ -565,6 +576,9 @@ export default function BrandKitView({
           </div>
         )}
       </RevealCard>
+
+      {/* 🌐 Website Preview modal — the kit's copy + palette as a live homepage */}
+      <WebsitePreview kit={kit} isOpen={showWebPreview} onClose={() => setShowWebPreview(false)} />
     </RevealProvider>
     </BrandIdContext.Provider>
   );
