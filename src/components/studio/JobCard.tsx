@@ -21,6 +21,7 @@ interface Props {
 
 const IMAGE_TYPE_LABELS: Record<string, string> = {
   logo_concept:   "Logo Concept",
+  mascot:         "Mascot",
   social_graphic: "Social Graphic",
   product_art:    "Product Art",
 };

@@ -129,7 +129,12 @@ export async function POST(request: Request) {
       .single();
 
     if (brand?.output_data) {
-      const kit = brand.output_data as { logoPrompt?: string; recommendedName?: string; colorPalette?: Array<{ hex?: string; name?: string }> };
+      const kit = brand.output_data as {
+        logoPrompt?: string;
+        recommendedName?: string;
+        colorPalette?: Array<{ hex?: string; name?: string }>;
+        mascot?: { name?: string; appearance?: string; personality?: string; visualDescription?: string; imagePrompt?: string };
+      };
       const baseLogo   = kit.logoPrompt ?? "";
       const brandName  = kit.recommendedName ?? "";
       // Plain color WORDS only — never raw hex (image models print hex as text).
@@ -138,6 +143,11 @@ export async function POST(request: Request) {
 
       if (imageType === "logo_concept") {
         prompt = `${baseLogo || `Logo concept for ${brandName}`}. Clean icon / symbol mark, professional quality, symbol only — no text, letters, or numbers.${colors ? ` Color palette: ${colors}.` : ""} Presented on a clean, solid white background.`;
+      } else if (imageType === "mascot") {
+        const m = kit.mascot;
+        const mascotDesc = [m?.imagePrompt || m?.visualDescription || m?.appearance, m?.personality ? `Personality: ${m.personality}.` : ""]
+          .filter(Boolean).join(" ");
+        prompt = `${mascotDesc || `A friendly brand mascot character for ${brandName}`}. Exactly one full-body mascot character, head to toe, expressive face, dynamic friendly pose, professional animation-studio character design.${colors ? ` Color palette: ${colors}.` : ""} No text, letters, or numbers anywhere. Clean, solid white background. ${noJunk}`;
       } else if (imageType === "social_graphic") {
         prompt = `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
       } else {
@@ -152,6 +162,7 @@ export async function POST(request: Request) {
       logo_concept:   "A clean, professional logo concept icon mark for a modern brand, on a clean solid white background.",
       social_graphic: "A bold, eye-catching social media graphic with modern design.",
       product_art:    "Professional product photography with clean background.",
+      mascot:         "One friendly full-body brand mascot character, expressive face, professional animation-studio character design, no text, on a clean solid white background.",
     };
     prompt = defaults[imageType as ImageType] ?? "A professional branded image.";
   }

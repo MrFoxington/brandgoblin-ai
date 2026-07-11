@@ -120,8 +120,31 @@ Also unaudited: fresh signup → first brand flow (item 12, do before acquisitio
 Files: Footer.tsx, Navbar.tsx, DailyCreatorDashboard.tsx, dashboard/page.tsx, pricing/page.tsx,
 EnergyWidget.tsx, lib/analytics.ts, + 2 new pages.
 
+**7. (Same session, part 4) 🧌 NEW FEATURE: MASCOT GENERATOR IN STUDIO (Fox's catch:
+"the landing sells a Mascot Generator, the kit writes a mascot concept, but Studio couldn't
+generate the mascot image"). Built (tsc exit 0, NO migration — image_type is free TEXT):**
+- `energy-config.ts`: ImageType union + IMAGE_TYPE_SIZES gain "mascot" (portrait_4_3,
+  768×1024 — full-body characters read best in portrait). Energy cost auto-computes (1MP,
+  same as logo).
+- `cook-prompt/route.ts`: mascot asset label + feeds the kit's EXISTING MascotConcept
+  (name/appearance/personality/visualDescription/imagePrompt — it was sitting unused!) into
+  the prompt engineer; new mascot textRule (ONE full-body character, no text, white bg for
+  clean cutout, character-sheet quality).
+- `jobs/route.ts`: mascot branch in the kit fallback builder (uses kit.mascot) + generic
+  default prompt.
+- `StudioImageGenerator.tsx`: 4th What-to-Create card "Mascot — Your brand's character,
+  brought to life" (grid now 2×2 mobile / 4-up desktop); the "playful mascot scene" spark
+  now correctly sets type mascot (was silently making logo_concepts — the July 3 mislabeled-
+  job hazard, now fixed at the source).
+- `JobCard.tsx`: "Mascot" type label. Remove BG on mascots uses fal rembg (photo/illustration
+  cutout — right tool; local strip stays logo-only). No official-logo button on mascots (by
+  design), no stamping on mascots (by design).
+
 **▶ NEXT SESSION / FOX — START HERE:**
-1. PUSH the 6 audit fixes (Claude Code: "commit and push my changes"). Then live-verify:
+1. PUSH the 6 audit fixes + MASCOT GENERATOR (Claude Code: "commit and push my changes").
+   LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
+   recommended for the first) → expect ONE full-body character on white, no text; Remove BG
+   → clean cutout. Then live-verify:
    footer while logged in, /studio redirect, a garbage URL shows the goblin 404, pricing copy,
    app navbar links, and the "What should Nix call you?" ask (set name → greeting updates).
 2. Fox homework (accounts): Setup Week from FOX_0_TO_100K_PLAN.pdf — Fox handles (TikTok

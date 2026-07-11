@@ -174,7 +174,7 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
 // Allowed output dimensions per image type — PIN these server-side to
 // prevent users from requesting arbitrary large sizes that erode margin.
 // Megapixels = ceil(width × height / 1_000_000).
-export type ImageType = "logo_concept" | "social_graphic" | "product_art";
+export type ImageType = "logo_concept" | "social_graphic" | "product_art" | "mascot";
 
 export interface PinnedSize {
   falSize: string;
@@ -187,6 +187,8 @@ export const IMAGE_TYPE_SIZES: Record<ImageType, PinnedSize> = {
   logo_concept:   { falSize: "square_hd",     width: 1024, height: 1024, label: "1024×1024" },
   social_graphic: { falSize: "landscape_4_3", width: 1024, height: 768,  label: "1024×768"  },
   product_art:    { falSize: "square_hd",     width: 1024, height: 1024, label: "1024×1024" },
+  // Full-body character reads best in portrait (July 10 2026 — Mascot generator)
+  mascot:         { falSize: "portrait_4_3",  width: 768,  height: 1024, label: "768×1024"  },
 };
 
 /** ceil(pixels / 1_000_000) matching fal.ai billing rounding */

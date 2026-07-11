@@ -29,6 +29,7 @@ const ASSET_LABELS: Record<ImageType, string> = {
   logo_concept:   "logo concept / icon mark",
   social_graphic: "social media graphic (landscape, 4:3)",
   product_art:    "product hero image",
+  mascot:         "brand mascot character (full body, portrait)",
 };
 
 export async function POST(request: Request) {
@@ -86,6 +87,20 @@ export async function POST(request: Request) {
       const mission = kit.brandStory?.mission ?? "";
       brandName = kit.recommendedName ?? "";
 
+      // The brand kit already contains a full mascot concept — feed it to the
+      // prompt engineer when the user is generating their mascot (July 10 2026).
+      const m = kit.mascot;
+      const mascotContext =
+        imageType === "mascot" && m
+          ? [
+              m.name              ? `Mascot name: ${m.name}`                    : "",
+              m.appearance        ? `Mascot appearance: ${m.appearance}`        : "",
+              m.personality       ? `Mascot personality: ${m.personality}`      : "",
+              m.visualDescription ? `Mascot visual style: ${m.visualDescription}` : "",
+              m.imagePrompt       ? `Mascot art direction: ${m.imagePrompt}`    : "",
+            ].filter(Boolean).join("\n")
+          : "";
+
       brandContext = [
         `Brand name: ${brandName}`,
         tagline  ? `Tagline: ${tagline}`               : "",
@@ -93,6 +108,7 @@ export async function POST(request: Request) {
         traits   ? `Personality: ${traits}`             : "",
         palette  ? `Color palette (in words): ${palette}` : "",
         kit.logoPrompt ? `Logo direction: ${kit.logoPrompt}` : "",
+        mascotContext,
       ].filter(Boolean).join("\n");
     }
   }
@@ -113,6 +129,8 @@ export async function POST(request: Request) {
 
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
+    : imageType === "mascot"
+    ? `CHARACTER: render exactly ONE full-body mascot character, head to toe, matching the described appearance and personality — expressive face, dynamic friendly pose, consistent character-design quality (think professional animation studio character sheet). TEXT IN IMAGE: render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. BACKGROUND: clean, solid white background so the character can be cut out cleanly. The character itself may freely use any colors, including white.`
     : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;
 
   const message = await anthropic.messages.create({

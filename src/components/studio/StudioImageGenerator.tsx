@@ -22,6 +22,7 @@ interface Props {
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
   { key: "logo_concept",   label: "Logo Concept",   desc: "Icon mark from your brand direction" },
+  { key: "mascot",         label: "Mascot",         desc: "Your brand's character, brought to life" },
   { key: "social_graphic", label: "Social Graphic", desc: "Branded post image for social" },
   { key: "product_art",    label: "Product Art",    desc: "Hero imagery for your brand" },
 ];
@@ -36,7 +37,7 @@ const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEn
 
 const IDEA_SPARKS = [
   { label: "moody hero shot",      imageType: "product_art"  as ImageType, note: "moody, dramatic hero shot with cinematic lighting" },
-  { label: "playful mascot scene", imageType: "logo_concept" as ImageType, note: "playful, fun mascot scene with vibrant colors" },
+  { label: "playful mascot scene", imageType: "mascot" as ImageType, note: "playful, fun mascot scene with vibrant colors" },
   { label: "minimalist logo card", imageType: "logo_concept" as ImageType, note: "clean minimalist logo on a simple card, lots of white space" },
   { label: "bold product flatlay", imageType: "product_art"  as ImageType, note: "bold product flatlay with colorful props and graphic styling" },
 ];
@@ -856,7 +857,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
             What to Create
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
               <button key={key} onClick={() => setImageType(key)}
                 className={`rounded-xl border p-3 text-left transition-all ${
