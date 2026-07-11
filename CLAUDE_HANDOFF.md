@@ -236,6 +236,15 @@ same-composition engine-compare trick, worth it); (2) More Like This now COOKS a
 variation prompt (same subject + brand style, new composition/angle/setting, original prompt
 passed as context; free text op, falls back to original prompt if the cook fails).
 
+**14. (Same session, part 11) 🎯 "WHAT'S THE PRODUCT?" FIELD FOR PRODUCT ART (Fox: product
+art generated random products — no way to say "coffee bag" or "skateboard").** Built (tsc
+exit 0, StudioImageGenerator.tsx only — no API change, rides the existing userNote param):
+optional text field + 8 quick-pick chips (T-shirt/Hoodie/Coffee bag/Bottle/Packaging box/
+Poster/Sticker/Phone case) appears under What-to-Create ONLY when Product Art is selected.
+The value is passed to the prompt cooker as a hard instruction ("The product MUST be: X."),
+auto re-cooks on change (800ms debounce while typing), fresh seed per change. Blank = Nix
+improvises like before.
+
 **▶ NEXT SESSION / FOX — START HERE:**
 1. ⚠️ MIGRATION 20260711_studio_archived.sql ✅ ALREADY RUN (July 11). THEN
    push everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT

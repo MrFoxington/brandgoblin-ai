@@ -107,6 +107,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [shareMsgIndex, setShareMsgIndex]       = useState(0);
   // Gallery tab: All (visible) / Favorites (visible favs) / Hidden (archived, restorable)
   const [galleryTab, setGalleryTab] = useState<"all" | "favorites" | "hidden">("all");
+  // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
+  const [productFocus, setProductFocus] = useState("");
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Bring-your-own-logo upload (Pro perk)
@@ -367,10 +369,18 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   async function cookPrompt(type: ImageType, userNote?: string): Promise<string> {
     setIsCooking(true);
     try {
+      // July 11 2026: the user can name the exact product for Product Art
+      // ("coffee bag", "skateboard deck"…) — hand it to Nix as a hard
+      // instruction so the prompt is built AROUND their product, not a guess.
+      const productNote =
+        type === "product_art" && productFocus.trim()
+          ? `The product MUST be: ${productFocus.trim()}.`
+          : "";
+      const note = [productNote, userNote].filter(Boolean).join(" ") || undefined;
       const res = await fetch("/api/studio/cook-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandId: selectedBrandId || undefined, imageType: type, userNote }),
+        body: JSON.stringify({ brandId: selectedBrandId || undefined, imageType: type, userNote: note }),
       });
       if (!res.ok) return "";
       const data = (await res.json()) as { prompt?: string };
@@ -395,6 +405,21 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBrandId, imageType]);
+
+  // Auto re-cook when the product focus changes (longer debounce — user is typing)
+  useEffect(() => {
+    if (imageType !== "product_art") return;
+    if (suppressCookRef.current) return;
+    if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
+    cookDebounceRef.current = setTimeout(async () => {
+      if (suppressCookRef.current) return;
+      seedRef.current = generateSeed(); // new creative intent
+      const cooked = await cookPrompt("product_art");
+      if (cooked) setPrompt(cooked);
+    }, 800);
+    return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productFocus]);
 
   // ── Job submission ─────────────────────────────────────────────────────────
 
@@ -915,6 +940,40 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               </button>
             ))}
           </div>
+
+          {/* Product focus — only for Product Art: name the exact product and
+              Nix cooks the prompt around it instead of guessing. */}
+          {imageType === "product_art" && (
+            <div className="mt-3 rounded-xl border border-white/10 bg-white/3 p-3.5 space-y-2.5">
+              <label className="block text-xs uppercase tracking-widest text-primary-light font-bold">
+                What&rsquo;s the product? <span className="normal-case font-normal text-faint tracking-normal">(optional — Nix improvises if blank)</span>
+              </label>
+              <input
+                type="text"
+                value={productFocus}
+                onChange={(e) => setProductFocus(e.target.value)}
+                maxLength={80}
+                placeholder="e.g. coffee bag, skateboard deck, hoodie, supplement jar…"
+                className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
+              />
+              <div className="flex flex-wrap gap-1.5">
+                {["T-shirt", "Hoodie", "Coffee bag", "Bottle", "Packaging box", "Poster", "Sticker", "Phone case"].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => { playButtonPress(); setProductFocus(chip.toLowerCase()); }}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      productFocus.toLowerCase() === chip.toLowerCase()
+                        ? "border-primary bg-primary/20 text-white"
+                        : "border-white/10 bg-white/5 text-muted hover:border-primary/40 hover:text-white"
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Official-logo stamp toggle — only when the brand has an official
               logo and this creation type would get stamped. */}
