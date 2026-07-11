@@ -25,7 +25,9 @@ const APP_LINKS = [
 
 // Convenience link only — the real gate is server-side in /admin (redirects non-admins).
 // Matches the server's ADMIN_EMAIL fallback.
-const ADMIN_EMAIL = "joepro@hotmail.com";
+// July 10 2026: fixed typo "joepro" → "jopro" (Fox's real email) — the Admin link
+// never showed because of the extra 'e'.
+const ADMIN_EMAIL = "jopro@hotmail.com";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);

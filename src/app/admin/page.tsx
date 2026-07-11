@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import ShowcaseAdmin from "@/components/admin/ShowcaseAdmin";
 import { listAdminFeaturable } from "@/lib/studio/showcase";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joepro@hotmail.com";
+// July 10 2026: fixed fallback typo "joepro" → "jopro" (Fox's real email).
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "jopro@hotmail.com";
 
 export default async function AdminPage() {
   const supabase = createClient();

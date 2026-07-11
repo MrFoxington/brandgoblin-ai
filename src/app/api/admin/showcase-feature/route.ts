@@ -8,7 +8,8 @@ import { setJobFeatured } from "@/lib/studio/showcase";
 
 export const runtime = "nodejs";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "joepro@hotmail.com";
+// July 10 2026: fixed fallback typo "joepro" → "jopro" (Fox's real email).
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "jopro@hotmail.com";
 
 export async function POST(request: Request) {
   const supabase = createClient();

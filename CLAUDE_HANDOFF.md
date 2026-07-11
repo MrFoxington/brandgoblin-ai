@@ -184,10 +184,37 @@ rebuild (tsc exit 0):**
 - AGREED FALLBACK: if v2 still doesn't spark on Fox's live look, demote the preview button
   and lead with the copy-prompt path instead.
 
+**11. (Same session, part 8) 🔴💰 REAL-MONEY BUG: $49 REFILL CREDITED ONLY 1,000 (Fox hit it
+live buying the Value pack — had ~10 energy, paid $49 for 3,000, got 1,000).**
+ROOT CAUSE: refill energy amounts relied ENTIRELY on `energy_amount` metadata set on the
+Stripe price objects; the $49 price is missing that metadata, so the webhook silently fell
+back to ENERGY_CONFIG.REFILL_AMOUNT (1,000 — the $19 amount). NOT a display bug and NOT a
+cap — balances hold any amount and the widget shows the over-max breakdown correctly.
+FIXED IN CODE (tsc exit 0, checkout/route.ts): authoritative server-side pack map
+(starter 1000 / value 3000 / creator 7000), Stripe metadata now only an OVERRIDE, checkout
+REFUSES to sell if no amount can be determined (never silently defaults), energyAmount
+ALWAYS written to session metadata, drift warning if metadata ≠ map.
+✅ RESOLVED same night (July 11, ~12:45am): (a) make-whole SQL ran — Fox briefly at 5,010
+(correction block ran twice; the continue-past-unique-violation design double-applied the
+balance update — lesson: idempotent ledger ≠ idempotent balance), corrected back down with
+a -2,000 update; final balance verified ~3,010 ✅. (b) Stripe metadata mystery solved:
+Fox had set energy_amount on the PRODUCTS, but the code reads it from the PRICES (separate
+metadata!). All 3 PRICE objects now have energy_amount 1000/3000/7000 set + saved ✅.
+(c) remaining: after deploy, verify the next real refill purchase against the ledger.
+**PLOT TWIST DURING THE FIX: Fox's real email is `jopro@hotmail.com` — NOT "joepro".**
+The first make-whole SQL silently no-op'd hunting for joepro. AND the same typo was baked
+into the code: ADMIN_EMAIL fallback said "joepro@hotmail.com" in Navbar.tsx, admin/page.tsx,
+and api/admin/showcase-feature/route.ts — meaning the 🧌 Admin link + admin page never
+worked for Fox. All 3 fixed to jopro@hotmail.com (tsc exit 0). ⚠️ ALSO CHECK: if an
+ADMIN_EMAIL env var exists in Vercel with the joepro typo, it overrides the code — correct
+it there too.
+
 **▶ NEXT SESSION / FOX — START HERE:**
 1. PUSH everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
-   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2. Then Fox eyeballs the Juicy Hazy preview
+   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2 + THE REFILL PAYMENT FIX (part 11 — push
+   this one ASAP, it's live-revenue correctness). Then Fox eyeballs the Juicy Hazy preview
    again — the verdict on v2 decides if the preview button stays primary.
+2. Run the make-whole SQL + add Stripe price metadata (see part 11).
    LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
    recommended for the first) → expect ONE full-body character on white, no text; Remove BG
    → clean cutout. Then live-verify:

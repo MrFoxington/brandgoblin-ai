@@ -111,16 +111,61 @@ export async function POST(request: Request) {
         );
       }
 
-      // Read energy_amount metadata from Stripe so the webhook is metadata-driven
-      // (no hardcoded price→energy map anywhere in the codebase)
-      let energyAmount: string | undefined;
+      // ── Determine the energy amount for this pack ──────────────────────────
+      // July 10 2026 bug: the $49 pack credited only 1,000 because the amount
+      // relied ENTIRELY on `energy_amount` metadata set on the Stripe price —
+      // when missing, the webhook silently fell back to the $19 default and
+      // SHORT-CHANGED a real paying customer. New rules:
+      //   1. Server-side pack map is the authoritative source of truth.
+      //   2. Stripe price metadata may OVERRIDE it (lets us tune packs without deploys).
+      //   3. If we cannot determine an amount, REFUSE to sell — never silently default.
+      const PACK_ENERGY: Record<string, number> = {
+        starter: 1000, // $19
+        value:   3000, // $49
+        creator: 7000, // $99
+      };
+      // Resolve which pack this price belongs to (works for both packKey and
+      // legacy direct-priceId calls).
+      const resolvedPackKey =
+        packKey && PACK_ENERGY[packKey] !== undefined
+          ? packKey
+          : requestedPriceId === process.env.STRIPE_PRICE_ID_ENERGY_REFILL
+          ? "starter"
+          : requestedPriceId === process.env.STRIPE_PRICE_ID_ENERGY_3000
+          ? "value"
+          : requestedPriceId === process.env.STRIPE_PRICE_ID_ENERGY_7000
+          ? "creator"
+          : undefined;
+
+      let metadataAmount: number | undefined;
       try {
         const price = await stripe.prices.retrieve(requestedPriceId);
-        energyAmount = price.metadata?.energy_amount;
+        const raw = price.metadata?.energy_amount;
+        const parsed = raw ? parseInt(raw, 10) : NaN;
+        if (Number.isFinite(parsed) && parsed > 0) metadataAmount = parsed;
       } catch (err) {
         console.error("[checkout] price metadata fetch failed:", err);
-        // Non-fatal — webhook falls back to ENERGY_CONFIG.REFILL_AMOUNT
+        // Non-fatal — the pack map below still covers us.
       }
+
+      const packAmount = resolvedPackKey ? PACK_ENERGY[resolvedPackKey] : undefined;
+      const finalEnergyAmount = metadataAmount ?? packAmount;
+      if (!finalEnergyAmount) {
+        console.error(
+          `[checkout] REFUSING refill checkout — cannot determine energy amount (price ${requestedPriceId}, packKey ${packKey ?? "none"})`
+        );
+        return NextResponse.json(
+          { error: "This refill pack is misconfigured. Please try again shortly — no charge was made." },
+          { status: 503 }
+        );
+      }
+      // Warn loudly if Stripe metadata disagrees with the code map (drift detector)
+      if (metadataAmount && packAmount && metadataAmount !== packAmount) {
+        console.warn(
+          `[checkout] energy_amount drift: Stripe metadata says ${metadataAmount}, pack map says ${packAmount} (price ${requestedPriceId}) — using metadata`
+        );
+      }
+      const energyAmount = String(finalEnergyAmount);
 
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
@@ -131,7 +176,7 @@ export async function POST(request: Request) {
         metadata: {
           userId: authData.user.id,
           type: "energy_refill",
-          ...(energyAmount ? { energyAmount } : {}),
+          energyAmount, // ALWAYS set now — the webhook never falls back to a default
         },
       });
 
