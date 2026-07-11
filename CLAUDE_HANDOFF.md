@@ -52,7 +52,7 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ✅ PUSHED + DEPLOYING)
+## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ✅ SHIPPED + LIVE-VERIFIED)
 
 Cowork session. Fox flagged (with the IndiQue playing-card test): EVERY product art / social
 graphic force-painted the brand name into the image ("MUST display the brand name" rule in the
@@ -79,9 +79,24 @@ engraving/labels into the prompt at all; (b) HARD GUARANTEE: server-side scrub d
 occurrence of the brand name (quoted or bare, case-insensitive) from the cooked prompt + appends
 a pinned "absolutely no text, all surfaces clean and unbranded" clause — deterministic, survives
 anything Haiku writes; (c) jobs-route fallback off-variants no longer mention the brand name at
-all. NOTE: unclear if v1 test ran before the Vercel deploy finished (checkbox visible?).
-**▶ NEXT: push v2 → live test: box OFF = zero text + no name in the cooked prompt text; ON =
-correct name; logo stamp unaffected. Then SOCIAL LAUNCH DAY (July 12) — setup week begins.**
+all. (v1's failed test was likely pre-deploy, but v2's hard scrub makes it moot.)
+✅ v2 pushed (`811a8d5`) + deployed + **LIVE-VERIFIED BY FOX: box OFF = clean prompt (no brand
+name, pinned no-text clause) and clean art. "That worked."**
+**v3 SAME SESSION — "MERCH DESIGNER" UPGRADE (tsc exit 0, ⚠️ needs push).** Fox's live verdict:
+social graphics improved a LOT with names off, but PRODUCTS got weak — "clean and unbranded"
+told the model to render BLANK products (empty phone case = boring). Fix: no-text now means
+no WORDS, not no DESIGN. (a) cook-prompt textRule (off) rewritten: Haiku must act like a merch
+designer — invent ONE bold signature visual motif from the brand identity and describe it
+concretely, dressing every printable surface (wordless but unmistakably THIS brand);
+(b) pinned scrub suffix now says "surfaces carry only wordless graphic artwork: patterns,
+motifs, and colors true to the brand" (was "clean and unbranded" — the blank-product culprit);
+(c) jobs fallback product prompt gets the same pattern-dressed treatment. Fox also noted he's
+ENJOYING hand-editing prompts — prompt box as a creative surface is working as designed.
+**▶ NEXT: push v3 → test a Juicy Hazy phone case (name off): should come out wrapped in
+brand-motif artwork, not blank. Then SOCIAL LAUNCH DAY (July 12) — setup week begins
+(FOX_0_TO_100K_PLAN.pdf): Fox-named TikTok + YouTube handles, park @brandgoblinai, film/post
+founder build video #1. Housekeeping when convenient: quick test of box ON = correct name;
+verify next real refill vs ledger.**
 
 ---
 

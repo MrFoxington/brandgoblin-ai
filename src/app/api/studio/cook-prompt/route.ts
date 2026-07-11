@@ -135,7 +135,7 @@ export async function POST(request: Request) {
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
     : isBrandedArt
-    ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. The design must communicate purely through shape, color, material, lighting, and composition. Do NOT invent or paint any logo or wordmark onto the subject. CRITICAL: never write the brand name${brandName ? ` "${brandName}"` : ""} anywhere in your prompt — image models paint any name they read. Do not describe any lettering, engraving, embossing, printed labels, or logos. Use the brand identity ONLY for mood, colors, and style.`
+    ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. Do NOT invent or paint any logo or wordmark onto the subject. CRITICAL: never write the brand name${brandName ? ` "${brandName}"` : ""} anywhere in your prompt — image models paint any name they read. Do not describe any lettering, engraving, embossing, printed labels, or logos. SURFACE DESIGN (this is what makes it great): the product or graphic must NOT be blank or plain — act like a world-class merch designer and invent ONE bold signature visual motif from the brand's identity (its imagery, mood, mission, and palette), then dress every printable surface in it: illustrated patterns, abstract shapes, gradients, or scenic artwork. Describe that motif concretely in your prompt (e.g. "wrapped in a hand-drawn pattern of curling turquoise waves and golden suns"). Wordless, but unmistakably THIS brand.`
     : imageType === "mascot"
     ? `CHARACTER: render exactly ONE full-body mascot character, head to toe, matching the described appearance and personality — expressive face, dynamic friendly pose, consistent character-design quality (think professional animation studio character sheet). TEXT IN IMAGE: render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. BACKGROUND: clean, solid white background so the character can be cut out cleanly. The character itself may freely use any colors, including white.`
     : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;
@@ -176,7 +176,7 @@ Rules:
         .replace(/\s+([,.;:])/g, "$1")
         .trim();
     }
-    prompt = `${prompt} Absolutely no text anywhere in the image — no words, letters, numbers, brand names, logos, wordmarks, labels, or engravings. All surfaces are clean and unbranded.`;
+    prompt = `${prompt} Absolutely no text anywhere in the image — no words, letters, numbers, brand names, logos, wordmarks, labels, or engravings. Surfaces carry only wordless graphic artwork: patterns, motifs, and colors true to the brand.`;
   }
 
   return NextResponse.json({ prompt });

@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       } else {
         prompt = showBrandName
           ? `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
-          : `Professional product hero photography.${colors ? ` Color palette: ${colors}.` : ""} Clean, unbranded product surfaces — absolutely no text, brand names, letters, numbers, logos, wordmarks, or labels anywhere on the product or scene. ${noJunk}`;
+          : `Professional product hero photography. The product is dressed in a bold wordless signature pattern${colors ? ` in the brand palette (${colors})` : ""} — illustrated motifs, abstract shapes, or scenic artwork covering its printable surfaces. Absolutely no text, brand names, letters, numbers, logos, wordmarks, or labels anywhere on the product or scene. ${noJunk}`;
       }
     }
   }
