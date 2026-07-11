@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Slow down a bit — too many prompt requests." }, { status: 429 });
   }
 
-  let body: { brandId?: string; imageType?: string; userNote?: string };
+  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -62,6 +62,9 @@ export async function POST(request: Request) {
   }
 
   const { brandId, imageType, userNote } = body;
+  // Brand name on the art is OPT-IN (July 11 2026 — forced names made every
+  // product look like a mockup; clean art wins, the official logo stamp covers branding).
+  const showBrandName = body.showBrandName === true;
 
   if (!imageType || !(imageType in ASSET_LABELS)) {
     return NextResponse.json({ error: "Invalid imageType." }, { status: 400 });
@@ -122,13 +125,17 @@ export async function POST(request: Request) {
     "\nWrite ONE image-generation prompt now.",
   ].join("");
 
-  // Products and social graphics should carry the real brand name as clean
-  // typography. Logo concepts stay icon-only (in-image text garbles badly).
-  const wantsBrandName =
-    (imageType === "product_art" || imageType === "social_graphic") && brandName.trim().length > 0;
+  // Brand name as in-image typography is OPT-IN for products and social
+  // graphics (user checkbox). Default is a completely text-free image —
+  // models improvise garbled fake names otherwise, and the official logo
+  // stamp is the proper branding path. Logo concepts stay icon-only.
+  const isBrandedArt = imageType === "product_art" || imageType === "social_graphic";
+  const wantsBrandName = isBrandedArt && showBrandName && brandName.trim().length > 0;
 
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
+    : isBrandedArt
+    ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. The design must communicate purely through shape, color, material, lighting, and composition. Do NOT invent or paint any logo or wordmark onto the subject.`
     : imageType === "mascot"
     ? `CHARACTER: render exactly ONE full-body mascot character, head to toe, matching the described appearance and personality — expressive face, dynamic friendly pose, consistent character-design quality (think professional animation studio character sheet). TEXT IN IMAGE: render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. BACKGROUND: clean, solid white background so the character can be cut out cleanly. The character itself may freely use any colors, including white.`
     : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;

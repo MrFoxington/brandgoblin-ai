@@ -111,6 +111,10 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [productFocus, setProductFocus] = useState("");
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
+  // Paint the brand name INTO the art (July 11 2026) — OPT-IN, default OFF.
+  // Forced names made every product look like a mockup with a fake wordmark;
+  // clean art + the official-logo stamp is the better default.
+  const [showBrandName, setShowBrandName] = useState(false);
   // Bring-your-own-logo upload (Pro perk)
   const [uploadBusy, setUploadBusy]       = useState(false);
   const [uploadRights, setUploadRights]   = useState(false);
@@ -380,7 +384,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       const res = await fetch("/api/studio/cook-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandId: selectedBrandId || undefined, imageType: type, userNote: note }),
+        body: JSON.stringify({ brandId: selectedBrandId || undefined, imageType: type, userNote: note, showBrandName }),
       });
       if (!res.ok) return "";
       const data = (await res.json()) as { prompt?: string };
@@ -421,6 +425,21 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productFocus]);
 
+  // Auto re-cook when the brand-name toggle flips (only affects branded art)
+  useEffect(() => {
+    if (imageType !== "product_art" && imageType !== "social_graphic") return;
+    if (suppressCookRef.current) return;
+    if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
+    cookDebounceRef.current = setTimeout(async () => {
+      if (suppressCookRef.current) return;
+      seedRef.current = generateSeed(); // new creative intent
+      const cooked = await cookPrompt(imageType);
+      if (cooked) setPrompt(cooked);
+    }, 400);
+    return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showBrandName]);
+
   // ── Job submission ─────────────────────────────────────────────────────────
 
   async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType) {
@@ -443,6 +462,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           prompt: jobPrompt,
           seed: seedRef.current,
           stampLogo,
+          showBrandName,
         }),
       });
 
@@ -973,6 +993,23 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Brand name in the art — OPT-IN (July 11 2026). Default OFF: the
+              model paints garbled fake wordmarks; clean art + logo stamp wins. */}
+          {selectedBrandId && (imageType === "product_art" || imageType === "social_graphic") && (
+            <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none rounded-xl border border-white/10 bg-white/3 px-4 py-2.5">
+              <input
+                type="checkbox"
+                checked={showBrandName}
+                onChange={(e) => { playButtonPress(); setShowBrandName(e.target.checked); }}
+                className="h-4 w-4 accent-[#8B5CF6]"
+              />
+              <span className="text-xs text-muted">
+                <span className="font-semibold text-primary-light">✍️ Put my brand name on it</span>
+                {" "}— AI-drawn text can look off; leave this off for clean art and use the logo stamp instead
+              </span>
+            </label>
           )}
 
           {/* Official-logo stamp toggle — only when the brand has an official

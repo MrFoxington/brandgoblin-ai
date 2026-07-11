@@ -52,6 +52,32 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ⚠️ NOT YET PUSHED)
+
+Cowork session. Fox flagged (with the IndiQue playing-card test): EVERY product art / social
+graphic force-painted the brand name into the image ("MUST display the brand name" rule in the
+prompt cooker) — models draw a garbled fake wordmark, never the real logo, and clean art without
+the name looks far better. Decision (Fox): **brand name in the art = OPT-IN, default OFF for both
+product art and social graphics.** The official-logo stamp remains the proper branding path.
+
+**Built (tsc exit 0, NO migration):**
+1. `cook-prompt/route.ts`: new `showBrandName` body flag (defaults false). ON = old exact-name
+   typography rule. OFF = new hard no-text rule for product_art/social_graphic ("render NO text
+   at all… do NOT invent or paint any logo or wordmark") — explicit, so models don't improvise
+   gibberish names in the vacuum.
+2. `jobs/route.ts`: `showBrandName` accepted; fallback prompts for social_graphic/product_art
+   now have clean no-text variants ("in the style of {brand}", unbranded surfaces).
+3. `StudioImageGenerator.tsx`: new "✍️ Put my brand name on it" checkbox (shows when a brand is
+   selected + type is Product Art or Social Graphic; default OFF; copy warns AI-drawn text can
+   look off). Toggling re-cooks the prompt (400ms debounce) + burns a fresh seed. Flag passed to
+   both cook-prompt and job submission.
+
+**▶ NEXT: (1) Fox pushes from his Mac ("commit and push my changes") → Vercel deploys;
+(2) live test: product art with box OFF = zero text on the product, ON = correct name; logo
+stamp unaffected either way. Then it's SOCIAL LAUNCH DAY (July 12) — setup week begins.**
+
+---
+
 ## 🗓️ SESSION LOG — July 10, 2026 (CHANNEL IDENTITY DECIDED: FILM AS FOX + THE 0-100K MASTER PLAN)
 
 Cowork session. Fox pushed the July 5 commit from his Mac (Powered by NIX + docs + agents).
@@ -245,30 +271,32 @@ The value is passed to the prompt cooker as a hard instruction ("The product MUS
 auto re-cooks on change (800ms debounce while typing), fresh seed per change. Blank = Nix
 improvises like before.
 
-**▶ NEXT SESSION / FOX — START HERE:**
-1. ⚠️ MIGRATION 20260711_studio_archived.sql ✅ ALREADY RUN (July 11). THEN
-   push everything (Claude Code: "commit and push my changes"): 6 audit fixes + MASCOT
-   GENERATOR + LAUNCH TIP + WEBSITE PREVIEW v2 + REFILL PAYMENT FIX + ADMIN TYPO FIX +
-   HIDE/ARCHIVE.
-2. Live test after deploy: hide the rip-curl-avenue shirt (✕) → vanishes from All/Favorites
-   → appears under Hidden → restore works → hidden art absent from Website Preview.
-3. Fox eyeballs the Juicy Hazy Website Preview v2 — verdict decides if the preview button
-   stays primary.
-   LIVE TEST mascot (costs energy): pick Juicy Hazy → Mascot → generate (Premium engine
-   recommended for the first) → expect ONE full-body character on white, no text; Remove BG
-   → clean cutout. Then live-verify:
-   footer while logged in, /studio redirect, a garbage URL shows the goblin 404, pricing copy,
-   app navbar links, and the "What should Nix call you?" ask (set name → greeting updates).
-2. Fox homework (accounts): Setup Week from FOX_0_TO_100K_PLAN.pdf — Fox handles (TikTok
-   personal, YouTube phone-verified), park @brandgoblinai, optionally nixgoblin.com (~$13).
-3. Airo paste-ins still pending (fix pack Blocks 1-3 + header Powered by NIX tagline). NOTE:
-   once Fox's real social accounts exist, the dead footer icons can become real links instead
-   of being removed.
-4. Brand Kit download (audit item 11): verify it exists; if not, build it — biggest product
-   win on the list.
-5. VIDEO: script the "I audited my own app and fixed everything in a day" build-in-public
-   video from this session's material (Fox requested it — waiting on the fixes being live).
-6. Acquisition plan Day 1 funnel check when accounts are live.
+**✅ SESSION CLOSED CLEAN (July 11, ~1:20am).** ALL 15 commits pushed + deployed through
+`06e93b8`. Migration run. LIVE-VERIFIED by Fox and/or Claude-in-Chrome: mascot generation
+WORKS (Fox), hide/archive WORKS (Fox), product-focus field WORKS (Fox), duplicate-seed fix
+deployed, ✕ buttons + Admin link visible (Claude), /studio redirect + goblin 404 + app navbar
++ nameless greeting/name-ask verified live (Claude), refill payment fix deployed, energy
+balance corrected to ~3,010, Stripe PRICE metadata set on all 3 packs, Vercel ADMIN_EMAIL
+corrected. Fox set his display name. Energy spent this session: mascot + product tests only.
+
+**▶ NEXT SESSION / FOX — START HERE (July 11+):**
+1. 🎬 EDIT + POST founder build video #1 (Website Preview build — recorded July 10). Also in
+   the can: mascot reveal footage + the "audited my own app, fixed everything in a day" story
+   (script it from audit doc + session log parts 5-14).
+2. 🏁 FOX HOMEWORK (carried over): Setup Week from FOX_0_TO_100K_PLAN.pdf — create Fox-named
+   handles (TikTok personal acct, YouTube phone-verified), park @brandgoblinai everywhere,
+   optionally grab nixgoblin.com (~$13).
+3. 🌐 WEBSITE PREVIEW v2 VERDICT still open: Fox eyeballs Juicy Hazy's preview (glows, huge
+   gradient headline, his real product art + mascot in it). Fire-up test decides if the
+   preview button stays primary or the copy-prompt path leads.
+4. Airo paste-ins still pending (fix pack Blocks 1-3 + header Powered by NIX tagline). NOTE:
+   once Fox's real social accounts exist, the dead footer icons become real links instead of
+   being removed.
+5. 📦 BRAND KIT DOWNLOAD (audit item 11): verify it exists; if not, BUILD it — biggest
+   product win on the roadmap, then WEBSITE PREVIEW→real-site path (Goblin Sites seed).
+6. Acquisition plan Day 1 funnel check once accounts are live.
+7. Housekeeping when convenient: free-account checks (BYOL locked panel; archive button for
+   free users), verify next real refill purchase against the energy ledger.
 
 ---
 

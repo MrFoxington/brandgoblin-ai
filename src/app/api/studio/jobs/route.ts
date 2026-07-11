@@ -44,6 +44,7 @@ export async function POST(request: Request) {
     prompt: clientPrompt,
     seed: clientSeed,
     stampLogo: clientStampLogo,
+    showBrandName: clientShowBrandName,
   } = body as {
     modelKey: string;
     imageType: string;
@@ -51,10 +52,15 @@ export async function POST(request: Request) {
     prompt?: string;
     seed?: number;
     stampLogo?: boolean;
+    showBrandName?: boolean;
   };
 
   // Per-job official-logo stamp opt-out (defaults to true = stamp when set).
   const stampLogo = clientStampLogo !== false;
+
+  // Brand name painted into the art is OPT-IN (July 11 2026 — default is a
+  // clean, text-free image; the official-logo stamp handles branding).
+  const showBrandName = clientShowBrandName === true;
 
   // Validate seed if provided: must be a safe positive integer
   const seed = (typeof clientSeed === "number" && Number.isInteger(clientSeed) && clientSeed >= 0 && clientSeed <= 2147483647)
@@ -149,9 +155,13 @@ export async function POST(request: Request) {
           .filter(Boolean).join(" ");
         prompt = `${mascotDesc || `A friendly brand mascot character for ${brandName}`}. Exactly one full-body mascot character, head to toe, expressive face, dynamic friendly pose, professional animation-studio character design.${colors ? ` Color palette: ${colors}.` : ""} No text, letters, or numbers anywhere. Clean, solid white background. ${noJunk}`;
       } else if (imageType === "social_graphic") {
-        prompt = `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
+        prompt = showBrandName
+          ? `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
+          : `A branded social media graphic in the style of ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. No text at all — no brand names, letters, words, or numbers; communicate purely through shape, color, and composition. ${noJunk}`;
       } else {
-        prompt = `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`;
+        prompt = showBrandName
+          ? `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
+          : `Professional product hero photography in the style of ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} Clean, unbranded product surfaces — no text, brand names, letters, or invented logos anywhere on the product or scene. ${noJunk}`;
       }
     }
   }

@@ -153,6 +153,32 @@ The goblin is free to try, no card. brandgoblinai.com. Comment your idea and I'l
 ## 📥 INCOMING BATCHES
 <!-- The Idea Engine appends new dated batches directly below this line. Newest on top. -->
 
+### Batch — July 11, 2026
+*(Trend read: this week's roundups are mostly recycled ground — Bangladesh, hot dog summer, Food Jutsu, Janice, Summer Days, Big Boom, text-feature tip, all used in prior batches, all skipped. Fresh and unused right now: the Olivia Rodrigo "u + me = <3" audio ("I know everybody changes, but I hope that we don't") that the July 10 batch parked for Pillar 1 — cashing it in today since Pillar 1 is due; AI-generated choreography dance challenges are leading the dance meta (flagged rising July 8, held because Pillar 2 ran — Pillar 2 is due today, perfect meta fit for an AI product); and Bad Bunny "DtMF" is trending for celebratory brand content post-Super Bowl. Also spotted but benched: Vance Joy "Riptide" (business-approved, warm — good future Pillar 1) and "Self Aware" by Temper City (moody cinematic — a future late-night founder piece). World Cup knockout rounds are dominating feeds; the parked squad play STAYS parked for the July 16-18 pre-final window as planned. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut cuts/text layers, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 1 / 2 / 3 — Pillars 1 and 2 last appeared July 9, and yesterday's batch (3/4/5) left both out. Going 3-for-quality. Posted Log still empty, no winner data to bias toward yet.)*
+
+**1. Pillar 1 · Nix Lives Here** *(Olivia Rodrigo "u + me = <3" — the sound we've been saving for exactly this)*
+- Hook (0–3s): first frame text: "me and this goblin, day 1 vs now 🥹" over a grainy "early days" photo of a messy desk with the Nix PNG small in the corner.
+- Script: soft two-part montage cut to the line "I know everybody changes, but I hope that we don't" — THEN: cramped desk, sticky notes, Nix PNG propped against a coffee mug like the only believer. NOW: cleaner desk, the live app on screen, same Nix PNG in the exact same spot by the mug, same size, unchanged. Gentle overlays: "the app got bigger" → "the dream got bigger" → "he stayed exactly the same" → final frame just the two of them, "hope we don't." Zero pitch, pure love — a follow-farmer. Every frame from Fox's approved art, on-model.
+- Sound: Olivia Rodrigo "u + me = <3" · Length: ~12s
+- CTA: caption "everybody changes. not this little guy 🫂🧌"
+- **Status:** —
+
+**2. Pillar 2 · Mirror Mode** *(AI-choreography dance challenge — the meta writes itself: our whole brand is "AI that's actually lovable")*
+- Hook (0–3s): first frame text: "an AI invented this dance. my AI refuses to be outdone 😤" over Fox squared up to camera, Nix PNG propped in frame.
+- Script: Fox attempts the week's AI-generated choreography, visibly struggling on the weird robotic counts; on each major beat, hard cut to the static Nix PNG in a matching approved pose (arms crossed, conjuring, celebrating), snap zooms selling the sync — the goblin "hits" every move Fox fumbles. Final beat: side-by-side split, Fox mid-flail, Nix frozen flawless, smug. The joke: the AI goblin wins the AI dance. Same pose-swap-on-beat trick as the MJ and Big Boom concepts, zero rig. Duet-bait. Nix on-model from approved art only.
+- Sound: the AI-choreography challenge audio that's peaking at edit time · Length: ~10s
+- CTA: caption "built different. literally built 💀 Nix lives in the app 👇"
+- **Status:** —
+
+**3. Pillar 3 · Conjure It** *(Bad Bunny "DtMF" celebratory energy + a heat-wave-timely idea)*
+- Hook (0–3s): first frame text: "it's 100° so I made a goblin brand a snow cone stand ☀️🍧" over the app idea box, finger typing "a snow cone stand for this heat wave."
+- Script: tap Generate, loading beat, then the reveal montage lands one element per DtMF beat — name, tagline, icy palette, logo, sample post — quick zoom on the logo. Static Nix PNG slides in at the end fanning himself with a tiny finished brand kit. One Fox VO line: "Ninety seconds. That's faster than the ice melts." Screen record + PNG pop-in, same shoot as Script 1.
+- Sound: Bad Bunny "DtMF" (celebratory, trending for brands) — low under the VO · Length: ~13s
+- CTA: caption "what's YOUR heat wave hustle? comment it and Nix brands it next 👇" + pinned link comment
+- **Status:** —
+
+---
+
 ### Batch — July 10, 2026
 *(Trend read: the week's DOMINANT pattern isn't a song — it's TikTok Shop "pocket change" price-disbelief hooks ("before you ask, no it's not a typo," "your card won't decline," "literal pennies") and text/voiceover-first openers beating music across the board. That's a gift for a free app. Fresh and unused audios/formats: Ken Eurich's "maybe the program I'm running isn't too strict" (self-imposed rules you cave on — pure founder material), the "What Sound Does It Make?" original-sound guessing format (huge for business accounts right now), and Olivia Rodrigo's "u + me = <3" ("I know everybody changes, but I hope that we don't" — a beautiful future Pillar 1, holding it since Pillar 1 led yesterday). Skipped: Tung Tung Sahur / Italian brainrot (peaking, but chaotic-brainrot energy clashes with lovable on-model Nix), Bangladesh / hot dog / nonchalant / MJ remix / Netflix doc — all used in prior batches. Calendar watch: The Odyssey opens July 17 and the World Cup Final is July 19 at MetLife — the parked squad play stays parked for the July 16-18 window as planned. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut text layers, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 3 / 4 / 5 — Pillars 1 and 2 both led yesterday, Pillar 4 last led July 8, Pillar 5 hasn't led since July 7. Going 3-for-quality. Posted Log still empty, no winner data to bias toward yet.)*
 
