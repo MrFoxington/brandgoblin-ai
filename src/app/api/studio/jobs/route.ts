@@ -157,11 +157,11 @@ export async function POST(request: Request) {
       } else if (imageType === "social_graphic") {
         prompt = showBrandName
           ? `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
-          : `A branded social media graphic in the style of ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. No text at all — no brand names, letters, words, or numbers; communicate purely through shape, color, and composition. ${noJunk}`;
+          : `A bold, modern social media graphic.${colors ? ` Colors: ${colors}.` : ""} Clean, striking design. No text at all — no brand names, letters, words, numbers, logos, or wordmarks; communicate purely through shape, color, and composition. ${noJunk}`;
       } else {
         prompt = showBrandName
           ? `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
-          : `Professional product hero photography in the style of ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} Clean, unbranded product surfaces — no text, brand names, letters, or invented logos anywhere on the product or scene. ${noJunk}`;
+          : `Professional product hero photography.${colors ? ` Color palette: ${colors}.` : ""} Clean, unbranded product surfaces — absolutely no text, brand names, letters, numbers, logos, wordmarks, or labels anywhere on the product or scene. ${noJunk}`;
       }
     }
   }

@@ -52,7 +52,7 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ⚠️ NOT YET PUSHED)
+## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ✅ PUSHED + DEPLOYING)
 
 Cowork session. Fox flagged (with the IndiQue playing-card test): EVERY product art / social
 graphic force-painted the brand name into the image ("MUST display the brand name" rule in the
@@ -72,9 +72,16 @@ product art and social graphics.** The official-logo stamp remains the proper br
    look off). Toggling re-cooks the prompt (400ms debounce) + burns a fresh seed. Flag passed to
    both cook-prompt and job submission.
 
-**▶ NEXT: (1) Fox pushes from his Mac ("commit and push my changes") → Vercel deploys;
-(2) live test: product art with box OFF = zero text on the product, ON = correct name; logo
-stamp unaffected either way. Then it's SOCIAL LAUNCH DAY (July 12) — setup week begins.**
+✅ v1 committed + pushed by Fox same session (Vercel auto-deploy). 🔴 Fox's first live test
+still saw wordmark instructions in cooked prompts → **v2 HARDENING (tsc exit 0, ⚠️ needs push):**
+(a) cook-prompt textRule (off) now ALSO forbids Haiku from writing the brand name/lettering/
+engraving/labels into the prompt at all; (b) HARD GUARANTEE: server-side scrub deletes every
+occurrence of the brand name (quoted or bare, case-insensitive) from the cooked prompt + appends
+a pinned "absolutely no text, all surfaces clean and unbranded" clause — deterministic, survives
+anything Haiku writes; (c) jobs-route fallback off-variants no longer mention the brand name at
+all. NOTE: unclear if v1 test ran before the Vercel deploy finished (checkbox visible?).
+**▶ NEXT: push v2 → live test: box OFF = zero text + no name in the cooked prompt text; ON =
+correct name; logo stamp unaffected. Then SOCIAL LAUNCH DAY (July 12) — setup week begins.**
 
 ---
 

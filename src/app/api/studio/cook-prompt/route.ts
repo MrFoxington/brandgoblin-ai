@@ -135,7 +135,7 @@ export async function POST(request: Request) {
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
     : isBrandedArt
-    ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. The design must communicate purely through shape, color, material, lighting, and composition. Do NOT invent or paint any logo or wordmark onto the subject.`
+    ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. The design must communicate purely through shape, color, material, lighting, and composition. Do NOT invent or paint any logo or wordmark onto the subject. CRITICAL: never write the brand name${brandName ? ` "${brandName}"` : ""} anywhere in your prompt — image models paint any name they read. Do not describe any lettering, engraving, embossing, printed labels, or logos. Use the brand identity ONLY for mood, colors, and style.`
     : imageType === "mascot"
     ? `CHARACTER: render exactly ONE full-body mascot character, head to toe, matching the described appearance and personality — expressive face, dynamic friendly pose, consistent character-design quality (think professional animation studio character sheet). TEXT IN IMAGE: render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. BACKGROUND: clean, solid white background so the character can be cut out cleanly. The character itself may freely use any colors, including white.`
     : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;
@@ -155,11 +155,28 @@ Rules:
     messages: [{ role: "user", content: userMsg }],
   });
 
-  const prompt =
+  let prompt =
     message.content[0].type === "text" ? message.content[0].text.trim() : "";
 
   if (!prompt) {
     return NextResponse.json({ error: "Failed to generate prompt." }, { status: 500 });
+  }
+
+  // HARD GUARANTEE (July 11 2026): when the brand name is OFF for branded art,
+  // the name must not survive into the prompt regardless of what the prompt
+  // engineer wrote — image models paint any name they read. Scrub every
+  // occurrence (quoted or bare, case-insensitive), then pin an explicit
+  // no-text clause to the end so the image model gets the rule directly.
+  if (isBrandedArt && !showBrandName) {
+    if (brandName.trim()) {
+      const escaped = brandName.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      prompt = prompt
+        .replace(new RegExp(`["'“‘]?${escaped}["'”’]?`, "gi"), "")
+        .replace(/\s{2,}/g, " ")
+        .replace(/\s+([,.;:])/g, "$1")
+        .trim();
+    }
+    prompt = `${prompt} Absolutely no text anywhere in the image — no words, letters, numbers, brand names, logos, wordmarks, labels, or engravings. All surfaces are clean and unbranded.`;
   }
 
   return NextResponse.json({ prompt });
