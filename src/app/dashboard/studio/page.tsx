@@ -10,7 +10,11 @@ import EnergyWidget from "@/components/EnergyWidget";
 import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
 import type { BrandGenerationRow } from "@/types";
 
-export default async function StudioPage() {
+export default async function StudioPage({
+  searchParams,
+}: {
+  searchParams?: { brand?: string };
+}) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) redirect("/login");
@@ -51,6 +55,11 @@ export default async function StudioPage() {
 
   const brandRows = (brands ?? []) as Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
 
+  // Deep link from the brand kit's "Create in Studio" CTA (?brand=<id>).
+  // Only honored if the brand actually belongs to this user's list.
+  const requestedBrandId = searchParams?.brand;
+  const initialBrandId = brandRows.find((b) => b.id === requestedBrandId)?.id;
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -80,6 +89,7 @@ export default async function StudioPage() {
                 brands={brandRows}
                 initialJobs={recentJobs}
                 isPro={isPro}
+                initialBrandId={initialBrandId}
               />
             </div>
 

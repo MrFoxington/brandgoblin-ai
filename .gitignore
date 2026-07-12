@@ -26,3 +26,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# Raw video footage — never commit (multi-GB)
+Footage/

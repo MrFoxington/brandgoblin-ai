@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import type { BrandKit, BrandInput, NameStrengthCheck } from "@/types";
 import CopyButton from "./CopyButton";
@@ -145,8 +146,23 @@ export default function BrandKitView({
   const [rerollErrors, setRerollErrors] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<"reveal" | "complete" | "done">("reveal");
   const [showWebPreview, setShowWebPreview] = useState(false); // 🌐 Website Preview modal
+  // 🎨 Sticky "Create in Studio" bar (July 12 2026 — Fox's live-filming find:
+  // the kit→Studio path was buried below a full page of scroll and the free
+  // funnel dead-ended at Pro-locked text builders). Appears after the reveal
+  // finishes OR 8s after mount, whichever comes first — never lost, never buried.
+  const [showStudioBar, setShowStudioBar] = useState(false);
   const { playReveal } = useSoundFx();
   const shouldReduce = useReducedMotion();
+
+  const studioHref = brandGenerationId
+    ? `/dashboard/studio?brand=${brandGenerationId}`
+    : "/dashboard/studio";
+
+  useEffect(() => {
+    if (phase === "done") { setShowStudioBar(true); return; }
+    const t = setTimeout(() => setShowStudioBar(true), 8000);
+    return () => clearTimeout(t);
+  }, [phase]);
 
   // Play reveal sound + track kit view on mount
   useEffect(() => {
@@ -284,8 +300,14 @@ export default function BrandKitView({
       <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4 space-y-3">
         <p className="text-sm text-muted leading-relaxed">{kit.logoPrompt}</p>
         <div className="pt-2 border-t border-white/8">
-          <p className="text-xs text-primary-light font-semibold">🎨 Generate this logo →</p>
-          <p className="text-xs text-faint mt-0.5">Coming soon: Goblin Studio will bring this to life.</p>
+          <Link
+            href={brandGenerationId ? `/dashboard/studio?brand=${brandGenerationId}` : "/dashboard/studio"}
+            onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "logo_direction" })}
+            className="inline-block text-xs font-semibold text-primary-light hover:text-white transition-colors"
+          >
+            🎨 Generate this logo in Goblin Studio →
+          </Link>
+          <p className="text-xs text-faint mt-0.5">It&apos;s live — one tap and Nix starts painting.</p>
         </div>
       </div>
     </SectionCard>,
@@ -566,6 +588,28 @@ export default function BrandKitView({
               </div>
             </motion.div>
 
+            {/* 🎨 THE next step — Goblin Studio (open to everyone, energy-gated).
+                This is the #1 funnel moment: kit → real logo/mascot/product art. */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/20 via-primary/8 to-transparent p-6 text-center space-y-3"
+            >
+              <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">✦ Your next step ✦</p>
+              <h3 className="font-display text-2xl font-black text-white">Bring {kit.recommendedName} to life</h3>
+              <p className="text-sm text-muted max-w-md mx-auto">
+                Goblin Studio turns this kit into the real thing — your logo, your mascot, your product art. Your Creative Energy is waiting.
+              </p>
+              <Link
+                href={studioHref}
+                onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "done_block" })}
+                className="btn-primary inline-block px-8 py-3.5 text-base font-bold"
+              >
+                🎨 Create in Studio →
+              </Link>
+            </motion.div>
+
             {/* Share card — always visible */}
             <ShareCard kit={kit} />
 
@@ -579,6 +623,32 @@ export default function BrandKitView({
 
       {/* 🌐 Website Preview modal — the kit's copy + palette as a live homepage */}
       <WebsitePreview kit={kit} brandId={brandGenerationId} isOpen={showWebPreview} onClose={() => setShowWebPreview(false)} />
+
+      {/* 🎨 Sticky mobile-first Studio bar — the always-there answer to
+          "where do I go next?". Spacer keeps it from covering the footer. */}
+      {showStudioBar && <div className="h-20" aria-hidden />}
+      {showStudioBar && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 26 }}
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/30 bg-[#0f0f1a]/95 backdrop-blur-md px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+        >
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-white truncate">Make it real 🧌</p>
+              <p className="text-[11px] text-faint truncate">Logo · Mascot · Product art</p>
+            </div>
+            <Link
+              href={studioHref}
+              onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "sticky_bar" })}
+              className="btn-primary shrink-0 px-6 py-2.5 text-sm font-bold"
+            >
+              🎨 Create in Studio →
+            </Link>
+          </div>
+        </motion.div>
+      )}
     </RevealProvider>
     </BrandIdContext.Provider>
   );

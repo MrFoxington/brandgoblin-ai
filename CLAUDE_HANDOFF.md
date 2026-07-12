@@ -52,6 +52,63 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 12, 2026 (SOCIAL LAUNCH DAY — ACCOUNTS LIVE + "THE HAT" FORMAT BORN)
+
+Cowork session, launch-day prep. **1. ACCOUNT DECISION: REUSE @foxximuss on both platforms**
+(checked live: YouTube "Foxington" 13 subs / 1 on-topic Short; TikTok 10 followers / travel bio).
+Aged + verified accounts skip new-account warm-up; tiny followings make niche-poisoning moot.
+Fox's call: travel content STAYS — nomad "build from Bali/Bangkok/Tokyo cafes" IS the brand
+angle (only the karaoke video goes private). Makeover done by Fox: display name
+"Fox | BrandGoblin AI", new bios (nomad builder angle). Privacy sweep advised: subscriptions
+private, comment-history skim (youtube.com/feed/history/comment_history), watch history/likes
+already private by default.
+**2. 🎩 FIRST VIDEO FORMAT — FOX'S IDEA, BETTER THAN THE SCRIPTS: "THE HAT."** Draw 3 random
+words from a hat → build the whole brand live in the app. Slot-machine suspense + guaranteed
+real reaction + infinitely repeatable episode format + built-in comment loop ("comment 3 words,
+weirdest combo gets built next" — audience restocks the hat forever; Fox saved blank papers to
+show on camera). Supersedes scripted Scripts 1/2 as the launch format (their skeleton remains:
+2s hook, fast reveals, spoken CTA). ~80 hat words generated (4 color-coded piles: vibes /
+things / wildcards / verbs). CTA: "Drop 3 words for the hat. Free at brandgoblinai.com, no
+card." + pinned comment with rules + link.
+**3. RECORDING WORKFLOW:** app demo screen-recorded ON PHONE (mobile Safari = native vertical,
+DND on), hat footage on phone camera, edit in CapCut DESKTOP (speed-ramp the reveal), export
+clean → upload separately to TikTok + YT Shorts (never watermarked). Fox filming 2-3 episodes
+in one batch today.
+**4. 🎬 FIRST TWO EPISODES FILMED:** Flip City (retro pancake & juice bar) + Dead Orbit Tacos
+(galactic zombie taco truck — kit named it, tagline "Undead. Interstellar. Delicious.", mascot
+"Cosmo the Rotting Rocketeer"). Fox dropped raw footage in `Footage/` (6.5GB); Claude mapped
+the 11:19 Dead Orbit screen recording frame-by-frame and built a speed-ramped 38.7s app
+segment with ffmpeg → **`Footage/DeadOrbit_APP_roughcut.mp4`** (1080×1920, status bar cropped,
+reveals at ~1x, dead time 6-8x). Fox assembles in CapCut: hat clip (IMG_2905) + rough cut +
+reaction (IMG_2910). Sunglasses clips = Flip City; no sunglasses = Dead Orbit. ⚠️ Flip City
+screen recording NOT yet in the folder — Fox to AirDrop it for the same treatment.
+
+**5. 🔴→✅ FILMING EXPOSED A FUNNEL HOLE — KIT→STUDIO CTA (shipped, tsc exit 0, ⚠️ needs
+push).** Fox got LOST after generating Dead Orbit on mobile: no visible path to Studio, had
+to scroll the entire kit, the one orange button didn't work for him, ended up going out via
+dashboard. Root causes found: (a) post-kit "Continue Building" only pushes Pro TEXT builders
+(free users hit a locked wall — no Studio CTA existed at all!); (b) Logo Direction section
+still said "Coming soon: Goblin Studio"; (c) Studio couldn't be deep-linked to a brand.
+FIXES: (1) `BrandKitView.tsx`: new "✦ Your next step ✦ Bring {name} to life" gradient CTA
+block after the reveal (above ShareCard) + STICKY bottom bar "🎨 Create in Studio →" (appears
+at reveal-done OR 8s after mount, safe-area padded, spacer div, works for FREE users — Studio
+is energy-gated not plan-gated) + Logo Direction now links "Generate this logo in Goblin
+Studio →"; (2) `dashboard/studio/page.tsx`: accepts `?brand=<id>` (validated against the
+user's own brands) → (3) `StudioImageGenerator.tsx`: new `initialBrandId` prop preselects the
+brand. New analytics event `studio_cta_clicked` (section: done_block / sticky_bar /
+logo_direction) — measures the funnel. Files: BrandKitView, studio/page, StudioImageGenerator,
+analytics.ts.
+
+**▶ NEXT: (1) Fox pushes ("commit and push my changes") → deploy → mobile test: generate/open
+a kit → sticky bar appears → tap → Studio opens with THAT brand preselected; (2) finish the
+Dead Orbit edit in CapCut + POST episode 1; (3) AirDrop Flip City screen recording for rough
+cut #2; (4) park @brandgoblinai handles + optional nixgoblin.com; (5) v3 phone-case test;
+expect 50-500 views = normal calibration. Fox's next content idea: take the hat to the PARK —
+strangers pull words / pitch their own idea, brand it live in front of them (get an on-camera
+"cool if I post this?").**
+
+---
+
 ## 🗓️ SESSION LOG — July 11, 2026 (BRAND NAME ON ART IS NOW OPT-IN — ✅ SHIPPED + LIVE-VERIFIED)
 
 Cowork session. Fox flagged (with the IndiQue playing-card test): EVERY product art / social
@@ -82,7 +139,7 @@ anything Haiku writes; (c) jobs-route fallback off-variants no longer mention th
 all. (v1's failed test was likely pre-deploy, but v2's hard scrub makes it moot.)
 ✅ v2 pushed (`811a8d5`) + deployed + **LIVE-VERIFIED BY FOX: box OFF = clean prompt (no brand
 name, pinned no-text clause) and clean art. "That worked."**
-**v3 SAME SESSION — "MERCH DESIGNER" UPGRADE (tsc exit 0, ⚠️ needs push).** Fox's live verdict:
+**v3 SAME SESSION — "MERCH DESIGNER" UPGRADE (tsc exit 0, ✅ pushed + deployed).** Fox's live verdict:
 social graphics improved a LOT with names off, but PRODUCTS got weak — "clean and unbranded"
 told the model to render BLANK products (empty phone case = boring). Fix: no-text now means
 no WORDS, not no DESIGN. (a) cook-prompt textRule (off) rewritten: Haiku must act like a merch
@@ -92,11 +149,21 @@ concretely, dressing every printable surface (wordless but unmistakably THIS bra
 motifs, and colors true to the brand" (was "clean and unbranded" — the blank-product culprit);
 (c) jobs fallback product prompt gets the same pattern-dressed treatment. Fox also noted he's
 ENJOYING hand-editing prompts — prompt box as a creative surface is working as designed.
-**▶ NEXT: push v3 → test a Juicy Hazy phone case (name off): should come out wrapped in
-brand-motif artwork, not blank. Then SOCIAL LAUNCH DAY (July 12) — setup week begins
-(FOX_0_TO_100K_PLAN.pdf): Fox-named TikTok + YouTube handles, park @brandgoblinai, film/post
-founder build video #1. Housekeeping when convenient: quick test of box ON = correct name;
-verify next real refill vs ledger.**
+**✅ SESSION CLOSED CLEAN (July 11). All 3 commits pushed + deployed (v1 `70bf079`, v2
+`811a8d5`, v3 merch-designer). Live-verified: names-off social graphics "improved a lot"
+(IndiQue graphics "awesome" per Fox); v3 phone-case test NOT yet run.**
+
+**▶ NEXT SESSION / FOX — START HERE (July 12 = SOCIAL LAUNCH DAY):**
+1. 🏁 Setup Week (FOX_0_TO_100K_PLAN.pdf): create Fox-named TikTok + YouTube handles, park
+   @brandgoblinai everywhere, optionally grab nixgoblin.com (~$13).
+2. 🎬 Edit + post founder build video #1 (Website Preview build, recorded July 10).
+3. 🧪 v3 verdict: Juicy Hazy phone case, name OFF → should be wrapped in brand-motif artwork,
+   not blank. If motifs feel repetitive/off-brand, tune the merch-designer rule.
+4. Quick test: name box ON → correct spelling renders.
+5. 💡 Roadmap idea from today (post-launch-week): style idea chips in Studio ("retro poster",
+   "hand-drawn", "photoreal studio") — productize Fox's hand-editing habit for regular users.
+6. Carried over: Brand Kit download (audit item 11), Website Preview v2 verdict, Airo
+   paste-ins, verify next real refill vs ledger, free-account checks.**
 
 ---
 

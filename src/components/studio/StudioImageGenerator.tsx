@@ -18,6 +18,8 @@ interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
   initialJobs: StudioJobRow[];
   isPro?: boolean;
+  /** Deep link from the brand kit CTA (?brand=<id>) — preselects that brand. */
+  initialBrandId?: string;
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
@@ -80,7 +82,7 @@ function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
 }
 
-export default function StudioImageGenerator({ brands, initialJobs, isPro = false }: Props) {
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false, initialBrandId }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -93,7 +95,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   } = useSoundFx();
   const reduce = useReducedMotion();
 
-  const [selectedBrandId, setSelectedBrandId] = useState<string>(brands[0]?.id ?? "");
+  const [selectedBrandId, setSelectedBrandId] = useState<string>(initialBrandId ?? brands[0]?.id ?? "");
   const [imageType, setImageType]   = useState<ImageType>("logo_concept");
   const [modelKey, setModelKey]     = useState<StudioModelKey>("flux_schnell");
   const [prompt, setPrompt]         = useState<string>("");
