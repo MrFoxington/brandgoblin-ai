@@ -201,6 +201,7 @@ export default function GeneratePage() {
             onRetry={handleRetry}
             revealed={revealed}
             done={!!doneBrandId}
+            studioBrandId={doneBrandId}
             onContinue={() => {
               if (doneBrandId) router.push(`/brand/${doneBrandId}`);
             }}

@@ -131,7 +131,10 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
     { "label": "Audience Match",      "score": number, "why": string }
   ]
   // brandDna scores must reflect this specific brand, not be generic.
+  // CRITICAL: every score is an INTEGER on a 0-100 scale (e.g. 84). NEVER score on a 0-10 scale.
   // Scores should be varied and honest — not all 90s. The "why" must name something specific.
+  // If the concept is a crowded category, score Creativity honestly (typically 45-65) and use
+  // its "why" to suggest ONE concrete twist to make it fresh — constructive, never dismissive.
 }
 
 Important rules:
@@ -231,6 +234,11 @@ no missing keys, no markdown fences):
     { "label": "Playfulness",         "score": number, "why": string }, // fun, warmth, approachability of the personality
     { "label": "Audience Match",      "score": number, "why": string }  // how tightly everything targets the stated audience
   ]
+  // CRITICAL: every score is an INTEGER on a 0-100 scale (e.g. 84). NEVER score on a 0-10 scale.
+  // BE HONEST about crowded categories: if this concept is a well-worn idea (cat cafe, candle
+  // shop, coffee for gamers), Creativity must reflect that honestly (typically 45-65) and its
+  // "why" must name ONE concrete twist that would make THIS brand feel fresh — constructive
+  // and encouraging, never dismissive. The founder should finish reading feeling inspired.
   // IMPORTANT for brandDna: scores must be specific and defensible — not all high, not all the same.
   // A luxury brand should score high on Professionalism/Emotional Resonance but lower on Playfulness.
   // A funny Gen Z brand should score high on Virality/Playfulness but perhaps lower on Professionalism.

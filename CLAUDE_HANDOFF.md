@@ -59,7 +59,8 @@ pulled 3 words from the hat) and the ~2-minute silent wait for the kit almost ki
 on camera.** Fix (Fox's idea, Fox picked "live reveal feed" over "jump to kit page early"):
 reveal each section the moment the AI finishes writing it instead of holding everything to the end.
 
-**Built (tsc exit 0, NO migration, ⚠️ NEEDS PUSH + LIVE TEST):**
+**Built (tsc exit 0, NO migration). ✅ PUSHED BY FOX same session (`370aab2`) → Vercel
+auto-deploy. ⚠️ Still needs the LIVE PHONE TEST:**
 1. `api/generate/route.ts`: the SSE stream now sends each section's REAL CONTENT the moment its
    JSON value completes in the buffer (new `extractCompleteValue()` — balanced, string-aware
    partial-JSON scanner; fixed-order pointer walk per mode). Two spec lists (generated vs
@@ -101,6 +102,46 @@ feel like another celebration moment" + creative essentials first). tsc exit 0:*
    gracefully if /public/sounds files are missing.
 NOTE: GitHub push from the Cowork sandbox tested July 16 — still blocked (403 proxy).
 Pushes stay Fox's job from Terminal.
+
+**(Same session, part 3) 📱 BRANDED QR CODE ASSETS — `marketing/qr/` (NEW folder).**
+Fox wants a scannable share code (street episodes: people scan right off the phone) +
+future stickers. pip/npm/apt ALL unreachable from sandbox, so Claude wrote a pure-Python
+QR encoder AND an independent decoder from scratch (qr_core.py pattern kept in session
+outputs only): ISO 18004 byte mode, Version 4, ECC level H (30% damage tolerance), mask
+auto-selected by penalty score. URL: https://brandgoblinai.com. Three assets, all purple
+(#5B21B6/#4C1D95) rounded-module style with styled finder eyes:
+1. `brandgoblin-qr-clean.png` (1968px, white bg, 4-module quiet zone) — drop anywhere.
+2. `brandgoblin-qr-share-card.png` (1080×1920 phone screen) — celebrating Nix on top,
+   "Everyone Has An Idea. / Scan it. Bring yours to life.", white QR panel, green URL,
+   "Free to start · No card needed", Powered by NIX footer.
+3. `brandgoblin-qr-sticker.png` (2048×2400, transparent outside rounded shape, purple
+   border, print-ready ~300dpi at 6.8in) — Nix + tagline + QR + URL.
+VERIFICATION: every rendered file re-decoded from its own pixels (module-center sampling
+→ format BCH check → RS syndromes all zero → URL match) at full size AND quarter size —
+ALL PASS. ⚠️ Fox: scan each with the real phone camera before printing stickers (the
+definitive test). Nix quality-checked before placing ✓ (celebrating pose, transparent).
+
+**(Same session, part 4) 📱 FOX'S LIVE PHONE TEST (iPhone 17 Pro Max) — reveal feed WORKS,
+QRs SCAN ✓, 4 fixes shipped (tsc exit 0, ⚠️ needs push):**
+1. 🔴→✅ **NO WAY TO REACH DASHBOARD ON A VERTICAL PHONE** — every nav link was
+   `hidden sm:`/`hidden lg:`, so phones showed only logo + sound + Generate. Fix:
+   hamburger menu (`Navbar.tsx`, < lg): logged-in = Dashboard / Goblin Studio / Nix /
+   Creator Pro / Pricing (+Admin); visitors = marketing links + Sign In.
+2. 🔴→✅ **BRAND DNA 9/100 SCALE BUG** — model scored Nyaffe (cat cafe) on a 0-10 scale
+   (9,9,8,10,10,7,10,10 ≈ 91/100 — it LOVED the brand) but the app averaged raw = "9/100
+   Overall". Fix: NEW `lib/brand-dna.ts` `normalizeBrandDna()` (max ≤ 10 → ×10, clamp
+   0-100) used in BrandDNA.tsx + LoadingScreen dna card; prompts hardened both modes
+   ("INTEGER 0-100, NEVER 0-10") + Fox's honesty rule: crowded categories score
+   Creativity 45-65 honestly and the "why" must name ONE concrete twist to freshen the
+   idea — constructive, never dismissive.
+3. ✅ Logo card in the reveal feed now becomes a real "⚡ Create it now →" button once
+   the kit is SAVED (deep link /dashboard/studio?brand=id). Mid-generation tap-away was
+   rejected: the kit only saves at the end — leaving early would lose it.
+4. ✅ Skip ✨ Reveal all pill (bottom-6) overlapped the sticky Studio bar (bottom-0) on
+   the kit page — moved to bottom-24.
+ALSO CONFIRMED by Fox's test: reveal feed streams beautifully on the phone, QR codes
+scan and hit the landing page. Sticky-bar funnel (July 12 item) now visually verified,
+though the overlap above needed fixing.
 
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
 1. ⚠️ PUSH + DEPLOY this session's changes (route.ts, LoadingScreen.tsx, generate/page.tsx).

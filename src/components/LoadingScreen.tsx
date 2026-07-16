@@ -14,6 +14,8 @@ import NixPose from "./primitives/NixPose";
 import type { Pose } from "./primitives/NixPose";
 import Sparkles from "./primitives/Sparkles";
 import { useSoundFx } from "./primitives/SoundFx";
+import { normalizeBrandDna } from "@/lib/brand-dna";
+import Link from "next/link";
 import type {
   FavoriteName,
   AlternativeName,
@@ -165,7 +167,7 @@ function Card({
   );
 }
 
-function SectionCard({ section, content }: RevealedSection) {
+function SectionCard({ section, content, studioHref }: RevealedSection & { studioHref?: string }) {
   const shouldReduce = useReducedMotion();
   switch (section) {
     case "name": {
@@ -284,9 +286,18 @@ function SectionCard({ section, content }: RevealedSection) {
           <p className="text-sm leading-relaxed text-muted">
             {prompt.length > 120 ? prompt.slice(0, 120).trimEnd() + "…" : prompt}
           </p>
-          <p className="mt-2 text-xs font-semibold text-secondary">
-            ⚡ Generate this logo in Goblin Studio the moment your kit opens
-          </p>
+          {studioHref ? (
+            <Link
+              href={studioHref}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-xl border border-secondary/40 bg-secondary/10 px-4 py-2 text-sm font-bold text-secondary hover:bg-secondary/20 transition-colors"
+            >
+              ⚡ Create it now →
+            </Link>
+          ) : (
+            <p className="mt-2 text-xs font-semibold text-secondary">
+              ⚡ Generate this logo in Goblin Studio the moment your kit opens
+            </p>
+          )}
         </Card>
       );
     }
@@ -357,8 +368,8 @@ function SectionCard({ section, content }: RevealedSection) {
       );
     }
     case "dna": {
-      const dna = content as BrandDNAScore[];
-      if (!Array.isArray(dna) || dna.length === 0) return null;
+      const dna = normalizeBrandDna(content as BrandDNAScore[]);
+      if (dna.length === 0) return null;
       const top = [...dna].sort((a, b) => b.score - a.score).slice(0, 3);
       return (
         <Card emoji="🧬" title="Brand DNA">
@@ -389,6 +400,8 @@ interface LoadingScreenProps {
   revealed?: RevealedSection[];
   done?: boolean;
   onContinue?: () => void;
+  /** When the kit is saved, the logo card gains a direct "Create it now" Studio link */
+  studioBrandId?: string | null;
 }
 
 export default function LoadingScreen({
@@ -398,6 +411,7 @@ export default function LoadingScreen({
   revealed = [],
   done = false,
   onContinue,
+  studioBrandId = null,
 }: LoadingScreenProps) {
   const [idleLabel, setIdleLabel] = useState(IDLE_LINES[0]);
   const [errorLine] = useState(() => randomFrom(ERROR_LINES));
@@ -562,7 +576,14 @@ export default function LoadingScreen({
       {/* The feed */}
       <div className="mt-4 space-y-3">
         {revealed.map((r) => (
-          <SectionCard key={r.section} section={r.section} content={r.content} />
+          <SectionCard
+            key={r.section}
+            section={r.section}
+            content={r.content}
+            studioHref={
+              done && studioBrandId ? `/dashboard/studio?brand=${studioBrandId}` : undefined
+            }
+          />
         ))}
         <div ref={feedEndRef} className="h-1" />
       </div>

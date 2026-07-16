@@ -123,7 +123,7 @@ export function SkipRevealButton() {
       animate={{ opacity: 1 }}
       transition={{ delay: 1 }}
       onClick={revealAll}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-full border border-white/20 bg-[rgba(12,10,24,0.9)] backdrop-blur-md px-5 py-2 text-xs font-semibold text-white/70 hover:text-white hover:border-white/40 transition-colors shadow-lg"
+      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 rounded-full border border-white/20 bg-[rgba(12,10,24,0.9)] backdrop-blur-md px-5 py-2 text-xs font-semibold text-white/70 hover:text-white hover:border-white/40 transition-colors shadow-lg"
     >
       Skip ✨ Reveal all
     </motion.button>

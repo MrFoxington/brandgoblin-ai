@@ -23,6 +23,16 @@ const APP_LINKS = [
   { label: "Pricing", href: "/pricing" },
 ];
 
+// Mobile menu (hamburger) — on phones every desktop link is hidden, so this
+// is the ONLY way back to the dashboard on a vertical phone (Fox's July 16 catch).
+const MOBILE_APP_LINKS = [
+  { label: "🏠 Dashboard", href: "/dashboard" },
+  { label: "🎨 Goblin Studio", href: "/dashboard/studio" },
+  { label: "✨ Nix", href: "/dashboard/nix" },
+  { label: "👑 Creator Pro", href: "/dashboard/creator-pro" },
+  { label: "💰 Pricing", href: "/pricing" },
+];
+
 // Convenience link only — the real gate is server-side in /admin (redirects non-admins).
 // Matches the server's ADMIN_EMAIL fallback.
 // July 10 2026: fixed typo "joepro" → "jopro" (Fox's real email) — the Admin link
@@ -32,6 +42,7 @@ const ADMIN_EMAIL = "jopro@hotmail.com";
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -138,8 +149,53 @@ export default function Navbar() {
               </Link>
             </>
           )}
+
+          {/* Hamburger — phones/tablets only (desktop links are hidden there) */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            className="lg:hidden rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-base leading-none text-white hover:bg-white/10 transition-colors"
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu panel */}
+      {menuOpen && (
+        <nav className="lg:hidden border-t border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.97)] backdrop-blur-md px-5 pb-2">
+          {(user ? MOBILE_APP_LINKS : VISITOR_LINKS).map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className="block border-b border-white/5 py-3.5 text-sm font-medium text-muted transition-colors hover:text-white last:border-0"
+            >
+              {link.label}
+            </Link>
+          ))}
+          {user && user.email === ADMIN_EMAIL && (
+            <Link
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
+            >
+              🧌 Admin
+            </Link>
+          )}
+          {!user && (
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="block py-3.5 text-sm font-medium text-muted transition-colors hover:text-white"
+            >
+              Sign In
+            </Link>
+          )}
+        </nav>
+      )}
     </header>
   );
 }

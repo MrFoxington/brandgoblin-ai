@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import type { BrandKit } from "@/types";
 import ScoreBar from "./primitives/ScoreBar";
+import { normalizeBrandDna } from "@/lib/brand-dna";
 
 const LABEL_COLORS: Record<string, string> = {
   "Creativity":          "#a78bfa",
@@ -16,8 +17,8 @@ const LABEL_COLORS: Record<string, string> = {
 };
 
 export default function BrandDNA({ kit }: { kit: BrandKit }) {
-  const scores = kit.brandDna;
-  if (!scores || scores.length === 0) return null;
+  const scores = normalizeBrandDna(kit.brandDna);
+  if (scores.length === 0) return null;
 
   const overall = Math.round(scores.reduce((a, s) => a + s.score, 0) / scores.length);
 
