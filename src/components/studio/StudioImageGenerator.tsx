@@ -29,12 +29,23 @@ const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
   { key: "product_art",    label: "Product Art",    desc: "Hero imagery for your brand" },
 ];
 
-// Standard first (cheap/abundant default), Premium last (price anchor).
-// Seedream is clearly labeled as a DIFFERENT art engine — not a quality tier.
+// Wow Plan Phase 1 (July 16 2026): every asset type has a SPECIALIST engine that
+// Studio auto-selects when the user picks what to create. Manual override stays.
+const RECOMMENDED_MODEL: Record<ImageType, StudioModelKey> = {
+  logo_concept:   "recraft_v3",   // design/brand specialist — receives the exact palette hexes
+  social_graphic: "ideogram_v3",  // built for posters + typography
+  product_art:    "flux_2_flex",  // new flagship — surface detail + rich scenes
+  mascot:         "seedream_v45", // character art is its strength
+};
+
+// Specialists first, Draft last (cheap explicit choice, never the default).
 const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEngine?: boolean }[] = [
-  { key: "flux_schnell", label: "Standard", desc: "Fast & sharp" },
-  { key: "flux_pro_v1",  label: "Premium",  desc: "Same brand, highest fidelity" },
-  { key: "seedream_v45", label: "Artistic", desc: "Different art engine · expect a new look", isAltEngine: true },
+  { key: "recraft_v3",   label: "Design Pro", desc: "Logo & brand-design specialist" },
+  { key: "ideogram_v3",  label: "Poster Pro", desc: "Social graphics & typography" },
+  { key: "flux_2_flex",  label: "Studio",     desc: "Flagship engine · rich detail" },
+  { key: "seedream_v45", label: "Artistic",   desc: "Different art engine · expect a new look", isAltEngine: true },
+  { key: "flux_pro_v1",  label: "Classic",    desc: "Previous flagship" },
+  { key: "flux_schnell", label: "Draft",      desc: "Fastest & cheapest" },
 ];
 
 const IDEA_SPARKS = [
@@ -97,7 +108,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   const [selectedBrandId, setSelectedBrandId] = useState<string>(initialBrandId ?? brands[0]?.id ?? "");
   const [imageType, setImageType]   = useState<ImageType>("logo_concept");
-  const [modelKey, setModelKey]     = useState<StudioModelKey>("flux_schnell");
+  const [modelKey, setModelKey]     = useState<StudioModelKey>(RECOMMENDED_MODEL.logo_concept);
   const [prompt, setPrompt]         = useState<string>("");
   const [isCooking, setIsCooking]   = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -677,6 +688,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     seedRef.current = generateSeed();
     suppressCookRef.current = true;
     setImageType(spark.imageType);
+    setModelKey(RECOMMENDED_MODEL[spark.imageType]); // sparks ride the specialist engine too
     if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
     try {
       const cooked = await cookPrompt(spark.imageType, spark.note);
@@ -950,7 +962,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
-              <button key={key} onClick={() => setImageType(key)}
+              <button key={key} onClick={() => { setImageType(key); setModelKey(RECOMMENDED_MODEL[key]); }}
                 className={`rounded-xl border p-3 text-left transition-all ${
                   imageType === key
                     ? "border-primary bg-primary/15 text-white"
@@ -1074,14 +1086,16 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           ))}
         </p>
 
-        {/* Quality selector */}
+        {/* Engine selector — the specialist for the chosen asset type is
+            auto-picked and badged; every engine stays available as an override */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            Quality
+            Engine
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {MODEL_OPTIONS.map(({ key, label, desc, isAltEngine }) => {
               const cost = computeStudioEnergyCost(key, { width: pinnedSize.width, height: pinnedSize.height });
+              const isRecommended = key === RECOMMENDED_MODEL[imageType];
               return (
                 <button key={key} onClick={() => setModelKey(key)}
                   className={`rounded-xl border p-3 text-left transition-all ${
@@ -1092,8 +1106,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                       : "border-white/10 bg-white/3 text-muted hover:border-secondary/40"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-sm font-semibold">{label}</span>
+                    {isRecommended && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-secondary border border-secondary/40 rounded px-1 leading-4">
+                        ✨ Best for this
+                      </span>
+                    )}
                     {isAltEngine && (
                       <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 border border-amber-400/40 rounded px-1 leading-4">
                         ALT
@@ -1109,6 +1128,11 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           {modelKey === "seedream_v45" && (
             <p className="mt-2 text-xs text-amber-400/80">
               ⚠ Artistic uses a different AI engine — it will reimagine your prompt with a painterly style, not just improve quality.
+            </p>
+          )}
+          {modelKey === "recraft_v3" && selectedBrandId && (
+            <p className="mt-2 text-xs text-secondary/80">
+              🎨 Design Pro receives your brand&apos;s exact palette colors — expect the closest color match of any engine.
             </p>
           )}
         </div>

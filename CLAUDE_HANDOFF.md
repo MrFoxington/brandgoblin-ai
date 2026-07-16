@@ -193,7 +193,8 @@ side-by-side, (4) GPT Image 2 for name-ON product art (real label text!) + evalu
 Ideogram 4/Seedream 5.0/Recraft V4. Fox approved all 4. NEXT BUILD SESSION = Phase 1+2.
 
 **(Same session, part 8) 🚀 WOW PLAN PHASE 1 PART 1 BUILT — new engines wired end to end
-(tsc exit 0, ⚠️ needs push; backend-only, invisible until Part 2's UI):**
+(tsc exit 0). ✅ PUSHED BY FOX (`38ce562`, includes brand archive; migration run in
+Supabase FIRST — confirmed success). Backend-only, invisible until Part 2's UI:**
 1. Registry (`energy-config.ts`): ideogram_v3 ($0.06 BALANCED, 34 energy), recraft_v3
    ($0.04 raster, 23 energy), flux_2_flex ($0.06/MP registered margin-safe vs $0.05 page
    copy, 34 energy) — all prices verified on live fal model pages + llms.txt schemas
@@ -214,6 +215,19 @@ Recraft raster (vector = Phase 4); flux_2_flex at 32 steps. ⚠️ Seedream pric
 noted: registry $0.03 vs explore page $0.04 — check fal dashboard billing.
 NEXT: Part 2 = smart defaults per asset type + engine picker labels in
 StudioImageGenerator (then push makes it all live).
+
+**(Same session, part 9) 🚀 WOW PLAN PHASE 1 PART 2 — SMART DEFAULTS + ENGINE PICKER
+(tsc exit 0, ⚠️ needs push — this makes Phase 1 LIVE):** `StudioImageGenerator.tsx`:
+NEW `RECOMMENDED_MODEL` map — picking What-to-Create auto-selects the specialist
+(logo→recraft_v3 "Design Pro", social→ideogram_v3 "Poster Pro", product→flux_2_flex
+"Studio", mascot→seedream_v45 "Artistic"); idea sparks ride the specialist too; initial
+default recraft_v3 (schnell NEVER default again). Picker: "Quality"→"Engine", 6 options
+(grid 2/3 cols): Design Pro/Poster Pro/Studio/Artistic/Classic(flux_pro)/Draft(schnell,
+last), "✨ Best for this" badge follows the asset type, palette-match note when Design
+Pro + brand selected. Remix/New-Style keep the original job's engine (by design).
+⚠️ AFTER DEPLOY, FOX A/B TEST: same brand, same prompt — logo on Design Pro vs Classic,
+social on Poster Pro, product on Studio. Judge with taste; tune defaults if any specialist
+disappoints. Then Phase 2 (cooker 2.0 + style chips).
 
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
 1. 🎨 WOW PLAN: Part 1 built (above) → build Part 2 (smart defaults + UI) → then
