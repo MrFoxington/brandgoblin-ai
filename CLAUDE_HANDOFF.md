@@ -148,7 +148,7 @@ though the overlap above needed fixing.
 conjured → loved "Creatos" → opened Studio → back to Mycelium, new names GONE). ROOT CAUSE:
 "Conjure More Names" stored results ONLY in React state — /api/generate/names never wrote to
 the DB (section rerolls persist; names never did) — and there was no way to SET a conjured
-name as the brand name at all. Fixed (tsc exit 0, ⚠️ needs push):**
+name as the brand name at all. Fixed (tsc exit 0). ✅ PUSHED BY FOX (`ea93b7f`):**
 1. NEW `/api/brands/update-names` — POST {brandGenerationId, favoriteName?, alternativeNames?,
    recommendedName?}: auth + ownership check → merge into output_data. Validation on all fields.
 2. `BrandNamesSection.tsx`: (a) conjured names now PERSIST immediately after conjure;
@@ -160,16 +160,79 @@ name as the brand name at all. Fixed (tsc exit 0, ⚠️ needs push):**
 3. `BrandKitView.tsx`: passes brandId + onNamesUpdate → setKit merge, so picking a name
    updates the page header, Goblin's Pick card, and Studio deep-links LIVE (Studio's brand
    selector reads output_data.recommendedName — now correct after save).
-1. ⚠️ PUSH + DEPLOY this session's changes (route.ts, LoadingScreen.tsx, generate/page.tsx).
-2. 📱 LIVE TEST on the PHONE (the target device): generate a kit → name card ~15s → cards
-   stream in → sticky CTA on done → full kit page. Both name modes if possible.
-3. 🎬 Edit the Thai ladies street episode (footage from July 15) — the reveal feed makes the
-   NEXT street episode's on-camera wait a non-issue.
-4. Carried over from July 13: Flip City files → rough cut #2; transparent Nix overlay pack
-   offer; check Dead Orbit stats ~July 20 (7-day rule); mobile test of the July 12 sticky
-   Studio bar (still unverified); park @brandgoblinai handles; nixgoblin.com (~$13);
-   v3 phone-case test; name-ON spelling test; Brand Kit download (audit item 11); verify next
-   refill vs ledger; `git gc`; `studio_cta_clicked` analytics once traffic exists.
+
+**(Same session, part 6) 🗄 BRAND ARCHIVE (Fox asked; only Studio content had archive).
+Soft-archive for BRANDS mirroring the July 11 studio pattern — never deletes. Built
+(tsc exit 0). ⚠️ MIGRATION REQUIRED BEFORE DEPLOY:
+`supabase/migrations/20260716_brand_archived.sql` (adds `brand_generations.archived
+boolean not null default false` + index — the studio/creator-pro queries reference the
+column, so run it in the Supabase SQL editor FIRST, then push):**
+1. NEW `/api/brands/archive` — POST {brandGenerationId, archived} — ownership enforced
+   in the update itself, not plan-gated.
+2. `DashboardGrid.tsx`: quiet ✕ on each vault card (becomes ↩ restore in the Archived
+   tab), optimistic with revert; "🗄 Archived (n)" tab appears only when n > 0; archived
+   cards dimmed + excluded from All/Favorites/name-mode filters; reassurance line
+   "never deleted — restore anytime".
+3. Excluded from: Studio brand picker (`studio/page.tsx`) + Creator Pro list
+   (`creator-pro/page.tsx`), both `.eq("archived", false)`. Direct /brand/[id] links
+   still work for archived brands (by design). types: BrandGenerationRow.archived?.
+
+**(Same session, part 7) 🎨 IMAGE QUALITY UPGRADE PLAN — `docs/IMAGE_QUALITY_UPGRADE_PLAN_JULY_2026.md`.**
+Fox: Premium/Artistic output is hit-or-miss; wants "wow, can't wait to share it" quality.
+Diagnosis: flux-pro v1.1 is TWO generations old (FLUX.2, GPT Image 2 [Apr 2026], Ideogram
+V3/V4, Recraft V3/V4, Seedream 5.0, Nano Banana 2 all shipped since); cooker prompts capped
+at 2-3 sentences; single seed per conjure. Live fal prices verified July 16: Ideogram V3
+$0.03/.06/.09 (typography/posters), Recraft V3 $0.04 raster/$0.08 vector (logo+brand
+specialist, accepts brand hex via `colors` param), FLUX.2 flex $0.05-0.06/MP (JSON prompts,
+hex color support!), GPT Image 2 $0.01-0.41 (SOTA product labels/packaging), Nano Banana 2
+$0.08. 4 phases: (1) new engines + SMART DEFAULTS per asset type (Recraft=logos,
+Ideogram=social, FLUX.2=product, Seedream=mascot; schnell demoted to "Draft"), (2) prompt
+cooker 2.0 (~120-word structured prompts, per-model dialects — hex allowed on new models,
+few-shot examples) + STYLE CHIPS (the parked July 11 idea, Fox greenlit), (3) Conjure ×2
+side-by-side, (4) GPT Image 2 for name-ON product art (real label text!) + evaluate
+Ideogram 4/Seedream 5.0/Recraft V4. Fox approved all 4. NEXT BUILD SESSION = Phase 1+2.
+
+**(Same session, part 8) 🚀 WOW PLAN PHASE 1 PART 1 BUILT — new engines wired end to end
+(tsc exit 0, ⚠️ needs push; backend-only, invisible until Part 2's UI):**
+1. Registry (`energy-config.ts`): ideogram_v3 ($0.06 BALANCED, 34 energy), recraft_v3
+   ($0.04 raster, 23 energy), flux_2_flex ($0.06/MP registered margin-safe vs $0.05 page
+   copy, 34 energy) — all prices verified on live fal model pages + llms.txt schemas
+   July 16.
+2. `provider.ts`: PER-MODEL INPUT BUILDER replaces one-size-fits-all. 🔴 BUG KILLED:
+   `num_inference_steps: 4` (schnell's speed setting) was being sent to EVERY model —
+   any model honoring it produced quarter-baked output. Likely a real contributor to
+   Fox's "Premium is hit-or-miss". Now: schnell keeps 4 (correct), flux_pro/seedream get
+   NO steps param, flux_2_flex gets 32. Ideogram: rendering_speed BALANCED,
+   expand_prompt FALSE (MagicPrompt would rewrite our cooked prompt and could re-add
+   text past the no-text scrub), negative_prompt wired. Recraft: style param (raster
+   only — vector bills 2x, NOT enabled), brand palette hexes converted to RGB and passed
+   via `colors` (API-level palette matching!), no seed (unsupported by Recraft).
+3. `jobs/route.ts`: fetches brand palette for recraft jobs; negative_prompt extended to
+   ideogram_v3; recraftStyle per asset (product=realistic_image, else digital_illustration).
+FOUNDER DECISIONS taken (changeable, one line each): Ideogram at BALANCED not TURBO;
+Recraft raster (vector = Phase 4); flux_2_flex at 32 steps. ⚠️ Seedream price drift
+noted: registry $0.03 vs explore page $0.04 — check fal dashboard billing.
+NEXT: Part 2 = smart defaults per asset type + engine picker labels in
+StudioImageGenerator (then push makes it all live).
+
+**▶ NEXT SESSION / FOX — START HERE (July 16+):**
+1. 🎨 WOW PLAN: Part 1 built (above) → build Part 2 (smart defaults + UI) → then
+   Phase 2 (prompt cooker 2.0 + style chips), Phase 3 (Conjure ×2), Phase 4 (GPT
+   Image 2 name-ON product art + evaluate Ideogram 4/Seedream 5.0/Recraft V4).
+2. 🗄 BRAND ARCHIVE DEPLOY: run `supabase/migrations/20260716_brand_archived.sql` in the
+   Supabase SQL editor FIRST → then push part 6 → test: ✕ a junk brand → Archived tab →
+   ↩ restore; archived brand gone from Studio picker.
+2. 📱 Retest on phone after deploy: ☰ menu, fresh DNA score (should read 70-90s),
+   conjure names → "Use this name" → refresh → Studio shows the new name.
+3. 🎬 Edit the Thai ladies street episode (footage from July 15) — the reveal feed makes
+   the NEXT street episode's on-camera wait a non-issue.
+4. 🔊 Optional: add real sound files to /public/sounds (reveal, streak-chime, level-up,
+   conjure-start, anticipation-loop) — the reveal feed is wired for them, silent until then.
+5. Carried over from July 13: Flip City files → rough cut #2; transparent Nix overlay pack
+   offer; check Dead Orbit stats ~July 20 (7-day rule); park @brandgoblinai handles;
+   nixgoblin.com (~$13); v3 phone-case test; name-ON spelling test; Brand Kit download
+   (audit item 11); verify next refill vs ledger; `git gc`; `studio_cta_clicked` analytics
+   once traffic exists.
 
 ---
 

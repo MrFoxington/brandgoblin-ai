@@ -89,6 +89,7 @@ export interface BrandGenerationRow {
   output_data: BrandKit;
   created_at: string;
   favorite: boolean;
+  archived?: boolean; // soft-archive (July 16 2026) — optional so old fetches still typecheck
 }
 
 // ---------- Generator input ----------

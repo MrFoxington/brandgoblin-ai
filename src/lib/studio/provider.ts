@@ -21,6 +21,18 @@ export interface SubmitJobParams {
   webhookUrl: string;
   seed?: number;
   negativePrompt?: string;
+  /** Brand palette hexes — Recraft accepts these as API-level color guidance */
+  brandColors?: string[];
+  /** Recraft style preset (raster styles only — vector styles bill 2x) */
+  recraftStyle?: string;
+}
+
+/** "#7C3AED" → {r,g,b} for Recraft's colors param. Invalid hexes return null. */
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.trim().match(/^#?([0-9a-f]{6})$/i);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
 
 export interface SubmitJobResult {
@@ -47,31 +59,73 @@ export async function submitImageJob(params: SubmitJobParams): Promise<SubmitJob
   // Try fal first
   if (process.env.FAL_KEY) {
     try {
+      // Per-model input builder (July 16 2026 — Wow Plan Phase 1).
+      // Previously num_inference_steps:4 (a schnell-only speed setting) was sent
+      // to EVERY model — any model honoring it produced quarter-baked images.
+      // Each model now gets exactly the parameters its schema documents.
       const input: Record<string, unknown> = {
         prompt: params.prompt,
-        num_inference_steps: 4,
         num_images: 1,
-        enable_safety_checker: model.enableSafetyChecker,
-        output_format: "jpeg",
       };
+      const size = { width: params.width, height: params.height };
 
-      // Seed — pin composition across quality-only changes; new seed = new creative intent
-      if (params.seed !== undefined) {
-        input.seed = params.seed;
-      }
+      switch (params.modelKey) {
+        case "flux_schnell":
+          input.image_size = size;
+          input.num_inference_steps = 4; // schnell IS a 4-step distilled model — correct here only
+          input.enable_safety_checker = model.enableSafetyChecker;
+          input.output_format = "jpeg";
+          if (params.seed !== undefined) input.seed = params.seed;
+          break;
 
-      // Most fal image models accept image_size as preset OR {width, height}
-      // Use the pinned {width, height} so cost is always tied to confirmed dimensions
-      if (params.modelKey === "flux_schnell" || params.modelKey === "flux_pro_v1") {
-        input.image_size = { width: params.width, height: params.height };
-      } else {
-        // Seedream and others use width/height directly
-        input.width  = params.width;
-        input.height = params.height;
-        // Seedream supports negative_prompt; use it to discourage off-brand palette drift
-        if (params.negativePrompt) {
-          input.negative_prompt = params.negativePrompt;
+        case "flux_pro_v1":
+          input.image_size = size;
+          input.enable_safety_checker = model.enableSafetyChecker;
+          input.output_format = "jpeg";
+          if (params.seed !== undefined) input.seed = params.seed;
+          break;
+
+        case "flux_2_flex":
+          input.image_size = size;
+          input.num_inference_steps = 32; // quality-leaning (range 10-50)
+          input.enable_safety_checker = model.enableSafetyChecker;
+          input.output_format = "jpeg";
+          if (params.seed !== undefined) input.seed = params.seed;
+          break;
+
+        case "ideogram_v3":
+          input.image_size = size;
+          input.rendering_speed = "BALANCED"; // $0.06 tier — registry usdRate must match
+          // MagicPrompt rewrites prompts server-side — OFF so our cooked prompt
+          // and the no-text scrub survive intact.
+          input.expand_prompt = false;
+          if (params.negativePrompt) input.negative_prompt = params.negativePrompt;
+          if (params.seed !== undefined) input.seed = params.seed;
+          break;
+
+        case "recraft_v3": {
+          input.image_size = size;
+          // Raster styles only — vector styles bill 2x the registered rate
+          input.style = params.recraftStyle ?? "digital_illustration";
+          input.enable_safety_checker = model.enableSafetyChecker;
+          const rgb = (params.brandColors ?? [])
+            .map(hexToRgb)
+            .filter((c): c is { r: number; g: number; b: number } => c !== null)
+            .slice(0, 5);
+          if (rgb.length > 0) input.colors = rgb;
+          // Recraft has no seed parameter — omitted by design
+          break;
         }
+
+        case "seedream_v45":
+        default:
+          input.width = params.width;
+          input.height = params.height;
+          input.enable_safety_checker = model.enableSafetyChecker;
+          input.output_format = "jpeg";
+          if (params.negativePrompt) input.negative_prompt = params.negativePrompt;
+          if (params.seed !== undefined) input.seed = params.seed;
+          break;
       }
 
       const { request_id } = await fal.queue.submit(model.falEndpoint, {

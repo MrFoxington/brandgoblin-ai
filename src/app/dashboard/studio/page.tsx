@@ -46,6 +46,7 @@ export default async function StudioPage({
     .from("brand_generations")
     .select("id, input_data, output_data")
     .eq("user_id", authData.user.id)
+    .eq("archived", false) // archived brands stay out of the Studio picker
     .order("created_at", { ascending: false })
     .limit(20);
 

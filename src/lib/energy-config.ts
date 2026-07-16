@@ -99,6 +99,9 @@ export type StudioModelKey =
   | "flux_schnell"
   | "flux_pro_v1"
   | "seedream_v45"
+  | "ideogram_v3"
+  | "recraft_v3"
+  | "flux_2_flex"
   | "bg_removal"
   | "clarity_upscaler"
   | "wan_2_6"
@@ -135,7 +138,29 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
   seedream_v45: {
     falEndpoint: "fal-ai/bytedance/seedream/v4.5/text-to-image",
     costUnit: "flat",
-    usdRate: 0.03,           // $0.03/image — verified June 20 2026
+    usdRate: 0.03,           // $0.03/image — verified June 20 2026 (fal explore page listed $0.04 July 16 — re-verify in dashboard)
+    license: "commercial-via-fal",
+    enableSafetyChecker: true,
+  },
+  // ── July 16 2026 — "Wow Plan" Phase 1 engines (docs/IMAGE_QUALITY_UPGRADE_PLAN_JULY_2026.md)
+  ideogram_v3: {
+    falEndpoint: "fal-ai/ideogram/v3",
+    costUnit: "flat",
+    usdRate: 0.06,           // $0.06/image at BALANCED rendering_speed — verified on model page July 16 2026
+    license: "commercial-via-fal",
+    enableSafetyChecker: false, // no such param in Ideogram's schema — provider omits it
+  },
+  recraft_v3: {
+    falEndpoint: "fal-ai/recraft/v3/text-to-image",
+    costUnit: "flat",
+    usdRate: 0.04,           // $0.04/image raster styles — verified July 16 2026 (vector styles are $0.08 — NOT enabled)
+    license: "commercial-via-fal",
+    enableSafetyChecker: true,
+  },
+  flux_2_flex: {
+    falEndpoint: "fal-ai/flux-2-flex",
+    costUnit: "per_megapixel",
+    usdRate: 0.06,           // page shows $0.05/MP, meta says $0.06/MP — registered at 0.06 (margin-safe), verified July 16 2026
     license: "commercial-via-fal",
     enableSafetyChecker: true,
   },

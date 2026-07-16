@@ -203,6 +203,23 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.FAL_WEBHOOK_SECRET ?? "";
   const webhookUrl = `${appUrl}/api/studio/webhook/fal?jobId=${jobId}&secret=${webhookSecret}`;
 
+  // Recraft accepts the brand's exact palette as API-level color guidance —
+  // the palette match no prompt wording can guarantee (July 16 2026, Wow Plan).
+  let brandColors: string[] | undefined;
+  if (modelKey === "recraft_v3" && brandId) {
+    const { data: colorBrand } = await adminSb
+      .from("brand_generations")
+      .select("output_data")
+      .eq("id", brandId)
+      .eq("user_id", authData.user.id)
+      .single();
+    const palette = (colorBrand?.output_data as { colorPalette?: Array<{ hex?: string }> })?.colorPalette;
+    brandColors = palette
+      ?.map((c) => c.hex)
+      .filter((h): h is string => typeof h === "string" && /^#?[0-9a-f]{6}$/i.test(h.trim()))
+      .slice(0, 5);
+  }
+
   let providerResult: { requestId: string; provider: "fal" | "replicate" };
   try {
     providerResult = await submitImageJob({
@@ -213,9 +230,14 @@ export async function POST(request: Request) {
       height:         pinnedSize.height,
       webhookUrl,
       seed,
-      // Seedream: discourage off-brand palette drift + junk text (hex codes,
-      // gibberish, watermarks). FLUX doesn't accept negative_prompt.
-      negativePrompt: modelKey === "seedream_v45"
+      brandColors,
+      // Recraft raster style per asset (vector styles bill 2x — not enabled)
+      recraftStyle: modelKey === "recraft_v3"
+        ? (imageType === "product_art" ? "realistic_image" : "digital_illustration")
+        : undefined,
+      // Discourage off-brand palette drift + junk text on models that accept
+      // negative prompts (Seedream, Ideogram). FLUX models don't accept one.
+      negativePrompt: modelKey === "seedream_v45" || modelKey === "ideogram_v3"
         ? "wrong colors, off-brand palette, clashing hues, inconsistent style, low quality, blurry, hex color codes, color code text, '#' symbols, hashtags, random numbers, gibberish text, misspelled text, scrambled letters, cut-off text, cropped letters, text extending past the edge, large white banner, solid white panel, watermark, qr code, barcode"
         : undefined,
     });

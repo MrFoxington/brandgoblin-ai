@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { BrandGenerationRow } from "@/types";
 
-type Filter = "all" | "favorites" | "generated" | "existing";
+type Filter = "all" | "favorites" | "generated" | "existing" | "archived";
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -17,13 +17,34 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
-export default function DashboardGrid({ rows }: { rows: BrandGenerationRow[] }) {
+export default function DashboardGrid({ rows: initialRows }: { rows: BrandGenerationRow[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [rows, setRows] = useState(initialRows);
 
-  const hasExisting = rows.some((r) => (r.input_data as { nameMode?: string }).nameMode === "existing");
-  const hasFavorites = rows.some((r) => r.favorite);
+  const active = rows.filter((r) => !r.archived);
+  const archivedRows = rows.filter((r) => r.archived);
+  const hasExisting = active.some((r) => (r.input_data as { nameMode?: string }).nameMode === "existing");
+  const hasFavorites = active.some((r) => r.favorite);
+  const hasArchived = archivedRows.length > 0;
+
+  // Soft-archive / restore — optimistic with revert on failure (never deletes)
+  async function toggleArchive(id: string, archived: boolean) {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, archived } : r)));
+    try {
+      const res = await fetch("/api/brands/archive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandGenerationId: id, archived }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, archived: !archived } : r)));
+    }
+  }
 
   const filtered = rows.filter((r) => {
+    if (filter === "archived") return r.archived;
+    if (r.archived) return false; // archived brands only show in their own tab
     if (filter === "favorites") return r.favorite;
     if (filter === "generated") return (r.input_data as { nameMode?: string }).nameMode !== "existing";
     if (filter === "existing") return (r.input_data as { nameMode?: string }).nameMode === "existing";
@@ -31,16 +52,20 @@ export default function DashboardGrid({ rows }: { rows: BrandGenerationRow[] }) 
   });
 
   const filters: { key: Filter; label: string; show: boolean }[] = [
-    { key: "all", label: `All (${rows.length})`, show: true },
+    { key: "all", label: `All (${active.length})`, show: true },
     { key: "favorites", label: `★ Favorites`, show: hasFavorites },
     { key: "generated", label: `🧌 Named by Goblin`, show: hasExisting },
     { key: "existing", label: `✨ My Own Name`, show: hasExisting },
+    { key: "archived", label: `🗄 Archived (${archivedRows.length})`, show: hasArchived },
   ];
+
+  // Snap back to All if the last archived brand gets restored while on that tab
+  if (filter === "archived" && !hasArchived) setFilter("all");
 
   return (
     <div>
       {/* Filter bar — only show if there's something to filter */}
-      {(hasFavorites || hasExisting) && (
+      {(hasFavorites || hasExisting || hasArchived) && (
         <div className="mb-6 flex flex-wrap gap-2">
           {filters.filter((f) => f.show).map((f) => (
             <button
@@ -58,12 +83,18 @@ export default function DashboardGrid({ rows }: { rows: BrandGenerationRow[] }) 
         </div>
       )}
 
+      {filter === "archived" && (
+        <p className="mb-4 text-xs text-faint">
+          Archived brands are never deleted — restore one anytime and it goes right back to your vault.
+        </p>
+      )}
+
       {filtered.length === 0 ? (
         <p className="text-center text-muted py-16">No brands match this filter.</p>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((row) => (
-            <BrandCard key={row.id} row={row} />
+            <BrandCard key={row.id} row={row} onToggleArchive={toggleArchive} />
           ))}
         </div>
       )}
@@ -71,17 +102,24 @@ export default function DashboardGrid({ rows }: { rows: BrandGenerationRow[] }) 
   );
 }
 
-function BrandCard({ row }: { row: BrandGenerationRow }) {
+function BrandCard({
+  row,
+  onToggleArchive,
+}: {
+  row: BrandGenerationRow;
+  onToggleArchive: (id: string, archived: boolean) => void;
+}) {
   const input = row.input_data as { nameMode?: string; businessIdea?: string; vibe?: string; industry?: string };
   const output = row.output_data;
   const isExisting = input.nameMode === "existing";
   const tagline = output?.taglines?.[0];
   const colors = output?.colorPalette?.slice(0, 4) ?? [];
+  const isArchived = !!row.archived;
 
   return (
     <Link
       href={`/brand/${row.id}`}
-      className="bg-card bg-card-hover group flex flex-col gap-3 p-6"
+      className={`bg-card bg-card-hover group flex flex-col gap-3 p-6 ${isArchived ? "opacity-70" : ""}`}
     >
       {/* Top row */}
       <div className="flex items-center justify-between gap-2">
@@ -95,10 +133,28 @@ function BrandCard({ row }: { row: BrandGenerationRow }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {row.favorite && (
+          {row.favorite && !isArchived && (
             <span className="badge-green text-xs">★ Favorite</span>
           )}
           <span className="text-xs text-faint">{timeAgo(row.created_at)}</span>
+          {/* Archive / restore — quiet, never deletes */}
+          <button
+            type="button"
+            title={isArchived ? "Restore brand" : "Archive brand"}
+            aria-label={isArchived ? "Restore brand" : "Archive brand"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleArchive(row.id, !isArchived);
+            }}
+            className={`rounded-md px-1.5 py-0.5 text-sm leading-none transition-colors ${
+              isArchived
+                ? "text-secondary hover:bg-secondary/15"
+                : "text-faint hover:text-white hover:bg-white/10"
+            }`}
+          >
+            {isArchived ? "↩" : "✕"}
+          </button>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ export default async function DashboardPage() {
     supabase.from("users").select("credits, plan, payment_status, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
     supabase
       .from("brand_generations")
-      .select("id, input_data, output_data, created_at, favorite")
+      .select("id, input_data, output_data, created_at, favorite, archived")
       .eq("user_id", authData.user.id)
       .order("created_at", { ascending: false }),
   ]);

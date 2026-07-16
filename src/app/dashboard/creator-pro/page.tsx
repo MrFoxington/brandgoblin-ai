@@ -25,6 +25,7 @@ export default async function CreatorProPage({
       .from("brand_generations")
       .select("id, input_data, output_data")
       .eq("user_id", authData.user.id)
+      .eq("archived", false) // archived brands stay out of Creator Pro
       .order("created_at", { ascending: false })
       .limit(20),
     supabase
