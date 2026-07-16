@@ -227,7 +227,25 @@ last), "✨ Best for this" badge follows the asset type, palette-match note when
 Pro + brand selected. Remix/New-Style keep the original job's engine (by design).
 ⚠️ AFTER DEPLOY, FOX A/B TEST: same brand, same prompt — logo on Design Pro vs Classic,
 social on Poster Pro, product on Studio. Judge with taste; tune defaults if any specialist
-disappoints. Then Phase 2 (cooker 2.0 + style chips).
+disappoints. Then Phase 2 (cooker 2.0 + style chips). ✅ Part 2 PUSHED BY FOX (`458b587`).
+
+**(Same session, part 10) 🚀 WOW PLAN PHASE 2 — COOKER 2.0 + STYLE CHIPS (tsc exit 0,
+⚠️ needs push):**
+1. `cook-prompt/route.ts` — COOKER 2.0: output upgraded from 2-3 sentences to ONE
+   structured 80-130 word paragraph (subject → setting → composition → lighting →
+   style/medium → mood → palette), max_tokens 400→600, FOUR gold-standard few-shot
+   examples (logo/product/social/mascot) baked into the system prompt. NEW engine-aware
+   coaching via `modelKey` in the body (ideogram=art-director layout language,
+   recraft=focus on subject/style since palette arrives via API, flux_2=photographic
+   language, seedream=painterly). DELIBERATE: no hex-in-prompt dialects even where
+   supported — users can switch engines after cooking and older models paint hex as
+   text. All existing no-text rules + the hard scrub unchanged.
+2. `StudioImageGenerator.tsx` — STYLE CHIPS (the parked July 11 idea, live): 8 one-tap
+   art directions (Retro poster / Hand-drawn / Photoreal studio / Neon glow / Minimal
+   flat / 3D clay / Vintage badge / Watercolor) in a new "Style" row above the Engine
+   picker; tap to toggle, auto re-cooks the prompt (400ms debounce) with a fresh seed;
+   chip note rides the same userNote channel as product focus. cookPrompt now sends
+   modelKey (sparks send the specialist they just selected).
 
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
 1. 🎨 WOW PLAN: Part 1 built (above) → build Part 2 (smart defaults + UI) → then

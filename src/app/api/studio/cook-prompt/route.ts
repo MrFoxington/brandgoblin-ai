@@ -54,14 +54,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Slow down a bit — too many prompt requests." }, { status: 429 });
   }
 
-  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean };
+  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean; modelKey?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { brandId, imageType, userNote } = body;
+  const { brandId, imageType, userNote, modelKey } = body;
   // Brand name on the art is OPT-IN (July 11 2026 — forced names made every
   // product look like a mockup; clean art wins, the official logo stamp covers branding).
   const showBrandName = body.showBrandName === true;
@@ -140,18 +140,38 @@ export async function POST(request: Request) {
     ? `CHARACTER: render exactly ONE full-body mascot character, head to toe, matching the described appearance and personality — expressive face, dynamic friendly pose, consistent character-design quality (think professional animation studio character sheet). TEXT IN IMAGE: render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. BACKGROUND: clean, solid white background so the character can be cut out cleanly. The character itself may freely use any colors, including white.`
     : `TEXT IN IMAGE: this is an icon / symbol mark. Render NO text at all — no letters, words, numbers, color codes, hex values, "#" symbols, or hashtags. Shapes and symbol only. BACKGROUND: present the mark on a clean, solid white background, like a professional brand board. The design itself may freely use any colors, including white.`;
 
+  // Engine-aware coaching (July 16 2026 — Cooker 2.0). Deliberately NO hex-in-prompt
+  // dialects even for models that support them: a user can switch engines after
+  // cooking, and older models paint hex codes as literal text.
+  const MODEL_HINTS: Record<string, string> = {
+    ideogram_v3:
+      "The target model is a poster/graphic-design engine — write like an art director describing a finished layout: clear focal point, visual hierarchy, background treatment, balance of shapes.",
+    recraft_v3:
+      "The target model is a professional brand-design engine and separately receives the brand's exact palette via the API — pour your effort into subject, style, and composition rather than color naming.",
+    flux_2_flex:
+      "The target model responds beautifully to photographic language — camera angle, lens feel, depth of field, and lighting direction are worth specifying.",
+    seedream_v45:
+      "The target model has a painterly, artistic bent — lean into medium, texture, and atmosphere.",
+  };
+  const modelHint = MODEL_HINTS[modelKey ?? ""] ?? "";
+
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 400,
-    system: `You are an expert image-prompt engineer for text-to-image AI models (FLUX, Seedream).
+    max_tokens: 600,
+    system: `You are a world-class image-prompt engineer for text-to-image AI models.
 Given a brand's identity and the requested asset type, write ONE vivid, concrete image-generation prompt.
 Rules:
-- Describe subject, composition, lighting, style, and mood with specific visual detail.
+- ONE flowing paragraph of roughly 80-130 words covering, in this order: the main subject and focal point; the setting or background treatment; composition and framing; lighting; artistic style or medium; mood; and the color palette.
 - COLORS: describe the palette using plain color WORDS only (e.g. "deep crimson, charcoal, warm gold"). NEVER write hex codes, "#" symbols, or numbers to specify color — image models print those characters as literal text on the artwork.
-- Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic.
-- ${textRule}
-- One short paragraph, 2-3 sentences max.
-- Output must be ready to paste directly into a text-to-image model with no editing.`,
+- Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic, no filler adjectives. Every visual choice must serve THIS brand.
+${modelHint ? `- ${modelHint}\n` : ""}- ${textRule}
+- Output must be ready to paste directly into a text-to-image model with no editing.
+
+GOLD-STANDARD EXAMPLES of the caliber expected (structure and specificity, not content to copy):
+- Logo: "A minimalist emblem of a mountain peak folded like origami from a single sheet, its facets catching light in alternating warm gold and deep forest green, centered inside a thin circular keyline with generous negative space around it, presented flat and perfectly symmetrical on a clean solid white brand board, crisp vector-like edges, soft even studio illumination, confident and premium mood, palette of forest green, warm gold, and off-white."
+- Product: "A matte black coffee bag standing hero-center on a slab of raw slate, wrapped edge to edge in a hand-drawn pattern of curling copper waves and tiny rising suns, shot straight-on at eye level with shallow depth of field, backlit by a low golden hour glow that rims the bag's edges, steam curling from a ceramic cup beside it, moody artisan photography, warm and quietly luxurious, palette of matte black, burnished copper, and cream."
+- Social graphic: "A bold off-center burst of overlapping translucent circles radiating from the lower left, layered in vivid teal, coral, and butter yellow over a deep charcoal field, sharp flat-design shapes with subtle grain texture, strong diagonal energy guiding the eye to a calm empty zone at upper right, punchy and optimistic mood, modern editorial poster style."
+- Mascot: "One cheerful full-body robot barista with a round copper head and expressive teal LED eyes, mid-stride while balancing a tray of tiny coffee cups, head-to-toe view in a friendly 3D animation-studio character style with soft rounded forms, gentle top-down key light with warm bounce, standing on a clean solid white background for easy cutout, playful and welcoming personality in the pose, palette of copper, teal, and cream."`,
     messages: [{ role: "user", content: userMsg }],
   });
 

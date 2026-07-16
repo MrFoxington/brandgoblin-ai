@@ -48,6 +48,19 @@ const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEn
   { key: "flux_schnell", label: "Draft",      desc: "Fastest & cheapest" },
 ];
 
+// Cooker 2.0 style chips (July 16 2026) — one-tap art direction, productizing
+// Fox's hand-editing habit for everyone. The note is injected into the prompt cook.
+const STYLE_CHIPS: { label: string; emoji: string; note: string }[] = [
+  { label: "Retro poster",     emoji: "🖼️", note: "retro vintage poster style, screen-print texture, bold simplified shapes, slightly distressed ink" },
+  { label: "Hand-drawn",       emoji: "✏️", note: "hand-drawn illustration style, organic linework, sketchbook charm, subtle paper texture" },
+  { label: "Photoreal studio", emoji: "📷", note: "photorealistic studio photography, softbox lighting, crisp focus, premium commercial look" },
+  { label: "Neon glow",        emoji: "🌆", note: "dark cinematic scene with vivid neon glow accents and rim lighting" },
+  { label: "Minimal flat",     emoji: "◻️", note: "minimal flat design, generous negative space, crisp geometry, restrained detail" },
+  { label: "3D clay",          emoji: "🧸", note: "cute 3D clay render style, soft rounded forms, gentle studio lighting" },
+  { label: "Vintage badge",    emoji: "🏅", note: "vintage badge and emblem design, classic engraved-style linework, circular composition" },
+  { label: "Watercolor",       emoji: "🎨", note: "soft watercolor artwork, gentle pigment blooms, textured paper feel" },
+];
+
 const IDEA_SPARKS = [
   { label: "moody hero shot",      imageType: "product_art"  as ImageType, note: "moody, dramatic hero shot with cinematic lighting" },
   { label: "playful mascot scene", imageType: "mascot" as ImageType, note: "playful, fun mascot scene with vibrant colors" },
@@ -122,6 +135,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [galleryTab, setGalleryTab] = useState<"all" | "favorites" | "hidden">("all");
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
+  const [styleChip, setStyleChip]       = useState<string | null>(null);
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Paint the brand name INTO the art (July 11 2026) — OPT-IN, default OFF.
@@ -383,7 +397,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   // ── Prompt cooking ─────────────────────────────────────────────────────────
 
-  async function cookPrompt(type: ImageType, userNote?: string): Promise<string> {
+  async function cookPrompt(type: ImageType, userNote?: string, modelForCook?: StudioModelKey): Promise<string> {
     setIsCooking(true);
     try {
       // July 11 2026: the user can name the exact product for Product Art
@@ -393,11 +407,21 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         type === "product_art" && productFocus.trim()
           ? `The product MUST be: ${productFocus.trim()}.`
           : "";
-      const note = [productNote, userNote].filter(Boolean).join(" ") || undefined;
+      // Style chips (Cooker 2.0) — one-tap art direction
+      const chipNote = styleChip
+        ? `Overall art style direction: ${STYLE_CHIPS.find((c) => c.label === styleChip)?.note ?? ""}.`
+        : "";
+      const note = [productNote, chipNote, userNote].filter(Boolean).join(" ") || undefined;
       const res = await fetch("/api/studio/cook-prompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandId: selectedBrandId || undefined, imageType: type, userNote: note, showBrandName }),
+        body: JSON.stringify({
+          brandId: selectedBrandId || undefined,
+          imageType: type,
+          userNote: note,
+          showBrandName,
+          modelKey: modelForCook ?? modelKey, // engine-aware prompt coaching
+        }),
       });
       if (!res.ok) return "";
       const data = (await res.json()) as { prompt?: string };
@@ -422,6 +446,20 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBrandId, imageType]);
+
+  // Auto re-cook when the style chip changes — new art direction, fresh seed
+  useEffect(() => {
+    if (suppressCookRef.current) return;
+    if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
+    cookDebounceRef.current = setTimeout(async () => {
+      if (suppressCookRef.current) return;
+      seedRef.current = generateSeed(); // new creative intent
+      const cooked = await cookPrompt(imageType);
+      if (cooked) setPrompt(cooked);
+    }, 400);
+    return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [styleChip]);
 
   // Auto re-cook when the product focus changes (longer debounce — user is typing)
   useEffect(() => {
@@ -691,7 +729,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     setModelKey(RECOMMENDED_MODEL[spark.imageType]); // sparks ride the specialist engine too
     if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
     try {
-      const cooked = await cookPrompt(spark.imageType, spark.note);
+      const cooked = await cookPrompt(spark.imageType, spark.note, RECOMMENDED_MODEL[spark.imageType]);
       if (cooked) setPrompt(cooked);
     } finally {
       suppressCookRef.current = false;
@@ -1085,6 +1123,31 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             </span>
           ))}
         </p>
+
+        {/* Style chips — Cooker 2.0: one-tap art direction, re-cooks the prompt */}
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
+            Style <span className="normal-case tracking-normal font-normal text-faint">· optional, tap to toggle</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {STYLE_CHIPS.map((chip) => {
+              const selected = styleChip === chip.label;
+              return (
+                <button
+                  key={chip.label}
+                  onClick={() => { playButtonPress(); setStyleChip(selected ? null : chip.label); }}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    selected
+                      ? "border-secondary bg-secondary/15 text-secondary shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+                      : "border-white/10 bg-white/3 text-muted hover:border-secondary/40 hover:text-white"
+                  }`}
+                >
+                  {chip.emoji} {chip.label}{selected ? " ✓" : ""}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Engine selector — the specialist for the chosen asset type is
             auto-picked and badged; every engine stays available as an override */}
