@@ -122,7 +122,8 @@ ALL PASS. ⚠️ Fox: scan each with the real phone camera before printing stick
 definitive test). Nix quality-checked before placing ✓ (celebrating pose, transparent).
 
 **(Same session, part 4) 📱 FOX'S LIVE PHONE TEST (iPhone 17 Pro Max) — reveal feed WORKS,
-QRs SCAN ✓, 4 fixes shipped (tsc exit 0, ⚠️ needs push):**
+QRs SCAN ✓, 4 fixes shipped (tsc exit 0). ✅ PUSHED BY FOX (`0833d9d`, includes QR assets
++ lib/brand-dna.ts) → Vercel auto-deploy:**
 1. 🔴→✅ **NO WAY TO REACH DASHBOARD ON A VERTICAL PHONE** — every nav link was
    `hidden sm:`/`hidden lg:`, so phones showed only logo + sound + Generate. Fix:
    hamburger menu (`Navbar.tsx`, < lg): logged-in = Dashboard / Goblin Studio / Nix /
@@ -143,7 +144,22 @@ ALSO CONFIRMED by Fox's test: reveal feed streams beautifully on the phone, QR c
 scan and hit the landing page. Sticky-bar funnel (July 12 item) now visually verified,
 though the overlap above needed fixing.
 
-**▶ NEXT SESSION / FOX — START HERE (July 16+):**
+**(Same session, part 5) 🔴→✅ CONJURED NAMES VANISHED ON REFRESH (Fox's find: Mycelium →
+conjured → loved "Creatos" → opened Studio → back to Mycelium, new names GONE). ROOT CAUSE:
+"Conjure More Names" stored results ONLY in React state — /api/generate/names never wrote to
+the DB (section rerolls persist; names never did) — and there was no way to SET a conjured
+name as the brand name at all. Fixed (tsc exit 0, ⚠️ needs push):**
+1. NEW `/api/brands/update-names` — POST {brandGenerationId, favoriteName?, alternativeNames?,
+   recommendedName?}: auth + ownership check → merge into output_data. Validation on all fields.
+2. `BrandNamesSection.tsx`: (a) conjured names now PERSIST immediately after conjure;
+   (b) NEW "★ Make this my brand name" button on the favorite card ("✓ Your brand name" badge
+   when active) + "Use this name →" on every alternative; (c) choosing an alternative PROMOTES
+   it to favorite and DEMOTES the old favorite into alternatives — nothing is ever lost, user
+   can always switch back; (d) optimistic updates with revert + error message on save failure;
+   (e) empty "Best for" box hidden (promoted alts don't have one).
+3. `BrandKitView.tsx`: passes brandId + onNamesUpdate → setKit merge, so picking a name
+   updates the page header, Goblin's Pick card, and Studio deep-links LIVE (Studio's brand
+   selector reads output_data.recommendedName — now correct after save).
 1. ⚠️ PUSH + DEPLOY this session's changes (route.ts, LoadingScreen.tsx, generate/page.tsx).
 2. 📱 LIVE TEST on the PHONE (the target device): generate a kit → name card ~15s → cards
    stream in → sticky CTA on done → full kit page. Both name modes if possible.

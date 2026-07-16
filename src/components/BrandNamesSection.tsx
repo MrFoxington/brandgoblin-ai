@@ -4,6 +4,12 @@ import { useState } from "react";
 import CopyButton from "./CopyButton";
 import type { FavoriteName, AlternativeName, BrandNameOption, BrandInput } from "@/types";
 
+export type NamesPatch = {
+  favoriteName?: FavoriteName;
+  alternativeNames?: AlternativeName[];
+  recommendedName?: string;
+};
+
 type Props = {
   favoriteName?: FavoriteName;
   alternativeNames?: AlternativeName[];
@@ -13,6 +19,9 @@ type Props = {
   recommendedName?: string;
   // For conjure more
   brandInput?: BrandInput;
+  // Persistence (July 16 2026 fix — conjured names used to vanish on refresh)
+  brandId?: string;
+  onNamesUpdate?: (patch: NamesPatch) => void;
 };
 
 export default function BrandNamesSection({
@@ -22,22 +31,43 @@ export default function BrandNamesSection({
   topThreeReasoning,
   recommendedName,
   brandInput,
+  brandId,
+  onNamesUpdate,
 }: Props) {
   const [conjuring, setConjuring] = useState(false);
   const [conjureError, setConjureError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentFavorite, setCurrentFavorite] = useState(favoriteName);
   const [currentAlts, setCurrentAlts] = useState(alternativeNames ?? []);
+  const [currentRecommended, setCurrentRecommended] = useState(recommendedName);
+  const [savingName, setSavingName] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [allSeenNames, setAllSeenNames] = useState<string[]>([
     ...(favoriteName ? [favoriteName.name] : []),
     ...(alternativeNames?.map((a) => a.name) ?? []),
     ...(brandNames?.map((b) => b.name) ?? []),
   ]);
 
+  // Writes name changes to the database so a refresh can never lose them
+  async function persist(patch: NamesPatch): Promise<boolean> {
+    if (!brandId) return true; // preview contexts with no saved brand — state only
+    try {
+      const res = await fetch("/api/brands/update-names", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandGenerationId: brandId, ...patch }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
   async function conjureMoreNames() {
     if (!brandInput) return;
     setConjuring(true);
     setConjureError(null);
+    setSaveError(null);
     try {
       const res = await fetch("/api/generate/names", {
         method: "POST",
@@ -46,19 +76,77 @@ export default function BrandNamesSection({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to conjure names.");
+      const newAlts: AlternativeName[] = data.alternativeNames ?? [];
       setCurrentFavorite(data.favoriteName);
-      setCurrentAlts(data.alternativeNames ?? []);
+      setCurrentAlts(newAlts);
       setAllSeenNames((prev) => [
         ...prev,
         data.favoriteName.name,
-        ...(data.alternativeNames?.map((a: AlternativeName) => a.name) ?? []),
+        ...newAlts.map((a) => a.name),
       ]);
+      // SAVE the fresh names — refresh must never eat them again
+      const patch: NamesPatch = { favoriteName: data.favoriteName, alternativeNames: newAlts };
+      onNamesUpdate?.(patch);
+      const ok = await persist(patch);
+      if (!ok) setSaveError("Names conjured but not saved — check your connection and conjure again.");
     } catch (err) {
       setConjureError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setConjuring(false);
       setShowModal(false);
     }
+  }
+
+  // Make a name THE brand name (favorite card or a promoted alternative).
+  // Old favorite is demoted into the alternatives — nothing is ever lost.
+  async function useThisName(altIndex: number | null) {
+    if (!currentFavorite || savingName) return;
+    const prev = {
+      fav: currentFavorite,
+      alts: currentAlts,
+      rec: currentRecommended,
+    };
+
+    let newFav = currentFavorite;
+    let newAlts = [...currentAlts];
+    if (altIndex !== null) {
+      const alt = newAlts[altIndex];
+      if (!alt) return;
+      newFav = { name: alt.name, tagline: alt.tagline, whyPicked: alt.whyItWorks, bestFor: "" };
+      newAlts.splice(altIndex, 1);
+      newAlts = [
+        { name: currentFavorite.name, tagline: currentFavorite.tagline, whyItWorks: currentFavorite.whyPicked },
+        ...newAlts,
+      ];
+    }
+
+    const patch: NamesPatch = {
+      favoriteName: newFav,
+      alternativeNames: newAlts,
+      recommendedName: newFav.name,
+    };
+
+    // Optimistic update, revert on failure
+    setSavingName(newFav.name);
+    setSaveError(null);
+    setCurrentFavorite(newFav);
+    setCurrentAlts(newAlts);
+    setCurrentRecommended(newFav.name);
+    onNamesUpdate?.(patch);
+
+    const ok = await persist(patch);
+    if (!ok) {
+      setCurrentFavorite(prev.fav);
+      setCurrentAlts(prev.alts);
+      setCurrentRecommended(prev.rec);
+      onNamesUpdate?.({
+        favoriteName: prev.fav,
+        alternativeNames: prev.alts,
+        ...(prev.rec ? { recommendedName: prev.rec } : {}),
+      });
+      setSaveError("Couldn't save the name — try again.");
+    }
+    setSavingName(null);
   }
 
   // New format
@@ -94,12 +182,31 @@ export default function BrandNamesSection({
               </p>
               <p className="text-sm text-muted leading-relaxed">{currentFavorite.whyPicked}</p>
             </div>
-            <div className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.3)] p-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
-                Best for
-              </p>
-              <p className="text-sm text-muted leading-relaxed">{currentFavorite.bestFor}</p>
-            </div>
+            {currentFavorite.bestFor && (
+              <div className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.3)] p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                  Best for
+                </p>
+                <p className="text-sm text-muted leading-relaxed">{currentFavorite.bestFor}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Make it official — or show it already is */}
+          <div className="mt-5">
+            {currentRecommended === currentFavorite.name ? (
+              <span className="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-4 py-2 text-sm font-bold text-secondary">
+                ✓ Your brand name
+              </span>
+            ) : (
+              <button
+                onClick={() => useThisName(null)}
+                disabled={!!savingName}
+                className="inline-flex items-center gap-2 rounded-xl border border-yellow-400/50 bg-yellow-400/10 px-5 py-2.5 text-sm font-bold text-yellow-300 hover:bg-yellow-400/20 transition-colors disabled:opacity-50"
+              >
+                {savingName === currentFavorite.name ? "Saving…" : "★ Make this my brand name"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -121,6 +228,13 @@ export default function BrandNamesSection({
                   </div>
                   <p className="text-xs text-secondary italic">"{alt.tagline}"</p>
                   <p className="text-xs text-muted leading-relaxed">{alt.whyItWorks}</p>
+                  <button
+                    onClick={() => useThisName(i)}
+                    disabled={!!savingName}
+                    className="mt-1 self-start rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary-light hover:bg-primary/20 transition-colors disabled:opacity-50"
+                  >
+                    {savingName === alt.name ? "Saving…" : "Use this name →"}
+                  </button>
                 </div>
               ))}
             </div>
@@ -130,6 +244,9 @@ export default function BrandNamesSection({
         {/* Conjure More Names */}
         {conjureError && (
           <p className="text-sm text-red-400 text-center">{conjureError}</p>
+        )}
+        {saveError && (
+          <p className="text-sm text-red-400 text-center">{saveError}</p>
         )}
 
         <button

@@ -210,7 +210,9 @@ export default function BrandKitView({
     <SectionCard key="names" emoji="🏆" title="All Brand Names" badge="Naming" {...noReroll}>
       <BrandNamesSection favoriteName={kit.favoriteName} alternativeNames={kit.alternativeNames}
         brandNames={kit.brandNames} topThreeReasoning={kit.topThreeReasoning}
-        recommendedName={kit.recommendedName} brandInput={brandInput} />
+        recommendedName={kit.recommendedName} brandInput={brandInput}
+        brandId={brandGenerationId}
+        onNamesUpdate={(patch) => setKit((p) => ({ ...p, ...patch }))} />
     </SectionCard>,
 
     // 3: Name Strength (conditional)
