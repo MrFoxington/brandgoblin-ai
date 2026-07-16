@@ -182,6 +182,14 @@ export async function POST(request: Request) {
         falInput.creativity  = 0.35;
         falInput.resemblance = 0.6;
       }
+      if (op === "bg_removal") {
+        // BiRefNet v2 (July 16 2026): "Matting" handles soft edges + semi-transparent
+        // effects (smoke, glows) far better than color-based cutout ever could.
+        falInput.model              = "Matting";
+        falInput.refine_foreground  = true;
+        falInput.output_format      = "png";
+        falInput.operating_resolution = "1024x1024";
+      }
 
       const result = await fal.subscribe(falEndpoint, {
         input: falInput,

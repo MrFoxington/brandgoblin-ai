@@ -153,7 +153,7 @@ export async function POST(request: Request) {
         const m = kit.mascot;
         const mascotDesc = [m?.imagePrompt || m?.visualDescription || m?.appearance, m?.personality ? `Personality: ${m.personality}.` : ""]
           .filter(Boolean).join(" ");
-        prompt = `${mascotDesc || `A friendly brand mascot character for ${brandName}`}. Exactly one full-body mascot character, head to toe, expressive face, dynamic friendly pose, professional animation-studio character design.${colors ? ` Color palette: ${colors}.` : ""} No text, letters, or numbers anywhere. Clean, solid white background. ${noJunk}`;
+        prompt = `${mascotDesc || `A friendly brand mascot character for ${brandName}`}. Exactly one full-body mascot character, head to toe, expressive face, dynamic friendly pose, professional animation-studio character design.${colors ? ` Color palette: ${colors}.` : ""} No text, letters, or numbers anywhere. Clean, solid white background. Crisp self-contained silhouette — no smoke, mist, glows, sparkles, particles, or floating props drifting off the character into the background. ${noJunk}`;
       } else if (imageType === "social_graphic") {
         prompt = showBrandName
           ? `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`

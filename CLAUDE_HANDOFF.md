@@ -289,7 +289,22 @@ Creative Energy) ✅ pushed `b20cfc6`. 🔙 CONJURE ×2 REMOVED same session it 
 (Fox's call, manifesto-correct): the app is designed around ONE reveal moment at a
 time — two at once diluted the celebration and cluttered the gallery; "Variation" on a
 finished image already covers second takes. UI + double-submit deleted, concurrency
-guard restored (submitJob still returns bool — harmless). tsc exit 0, rides next push.
+guard restored (submitJob still returns bool — harmless). ✅ PUSHED BY FOX (with the
+Print Pro "~1 min" note). SESSION CLOSED CLEAN — everything built July 16 is live.
+
+**(Same session, part 17) ✂️ BACKGROUND REMOVAL UPGRADED — rembg → BiRefNet v2 (tsc
+exit 0, ⚠️ needs push).** Fox's screenshots: Remove BG on mascots either ate white
+subject parts (Dead Orbit's white spacesuit on white bg) or left white behind — rembg
+cuts by COLOR; BiRefNet segments the SUBJECT (endpoint `fal-ai/birefnet/v2`, "Matting"
+mode + refine_foreground, schema-verified via llms.txt; compute-second billed, $0.01
+flat registry rate kept, output shape identical so only the endpoint + params changed
+in process/route.ts). Logos KEEP the local flood-fill strip (July 3 design, unchanged).
+PLUS prompt fix: mascot rules (cook-prompt + jobs fallback) now demand a CUTOUT-SAFE
+silhouette — no smoke/mist/glows/sparkles/particles/floating props drifting off the
+body (Dead Orbit's smoke made clean cutout physically impossible). NOTE: existing baked
+images keep their old cutouts — regenerate the mascot or re-run Remove BG on originals
+to feel the difference. Checkerboard-from-the-start idea explained away: checkerboard
+IS the UI's transparency rendering; models would paint literal checkerboards.
 
 **🎯 NEXT HEADLINE PROJECT (Fox's brief, July 16): "THE FEEL PLAN" — full UX/feel
 overhaul.** Goal in Fox's words: mobile-first, totally beautiful, totally intuitive,

@@ -175,9 +175,12 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
     enableSafetyChecker: false, // no such param in the schema — provider omits it
   },
   bg_removal: {
-    falEndpoint: "fal-ai/imageutils/rembg",
+    // July 16 2026: upgraded rembg → BiRefNet v2. rembg cuts by COLOR (white suit
+    // on white bg = eaten suit — Fox's Dead Orbit mascots); BiRefNet segments the
+    // SUBJECT itself. Billed per compute-second (tiny); $0.01 flat stays margin-safe.
+    falEndpoint: "fal-ai/birefnet/v2",
     costUnit: "flat",
-    usdRate: 0.01,           // ~$0.01/image — re-verify before launch
+    usdRate: 0.01,
     license: "commercial-via-fal",
     enableSafetyChecker: false,
   },
