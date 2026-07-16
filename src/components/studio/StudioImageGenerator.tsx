@@ -1191,7 +1191,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             auto-picked and badged; every engine stays available as an override */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            Engine
+            ⚙️ Creative Engine
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {MODEL_OPTIONS.filter(({ nameOnOnly }) =>

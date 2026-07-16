@@ -280,7 +280,9 @@ products still garble on the painter engines — expected; the answer is the nam
 Print Pro path (that's its whole job). FOUNDER CALL ANSWERED (part 14): product_art default = flux_2_flex (Studio) with the
 "Photoreal studio" chip AUTO-SELECTED (new AUTO_STYLE_CHIP map; auto-chip clears when
 leaving the type, manual picks respected; user can change anything). Name-ON still
-auto-hands to Print Pro, chip carries over. tsc exit 0, rides the next push.
+auto-hands to Print Pro, chip carries over. tsc exit 0. ✅ PUSHED BY FOX (`d60bf27`) —
+ALL 4 WOW PLAN PHASES + taste-test tuning LIVE. Only the Print Pro name-ON label test
+remains unrun.
 
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
 1. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
