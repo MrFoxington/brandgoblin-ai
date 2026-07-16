@@ -291,9 +291,24 @@ time — two at once diluted the celebration and cluttered the gallery; "Variati
 finished image already covers second takes. UI + double-submit deleted, concurrency
 guard restored (submitJob still returns bool — harmless). tsc exit 0, rides next push.
 
+**🎯 NEXT HEADLINE PROJECT (Fox's brief, July 16): "THE FEEL PLAN" — full UX/feel
+overhaul.** Goal in Fox's words: mobile-first, totally beautiful, totally intuitive,
+best e-commerce + gaming practices, "so fun and so addicting you want to keep coming
+back" — see it → jump in → create → share → repeat. Approach: audit the live app
+screen-by-screen (phone flow first) → phased plan doc like the Wow Plan → build
+part-by-part with Fox's taste as judge. KNOWN TOP ITEMS ALREADY: (1) 🔊 THE SILENT APP —
+reveal feed/streak chimes/whoosh/fanfare are fully wired but /public/sounds files were
+NEVER ADDED; adding 8 free CC0 sounds is the cheapest massive feel win (do this FIRST);
+(2) celebration economy — XP/streak/confetti bones exist, make progress visible and
+stacking; (3) time-to-magic lens on signup → first kit → Studio → pricing; (4) motion/
+transitions between screens (phone thumb-zone first). Print Pro desc now warns "~1 min"
+(part 16, rides next push).
+
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
-1. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
-   text — the money test, not yet run), Conjure ×2 pair, logo A/B Design Pro vs old.
+1. 🔊 THE FEEL PLAN session: start with sound files (instant transformation), then the
+   full phone-flow audit → plan doc → phased build.
+2. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
+   text — the money test), logo A/B Design Pro vs old favorites.
 2. 💰 Verify GPT Image 2's real per-image cost in the fal dashboard → tune usdRate.
 3. Evaluate Ideogram 4 / Seedream 5.0 / Recraft V4 upgrades (prices unverified).
 2. 🗄 BRAND ARCHIVE DEPLOY: run `supabase/migrations/20260716_brand_archived.sql` in the
