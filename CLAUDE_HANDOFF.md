@@ -229,8 +229,8 @@ Pro + brand selected. Remix/New-Style keep the original job's engine (by design)
 social on Poster Pro, product on Studio. Judge with taste; tune defaults if any specialist
 disappoints. Then Phase 2 (cooker 2.0 + style chips). ✅ Part 2 PUSHED BY FOX (`458b587`).
 
-**(Same session, part 10) 🚀 WOW PLAN PHASE 2 — COOKER 2.0 + STYLE CHIPS (tsc exit 0,
-⚠️ needs push):**
+**(Same session, part 10) 🚀 WOW PLAN PHASE 2 — COOKER 2.0 + STYLE CHIPS (tsc exit 0).
+✅ PUSHED BY FOX. Phases 1+2 both LIVE — awaiting Fox's taste test before Phase 3:**
 1. `cook-prompt/route.ts` — COOKER 2.0: output upgraded from 2-3 sentences to ONE
    structured 80-130 word paragraph (subject → setting → composition → lighting →
    style/medium → mood → palette), max_tokens 400→600, FOUR gold-standard few-shot
@@ -247,10 +247,46 @@ disappoints. Then Phase 2 (cooker 2.0 + style chips). ✅ Part 2 PUSHED BY FOX (
    chip note rides the same userNote channel as product focus. cookPrompt now sends
    modelKey (sparks send the specialist they just selected).
 
+**(Same session, part 11) 🔧 FOX'S LIVE TASTE-TEST FEEDBACK → IMMEDIATE FIXES.**
+Verdict: Design Pro + Poster Pro = winners. Studio (flux_2_flex) = "shit" (floating
+surfboard, object-interaction fails). "Draft" label sounded useless; "flagship" = jargon;
+"Classic" = confusing. Fixed: (a) product_art default → recraft_v3 (Design Pro does
+products too + gets exact palette); (b) flux_2_flex steps 32→40, demoted to manual
+option "Studio · Realistic photo scenes"; (c) "Draft"→"Quick · Test ideas fast · lowest
+energy"; (d) flux_pro_v1 REMOVED from the picker (still registered — old-job remixes
+work). Picker is now 5 options.
+
+**(Same session, part 12) 🚀 WOW PLAN PHASES 3+4 (tsc exit 0, ⚠️ needs push — Fox
+retests EVERYTHING after this deploy):**
+1. PHASE 3 — CONJURE ×2: checkbox above the Conjure button ("🎲 Conjure 2 variants —
+   pick your favorite ⚡2x"): submits two jobs back-to-back, each on a fresh seed
+   (submitJob burns the seed per submission + now returns success bool; second only
+   fires if the first succeeded). Concurrency guard: button disables when
+   activeJobs + batch > 2.
+2. PHASE 4 — GPT IMAGE 2 "PRINT PRO" (openai/gpt-image-2, quality "high"): registered
+   FLAT $0.20 = 112 energy — a CONSERVATIVE UPPER BOUND because the model is
+   TOKEN-billed ($30/1M output img tokens, ~$0.13-0.17 typical at our 1MP) —
+   ⚠️ verify real per-image cost in the fal dashboard after first uses, then tune the
+   usdRate down. No seed / no safety-checker params (schema-verified via llms.txt).
+   UX: "Print Pro · Writes your brand name perfectly" appears in the picker ONLY when
+   "Put my brand name on it" is ticked on product/social — and auto-selects (specialist
+   restored when unticked). Cooker hint added: specify text placement + typographic style.
+
+**(Same session, part 13) ✅ FOX'S RETEST VERDICT:** Studio (flux_2_flex) at 40 steps +
+"Photoreal studio" chip = "insanely good looking" product art (Fossil Fuel brand test) —
+fully redeemed from the 32-step surfboard fail. Style chips loved; multi-engine
+test-and-pick approach loved; "✨ Best for this" badge loved. REMAINING: words on
+products still garble on the painter engines — expected; the answer is the name-ON →
+Print Pro path (that's its whole job). FOUNDER CALL ANSWERED (part 14): product_art default = flux_2_flex (Studio) with the
+"Photoreal studio" chip AUTO-SELECTED (new AUTO_STYLE_CHIP map; auto-chip clears when
+leaving the type, manual picks respected; user can change anything). Name-ON still
+auto-hands to Print Pro, chip carries over. tsc exit 0, rides the next push.
+
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
-1. 🎨 WOW PLAN: Part 1 built (above) → build Part 2 (smart defaults + UI) → then
-   Phase 2 (prompt cooker 2.0 + style chips), Phase 3 (Conjure ×2), Phase 4 (GPT
-   Image 2 name-ON product art + evaluate Ideogram 4/Seedream 5.0/Recraft V4).
+1. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
+   text — the money test, not yet run), Conjure ×2 pair, logo A/B Design Pro vs old.
+2. 💰 Verify GPT Image 2's real per-image cost in the fal dashboard → tune usdRate.
+3. Evaluate Ideogram 4 / Seedream 5.0 / Recraft V4 upgrades (prices unverified).
 2. 🗄 BRAND ARCHIVE DEPLOY: run `supabase/migrations/20260716_brand_archived.sql` in the
    Supabase SQL editor FIRST → then push part 6 → test: ✕ a junk brand → Archived tab →
    ↩ restore; archived brand gone from Studio picker.

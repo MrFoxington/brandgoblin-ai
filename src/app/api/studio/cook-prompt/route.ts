@@ -152,6 +152,8 @@ export async function POST(request: Request) {
       "The target model responds beautifully to photographic language — camera angle, lens feel, depth of field, and lighting direction are worth specifying.",
     seedream_v45:
       "The target model has a painterly, artistic bent — lean into medium, texture, and atmosphere.",
+    gpt_image_2:
+      "The target model renders text with pixel-perfect accuracy — when a brand name is required, specify exactly where it sits and what typographic style it uses (e.g. embossed serif on the label's center band).",
   };
   const modelHint = MODEL_HINTS[modelKey ?? ""] ?? "";
 

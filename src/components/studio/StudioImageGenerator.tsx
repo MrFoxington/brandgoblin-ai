@@ -34,18 +34,29 @@ const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
 const RECOMMENDED_MODEL: Record<ImageType, StudioModelKey> = {
   logo_concept:   "recraft_v3",   // design/brand specialist — receives the exact palette hexes
   social_graphic: "ideogram_v3",  // built for posters + typography
-  product_art:    "flux_2_flex",  // new flagship — surface detail + rich scenes
+  // July 16 retest (Fox): flux_2_flex at 40 steps + Photoreal chip = "insanely good"
+  // product art — Studio is the product default again, with the chip auto-selected.
+  product_art:    "flux_2_flex",
   mascot:         "seedream_v45", // character art is its strength
 };
 
+// Auto-selected style chip per asset type (user can change or clear it freely)
+const AUTO_STYLE_CHIP: Partial<Record<ImageType, string>> = {
+  product_art: "Photoreal studio",
+};
+
 // Specialists first, Draft last (cheap explicit choice, never the default).
-const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEngine?: boolean }[] = [
-  { key: "recraft_v3",   label: "Design Pro", desc: "Logo & brand-design specialist" },
+// flux_pro_v1 ("Classic"/old Premium) removed from the picker July 16 — outclassed by
+// the specialists and confusing as a 6th option. Still registered: old jobs remix fine.
+// gpt_image_2 ("Print Pro") is nameOnOnly: it only appears — and auto-selects — when
+// the "Put my brand name on it" box is ticked, because real typography is its whole job.
+const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEngine?: boolean; nameOnOnly?: boolean }[] = [
+  { key: "recraft_v3",   label: "Design Pro", desc: "Logos, products & brand design" },
   { key: "ideogram_v3",  label: "Poster Pro", desc: "Social graphics & typography" },
-  { key: "flux_2_flex",  label: "Studio",     desc: "Flagship engine · rich detail" },
+  { key: "gpt_image_2",  label: "Print Pro",  desc: "Writes your brand name perfectly", nameOnOnly: true },
   { key: "seedream_v45", label: "Artistic",   desc: "Different art engine · expect a new look", isAltEngine: true },
-  { key: "flux_pro_v1",  label: "Classic",    desc: "Previous flagship" },
-  { key: "flux_schnell", label: "Draft",      desc: "Fastest & cheapest" },
+  { key: "flux_2_flex",  label: "Studio",     desc: "Realistic photo scenes" },
+  { key: "flux_schnell", label: "Quick",      desc: "Test ideas fast · lowest energy" },
 ];
 
 // Cooker 2.0 style chips (July 16 2026) — one-tap art direction, productizing
@@ -136,6 +147,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
   const [styleChip, setStyleChip]       = useState<string | null>(null);
+  const [conjureTwo, setConjureTwo]     = useState(false);
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Paint the brand name INTO the art (July 11 2026) — OPT-IN, default OFF.
@@ -447,6 +459,19 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBrandId, imageType]);
 
+  // Name-ON path (Wow Plan Phase 4): GPT Image 2 ("Print Pro") renders real
+  // typography — auto-select it when the brand-name box is ticked on branded
+  // art, and hand back to the type's specialist when it's unticked.
+  useEffect(() => {
+    const brandedArt = imageType === "product_art" || imageType === "social_graphic";
+    if (brandedArt && showBrandName) {
+      setModelKey("gpt_image_2");
+    } else if (modelKey === "gpt_image_2") {
+      setModelKey(RECOMMENDED_MODEL[imageType]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showBrandName, imageType]);
+
   // Auto re-cook when the style chip changes — new art direction, fresh seed
   useEffect(() => {
     if (suppressCookRef.current) return;
@@ -493,7 +518,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   // ── Job submission ─────────────────────────────────────────────────────────
 
-  async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType) {
+  async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType): Promise<boolean> {
     setGenerating(true);
     setError(null);
     // Fire conjure-start synchronously (before first await) — still in gesture context,
@@ -536,7 +561,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         } else {
           setError(data.error ?? "Something went wrong. Please try again.");
         }
-        return;
+        return false;
       }
 
       const newJob: StudioJobRow = {
@@ -568,8 +593,10 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       };
       setJobs((prev) => [newJob, ...prev]);
       startPolling(data.jobId!);
+      return true;
     } catch {
       setError("Couldn't connect to the generation service. Please try again.");
+      return false;
     } finally {
       setGenerating(false);
     }
@@ -678,7 +705,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   async function handleGenerate() {
     playButtonPress(); // in gesture context — primes audio unlock chain for the loop
-    await submitJob(prompt, modelKey, imageType);
+    const ok = await submitJob(prompt, modelKey, imageType);
+    // Conjure ×2 (Wow Plan Phase 3): second variant rides a fresh seed —
+    // submitJob burns the seed after every submission, so this is a new roll.
+    if (ok && conjureTwo) {
+      await submitJob(prompt, modelKey, imageType);
+    }
   }
 
   function handleMakeAnother() {
@@ -1000,7 +1032,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
-              <button key={key} onClick={() => { setImageType(key); setModelKey(RECOMMENDED_MODEL[key]); }}
+              <button key={key} onClick={() => {
+                setImageType(key);
+                setModelKey(RECOMMENDED_MODEL[key]);
+                // Auto style chip: set the type's default; clear a previous auto-chip
+                // when leaving its type (manual picks for other types are respected)
+                setStyleChip((prev) => AUTO_STYLE_CHIP[key] ?? (prev && Object.values(AUTO_STYLE_CHIP).includes(prev) ? null : prev));
+              }}
                 className={`rounded-xl border p-3 text-left transition-all ${
                   imageType === key
                     ? "border-primary bg-primary/15 text-white"
@@ -1156,9 +1194,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             Engine
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {MODEL_OPTIONS.map(({ key, label, desc, isAltEngine }) => {
+            {MODEL_OPTIONS.filter(({ nameOnOnly }) =>
+              !nameOnOnly || (showBrandName && (imageType === "product_art" || imageType === "social_graphic"))
+            ).map(({ key, label, desc, isAltEngine }) => {
               const cost = computeStudioEnergyCost(key, { width: pinnedSize.width, height: pinnedSize.height });
-              const isRecommended = key === RECOMMENDED_MODEL[imageType];
+              const isRecommended =
+                key === RECOMMENDED_MODEL[imageType] ||
+                (key === "gpt_image_2" && showBrandName); // name ON = Print Pro is the pick
               return (
                 <button key={key} onClick={() => setModelKey(key)}
                   className={`rounded-xl border p-3 text-left transition-all ${
@@ -1205,6 +1247,20 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           Output: {pinnedSize.label} — {pinnedSize.width}×{pinnedSize.height}px
         </div>
 
+        {/* Conjure ×2 — two seeds, pick the winner (Wow Plan Phase 3) */}
+        <label className="flex items-center gap-2.5 cursor-pointer select-none text-sm text-muted">
+          <input
+            type="checkbox"
+            checked={conjureTwo}
+            onChange={(e) => setConjureTwo(e.target.checked)}
+            className="h-4 w-4 accent-[#7c3aed]"
+          />
+          <span>
+            🎲 Conjure <span className="font-bold text-white">2 variants</span> — pick your favorite{" "}
+            <span className="text-secondary font-semibold">⚡ {energyCost * 2} energy</span>
+          </span>
+        </label>
+
         {/* Error */}
         {error && (
           <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
@@ -1215,7 +1271,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         {/* Conjure button — orange, magnetic, the most visible thing on the page */}
         <button
           onClick={handleGenerate}
-          disabled={generating || isCooking || activeJobs.length >= 2}
+          disabled={generating || isCooking || activeJobs.length + (conjureTwo ? 2 : 1) > 2}
           className="w-full rounded-2xl py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_20px_rgba(255,107,53,0.45),0_0_40px_rgba(255,107,53,0.2)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90 active:opacity-80"
         >
           {generating

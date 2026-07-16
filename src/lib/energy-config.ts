@@ -102,6 +102,7 @@ export type StudioModelKey =
   | "ideogram_v3"
   | "recraft_v3"
   | "flux_2_flex"
+  | "gpt_image_2"
   | "bg_removal"
   | "clarity_upscaler"
   | "wan_2_6"
@@ -163,6 +164,15 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
     usdRate: 0.06,           // page shows $0.05/MP, meta says $0.06/MP — registered at 0.06 (margin-safe), verified July 16 2026
     license: "commercial-via-fal",
     enableSafetyChecker: true,
+  },
+  gpt_image_2: {
+    falEndpoint: "openai/gpt-image-2",
+    costUnit: "flat",
+    usdRate: 0.20,           // TOKEN-billed ($30/1M output img tokens) — 0.20 is a conservative
+                             // upper bound for 1MP at quality "high" (~$0.13-0.17 typical).
+                             // ⚠️ Verify real per-image cost in the fal dashboard, then tune down.
+    license: "commercial-via-fal",
+    enableSafetyChecker: false, // no such param in the schema — provider omits it
   },
   bg_removal: {
     falEndpoint: "fal-ai/imageutils/rembg",

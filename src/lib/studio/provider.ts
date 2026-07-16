@@ -87,7 +87,9 @@ export async function submitImageJob(params: SubmitJobParams): Promise<SubmitJob
 
         case "flux_2_flex":
           input.image_size = size;
-          input.num_inference_steps = 32; // quality-leaning (range 10-50)
+          // 40/50 steps (July 16 — Fox's live test caught a floating surfboard at 32;
+          // object-interaction accuracy improves with steps, price unchanged per MP)
+          input.num_inference_steps = 40;
           input.enable_safety_checker = model.enableSafetyChecker;
           input.output_format = "jpeg";
           if (params.seed !== undefined) input.seed = params.seed;
@@ -101,6 +103,13 @@ export async function submitImageJob(params: SubmitJobParams): Promise<SubmitJob
           input.expand_prompt = false;
           if (params.negativePrompt) input.negative_prompt = params.negativePrompt;
           if (params.seed !== undefined) input.seed = params.seed;
+          break;
+
+        case "gpt_image_2":
+          input.image_size = size; // our pinned sizes satisfy the multiple-of-16 + min-pixel rules
+          input.quality = "high";
+          input.output_format = "jpeg";
+          // Token-billed model: no seed, no safety-checker param in the schema
           break;
 
         case "recraft_v3": {
