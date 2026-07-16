@@ -284,6 +284,13 @@ auto-hands to Print Pro, chip carries over. tsc exit 0. ✅ PUSHED BY FOX (`d60b
 ALL 4 WOW PLAN PHASES + taste-test tuning LIVE. Only the Print Pro name-ON label test
 remains unrun.
 
+**(Same session, part 15) ⚙️ "Creative Engine" rename (Fox's on-brand copy — pairs with
+Creative Energy) ✅ pushed `b20cfc6`. 🔙 CONJURE ×2 REMOVED same session it shipped
+(Fox's call, manifesto-correct): the app is designed around ONE reveal moment at a
+time — two at once diluted the celebration and cluttered the gallery; "Variation" on a
+finished image already covers second takes. UI + double-submit deleted, concurrency
+guard restored (submitJob still returns bool — harmless). tsc exit 0, rides next push.
+
 **▶ NEXT SESSION / FOX — START HERE (July 16+):**
 1. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
    text — the money test, not yet run), Conjure ×2 pair, logo A/B Design Pro vs old.

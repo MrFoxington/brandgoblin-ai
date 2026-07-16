@@ -147,7 +147,6 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
   const [styleChip, setStyleChip]       = useState<string | null>(null);
-  const [conjureTwo, setConjureTwo]     = useState(false);
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Paint the brand name INTO the art (July 11 2026) — OPT-IN, default OFF.
@@ -703,14 +702,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   // ── CTA handlers ───────────────────────────────────────────────────────────
 
+  // Conjure ×2 was built July 16 and REMOVED same day (Fox's call): the app is
+  // designed around ONE reveal moment at a time — two at once diluted the
+  // celebration and cluttered the gallery. "Variation" on a finished image
+  // covers the second-take need, one reveal at a time.
   async function handleGenerate() {
     playButtonPress(); // in gesture context — primes audio unlock chain for the loop
-    const ok = await submitJob(prompt, modelKey, imageType);
-    // Conjure ×2 (Wow Plan Phase 3): second variant rides a fresh seed —
-    // submitJob burns the seed after every submission, so this is a new roll.
-    if (ok && conjureTwo) {
-      await submitJob(prompt, modelKey, imageType);
-    }
+    await submitJob(prompt, modelKey, imageType);
   }
 
   function handleMakeAnother() {
@@ -1247,20 +1245,6 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           Output: {pinnedSize.label} — {pinnedSize.width}×{pinnedSize.height}px
         </div>
 
-        {/* Conjure ×2 — two seeds, pick the winner (Wow Plan Phase 3) */}
-        <label className="flex items-center gap-2.5 cursor-pointer select-none text-sm text-muted">
-          <input
-            type="checkbox"
-            checked={conjureTwo}
-            onChange={(e) => setConjureTwo(e.target.checked)}
-            className="h-4 w-4 accent-[#7c3aed]"
-          />
-          <span>
-            🎲 Conjure <span className="font-bold text-white">2 variants</span> — pick your favorite{" "}
-            <span className="text-secondary font-semibold">⚡ {energyCost * 2} energy</span>
-          </span>
-        </label>
-
         {/* Error */}
         {error && (
           <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
@@ -1271,7 +1255,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         {/* Conjure button — orange, magnetic, the most visible thing on the page */}
         <button
           onClick={handleGenerate}
-          disabled={generating || isCooking || activeJobs.length + (conjureTwo ? 2 : 1) > 2}
+          disabled={generating || isCooking || activeJobs.length >= 2}
           className="w-full rounded-2xl py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_20px_rgba(255,107,53,0.45),0_0_40px_rgba(255,107,53,0.2)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90 active:opacity-80"
         >
           {generating
