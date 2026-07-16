@@ -52,6 +52,117 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 16, 2026 (⚡ LIVE REVEAL FEED — kit reveals section-by-section as it generates)
+
+Cowork session. **Origin: Fox filmed the first street-style episode (real local Thai ladies
+pulled 3 words from the hat) and the ~2-minute silent wait for the kit almost killed the moment
+on camera.** Fix (Fox's idea, Fox picked "live reveal feed" over "jump to kit page early"):
+reveal each section the moment the AI finishes writing it instead of holding everything to the end.
+
+**Built (tsc exit 0, NO migration, ⚠️ NEEDS PUSH + LIVE TEST):**
+1. `api/generate/route.ts`: the SSE stream now sends each section's REAL CONTENT the moment its
+   JSON value completes in the buffer (new `extractCompleteValue()` — balanced, string-aware
+   partial-JSON scanner; fixed-order pointer walk per mode). Two spec lists (generated vs
+   existing name mode) matching the actual prompt key order. BONUS BUG FIX: the old milestones
+   watched for a `"brandNames"` key that no longer exists in either prompt, so the first
+   progress label never fired in production.
+2. `LoadingScreen.tsx`: full rework into the LIVE REVEAL FEED (mobile-first, max-w-md single
+   column). Phase 1 = big centered Nix until the first section lands; Phase 2 = sticky Nix
+   status header (small pose + label + progress bar) with compact teaser cards sliding in:
+   NAME lands first (~15s, big gradient type + tagline, highlighted card), then backup names /
+   name-strength check, taglines (first 3), story (mission), voice (trait chips), mascot,
+   logo direction excerpt, COLOR SWATCHES, website hero, social bio, marketing idea, Day 1 of
+   launch plan, top-3 Brand DNA chips. Auto-scrolls to newest card. Reduced-motion respected.
+3. `generate/page.tsx`: collects `content` events into the feed; DONE now shows a sticky
+   bottom "✨ See your full brand kit →" button (one tap → /brand/{id}) instead of
+   auto-redirecting — the feed IS the reveal moment, don't yank the user away mid-read.
+   Error mid-feed falls back to the centered retry screen. XP + toast unchanged.
+
+WHY IT MATTERS: felt wait drops from ~2 min to ~15s; the name reveal (the money shot for the
+Hat format) happens almost immediately, so on-camera reactions land while the rest cooks.
+Total generation time unchanged — it's all perception.
+
+**(Same session, part 2) 🎆 CELEBRATION PASS + NEW REVEAL ORDER (Fox: "each section should
+feel like another celebration moment" + creative essentials first). tsc exit 0:**
+1. **NEW KIT ORDER (prompts.ts, BOTH modes): name → logoPrompt → mascot → taglines → story →
+   voice → colors → website → social → marketing → launch → dna.** Users see name + logo
+   direction + mascot in the first ~30s and can head straight to Studio to create the logo.
+   JSON key order only — object parsing/DB save unaffected, nothing lost, old kits untouched.
+2. `route.ts` spec lists match the new order; firing logic upgraded from strict pointer-walk
+   to check-all-unfired-every-chunk, so an out-of-order model can never stall the feed.
+3. `LoadingScreen.tsx` celebration pass: sparkle BURST on every card landing (6 one-shot
+   particles), one-shot GLOW FLASH per card (name card keeps a soft steady glow), name at
+   text-5xl with animated SHIMMER gradient (purple→white→green sweep), inner content staggers
+   in after the card, logo card gains "⚡ Generate this logo in Goblin Studio" line.
+   All bursts/shimmer respect prefers-reduced-motion.
+4. **SOUND (existing SoundFx system wired in):** conjure whoosh on submit (also unlocks
+   phone audio), anticipation loop during generation, reveal.mp3 on the NAME card,
+   rising-pitch streak chime per subsequent section, level-up fanfare on done. All silent
+   gracefully if /public/sounds files are missing.
+NOTE: GitHub push from the Cowork sandbox tested July 16 — still blocked (403 proxy).
+Pushes stay Fox's job from Terminal.
+
+**▶ NEXT SESSION / FOX — START HERE (July 16+):**
+1. ⚠️ PUSH + DEPLOY this session's changes (route.ts, LoadingScreen.tsx, generate/page.tsx).
+2. 📱 LIVE TEST on the PHONE (the target device): generate a kit → name card ~15s → cards
+   stream in → sticky CTA on done → full kit page. Both name modes if possible.
+3. 🎬 Edit the Thai ladies street episode (footage from July 15) — the reveal feed makes the
+   NEXT street episode's on-camera wait a non-issue.
+4. Carried over from July 13: Flip City files → rough cut #2; transparent Nix overlay pack
+   offer; check Dead Orbit stats ~July 20 (7-day rule); mobile test of the July 12 sticky
+   Studio bar (still unverified); park @brandgoblinai handles; nixgoblin.com (~$13);
+   v3 phone-case test; name-ON spelling test; Brand Kit download (audit item 11); verify next
+   refill vs ledger; `git gc`; `studio_cta_clicked` analytics once traffic exists.
+
+---
+
+## 🗓️ SESSION LOG — July 13, 2026 (🎉 FIRST TIKTOK POSTED — CONTENT ENGINE RUNNING)
+
+Cowork session. **1. 🎬 EPISODE 1 IS LIVE: Fox finished the Dead Orbit Tacos edit in CapCut
+and POSTED it to TikTok (@foxximuss) — the first real video.** Claude reviewed the final cut
+frame-by-frame (Fox uploaded the 56s MOV): captions clean, "next 90 seconds" hook lands, hat
+cold-open works, real reactions read, app segment with the astronaut logo pops. Notes for
+next time: (a) aim 35-45s — completion rate is the lever, 56s is long; (b) hook TEXT on
+frame 1 (first frame was torso+hat, no text). Standing reminder: 50-500 views = normal,
+judge at 7 days.
+**2. 📅 FLIP CITY PARKED FOR NEXT WEEK (Fox's call — space the Hat episodes out).** Fox will
+drop the Flip City video files; Claude builds rough cut #2 so it sits ready in the can.
+**3. 🌍 NEW CONTENT STYLES DECIDED: the Hat stays the ENGINE, the LOCATION becomes the
+variable** — street interviews (strangers pull 3 words = the park episode), build sesh with
+friends, exploring the city, Thai food → brand a fake restaurant from it. Nomad life IS the
+brand angle; no more same-hotel-room-every-video.
+**4. 🧌 NIX OVERLAYS IN CAPCUT WORK (Fox discovered it + loves the look).** Static Nix PNGs
+dropped over footage = the planned no-rig mascot play. Guidance given: small + consistent
+corner spot, pop-in on reveals, pose matches the moment, seasoning not the dish (full Nix
+skits stay 1x/week max). **Claude built `public/nix/celebrating-nix-transparent.png`**
+(custom flood-fill bg removal in-sandbox — rembg/PyPI unreachable; original untouched +
+`celebrating-nix-ORIGINAL-BACKUP.png` safety copy). Verified clean on dark AND light
+backgrounds, confetti/sparkle effects preserved. Offer open: transparent versions of the
+other poses (waving/thinking/working/conjuring) as a full overlay pack.
+
+**▶ NEXT SESSION / FOX — START HERE (July 13+):**
+1. 📼 Fox drops Flip City files → Claude builds rough cut #2 (post next week).
+2. 🧌 Full transparent Nix overlay pack (waving/thinking/working/conjuring) if Fox confirms.
+3. 🎬 Film first new-style episode (street interview or Thai food — Fox picking).
+4. 📱 STILL PENDING: mobile test of the July 12 funnel fix (sticky Studio bar → brand
+   preselected) — not yet verified live.
+5. 📊 Check Dead Orbit performance ~July 20 (7-day rule) — get the TikTok link from Fox.
+6. Carried over: park @brandgoblinai handles, nixgoblin.com (~$13), v3 phone-case test,
+   name-ON spelling test, Brand Kit download (audit item 11), verify next refill vs ledger,
+   `git gc` for stray tmp objects, `studio_cta_clicked` analytics once traffic exists.
+
+---
+
+## 🗓️ SESSION LOG — July 13, 2026 (light session — no product changes)
+
+Social hangout session (Fox + friend Dennis). No code, no deploys. Recapped the Dead Orbit
+rough-cut workflow; helped Dennis with a Claude Desktop install issue on his old Mac (Big Sur).
+**Every open item from July 12 still stands — that list below is the live to-do.** Top of it:
+mobile-test the kit→Studio sticky bar (still unverified live), finish + POST the Dead Orbit
+edit, AirDrop the Flip City screen recording into `Footage/` for rough cut #2.
+
+---
+
 ## 🗓️ SESSION LOG — July 12, 2026 (SOCIAL LAUNCH DAY — ACCOUNTS LIVE + "THE HAT" FORMAT BORN)
 
 Cowork session, launch-day prep. **1. ACCOUNT DECISION: REUSE @foxximuss on both platforms**
@@ -99,13 +210,28 @@ brand. New analytics event `studio_cta_clicked` (section: done_block / sticky_ba
 logo_direction) — measures the funnel. Files: BrandKitView, studio/page, StudioImageGenerator,
 analytics.ts.
 
-**▶ NEXT: (1) Fox pushes ("commit and push my changes") → deploy → mobile test: generate/open
-a kit → sticky bar appears → tap → Studio opens with THAT brand preselected; (2) finish the
-Dead Orbit edit in CapCut + POST episode 1; (3) AirDrop Flip City screen recording for rough
-cut #2; (4) park @brandgoblinai handles + optional nixgoblin.com; (5) v3 phone-case test;
-expect 50-500 views = normal calibration. Fox's next content idea: take the hat to the PARK —
-strangers pull words / pitch their own idea, brand it live in front of them (get an on-camera
-"cool if I post this?").**
+**✅ SESSION CLOSED CLEAN (July 12, evening).** Funnel fix committed by Claude in-sandbox
+(`150d48f` — GitHub unreachable from sandbox, so: Claude committed locally → Fox cleared the
+leftover `.git/HEAD.lock` (sandbox can't delete on the Mac — remember this quirk) + `git push`
+from Terminal → deployed. `Footage/` added to .gitignore so raw video (6.5GB) can never be
+committed. NOTE: stray `.git/objects/*/tmp_obj_*` files remain from the sandbox commit —
+harmless, clean up sometime with `git gc`.
+
+**▶ NEXT SESSION / FOX — START HERE (July 13):**
+1. 📱 MOBILE TEST the funnel fix (not yet verified live): open a kit on the phone → sticky
+   "Make it real 🧌" bar slides up → tap → Studio opens with THAT brand preselected. Also
+   check the new "Your next step" CTA block after the reveal + the Logo Direction link.
+2. 🎬 FINISH THE DEAD ORBIT EDIT in CapCut (assembly: hat clip IMG_2905 → 
+   `Footage/DeadOrbit_APP_roughcut.mp4` → reaction IMG_2910; voiceover, auto-captions, hook
+   text frame 1, music ~15%) → POST episode 1 (TikTok first, clean re-export to YT Shorts).
+3. 📼 AirDrop the FLIP CITY screen recording into `Footage/` → Claude builds rough cut #2.
+4. 🌳 PARK EPISODE (Fox's idea): strangers pull 3 words or pitch their own idea → brand it
+   live in front of them. Get an on-camera "cool if I post this?".
+5. Carried over: park @brandgoblinai handles everywhere + optional nixgoblin.com (~$13);
+   v3 merch-designer phone-case test (name OFF → patterned, not blank); name box ON spelling
+   test; style-idea chips (post-launch-week); Brand Kit download (audit item 11); verify next
+   real refill vs ledger. Analytics to watch once traffic exists: `studio_cta_clicked`.
+6. Calibration reminder: 50-500 views on early videos = NORMAL. Judge YT Shorts at 7 days.**
 
 ---
 

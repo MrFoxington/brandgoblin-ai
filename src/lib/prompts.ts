@@ -74,6 +74,14 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
     "suggestedRefinement": string, // 1-2 sentences: optional tweak or variation if helpful. If no refinement needed, affirm the name as-is.
     "bestPositioningAngle": string // 1 sentence: the strongest market positioning angle for this specific name
   },
+  "logoPrompt": string,
+  "mascot": {
+    "name": string,
+    "appearance": string,
+    "personality": string,
+    "visualDescription": string,
+    "imagePrompt": string
+  },
   "taglines": [ string ], // exactly 10 catchy taglines built around the provided name, varied tones
   "brandStory": {
     "originStory": string,
@@ -85,14 +93,6 @@ Respond with ONLY a JSON object matching this exact shape (no extra keys, no mis
     "wordsToUse": [ string ],
     "wordsToAvoid": [ string ]
   },
-  "mascot": {
-    "name": string,
-    "appearance": string,
-    "personality": string,
-    "visualDescription": string,
-    "imagePrompt": string
-  },
-  "logoPrompt": string,
   "colorPalette": [ { "name": string, "hex": string, "usage": string } ],
   "websiteCopy": {
     "heroHeadline": string,           // punchy, benefit-first, <= ~60 chars
@@ -175,6 +175,14 @@ no missing keys, no markdown fences):
     { "name": string, "tagline": string, "whyItWorks": string }
   ],
   "recommendedName": string, // must equal favoriteName.name exactly — used for display elsewhere
+  "logoPrompt": string, // a single detailed AI image-gen prompt for the logo: style, colors, mood, composition, what to avoid
+  "mascot": {
+    "name": string,
+    "appearance": string, // 2-3 sentences
+    "personality": string, // 2-3 sentences
+    "visualDescription": string, // dense visual description for an illustrator
+    "imagePrompt": string // a full, detailed AI image generation prompt (style, lighting, composition, colors, mood)
+  },
   "taglines": [ string ], // exactly 10 catchy taglines, varied tones
   "brandStory": {
     "originStory": string, // short emotional origin story, 3-5 sentences, written as if told by the founder
@@ -186,14 +194,6 @@ no missing keys, no markdown fences):
     "wordsToUse": [ string ], // 8-10 words/phrases
     "wordsToAvoid": [ string ] // 8-10 words/phrases
   },
-  "mascot": {
-    "name": string,
-    "appearance": string, // 2-3 sentences
-    "personality": string, // 2-3 sentences
-    "visualDescription": string, // dense visual description for an illustrator
-    "imagePrompt": string // a full, detailed AI image generation prompt (style, lighting, composition, colors, mood)
-  },
-  "logoPrompt": string, // a single detailed AI image-gen prompt for the logo: style, colors, mood, composition, what to avoid
   "colorPalette": [ { "name": string, "hex": string, "usage": string } ], // exactly 5 colors with usage notes
   "websiteCopy": {
     "heroHeadline": string,           // punchy, benefit-first, <= ~60 chars

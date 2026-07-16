@@ -4,9 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import LoadingScreen, { type GenerationProgress } from "@/components/LoadingScreen";
+import LoadingScreen, {
+  type GenerationProgress,
+  type RevealedSection,
+} from "@/components/LoadingScreen";
 import { useXP } from "@/components/XPSystem";
 import { useToast } from "@/components/NixToast";
+import { useSoundFx } from "@/components/primitives/SoundFx";
 import type { BrandInput, BrandTrait, NameMode } from "@/types";
 
 const TRAITS: { key: BrandTrait; emoji: string }[] = [
@@ -48,6 +52,7 @@ export default function GeneratePage() {
   const router = useRouter();
   const { trackGeneration } = useXP();
   const { showToast } = useToast();
+  const { playConjureStart } = useSoundFx();
 
   const [nameMode, setNameMode] = useState<NameMode | null>(null);
   const [form, setForm] = useState<BrandInput>({
@@ -63,6 +68,8 @@ export default function GeneratePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
+  const [revealed, setRevealed] = useState<RevealedSection[]>([]);
+  const [doneBrandId, setDoneBrandId] = useState<string | null>(null);
 
   function update<K extends keyof BrandInput>(key: K, value: BrandInput[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -86,6 +93,9 @@ export default function GeneratePage() {
     setLoading(true);
     setError(null);
     setGenProgress(null);
+    setRevealed([]);
+    setDoneBrandId(null);
+    playConjureStart(); // gesture context — whoosh + primes phone audio for the reveal cues
 
     const payload: BrandInput = {
       ...form,
@@ -132,6 +142,7 @@ export default function GeneratePage() {
             label?: string;
             pose?: string;
             progress?: number;
+            content?: unknown;
           };
           try {
             evt = JSON.parse(raw);
@@ -146,11 +157,21 @@ export default function GeneratePage() {
               pose: (evt.pose as GenerationProgress["pose"]) ?? "thinking",
               progress: evt.progress ?? 0,
             });
+            // Live reveal: real section content streams in as it completes
+            if (evt.content !== undefined) {
+              const section = evt.section;
+              const content = evt.content;
+              setRevealed((prev) =>
+                prev.some((r) => r.section === section)
+                  ? prev
+                  : [...prev, { section, content }]
+              );
+            }
           }
           if (evt.status === "done" && evt.id) {
             trackGeneration();
             showToast("Brand conjured! Welcome to your new brand ✨", "success", "🎉");
-            router.push(`/brand/${evt.id}`);
+            setDoneBrandId(evt.id);
             return;
           }
         }
@@ -164,6 +185,8 @@ export default function GeneratePage() {
   function handleRetry() {
     setError(null);
     setGenProgress(null);
+    setRevealed([]);
+    setDoneBrandId(null);
     setLoading(false);
   }
 
@@ -172,7 +195,16 @@ export default function GeneratePage() {
       <div className="flex min-h-screen flex-col">
         <Navbar />
         <main className="flex-1">
-          <LoadingScreen progress={genProgress} error={error} onRetry={handleRetry} />
+          <LoadingScreen
+            progress={genProgress}
+            error={error}
+            onRetry={handleRetry}
+            revealed={revealed}
+            done={!!doneBrandId}
+            onContinue={() => {
+              if (doneBrandId) router.push(`/brand/${doneBrandId}`);
+            }}
+          />
         </main>
         <Footer />
       </div>

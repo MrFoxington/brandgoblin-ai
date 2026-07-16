@@ -153,6 +153,84 @@ The goblin is free to try, no card. brandgoblinai.com. Comment your idea and I'l
 ## 📥 INCOMING BATCHES
 <!-- The Idea Engine appends new dated batches directly below this line. Newest on top. -->
 
+### Batch — July 16, 2026
+*(Trend read: TODAY THE PARKED PLAY UNPARKS — this is day 1 of the July 16-18 pre-final window we've been protecting since July 1 (World Cup Final is Sunday July 19 at MetLife), so the squad-builder concept finally ships, rebuilt for the no-rig workflow since the original July 1 version assumed an animated shoulder-Nix. Sound scan: the roundups are still mostly recycled ground (Summer Days, Food Jutsu, Janice, Bangladesh, hot dog summer, Six Seven, Riptide, A Million Colors — all used in prior batches, all skipped). Fresh and unused: the Beyoncé "Wait, that's it?" sound — creators use it for things that look hard but work perfectly on the first try, which is LITERALLY the product's whole pitch, cashing it in today as the Conjure It — and The Heavy "How You Like Me Now" (punchy rock swagger, benched for a future reveal/victory beat). The @ridgeclub "Inspiration Sound" feel-good day-clips audio benched on July 14 is also cashed in today for the Pillar 1 — and it's pointed at the July 13 handoff's new content direction (location is the variable, city exploring, nomad life IS the brand) rather than repeating July 12's backpack montage. PRODUCTION NOTE: rig still paused — all three concepts shootable with static Nix PNGs (including the new transparent celebrating-Nix), CapCut cuts/text layers, and Fox voiceover. Lesson from Ep 1 applied everywhere: hook TEXT on frame 1, target well under 45s. Rotation 5 / 1 / 3 — July 14 ran 3/2/4, so Pillars 5 and 1 (both last seen July 12) are due; Pillar 3 returns after one day off because the Beyoncé sound is too perfect a product fit to bench. Going 3-for-quality. Posted Log: Ep 1 (Dead Orbit) judged at 7 days ~July 20 — still no winner data to bias toward.)*
+
+**1. Pillar 5 · Trend Hijack** *(THE PARKED SQUAD PLAY — World Cup starting XI of brand deliverables, posting window is NOW through July 18, before Sunday's final)*
+- Hook (0–3s): first frame text: "my goblin drafted your whole brand like a World Cup starting XI 🏆" over the first card already mid-slam — open ON the motion, no intro.
+- Script: squad-reveal montage, one "starting XI" card snapping in per beat — but the players are deliverables: name, logo, palette, tagline, font, social post — each screen-recorded from a real kit and framed as a player card in CapCut (name + position label like "LOGO · Striker"). Final beat: the full kit slams in as the team sheet and the transparent celebrating-Nix PNG pops in like the manager who just won it all (no jersey on Nix — he stays himself, on-model from approved art). Fox VO, one line: "Your idea deserves a starting spot."
+- Sound: the World Cup / PRESSURE!-style hype audio peaking at edit time (volume is at maximum this week — pick same-day) · Length: ~12s
+- CTA: caption "the final's Sunday. your brand could be ready before kickoff 🏆 drop 3 words for the hat 👇" + pinned comment with the hat rules + brandgoblinai.com
+- **Status:** —
+
+**2. Pillar 1 · Nix Lives Here** *(@ridgeclub "Inspiration Sound" day-clips — benched July 14 for exactly this; the city-exploring lane from the July 13 decision, NOT a rerun of the July 12 backpack video)*
+- Hook (0–3s): first frame text: "POV: your coworker is a goblin and your office is whatever city you woke up in 🧌" over the Nix PNG propped against a street-food stall or city window.
+- Script: feel-good day-clips montage with the static Nix PNG composited into real out-in-the-city shots — beside a Thai food plate "picking what we brand next", peeking from the shirt pocket on a walk through a market, propped by the phone while Fox films a hat clip, last shot golden-hour skyline with him beside the laptop. Gentle overlays: "no office" → "no meetings" → "he still made someone a brand today" → "same time tomorrow." Pure love, zero pitch — this is the video that plants the new location-is-the-variable identity. Every frame from Fox's approved art, on-model.
+- Sound: @ridgeclub "Inspiration Sound" (feel-good day-clips audio) · Length: ~12s
+- CTA: caption "the office is wherever he says it is 🌏 drop 3 words for the hat 👇"
+- **Status:** —
+
+**3. Pillar 3 · Conjure It** *(Beyoncé "Wait, that's it?" sound — the make-it-look-easy format, and ours is the one case where it's true)*
+- Hook (0–3s): first frame text: "branding a business is supposed to take weeks. watch this." over the app idea box, finger already typing.
+- Script: finger types a real idea (grab one from the Ep 1/hat comments if any exist; fallback "a barbershop for introverts"), tap Generate, loading beat — then the reveal montage lands name, tagline, palette, logo, sample post one per beat, and on the finished kit the audio's "wait, that's it?" beat hits with text overlay "wait. that's it?" Static Nix PNG slides in beside the kit, smug, like it was never in doubt. One Fox VO line: "That's it. That's the whole thing." Screen record + PNG pop-in, same shoot as Script 1. Nix on-model from approved art.
+- Sound: Beyoncé "Wait, that's it?" sound (make-it-look-easy format) · Length: ~13s
+- CTA: caption "yes it's free. no there's no card. comment an idea and Nix builds it next 👇" + pinned link comment
+- **Status:** —
+
+---
+
+### Batch — July 14, 2026
+*(Trend read: DAY 2 OF BEING LIVE — Episode 1 (Dead Orbit Tacos) posted to @foxximuss July 13, so this batch is built around the one thing no other day can offer: the just-posted moment. Per the July 13 handoff: the Hat is the ENGINE and location is the variable, Flip City is parked for next week (nothing here touches it), Nix PNG overlays in CapCut are confirmed working and there's a NEW ASSET — the transparent celebrating-Nix PNG — so concept 2 is built to show it off. Sound scan: this week's roundups are almost all recycled ground (Bangladesh, Food Jutsu, hot dog summer, Janice, DtMF, Riptide, Six Seven, Young Hearts Run Free, Like a Prayer remix, A Million Colors — all used in prior batches, all skipped). Fresh and unused: Taylor Swift "You Belong With Me" via the "You Look Happier" self-glow-up format (perennial summer audio, perfect for a day-after-launch founder beat) and the @ridgeclub "Inspiration Sound" feel-good day-clips audio (benched for a future Pillar 1 — Pillar 1 ran July 12). World Cup volume still dominating feeds; the parked squad play STAYS parked for the July 16-18 pre-final window (final July 19) — concept 2 warms that lane without burning it. PRODUCTION NOTE: rig still paused — all three concepts shootable with static Nix PNGs, CapCut cuts/text layers, and Fox voiceover. Lesson from Ep 1 applied: hook TEXT on frame 1, every concept. Rotation 3 / 2 / 4 — yesterday's batch ran 4/5/1, Pillars 2 and 3 last appeared July 11. Going 3-for-quality. Posted Log: Ep 1 just shipped, metrics judged at 7 days (~July 20) — no winner data to bias toward yet.)*
+
+**1. Pillar 3 · Conjure It** *(the hat-restock bridge — Ep 1's caption asked for 3 words; this video proves the comments go IN the hat)*
+- Hook (0–3s): first frame text: "you commented 3 words. they're going in the hat. 🎩" over Fox's hand writing a real comment's words onto one of the saved blank paper slips.
+- Script: rapid cuts — comment screenshot sticker on screen → the words handwritten onto a slip (use real comments if Ep 1 has any; if not, seed with a friend's 3 words and say "first submission") → the slip drops into the hat → shake → hard cut to the transparent celebrating-Nix PNG popping in beside the hat. One Fox VO line: "Every comment goes in. Weirdest combo gets built next episode." No kit reveal — this is pure bait for Ep 2, keeps Flip City in the can and makes commenters feel seen. Nix on-model from approved art.
+- Sound: trending low-key suspense/anticipation audio of the day, low under the VO (pick at edit time) · Length: ~9s
+- CTA: caption "the hat is filling up. 3 words. any words. weirdest combo wins 👇" + pinned comment with rules + brandgoblinai.com link
+- **Status:** —
+
+**2. Pillar 2 · Mirror Mode** *(World Cup goal-celebration mirror — rides the dominant volume NOW without burning the parked July 16-18 squad play)*
+- Hook (0–3s): first frame text: "teaching my goblin the great goal celebrations before the final 🏆" over Fox squared up to camera, Nix PNG propped in frame.
+- Script: Fox hits 3 iconic goal celebrations on the beat (knee slide, the Siu, arms-out airplane); on each hit, hard cut to a static Nix PNG in the closest matching approved pose — ending on the NEW transparent celebrating-Nix composited mid-frame like he stuck the landing, snap zoom selling it. Final beat: side-by-side split, Fox mid-slide, Nix frozen flawless. Same pose-swap-on-beat trick as the MJ and Big Boom concepts, zero rig. Duet-bait during peak World Cup week. Nix on-model from approved art only.
+- Sound: the World Cup celebration audio peaking at edit time (volume is huge this week, pick same-day) · Length: ~9s
+- CTA: caption "he's ready for Sunday 🏆 Nix lives in the app — search BrandGoblin AI"
+- **Status:** —
+
+**3. Pillar 4 · Fox the Founder** *(Taylor Swift "You Belong With Me" / "You Look Happier" glow-up format — the day-after-launch beat that can only be shot this week)*
+- Hook (0–3s): first frame text: "me for the 6 months I was too scared to post vs me now" over a deadpan "before" shot of Fox at the desk, Nix PNG face-down beside the keyboard.
+- Script: two-beat glow-up on the audio's turn — BEFORE: gray-lit desk, unposted drafts, Fox rubbing his eyes. AFTER: golden-hour desk, the posted TikTok on the phone screen, Fox visibly lighter, Nix PNG now upright in the celebrating pose beside the view counter. Overlay on the after-beat: "it has 63 views. I've never been happier." The honesty IS the hook — shipping beat perfection. One Fox VO line optional: "It's live. That's the whole win." Nix on-model from approved art.
+- Sound: Taylor Swift "You Belong With Me" ("You Look Happier" glow-up format) · Length: ~11s
+- CTA: caption "day 2 of building in public. drop 3 words for the hat and the goblin builds the weirdest one 👇"
+- **Status:** —
+
+---
+
+### Batch — July 12, 2026
+*(Trend read: today is LAUNCH DAY — accounts live as @foxximuss "Fox | BrandGoblin AI", and per the July 12 handoff "The Hat" format (3 random words from a hat → brand it live) is now the launch format with episodes 1-2 already filmed (Flip City, Dead Orbit Tacos). This batch is built to COMPLEMENT the hat, not duplicate it — Fox's park-hat idea is his own and stays his. Sound scan: this week's roundups are almost all recycled ground (Bangladesh, Hot Dog Summer, Food Jutsu, Janice, MJ remix, DtMF, A Million Colors — all used in prior batches, all skipped). Fresh and unused: Thundercat "Where I'm Going" (business-approved, light funky — new to the roundups this week) and Vance Joy "Riptide" (business-approved, warm), which the July 11 batch benched for a future Pillar 1 — cashing it in today because the July 12 account decision made the nomad-builder angle official brand canon, and Riptide IS that vibe. World Cup knockout content still dominating; the parked squad play STAYS parked for the July 16-18 pre-final window. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut cuts/text layers, and Fox voiceover. Rotation 4 / 5 / 1 — yesterday ran 1/2/3, Pillar 4 last led July 10. Going 3-for-quality. Posted Log still empty; the first hat episodes post today, so tomorrow's run may finally have winner data.)*
+
+**1. Pillar 4 · Fox the Founder** *(launch-day time capsule — this video can only be made once, today)*
+- Hook (0–3s): first frame text: "day 1. I'm posting my goblin startup to the internet for the first time." over Fox's thumb hovering on the Post button, Nix PNG propped against the phone like moral support.
+- Script: rapid jump cuts of the road here, one beat each — the napkin scribble, the desk, the app generating a kit, the hat full of paper slips (a quiet teaser for the episodes dropping today) — then back to the thumb, press Post, real exhale, hard cut to the Nix PNG in the celebrating pose. One Fox VO line: "I built an app where a goblin brands your ideas. Today the internet finds out." Honest, zero polish, the follow-from-day-1 magnet. Nix on-model from approved art.
+- Sound: soft build-in-public / cinematic-underdog audio of the day, low under the VO (pick at edit time) · Length: ~12s
+- CTA: caption "day 1 of building this in public. drop 3 words for the hat and the goblin brands the weirdest combo 👇" — feeds the hat's comment loop from a non-hat video
+- **Status:** —
+
+**2. Pillar 5 · Trend Hijack** *(Thundercat "Where I'm Going" — the week's fresh business-approved funk, made for a smug victory lap)*
+- Hook (0–3s): first frame text: "my goblin found out we launched today. he's been like this since 9am 💀" over the static Nix PNG dead-center, arms crossed, maximum smug.
+- Script: funky strut-montage — on each groove beat, hard cut to the Nix PNG "having his moment" somewhere new: perched on top of the word hat, beside the phone showing the freshly posted video, in front of the analytics screen (views: double digits), finally back at the desk like nothing happened. Text overlays per cut: "we posted" → "he thinks he's famous" → "sir, it has 14 views" → "unbothered." The gap between his confidence and the view count is the joke. Zero rig, pure pose-cuts. Nix on-model from approved art only.
+- Sound: Thundercat "Where I'm Going" (business-approved, funky) · Length: ~10s
+- CTA: caption "14 views and he's already demanding a trailer 💀 search BrandGoblin AI"
+- **Status:** —
+
+**3. Pillar 1 · Nix Lives Here** *(Vance Joy "Riptide" — cashing in the benched sound now that the nomad-builder angle is official)*
+- Hook (0–3s): first frame text: "I don't have an office. I have a backpack and a goblin 🎒🧌" over the Nix PNG peeking out of a real backpack pocket.
+- Script: warm montage of real shots with the PNG composited in — peeking from the backpack at a cafe table, propped by the coffee and passport, "reading" the laptop screen mid-build, last shot golden-hour window with him beside the phone. Gentle overlays: "no office" → "no meetings" → "one goblin" → "we build from anywhere." Zero pitch, pure follow-farmer — this is the video that plants the nomad-builder identity the channel now runs on. Every frame from Fox's approved art, on-model.
+- Sound: Vance Joy "Riptide" (business-approved, warm) · Length: ~12s
+- CTA: caption "home is wherever the laptop opens 🌏 he agrees"
+- **Status:** —
+
+---
+
 ### Batch — July 11, 2026
 *(Trend read: this week's roundups are mostly recycled ground — Bangladesh, hot dog summer, Food Jutsu, Janice, Summer Days, Big Boom, text-feature tip, all used in prior batches, all skipped. Fresh and unused right now: the Olivia Rodrigo "u + me = <3" audio ("I know everybody changes, but I hope that we don't") that the July 10 batch parked for Pillar 1 — cashing it in today since Pillar 1 is due; AI-generated choreography dance challenges are leading the dance meta (flagged rising July 8, held because Pillar 2 ran — Pillar 2 is due today, perfect meta fit for an AI product); and Bad Bunny "DtMF" is trending for celebratory brand content post-Super Bowl. Also spotted but benched: Vance Joy "Riptide" (business-approved, warm — good future Pillar 1) and "Self Aware" by Temper City (moody cinematic — a future late-night founder piece). World Cup knockout rounds are dominating feeds; the parked squad play STAYS parked for the July 16-18 pre-final window as planned. PRODUCTION NOTE: rig still paused — all three concepts shootable with the static approved Nix PNG, CapCut cuts/text layers, and Fox voiceover, same workflow as the pinned Scripts 1-3. Rotation 1 / 2 / 3 — Pillars 1 and 2 last appeared July 9, and yesterday's batch (3/4/5) left both out. Going 3-for-quality. Posted Log still empty, no winner data to bias toward yet.)*
 
