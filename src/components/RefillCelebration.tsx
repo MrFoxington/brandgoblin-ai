@@ -20,6 +20,7 @@ import { useSoundFx } from "@/components/primitives/SoundFx";
 interface BalanceShape {
   totalRemaining?: number;
   monthlyAllowance?: number;
+  monthlyRemaining?: number;
   refillRemaining?: number;
   percentRemaining?: number;
 }
@@ -75,7 +76,13 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
 
   const total = balance?.totalRemaining ?? 0;
   const allowance = balance?.monthlyAllowance ?? 0;
+  const monthly = balance?.monthlyRemaining ?? 0;
   const refill = balance?.refillRemaining ?? 0;
+
+  // Refill packs (3,000 / 7,000 ⚡) can push the balance past the monthly
+  // allowance — "3,013 / 1,000" reads as broken math. Same over-max pattern as
+  // EnergyWidget / DailyCreatorDashboard: full bar, honest total + breakdown.
+  const overMax = allowance > 0 && total > allowance;
 
   // Bar fills from the pre-refill level up to the new total (as % of allowance).
   const newPct = allowance > 0 ? Math.min(100, Math.round((total / allowance) * 100)) : 100;
@@ -169,15 +176,17 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
 
             {/* Energy bar filling up */}
             <div className="mb-2 flex items-center justify-between text-xs text-muted">
-              <span>Creative Energy</span>
+              <span>{overMax ? "Creative Energy · Fully charged" : "Creative Energy"}</span>
               {balance && allowance > 0 && (
                 <span className="tabular-nums font-semibold text-white">
                   {total.toLocaleString()}
-                  <span className="text-faint font-normal"> / {allowance.toLocaleString()}</span>
+                  <span className="text-faint font-normal">
+                    {overMax ? " ⚡" : ` / ${allowance.toLocaleString()}`}
+                  </span>
                 </span>
               )}
             </div>
-            <div className="mb-8 h-3 w-full rounded-full bg-white/8 overflow-hidden">
+            <div className={`${overMax ? "mb-2" : "mb-8"} h-3 w-full rounded-full bg-white/8 overflow-hidden`}>
               <motion.div
                 className="h-full rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
                 initial={{ width: `${reduce ? newPct : prevPct}%` }}
@@ -185,6 +194,11 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
                 transition={reduce ? { duration: 0 } : { duration: 1.1, ease: "easeOut", delay: 0.05 }}
               />
             </div>
+            {overMax && (
+              <p className="mb-8 text-right text-xs text-faint tabular-nums">
+                {monthly.toLocaleString()} monthly + {refill.toLocaleString()} refill
+              </p>
+            )}
 
             <button
               type="button"

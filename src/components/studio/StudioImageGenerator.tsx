@@ -53,7 +53,7 @@ const AUTO_STYLE_CHIP: Partial<Record<ImageType, string>> = {
 const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEngine?: boolean; nameOnOnly?: boolean }[] = [
   { key: "recraft_v3",   label: "Design Pro", desc: "Logos, products & brand design" },
   { key: "ideogram_v3",  label: "Poster Pro", desc: "Social graphics & typography" },
-  { key: "gpt_image_2",  label: "Print Pro",  desc: "Writes your brand name perfectly · slower (~1 min)", nameOnOnly: true },
+  { key: "gpt_image_2",  label: "Print Pro",  desc: "Writes your brand name perfectly · Cook time ~1 min", nameOnOnly: true },
   { key: "seedream_v45", label: "Artistic",   desc: "Different art engine · expect a new look", isAltEngine: true },
   { key: "flux_2_flex",  label: "Studio",     desc: "Realistic photo scenes" },
   { key: "flux_schnell", label: "Quick",      desc: "Test ideas fast · lowest energy" },
