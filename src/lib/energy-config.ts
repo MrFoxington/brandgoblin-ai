@@ -105,15 +105,24 @@ export type StudioModelKey =
   | "gpt_image_2"
   | "bg_removal"
   | "clarity_upscaler"
-  | "wan_2_6"
-  | "kling_3_0";
+  | "kling_v26_pro"
+  | "ltx_23_fast"
+  | "hailuo_23_fast"
+  | "veo_31_lite";
 
 export interface StudioModel {
   falEndpoint: string;
   replicateModel?: string;
   costUnit: StudioCostUnit;
-  usdRate: number;         // $/MP | $/img | $/sec
+  usdRate: number;         // $/MP | $/img | $/sec (audio OFF for video models with an audio toggle)
+  // Video models with billable native audio: $/sec with audio ON. Omit = model
+  // has no audio toggle (either no audio, or audio included in usdRate).
+  audioUsdRate?: number;
+  // Longest single-generation clip the endpoint supports (video only).
+  maxDurationSeconds?: number;
   license: string;
+  // NOTE: for video models this doubles as the CATEGORY guard — jobs/route.ts
+  // rejects defaultFor "video" until Goblin Labs Phase 0d wires real video jobs.
   defaultFor?: "image" | "video";
   enableSafetyChecker: boolean;
 }
@@ -191,20 +200,58 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
     license: "commercial-via-fal",
     enableSafetyChecker: false,
   },
-  // ── Phase 2: Video (mapped; not wired yet) ────────────────────────────────
-  wan_2_6: {
-    falEndpoint: "fal-ai/wan-video/wan2.6-14b",
+  // ── 🧪 GOBLIN LABS: Video launch engines (July 17 2026) ───────────────────
+  // Prices live-verified on fal model pages July 17 2026 (deep-dive research,
+  // docs/GOBLIN_LABS_VIDEO_PLAN_JULY_2026.md §2). Registered but NOT buildable
+  // until Labs Phase 0d — jobs/route.ts rejects defaultFor "video".
+  // Old stale entries (wan_2_6 at unverified $0.05, "kling_3_0" that pointed at
+  // a v1.6 endpoint) deleted same day — never wired, no jobs reference them.
+  kling_v26_pro: {
+    // "Motion Pro" — quality image-to-video; best faithfulness-per-dollar.
+    // Start+end frame support = controlled loops + clip chaining later.
+    falEndpoint: "fal-ai/kling-video/v2.6/pro/image-to-video",
     costUnit: "per_second",
-    usdRate: 0.05,           // $0.05/sec — re-verify before launch
+    usdRate: 0.07,           // $0.07/s audio OFF — verified July 17 2026
+    audioUsdRate: 0.14,      // $0.14/s native audio ON (voice-control tier $0.168 NOT enabled)
+    maxDurationSeconds: 10,  // 5s / 10s
     license: "commercial-via-fal",
     defaultFor: "video",
     enableSafetyChecker: true,
   },
-  kling_3_0: {
-    falEndpoint: "fal-ai/kling-video/v1.6/standard/text-to-video",
+  ltx_23_fast: {
+    // "Quick Motion" — the value engine: 1080p, explicit 9:16, native audio
+    // INCLUDED in the rate, 20s max single shot, Apache 2.0 (cleanest license).
+    falEndpoint: "fal-ai/ltx-2.3/image-to-video/fast",
     costUnit: "per_second",
-    usdRate: 0.10,           // $0.10/sec — re-verify before launch
+    usdRate: 0.04,           // $0.04/s at 1080p WITH audio — verified July 17 2026 (1440p $0.08, 4K $0.16 — not enabled)
+    maxDurationSeconds: 20,
+    license: "Apache-2.0",
+    defaultFor: "video",
+    enableSafetyChecker: true,
+  },
+  hailuo_23_fast: {
+    // "Character" — mascot/character motion specialist, budget tier.
+    // fal bills FLAT per video: $0.19/6s, $0.32/10s. Registered as $0.032/s so
+    // the per_second math reproduces both real prices margin-safe
+    // (6s → $0.192, 10s → $0.32). 768p; no audio; no end-frame (2.3 dropped it).
+    falEndpoint: "fal-ai/minimax/hailuo-2.3-fast/standard/image-to-video",
+    costUnit: "per_second",
+    usdRate: 0.032,          // derived from flat $0.19/6s + $0.32/10s — verified July 17 2026
+    maxDurationSeconds: 10,  // 6s / 10s
     license: "commercial-via-fal",
+    defaultFor: "video",
+    enableSafetyChecker: true,
+  },
+  veo_31_lite: {
+    // "Ad Director (Lite)" — Google-quality motion + native audio dirt cheap;
+    // the text-to-video teaser path starts here (Veo 3.1 Fast = later upsell).
+    falEndpoint: "fal-ai/veo3.1/lite/image-to-video",
+    costUnit: "per_second",
+    usdRate: 0.03,           // $0.03/s 720p audio OFF — verified July 17 2026
+    audioUsdRate: 0.05,      // $0.05/s 720p audio ON (1080p $0.05/$0.08 — not enabled yet)
+    maxDurationSeconds: 8,
+    license: "commercial-via-fal",
+    defaultFor: "video",
     enableSafetyChecker: true,
   },
 };
@@ -242,7 +289,7 @@ export function megapixelsForSize(width: number, height: number): number {
  */
 export function computeStudioEnergyCost(
   modelKey: StudioModelKey,
-  params: { width?: number; height?: number; durationSeconds?: number } = {}
+  params: { width?: number; height?: number; durationSeconds?: number; audio?: boolean } = {}
 ): number {
   const model = STUDIO_MODELS[modelKey];
   const markup = parseInt(process.env.ENERGY_MARKUP_MULTIPLIER ?? "10");
@@ -252,12 +299,31 @@ export function computeStudioEnergyCost(
     const mp = megapixelsForSize(params.width ?? 1024, params.height ?? 1024);
     usdCost = model.usdRate * mp;
   } else if (model.costUnit === "per_second") {
-    usdCost = model.usdRate * (params.durationSeconds ?? 5);
+    // Video: native audio is a separate billing tier on some engines (Kling,
+    // Veo). audio=true uses audioUsdRate when the model has one; models with
+    // audio included (LTX) or no audio (Hailuo) ignore the flag.
+    const rate = params.audio && model.audioUsdRate ? model.audioUsdRate : model.usdRate;
+    usdCost = rate * (params.durationSeconds ?? 5);
   } else {
     usdCost = model.usdRate;
   }
 
   return Math.ceil((usdCost * markup) / 0.018);
+}
+
+/**
+ * Video energy cost — thin, intention-revealing wrapper for Goblin Labs.
+ * Duration is clamped to the model's maxDurationSeconds so a rogue client
+ * can never buy a 60s generation on a 10s engine.
+ */
+export function computeVideoEnergyCost(
+  modelKey: StudioModelKey,
+  durationSeconds: number,
+  audio: boolean = false
+): number {
+  const model = STUDIO_MODELS[modelKey];
+  const clamped = Math.max(1, Math.min(durationSeconds, model.maxDurationSeconds ?? 10));
+  return computeStudioEnergyCost(modelKey, { durationSeconds: clamped, audio });
 }
 
 /** Returns an allowed image type's pinned size, throwing on unknown types. */
