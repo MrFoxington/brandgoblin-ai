@@ -104,12 +104,10 @@ export async function POST(request: Request) {
         );
       }
 
-      if (userRow?.plan !== "pro") {
-        return NextResponse.json(
-          { error: "Creator Pro subscription required to purchase a refill." },
-          { status: 403 }
-        );
-      }
+      // July 17 2026: refills are open to EVERYONE — "energy is the gate, not
+      // the plan" (same doctrine as Studio/Labs). The old Pro-only 403 here was
+      // silently breaking the free-tier "Top up energy" funnel the EnergyWidget
+      // has offered all along.
 
       // ── Determine the energy amount for this pack ──────────────────────────
       // July 10 2026 bug: the $49 pack credited only 1,000 because the amount
@@ -165,7 +163,23 @@ export async function POST(request: Request) {
           `[checkout] energy_amount drift: Stripe metadata says ${metadataAmount}, pack map says ${packAmount} (price ${requestedPriceId}) — using metadata`
         );
       }
-      const energyAmount = String(finalEnergyAmount);
+
+      // ── MEMBER BONUS FLYWHEEL (July 17 2026, Fox-approved) ─────────────────
+      // Creator Pro subscribers get +20% bonus energy on every refill pack.
+      // Applied here (not the webhook) so the boosted amount rides the session
+      // metadata that the webhook already trusts. Raw plan === "pro" only —
+      // real subscribers, not trials.
+      const PRO_PACK_BONUS = 1.2;
+      const isProMember = userRow?.plan === "pro";
+      const grantedAmount = isProMember
+        ? Math.round(finalEnergyAmount * PRO_PACK_BONUS)
+        : finalEnergyAmount;
+      if (isProMember) {
+        console.log(
+          `[checkout] Pro member bonus: ${finalEnergyAmount} → ${grantedAmount} (+20%) for user ${authData.user.id}`
+        );
+      }
+      const energyAmount = String(grantedAmount);
 
       const session = await stripe.checkout.sessions.create({
         mode: "payment",

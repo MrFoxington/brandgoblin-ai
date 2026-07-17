@@ -52,6 +52,65 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 17, 2026 (⚡ REFILL DISPLAY FIX · PRINT PRO MONEY TEST PASSED · BRAND LAW + PRODUCT NAME ON LABEL)
+
+Cowork session. Part 17 (BiRefNet) turned out already pushed by Fox before the session
+(`7cd57bb`) — repo was clean at start.
+
+**1. 🔴→✅ REFILL OVER-MAX DISPLAY GLITCH (Fox's find: bought the $49/3,000⚡ Value pack →
+post-checkout celebration screen read "3,013 / 1,000").** RefillCelebration.tsx was the ONE
+energy meter missing the over-max guard (EnergyWidget + DailyCreatorDashboard already had it).
+Fix: same pattern — "Creative Energy · Fully charged", real total + ⚡, "1,000 monthly +
+2,013 refill" breakdown line, bar caps at full and animates pre-refill → full. FOUNDER
+DECISION: bar denominator STAYS the monthly allowance (not 7.5K/10K) — a 10K scale would make
+a fully-loaded normal month render ~90% empty; full bar + honest number wins. Refill packs +
+monthly setup confirmed staying as-is. ✅ PUSHED BY FOX.
+
+**2. ✍️ Print Pro copy fix (Fox: "slower" makes it feel worse, not premium):** picker desc
+"slower (~1 min)" → **"Cook time ~1 min"** — frames the wait as craft + matches the existing
+prompt-cooker language. ✅ PUSHED BY FOX (same commit as #1).
+
+**3. 🖨 PRINT PRO MONEY TEST — PASSED, with one catch that became a feature.** Juicy Hazy
+tests: pomade jar = flawless (perfect "Juicy Hazy" lockup, real label hierarchy: POMADE ·
+STRONG HOLD · MATTE FINISH — launch-ready shot). Beard oil = spelled "Juicy Hazy" perfectly
+in script + badge BUT invented "POSEIDON BEARD COMPANY" on the bottle label and both combs.
+Verdict: the SPELLING problem is dead; what remained was a brand-consistency hole (model
+invents secondary brands in the vacuum).
+
+**4. 🏷 BRAND LAW + PRODUCT NAME ON LABEL (Fox's idea — turn the Poseidon miss into a
+feature; tsc exit 0). ✅ PUSHED BY FOX + LIVE-VERIFIED: "the new feature worked":**
+1. `cook-prompt/route.ts` name-ON textRule gains BRAND LAW: the brand name is the ONLY
+   brand/company name that exists in the image — never invent/substitute/add another
+   wordmark anywhere (packaging, labels, engravings, accessories, background props); any
+   branded object reads the real brand name.
+2. NEW optional `productLabelName` (sanitized, 60 chars, only sent when name-ON): renders
+   correctly spelled UNDER the brand name like a scent/flavor name — enables
+   "Juicy Hazy 'Poseidon's Mist' beard oil". Wired through cook-prompt (rule text),
+   jobs route (accepted + both fallback prompts get brand-law + product-name variants),
+   and StudioImageGenerator ("Product name on the label (optional)" input appears when
+   the name-ON box is ticked; re-cooks on typing, 800ms debounce, fresh seed; field
+   gated out of payloads when the box is off).
+NOTE (workflow): sandbox git commands leave a stale `.git/index.lock` on the Mac that the
+sandbox can't delete — Fox's push lines now start with `rm -f .git/index.lock`.
+
+**🎯 NEXT HEADLINE PROJECT (Fox's call, July 17): "GOBLIN LABS VIDEOS."** Fox: "this may
+require a big build — let's take the time to really think, plan, create and build Goblin
+Labs as best as we can." Existing groundwork found: `energy-config.ts` registers wan_2_6
+($0.05/sec) + kling_3_0 ($0.10/sec) as "Phase 2: Video (mapped; not wired)" — ⚠️ prices
+stale ("re-verify before launch") and the kling_3_0 key actually points at a **v1.6**
+endpoint; jobs route rejects `defaultFor: "video"`; energy table has `video_generation: 500`;
+roadmap lists Goblin Labs (experimental tools) AND Goblin Motion (AI video & animation);
+Footer ships a "🧪 Goblin Labs" chip (inactive); asset map wants scientist-Nix + Goblin Labs
+badge (not generated — Nix images come from Fox only). Approach agreed: Wow-Plan style —
+research the July-2026 video model landscape on fal with live prices FIRST → phased plan
+doc → build part-by-part with Fox's taste as judge.
+
+Still open from July 16: Feel Plan (sound files first!), fal dashboard cost check (GPT
+Image 2 real cost + Seedream $0.03/$0.04 drift), Thai ladies street episode edit, Flip City
+rough cut #2, Dead Orbit stats ~July 20.
+
+---
+
 ## 🗓️ SESSION LOG — July 16, 2026 (⚡ LIVE REVEAL FEED — kit reveals section-by-section as it generates)
 
 Cowork session. **Origin: Fox filmed the first street-style episode (real local Thai ladies
@@ -319,11 +378,32 @@ stacking; (3) time-to-magic lens on signup → first kit → Studio → pricing;
 transitions between screens (phone thumb-zone first). Print Pro desc now warns "~1 min"
 (part 16, rides next push).
 
-**▶ NEXT SESSION / FOX — START HERE (July 16+):**
-1. 🔊 THE FEEL PLAN session: start with sound files (instant transformation), then the
-   full phone-flow audit → plan doc → phased build.
-2. 🎨 Remaining Wow Plan checks: name-ON product on PRINT PRO (real readable label
-   text — the money test), logo A/B Design Pro vs old favorites.
+**✅ SESSION CLOSED (July 16, ~9pm — the marathon session: 17 parts).** Everything
+pushed and live EXCEPT part 17 (BiRefNet + cutout-safe mascot prompts) which sits
+COMMITTED-OR-UNCOMMITTED ON FOX'S MAC — verify with `git status` and push first thing.
+Shipped today: live reveal feed w/ celebrations · QR codes · mobile nav menu · DNA
+scale fix + honest scoring · name persistence + Use This Name · brand archive
+(+migration, run ✓) · WOW PLAN all 4 phases (5 specialist engines, smart defaults,
+cooker 2.0, style chips, auto Photoreal chip, Print Pro name-ON) · Conjure ×2 built
+then removed (one reveal at a time) · Creative Engine rename · BiRefNet bg removal.
+Fox's retest verdicts logged in parts 11/13/14.
+
+**▶ NEXT SESSION / FOX — START HERE (July 17):**
+1. ⚠️ PUSH PART 17 if not yet pushed (`git status` in the repo → add/commit/push):
+   BiRefNet bg removal + cutout-safe mascot prompts. Then TEST: fresh Dead Orbit
+   mascot (should come out smoke-free) → Remove BG → white suit survives intact.
+2. 🖨 PRINT PRO MONEY TEST (still unrun): product art + "Put my brand name on it" →
+   Print Pro auto-selects → is "Fossil Fuel" readable + correctly spelled on the label?
+3. 🔊 THE FEEL PLAN session (Fox's brief in the 🎯 block above): start with sound
+   files (instant transformation), then full phone-flow audit → plan doc → phased build.
+4. 💰 Check fal dashboard: GPT Image 2 real per-image cost (registered at conservative
+   $0.20 — tune down) + Seedream $0.03 vs $0.04 drift.
+5. Carried over: Flip City files → rough cut #2; Thai ladies street episode edit;
+   transparent Nix overlay pack offer; Dead Orbit TikTok stats ~July 20 (7-day rule);
+   park @brandgoblinai handles; nixgoblin.com (~$13); name-ON spelling test (now =
+   Print Pro test); Brand Kit download (audit item 11); verify next refill vs ledger;
+   `git gc`; evaluate Ideogram 4 / Seedream 5.0 / Recraft V4 (prices unverified);
+   `studio_cta_clicked` analytics once traffic exists.
 2. 💰 Verify GPT Image 2's real per-image cost in the fal dashboard → tune usdRate.
 3. Evaluate Ideogram 4 / Seedream 5.0 / Recraft V4 upgrades (prices unverified).
 2. 🗄 BRAND ARCHIVE DEPLOY: run `supabase/migrations/20260716_brand_archived.sql` in the
