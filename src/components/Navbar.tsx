@@ -103,13 +103,25 @@ export default function Navbar() {
           {user ? (
             <>
               {user.email === ADMIN_EMAIL && (
-                <Link
-                  href="/admin"
-                  className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
-                  title="Admin dashboard"
-                >
-                  🧌 Admin
-                </Link>
+                <>
+                  {/* Founder preview (July 17 2026): Labs link rides the admin
+                      gate until experiments pass the quality bar, then moves
+                      into APP_LINKS/MOBILE_APP_LINKS for everyone. */}
+                  <Link
+                    href="/dashboard/labs"
+                    className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
+                    title="Goblin Labs (founder preview)"
+                  >
+                    🧪 Labs
+                  </Link>
+                  <Link
+                    href="/admin"
+                    className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
+                    title="Admin dashboard"
+                  >
+                    🧌 Admin
+                  </Link>
+                </>
               )}
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
                 Dashboard
@@ -177,13 +189,22 @@ export default function Navbar() {
             </Link>
           ))}
           {user && user.email === ADMIN_EMAIL && (
-            <Link
-              href="/admin"
-              onClick={() => setMenuOpen(false)}
-              className="block py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
-            >
-              🧌 Admin
-            </Link>
+            <>
+              <Link
+                href="/dashboard/labs"
+                onClick={() => setMenuOpen(false)}
+                className="block border-b border-white/5 py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
+              >
+                🧪 Goblin Labs
+              </Link>
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                className="block py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
+              >
+                🧌 Admin
+              </Link>
+            </>
           )}
           {!user && (
             <Link
