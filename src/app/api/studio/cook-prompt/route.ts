@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Slow down a bit — too many prompt requests." }, { status: 429 });
   }
 
-  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean; modelKey?: string };
+  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean; productLabelName?: string; modelKey?: string };
   try {
     body = await request.json();
   } catch {
@@ -65,6 +65,15 @@ export async function POST(request: Request) {
   // Brand name on the art is OPT-IN (July 11 2026 — forced names made every
   // product look like a mockup; clean art wins, the official logo stamp covers branding).
   const showBrandName = body.showBrandName === true;
+
+  // Optional product-line name (July 17 2026 — "Juicy Hazy 'Poseidon's Mist'
+  // beard oil"): renders as the product name on the label, subordinate to the
+  // brand name. Only meaningful when the brand name is ON. Sanitized — it goes
+  // straight into the prompt.
+  const productLabelName =
+    showBrandName && typeof body.productLabelName === "string"
+      ? body.productLabelName.trim().replace(/\0/g, "").slice(0, 60)
+      : "";
 
   if (!imageType || !(imageType in ASSET_LABELS)) {
     return NextResponse.json({ error: "Invalid imageType." }, { status: 400 });
@@ -133,7 +142,11 @@ export async function POST(request: Request) {
   const wantsBrandName = isBrandedArt && showBrandName && brandName.trim().length > 0;
 
   const textRule = wantsBrandName
-    ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. That brand name is the ONLY text allowed — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
+    ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. BRAND LAW (July 17 2026 — a model once invented "POSEIDON BEARD COMPANY" on a Juicy Hazy bottle): "${brandName}" is the ONLY brand or company name that exists in this image — NEVER invent, substitute, or add any other brand name, company name, or wordmark anywhere, including on packaging, labels, engravings, accessories, and background props; if ANY object carries branding, it reads "${brandName}". ${
+        productLabelName
+          ? `PRODUCT NAME: the product line is named EXACTLY "${productLabelName}" — render it correctly spelled on the label as the product name, styled subordinate to the brand name (the way a fragrance or flavor name sits under its brand). The brand name "${brandName}" and the product name "${productLabelName}" are the only text allowed`
+          : `That brand name is the ONLY text allowed`
+      } — do NOT add taglines, body copy, color codes, hex values, "#" symbols, hashtags, numbers, measurements, random letters, gibberish, lorem ipsum, or watermarks.`
     : isBrandedArt
     ? `TEXT IN IMAGE: render NO text at all — no brand names, letters, words, numbers, color codes, hex values, "#" symbols, hashtags, or watermarks. Do NOT invent or paint any logo or wordmark onto the subject. CRITICAL: never write the brand name${brandName ? ` "${brandName}"` : ""} anywhere in your prompt — image models paint any name they read. Do not describe any lettering, engraving, embossing, printed labels, or logos. SURFACE DESIGN (this is what makes it great): the product or graphic must NOT be blank or plain — act like a world-class merch designer and invent ONE bold signature visual motif from the brand's identity (its imagery, mood, mission, and palette), then dress every printable surface in it: illustrated patterns, abstract shapes, gradients, or scenic artwork. Describe that motif concretely in your prompt (e.g. "wrapped in a hand-drawn pattern of curling turquoise waves and golden suns"). Wordless, but unmistakably THIS brand.`
     : imageType === "mascot"

@@ -45,6 +45,7 @@ export async function POST(request: Request) {
     seed: clientSeed,
     stampLogo: clientStampLogo,
     showBrandName: clientShowBrandName,
+    productLabelName: clientProductLabelName,
   } = body as {
     modelKey: string;
     imageType: string;
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
     seed?: number;
     stampLogo?: boolean;
     showBrandName?: boolean;
+    productLabelName?: string;
   };
 
   // Per-job official-logo stamp opt-out (defaults to true = stamp when set).
@@ -61,6 +63,13 @@ export async function POST(request: Request) {
   // Brand name painted into the art is OPT-IN (July 11 2026 — default is a
   // clean, text-free image; the official-logo stamp handles branding).
   const showBrandName = clientShowBrandName === true;
+
+  // Optional product-line name (July 17 2026) — only used when the brand name
+  // is ON; rendered as the product name on the label, under the brand name.
+  const productLabelName =
+    showBrandName && typeof clientProductLabelName === "string"
+      ? clientProductLabelName.trim().replace(/\0/g, "").slice(0, 60)
+      : "";
 
   // Validate seed if provided: must be a safe positive integer
   const seed = (typeof clientSeed === "number" && Number.isInteger(clientSeed) && clientSeed >= 0 && clientSeed <= 2147483647)
@@ -156,11 +165,11 @@ export async function POST(request: Request) {
         prompt = `${mascotDesc || `A friendly brand mascot character for ${brandName}`}. Exactly one full-body mascot character, head to toe, expressive face, dynamic friendly pose, professional animation-studio character design.${colors ? ` Color palette: ${colors}.` : ""} No text, letters, or numbers anywhere. Clean, solid white background. Crisp self-contained silhouette — no smoke, mist, glows, sparkles, particles, or floating props drifting off the character into the background. ${noJunk}`;
       } else if (imageType === "social_graphic") {
         prompt = showBrandName
-          ? `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
+          ? `A branded social media graphic for ${brandName}.${colors ? ` Colors: ${colors}.` : ""} Clean, modern design. Display the brand name spelled exactly "${brandName}"${productLabelName ? ` and the product name spelled exactly "${productLabelName}"` : ""} in clean legible typography as the ONLY text. "${brandName}" is the only brand name in the image — never invent any other brand, company name, or wordmark. ${noJunk}`
           : `A bold, modern social media graphic.${colors ? ` Colors: ${colors}.` : ""} Clean, striking design. No text at all — no brand names, letters, words, numbers, logos, or wordmarks; communicate purely through shape, color, and composition. ${noJunk}`;
       } else {
         prompt = showBrandName
-          ? `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}" in clean legible typography as the ONLY text. ${noJunk}`
+          ? `Professional product hero photography for ${brandName}.${colors ? ` Color palette: ${colors}.` : ""} The product packaging clearly shows the brand name spelled exactly "${brandName}"${productLabelName ? ` with the product name spelled exactly "${productLabelName}" beneath it` : ""} in clean legible typography as the ONLY text. "${brandName}" is the only brand name in the image — never invent any other brand, company name, or wordmark on the product, accessories, or background props. ${noJunk}`
           : `Professional product hero photography. The product is dressed in a bold wordless signature pattern${colors ? ` in the brand palette (${colors})` : ""} — illustrated motifs, abstract shapes, or scenic artwork covering its printable surfaces. Absolutely no text, brand names, letters, numbers, logos, wordmarks, or labels anywhere on the product or scene. ${noJunk}`;
       }
     }

@@ -153,6 +153,10 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   // Forced names made every product look like a mockup with a fake wordmark;
   // clean art + the official-logo stamp is the better default.
   const [showBrandName, setShowBrandName] = useState(false);
+  // Optional product-line name painted with the brand name (July 17 2026):
+  // "Juicy Hazy 'Poseidon's Mist' beard oil" — sits under the brand name on
+  // the label like a fragrance/flavor name. Only sent when the name is ON.
+  const [productLabelName, setProductLabelName] = useState("");
   // Bring-your-own-logo upload (Pro perk)
   const [uploadBusy, setUploadBusy]       = useState(false);
   const [uploadRights, setUploadRights]   = useState(false);
@@ -431,6 +435,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           imageType: type,
           userNote: note,
           showBrandName,
+          productLabelName: showBrandName ? productLabelName.trim() || undefined : undefined,
           modelKey: modelForCook ?? modelKey, // engine-aware prompt coaching
         }),
       });
@@ -515,6 +520,23 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showBrandName]);
 
+  // Auto re-cook when the product label name changes (longer debounce — user
+  // is typing; only matters while the brand name is ON)
+  useEffect(() => {
+    if (imageType !== "product_art" && imageType !== "social_graphic") return;
+    if (!showBrandName) return;
+    if (suppressCookRef.current) return;
+    if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
+    cookDebounceRef.current = setTimeout(async () => {
+      if (suppressCookRef.current) return;
+      seedRef.current = generateSeed(); // new creative intent
+      const cooked = await cookPrompt(imageType);
+      if (cooked) setPrompt(cooked);
+    }, 800);
+    return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productLabelName]);
+
   // ── Job submission ─────────────────────────────────────────────────────────
 
   async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType): Promise<boolean> {
@@ -538,6 +560,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           seed: seedRef.current,
           stampLogo,
           showBrandName,
+          productLabelName: showBrandName ? productLabelName.trim() || undefined : undefined,
         }),
       });
 
@@ -1086,18 +1109,35 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           {/* Brand name in the art — OPT-IN (July 11 2026). Default OFF: the
               model paints garbled fake wordmarks; clean art + logo stamp wins. */}
           {selectedBrandId && (imageType === "product_art" || imageType === "social_graphic") && (
-            <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none rounded-xl border border-white/10 bg-white/3 px-4 py-2.5">
-              <input
-                type="checkbox"
-                checked={showBrandName}
-                onChange={(e) => { playButtonPress(); setShowBrandName(e.target.checked); }}
-                className="h-4 w-4 accent-[#8B5CF6]"
-              />
-              <span className="text-xs text-muted">
-                <span className="font-semibold text-primary-light">✍️ Put my brand name on it</span>
-                {" "}— AI-drawn text can look off; leave this off for clean art and use the logo stamp instead
-              </span>
-            </label>
+            <>
+              <label className="mt-3 flex items-center gap-2.5 cursor-pointer select-none rounded-xl border border-white/10 bg-white/3 px-4 py-2.5">
+                <input
+                  type="checkbox"
+                  checked={showBrandName}
+                  onChange={(e) => { playButtonPress(); setShowBrandName(e.target.checked); }}
+                  className="h-4 w-4 accent-[#8B5CF6]"
+                />
+                <span className="text-xs text-muted">
+                  <span className="font-semibold text-primary-light">✍️ Put my brand name on it</span>
+                  {" "}— AI-drawn text can look off; leave this off for clean art and use the logo stamp instead
+                </span>
+              </label>
+              {showBrandName && (
+                <div className="mt-2 space-y-1.5">
+                  <input
+                    type="text"
+                    value={productLabelName}
+                    onChange={(e) => setProductLabelName(e.target.value)}
+                    maxLength={60}
+                    placeholder="Product name on the label (optional) — e.g. Poseidon's Mist"
+                    className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
+                  />
+                  <p className="text-xs text-faint">
+                    Sits under your brand name like a scent or flavor name — your brand stays the star.
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Official-logo stamp toggle — only when the brand has an official
