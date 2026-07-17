@@ -109,6 +109,104 @@ Still open from July 16: Feel Plan (sound files first!), fal dashboard cost chec
 Image 2 real cost + Seedream $0.03/$0.04 drift), Thai ladies street episode edit, Flip City
 rough cut #2, Dead Orbit stats ~July 20.
 
+**(Same session, evening marathon) 🧪 GOBLIN LABS IS BORN — research → plan → Phases 0a/0b/0c
+ALL BUILT + PUSHED same night:**
+
+**5. 🔬 DEEP-DIVE RESEARCH (2 parallel agents, every price read off live fal pages July 17):**
+`docs/GOBLIN_LABS_VIDEO_PLAN_JULY_2026.md` = the master doc (Wow-Plan style, 5 phases).
+Launch engines: Kling v2.6 Pro "Motion Pro" ($0.07/s silent), LTX-2.3 Fast "Quick Motion"
+(the value freak: $0.04/s 1080p WITH audio, 9:16 explicit, 20s max, Apache 2.0), Hailuo 2.3
+Fast "Character" (flat $0.19/6s), Veo 3.1 Lite "Ad Director" ($0.03-0.05/s w/ audio+speech).
+Launch recipes: Hero Push-In / Unboxing Reveal / Mascot Comes Alive / Logo Sting. Cooker 3.0
+craft rules encoded in the doc (animate camera/light/atmosphere NEVER the product; motion-only
+prompts; no in-video text ever). KEY: i2v engines inherit aspect ratio from the input image →
+a 9:16 outpaint "vertical stage" step makes every video TikTok-native. HARD NOs: Sora for i2v
+(OpenAI IP-blocking would reject our branded mascots/logos), Seedance 2.0/Kling 4K (840-1,945⚡
+per 5s = premium-only). APPAREL TRY-ON: researched (FASHN v1.6 chain works, ~$0.60/clip) but
+**PARKED by Fox** — niche, complicated, not max bang-for-buck yet; research banked in plan §4.
+
+**6. 💰 PRICING & ACCESS DECIDED (all four Fox-approved, in plan §6):** (1) same-price nudge
+($19 pack → "same $19/month = 1,000⚡ EVERY month" upsell); (2) MEMBER BONUS FLYWHEEL: Pros
+get +20% energy on every pack; (3) Labs open to everyone, energy-gated (Studio doctrine);
+(4) trust economy non-negotiable. REJECTED: 30-days-of-Pro-per-pack (Fox caught the
+cannibalization). Priority call: VIDEO FIRST, Bazaar/POD when real users exist — video output
+IS distribution (users post their brand videos = ads for us; feeds Fox's TikTok engine too).
+
+**7. ✅ PHASE 0a PUSHED (`1db2264`):** nudge live in EnergyRefillModal ($19 pack, free users
+only, `upgrade_cta_clicked` section refill_modal_nudge); +20% Pro bonus applied server-side at
+checkout (rides energyAmount metadata — webhook untouched); 🔴→✅ BONUS BUG FIX: checkout had a
+Pro-only 403 on refills that silently broke the free-tier "Top up energy" funnel the widget
+always offered — removed ("energy is the gate, not the plan"). Modal shows Pros boosted pack
+numbers; free users see the +20% teaser + "Energy never expires."
+
+**8. ✅ PHASE 0b PUSHED:** video engine registry rebuilt in energy-config.ts — stale wan_2_6 +
+"kling_3_0"(v1.6 endpoint!) DELETED (verified zero references), 4 launch engines registered
+with July 17 verified prices, new audioUsdRate + maxDurationSeconds fields,
+computeStudioEnergyCost takes audio flag, new computeVideoEnergyCost(model, secs, audio)
+clamps duration. Verified math: Quick 5s=112⚡, Motion Pro 5s=195⚡, MP 10s audio=778⚡.
+All four carry defaultFor:"video" → jobs route still rejects them (invisible until 0d).
+
+**9. ✅ PHASE 0c PUSHED:** `/dashboard/labs` FOUNDER-PREVIEW shell (ADMIN_EMAIL gate — public
+launch = delete one documented line) + `LabsHub.tsx` (floating conjuring-Nix header, "Founder
+Preview" badge, 3 experiment cards: 🎬 Brand Videos "⚗️ Brewing" / 🗣 Talking Mascot /
+🌀 Viral Effects, lab-rules trust line) + Navbar 🧪 Labs links (desktop + hamburger,
+admin-gated). Swap header art to scientist-nix.png when Fox drops the PNG (never generate Nix).
+
+**10. 🏪 GOBLIN BAZAAR (renamed from Marketplace, Fox's call) + POD VISION:** Footer chip +
+brand guidelines + roadmap updated; roadmap now carries the Make-It-Real path: (1) "📦 Make it
+real" Printful/Printify tip box (cheap, ship anytime), (2) print-ready design export,
+(3) full Bazaar design→POD→store. KEY INSIGHT: POD needs the flat ARTWORK, so future flow is
+DESIGN-FIRST (product art AND real product both derive from one design file — exact match by
+construction). Affiliates (Printful/Printify) once traffic exists.
+
+**11. 💜 QUEUED — OFFICIAL BRANDGOBLIN BRAND IMPORT (Fox's ask):** hand-craft the real
+BrandGoblin kit (true palette/voice/story/Nix data from docs, NOT generated) as a
+brand_generations row via SQL insert for Fox's admin account + attach real logo via existing
+BYOL → Fox creates on-brand content in-app. NUANCE: kit mascot data must not be used with
+Studio's mascot generator (rule #1 — never generate Nix); but Labs i2v on official Nix PNGs =
+ANIMATING real art, not generating — Fox's call when video lands. ALSO: Fox LOVES Print Pro
+("single biggest improvement, the images are coming out so fucking good").
+
+**(Same session, part 12) 🎬 FOUNDER VIDEO: "GOBLIN LABS" EPISODE — EDITED + READY TO POST.**
+Fox recorded the build session (screen) + a talking-head clip. Claude frame-mapped the 5:29
+screen recording and cut `Footage/labs_build_sizzle.mp4` (9.97s, 4 beats: 120x build blur →
+Spotlight "terminal" → commands rain in at 14x → git push lands slowed) + built the JoJo
+"To Be Continued" outro kit: `tobecontinued_brandgoblin.png` (loose arrow, Nix purple/gold),
+`tobecontinued_brandgoblin_9x16.png` (1080×1920 pre-positioned overlay), and
+`labs_tobecontinued_outro.mp4` (4s ready-made: frozen push frame + sepia + arrow — built
+because CapCut mobile's freeze tool is buried: tap clip → toolbar → scroll right → Freeze).
+Fox assembled in CapCut, added the Roundabout/JoJo sound IN TIKTOK at the end (TikTok = one
+added sound max; any background lo-fi bed must be baked in CapCut at 10-15% vol, cut to
+silence ~0.5s before the bass drop). Caption chosen: natural "founder log" style, keywords
+woven in, tags #buildinpublic #solofounder #aitools #goblinlabs. **POSTING PLAN: draft →
+post 9PM Bangkok July 17 (= 9-10AM ET morning scroll).** ⚠️ TIMEZONE NOTE: Fox is in
+BANGKOK (UTC+7) — account timezone setting says New York, don't trust it for scheduling math.
+
+**(Same session, part 13) 🔥 THE CAPCUT LESSON → PERMANENT PRODUCT LAW.** CapCut blocked
+Fox's EXPORT despite his paid Pro (auto-enabled AI-upscale/UHD was the paywall bait; fix:
+export 1080p, enhance toggles off). Fox: "I will remember this feeling and never want us to
+do this to someone else." Saved to PROJECT MEMORY as `never-gate-the-finish-line.md` — four
+rules: (1) never surprise a creator at the export button — if they could MAKE it they can
+HAVE it; (2) intent-first simplicity — ask what they want to do, common actions dead easy,
+core tools findable; (3) AI features for their own sake are lame — needed/wanted/useful or
+don't ship it; (4) help them win FIRST, then offer next steps conversationally ("export
+straight to TikTok?", "what's this video for? we'll pick music — or choose manually") —
+that pattern IS the Nix companion thesis. Apply to every pricing/UX decision.
+
+**▶ NEXT SESSION — START HERE (July 18):**
+1. 🎬 PHASE 0d — video job plumbing: jobs route accepts video (drop the defaultFor reject),
+   provider.ts video input builders, webhook handles video output, duration+audio params,
+   video JobCard variant (player + download), ⚠️ likely migration (duration/audio on
+   studio_jobs) — run in Supabase SQL editor BEFORE push. Then PHASE 1 = the Brand Videos
+   card goes interactive (recipes → Cooker 3.0 → engines → 9:16 vertical stage).
+2. 💜 BrandGoblin brand import (SQL + kit JSON from Claude; Fox runs + uploads logo via BYOL).
+3. 📱 Verify tonight's pushes live: Labs tab (admin), refill modal nudge (free acct) +
+   Pro pack bonus numbers, next real pack purchase grants +20% (webhook log).
+4. Carried: Feel Plan (sound files first!); fal dashboard cost check (GPT Image 2 real cost →
+   tune down from $0.20; Seedream drift); Thai ladies episode edit; Flip City cut #2;
+   Dead Orbit stats ~July 20; GOBLIN LABS episode stats ~July 24 (posted 9PM ICT July 17 — 7-day rule); scientist-Nix PNG for Labs header; "Make it real" POD tip box
+   (rides any Studio session).
+
 ---
 
 ## 🗓️ SESSION LOG — July 16, 2026 (⚡ LIVE REVEAL FEED — kit reveals section-by-section as it generates)
