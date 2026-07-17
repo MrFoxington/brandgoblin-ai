@@ -75,7 +75,7 @@ Think: **Pixar + Duolingo + Discord + premium SaaS**
 | Goblin Sites | AI Powered Websites | Coming Soon |
 | Goblin Growth | Grow Your Brand. Crush Your Goals. | Coming Soon |
 | Goblin Motion | AI Video & Animation That Moves | Coming Soon |
-| Goblin Marketplace | Tools, Templates & Digital Goodies | Coming Soon |
+| Goblin Bazaar | Tools, Templates & Digital Goodies | Coming Soon |
 
 ---
 

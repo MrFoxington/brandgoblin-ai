@@ -13,7 +13,7 @@ const ECOSYSTEM: { label: string; active: boolean; href?: string }[] = [
   { label: "🌐 Goblin Sites",     active: false },
   { label: "📈 Goblin Growth",    active: false },
   { label: "📹 Goblin Motion",    active: false },
-  { label: "🏪 Goblin Marketplace", active: false },
+  { label: "🏪 Goblin Bazaar", active: false },
 ];
 
 export default function Footer() {

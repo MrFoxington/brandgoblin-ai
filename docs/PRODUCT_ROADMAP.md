@@ -129,8 +129,19 @@
 - AI video & animation
 - Brand videos
 
-### 🔜 Goblin Marketplace
+### 🔜 Goblin Bazaar
+*(renamed from "Goblin Marketplace" — Fox, July 17 2026)*
 - Templates, tools & digital products
+- **PRINT-ON-DEMAND / "MAKE IT REAL" (Fox's vision, July 17 2026):** users turn their Studio
+  product art into REAL products — Printful/Printify/Gelato POD, zero inventory. Path:
+  (1) cheap first step: "📦 Make it real" tip box on product art (same pattern as the
+  "Where to launch this" website tip) + affiliate links once traffic exists (Printful/
+  Printify both have programs); (2) later: print-ready design export from Studio
+  (the design FILE, not the product photo — BiRefNet cutout + upscale gets close);
+  (3) full Bazaar: design → POD catalog → mockups → connected store.
+- KEY INSIGHT for exact-match real products: POD printers need the flat ARTWORK, so the
+  future flow is design-first (generate/extract the print design, then product art AND
+  real product both come FROM it — they match by construction).
 
 ---
 
