@@ -34,9 +34,9 @@ const EXPERIMENTS: Experiment[] = [
   },
   {
     code: "EXPERIMENT 002",
-    icon: "🗣",
-    title: "Talking Mascot",
-    desc: "Your brand's character speaks — taglines, announcements, pure chaos. Lip-synced, in character, unmistakably yours.",
+    icon: "⚡",
+    title: "Bring Your Mascot to Life",
+    desc: "Strap your mascot to the table and pull the lever — it blinks, it waves, it walks. IT'S ALIVE. Unmistakably yours, now in motion.",
     status: "pipeline",
     statusLabel: "🔮 In the pipeline",
   },
@@ -95,8 +95,7 @@ export default function LabsHub() {
             Welcome to the Lab
           </h1>
           <p className="text-sm text-muted max-w-lg mx-auto">
-            Nix&apos;s laboratory — where future magic is forged. Experiments live here
-            first; the ones worthy of your brand graduate to the Studio.
+            Nix&apos;s laboratory — where the magic is brewed.
           </p>
         </div>
       </motion.div>
