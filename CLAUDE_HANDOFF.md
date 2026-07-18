@@ -204,7 +204,7 @@ that pattern IS the Nix companion thesis. Apply to every pricing/UX decision.
    Pro pack bonus numbers, next real pack purchase grants +20% (webhook log).
 4. Carried: Feel Plan (sound files first!); fal dashboard cost check (GPT Image 2 real cost →
    tune down from $0.20; Seedream drift); Thai ladies episode edit; Flip City cut #2;
-   Dead Orbit stats ~July 20; GOBLIN LABS episode stats ~July 24 (posted 9PM ICT July 17 — 7-day rule); scientist-Nix PNG for Labs header; "Make it real" POD tip box
+   Dead Orbit stats ~July 20; GOBLIN LABS episode stats ~July 25 (✅ POSTED to TikTok ~10PM ICT July 17, 'felt great!' — 7-day rule; YT Shorts re-post 9PM ICT July 18, clean export + re-add JoJo sound from the Shorts library since it was added in-TikTok); scientist-Nix PNG for Labs header; "Make it real" POD tip box
    (rides any Studio session).
 
 ---

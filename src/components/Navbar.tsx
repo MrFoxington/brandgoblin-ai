@@ -103,25 +103,13 @@ export default function Navbar() {
           {user ? (
             <>
               {user.email === ADMIN_EMAIL && (
-                <>
-                  {/* Founder preview (July 17 2026): Labs link rides the admin
-                      gate until experiments pass the quality bar, then moves
-                      into APP_LINKS/MOBILE_APP_LINKS for everyone. */}
-                  <Link
-                    href="/dashboard/labs"
-                    className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
-                    title="Goblin Labs (founder preview)"
-                  >
-                    🧪 Labs
-                  </Link>
-                  <Link
-                    href="/admin"
-                    className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
-                    title="Admin dashboard"
-                  >
-                    🧌 Admin
-                  </Link>
-                </>
+                <Link
+                  href="/admin"
+                  className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
+                  title="Admin dashboard"
+                >
+                  🧌 Admin
+                </Link>
               )}
               <Link href="/dashboard" className="btn-ghost hidden sm:inline-flex">
                 Dashboard
@@ -144,6 +132,20 @@ export default function Navbar() {
                   FREE
                 </span>
               </Link>
+              {/* 🧪 Labs tab — neon emerald, matching the lab (July 18 2026).
+                  Rides the admin gate until Labs launches publicly, then this
+                  condition simply drops. */}
+              {user.email === ADMIN_EMAIL && (
+                <Link
+                  href="/dashboard/labs"
+                  className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/50 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300 hover:text-emerald-100 hover:bg-emerald-400/20 shadow-[0_0_16px_rgba(16,185,129,0.5)] transition-colors"
+                >
+                  🧪 Labs
+                  <span className="absolute -top-1.5 -right-1.5 rounded-full bg-emerald-400 px-1 text-[9px] font-bold leading-4 text-black">
+                    BETA
+                  </span>
+                </Link>
+              )}
               <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-[0_0_20px_rgba(255,107,53,0.5)]">
                 ✦ Generate
               </Link>
