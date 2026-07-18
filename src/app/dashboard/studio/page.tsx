@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import EnergyWidget from "@/components/EnergyWidget";
 import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
+import StudioHero from "@/components/studio/StudioHero";
 import type { BrandGenerationRow } from "@/types";
 
 export default async function StudioPage({
@@ -74,14 +75,8 @@ export default async function StudioPage({
             ← Back to Brand Vault
           </Link>
 
-          <div className="mb-8">
-            <h1 className="font-display text-3xl font-black text-white mb-1">
-              🎨 Goblin Studio
-            </h1>
-            <p className="text-sm text-muted">
-              ⚡ Creative Energy powers every creation — logos, social graphics & product art.
-            </p>
-          </div>
+          {/* Badge hero — matches the Labs arrival moment (July 18 2026) */}
+          <StudioHero />
 
           <div className="flex flex-col xl:flex-row gap-8 items-start">
             {/* Generator */}
