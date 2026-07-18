@@ -62,34 +62,39 @@ export default function LabsHub() {
         ← Back to Brand Vault
       </Link>
 
-      {/* ── Lab header ── */}
+      {/* ── Lab header — the BADGE is the arrival moment (Fox, July 18 2026:
+          "as soon as people click Labs they see this — I'm in the lab now").
+          Big, centered, glowing, gently floating. ── */}
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-10 flex flex-col sm:flex-row items-center gap-6 rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 p-8"
+        className="mb-10 flex flex-col items-center gap-6 rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 p-8 text-center"
       >
         <motion.div
-          animate={reduce ? {} : { y: [0, -8, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="shrink-0"
+          animate={reduce ? {} : { y: [0, -10, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="relative"
         >
+          {/* soft creative-energy glow behind the badge */}
+          <div aria-hidden className="absolute inset-0 scale-110 rounded-full bg-primary/25 blur-3xl motion-safe:animate-pulse" />
+          <div aria-hidden className="absolute inset-8 rounded-full bg-secondary/20 blur-2xl" />
           <Image
-            src="/nix/conjuring-nix.png"
-            alt="Nix conjuring new magic in Goblin Labs"
-            width={140}
-            height={140}
-            className="drop-shadow-[0_0_30px_rgba(139,92,246,0.45)]"
+            src="/badges/goblin-labs-badge.png"
+            alt="Goblin Labs — where future magic is forged"
+            width={288}
+            height={288}
+            className="relative h-auto w-56 sm:w-72 drop-shadow-[0_0_35px_rgba(139,92,246,0.55)]"
             priority
           />
         </motion.div>
-        <div className="text-center sm:text-left">
+        <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-secondary">
             Founder Preview
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-black text-white mb-2">
-            🧪 Goblin Labs
+          <h1 className="font-display text-2xl sm:text-3xl font-black text-white mb-2">
+            Welcome to the Lab
           </h1>
-          <p className="text-sm text-muted max-w-lg">
+          <p className="text-sm text-muted max-w-lg mx-auto">
             Nix&apos;s laboratory — where future magic is forged. Experiments live here
             first; the ones worthy of your brand graduate to the Studio.
           </p>
