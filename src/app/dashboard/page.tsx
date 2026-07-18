@@ -10,6 +10,7 @@ import { headers } from "next/headers";
 import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan } from "@/lib/access";
 import StudioFavoritesSection from "@/components/studio/StudioFavoritesSection";
+import BadgeShelf from "@/components/BadgeShelf";
 import { listUserFavoriteJobs } from "@/lib/studio/jobs";
 import type { BrandGenerationRow } from "@/types";
 
@@ -27,18 +28,34 @@ export default async function DashboardPage() {
     ipHash: rawIp ? hashIp(rawIp) : undefined,
   });
 
-  const [{ data: userRow }, { data: generations }] = await Promise.all([
+  const [{ data: userRow }, { data: generations }, { data: jobRows }] = await Promise.all([
     supabase.from("users").select("credits, plan, payment_status, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
     supabase
       .from("brand_generations")
       .select("id, input_data, output_data, created_at, favorite, archived")
       .eq("user_id", authData.user.id)
       .order("created_at", { ascending: false }),
+    // Trophy Shelf stats (July 18 2026) — lightweight flags only, capped
+    supabase
+      .from("studio_jobs")
+      .select("image_type, official_logo, status")
+      .eq("user_id", authData.user.id)
+      .eq("status", "completed")
+      .limit(500),
   ]);
 
   const rows = (generations ?? []) as BrandGenerationRow[];
   const email = authData.user.email ?? "";
   const paymentStatus = userRow?.payment_status ?? "active";
+
+  // 🏆 Trophy Shelf stats — all from data we already have or one cheap query
+  const jobs = (jobRows ?? []) as { image_type: string; official_logo: boolean }[];
+  const badgeStats = {
+    brandCount: rows.length,
+    completedJobs: jobs.length,
+    productArtJobs: jobs.filter((j) => j.image_type === "product_art").length,
+    hasOfficialLogo: jobs.some((j) => j.official_logo),
+  };
 
   // Studio favorites — anyone can now create in Studio (free starter energy),
   // so surface favorites for all users; the query returns [] when there are none.
@@ -72,6 +89,9 @@ export default async function DashboardPage() {
             latestBrand={rows[0]}
             signupDate={authData.user.created_at}
           />
+
+          {/* 🏆 Trophy Shelf — collector badges (July 18 2026) */}
+          <BadgeShelf stats={badgeStats} />
 
           {/* Studio Favorites — treasure stash (hidden if none) */}
           <StudioFavoritesSection favorites={studioFavorites} />
