@@ -52,6 +52,88 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 18, 2026 (💜 BRAND IMPORTED INTO ITSELF · CREST SYSTEM · 🏆 TROPHY SHELF — ALL 8 BADGES MINTED)
+
+Cowork session (note: Fox's Mac clock runs US Eastern; Fox is in Bangkok UTC+7 — saved to
+project memory, don't trust Mac timestamps for scheduling).
+
+**1. 💜 OFFICIAL BRANDGOBLIN BRAND IMPORTED — "best idea ever" (Fox).**
+`supabase/import_official_brandgoblin.sql` (kept OUT of migrations/ so it never auto-runs):
+hand-crafted kit from BRAND_GUIDELINES + Nix docs (real palette #7C3AED/#10B981/#FBBF24,
+real voice rules, real origin story, honest DNA 88-94). Run ✓ by Fox in Supabase SQL editor
+→ brand id `f429c426-1186-40e0-9c83-9628e2d6a6f7` in his admin account, real logo uploaded
+via BYOL ✓. SAFETY: kit mascot.imagePrompt is a literal "OFFICIAL MASCOT — do not generate"
+warning string, so the Mascot generator can never paint a fake Nix from it (rule #1 belt+
+suspenders). Result: Studio/Labs now create genuinely on-brand BrandGoblin content — the
+app designs itself (all of today's art came from this).
+
+**2. 🧪🎨 ECOSYSTEM CREST SYSTEM (badges conjured by Fox in Studio w/ Design Pro + brand
+palette; Claude picks winner by taste, flood-fill cutout, installs):**
+- GOBLIN LABS badge (bubbling emerald flask, circuitry ring) + Claude typeset "GOBLIN LABS"
+  on a navy ribbon arc (real typography, clipped to silhouette) → `public/badges/
+  goblin-labs-badge.png` → HERO of /dashboard/labs (floating, purple aura + emerald glow,
+  ~1/3 mobile screen). Copy pass (Fox): h1 "Welcome to the Lab", tagline "Nix's laboratory —
+  where the magic is brewed." (graduate-to-Studio line CUT — real flow is Studio → Labs);
+  Experiment 002 renamed "⚡ Bring Your Mascot to Life" (Frankenstein copy: "IT'S ALIVE").
+- GOBLIN STUDIO badge (paintbrush + ribbon): ribbon TEXT version rejected by Fox's taste →
+  CLEAN emblem in `public/badges/goblin-studio-badge.png` + NEW `StudioHero.tsx` ("Welcome
+  to the Studio — bring your brand to life", amber-purple glow) replacing the old h1 in
+  studio/page.tsx. Both flagship pages now have matching badge-arrival moments. Fox: "the
+  new studio section looks great!"
+- 🧪 LABS NAVBAR TAB: neon-emerald glowing pill + BETA chip next to Studio/Nix (admin-gated;
+  public launch = delete one condition). Fox verified live — full row of glowing doors.
+- Working folders `Goblin Art/` gitignored (⚠️ `Badges/` should be too — in push lines).
+
+**3. 🏆 THE TROPHY SHELF — COLLECTOR BADGES (Fox's idea: Pokemon-style badges for creation
+milestones; "honest dopamine — earned by creating, never bought"). BUILT + ALL ART MINTED:**
+1. `src/lib/badges.ts` — registry of 8 badges + computeBadges(stats). Earning = REAL data:
+   first-spark (≥1 brand) · conjurer (≥1 completed studio job) · mark-maker (official logo)
+   · merch-goblin (≥1 product_art) · collector (≥10 jobs, progress n/10) · on-fire (3-day
+   streak from localStorage, n/3) · herald + its-alive = 🔮 coming-soon (share tracking /
+   Labs video — flip COMING_SOON set when signals land).
+2. `src/components/BadgeShelf.tsx` — gold-trimmed dashboard card "X/8 collected", earned
+   badges glow, locked dimmed w/ 🔒, "Next badge" quest strip w/ progress + deep link,
+   FULLSCREEN trophy modal (tap badge → floating art, gold aura, EARNED chip / quest hint +
+   "Start the quest →"). Art AUTO-LIGHTS-UP: falls back to emoji until PNG exists at
+   /badges/achievements/<id>.png — zero code per badge. Spin/particles = Feel Plan later.
+3. `dashboard/page.tsx` — one cheap studio_jobs query (completed, capped 500) → stats.
+   NO migration needed.
+4. **ALL 8 ARTS CONJURED (Fox) + INSTALLED (Claude, 512px cutouts):** first-spark (gold star
+   erupting from spellbook), conjurer (purple cauldron + stirring wand), mark-maker (crown
+   mid-descent onto crest — mid-coronation beat the parked-crown variants), merch-goblin
+   (tee + glowing stamp emblem), collector (obsidian-gold tech vault chest — v1 prompt was
+   "too pirate", reworked to techno-fantasy), on-fire (anvil + THREE flames in the three
+   brand colors), herald (BLACK GOAT w/ gold horns — Fox rejected the trumpet concept as
+   weakest, war-horn prompt produced the goat, instant favorite), its-alive (lightning
+   striking a tesla-coil lever rig in a purple storm).
+
+**4. 🔴 DOGFOODING FOUND A REAL BUG:** Collector prompt v2 (1,106 chars) failed 3-4x with
+"Provider reported failure — energy returned" — Recraft's hard prompt cap is ~1,000 chars
+(Herald at 956 sailed through). Users get a cryptic failure with no explanation. FIX QUEUED:
+per-engine prompt-length validation in jobs route + character counter in the Studio prompt
+box (+ cap awareness in cook-prompt). Trimmed 830-char prompt worked.
+
+**5. Video:** TikTok episode LIVE since ~10PM July 17 ✓. YT Shorts re-post: pending — clean
+export + re-add sound from Shorts library (the JoJo sound lives in TikTok only).
+
+**▶ NEXT SESSION — START HERE (fresh session):**
+1. ⚡ **PHASE 0d — VIDEO JOB PLUMBING. NO MORE DECORATING.** jobs route accepts video (drop
+   defaultFor reject), provider.ts video input builders (4 engines), webhook video output,
+   duration+audio params, video JobCard w/ player+download, ⚠️ likely studio_jobs migration
+   (duration/audio) — Supabase SQL editor BEFORE push. Then Phase 1: recipes → Cooker 3.0 →
+   9:16 vertical stage → the 🎬 Brand Videos card goes LIVE (and the its-alive badge earns
+   its first strike).
+2. 🔤 Prompt-length guard (bug #4 above) — small, bundle into any build session.
+3. 📱 Verify Trophy Shelf live: dashboard should show 4-5 earned w/ real art; tap-to-
+   fullscreen; Next-badge strip. + YT Shorts post if still pending.
+4. Carried: Feel Plan (sound files! badge spin/particles now added to it); fal dashboard
+   cost check (GPT Image 2 → tune down from $0.20; Seedream drift); Dead Orbit stats
+   ~July 20; GOBLIN LABS episode stats ~July 25; Thai ladies episode edit; Flip City cut
+   #2; scientist-Nix PNG; "Make it real" POD tip box; remaining ecosystem crests (Bazaar/
+   Motion/Sites/Growth) whenever Fox feels like conjuring.
+
+---
+
 ## 🗓️ SESSION LOG — July 17, 2026 (⚡ REFILL DISPLAY FIX · PRINT PRO MONEY TEST PASSED · BRAND LAW + PRODUCT NAME ON LABEL)
 
 Cowork session. Part 17 (BiRefNet) turned out already pushed by Fox before the session
