@@ -52,6 +52,35 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — July 24, 2026 (🔥 HOT RIGHT NOW FONTS — AI-curated monthly shelf · ⚠️ MIGRATION BEFORE DEPLOY)
+
+Cowork session. Also: found + committed an ORPHANED fix left uncommitted on Fox's Mac from a
+prior session — Pango misread font families ending in numbers ("Baloo 2" → 2pt text) because
+the font description had no explicit size; now `"<family> 40"` (`d04a3a4`, pushed... verify).
+
+**NEW FEATURE — 🔥 "Hot Right Now" fonts (Fox's ask: AI sources + refreshes what's hot monthly):**
+- **⚠️ MIGRATION FIRST:** `supabase/migrations/20260724_trending_fonts.sql` — `trending_fonts`
+  table (month_key pk, fonts jsonb, RLS on / no policies = service-role only). Run in Supabase
+  SQL editor BEFORE the deploy.
+- **NEW `src/lib/studio/trending-fonts.ts`** (server): one list per calendar month, cached in the
+  table. First picker-open of a new month → Claude Haiku picks ~8 hot Google Fonts (tries the
+  API-side web_search tool for genuine currency; falls back to a plain call — SDK types predate
+  the tool, cast + try/catch). EVERY pick validated against live Google Fonts (HEAD on css2 URL)
+  before saving — hallucinated families can't reach the picker. Failure ladder: this month's row
+  → most recent previous row → static "Trending 2026" group. Picker never breaks. Needs ≥4 valid
+  picks to save. Excludes tired defaults (Roboto/Open Sans/Poppins/etc.) by prompt.
+- **NEW GET `/api/studio/trending-fonts`** (auth'd, private cache 1h) + **NEW client hook
+  `use-trending-fonts.ts`** (module-level promise cache, silent null on failure).
+- **Both pickers updated** (Studio `FontField` + BrandKitView `FontSelect`): "🔥 Hot right now ·
+  <Month Year>" optgroup FIRST; while live list is loaded the static "Trending 2026" group is
+  hidden (it's the fallback, not a sibling); trending families count as "known" so the custom-font
+  input doesn't pop open. Font FILES need no work — `font-files.ts` already downloads any Google
+  Font on demand, and overlay rendering resolves them the same way.
+- tsc exit 0. **▶ push lines below; live test = open a font picker → 🔥 group at top with this
+  month's label; pick a trending font → thumbnail renders with it.**
+
+---
+
 ## 🗓️ SESSION LOG — July 18, 2026 (💜 BRAND IMPORTED INTO ITSELF · CREST SYSTEM · 🏆 TROPHY SHELF — ALL 8 BADGES MINTED)
 
 Cowork session (note: Fox's Mac clock runs US Eastern; Fox is in Bangkok UTC+7 — saved to

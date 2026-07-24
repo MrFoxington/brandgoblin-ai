@@ -14,6 +14,7 @@ import { useSoundFx } from "@/components/primitives/SoundFx";
 import { shareImage } from "@/lib/studio/share";
 import { FAVORITES_LABEL } from "@/lib/studio/favorites";
 import { FONT_GROUPS, ALL_FONT_FAMILIES, resolveTypography } from "@/lib/studio/fonts";
+import { useTrendingFonts } from "@/lib/studio/use-trending-fonts";
 
 interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
@@ -86,7 +87,14 @@ const STYLE_CHIPS: { label: string; emoji: string; note: string }[] = [
 // Saved Brand Fonts (July 2026) — a curated Google Font <select> with a "Custom
 // font…" escape hatch. Shared by the headline + body pickers in Studio.
 function FontField({ label, value, onChange }: { label: string; value: string; onChange: (family: string) => void }) {
-  const isCustom = !ALL_FONT_FAMILIES.includes(value);
+  // 🔥 AI-curated monthly shelf — replaces the static "Trending 2026" group
+  // while it's loaded; the static group is the offline fallback.
+  const trending = useTrendingFonts();
+  const knownFamilies = trending
+    ? [...ALL_FONT_FAMILIES, ...trending.fonts.map((f) => f.family)]
+    : ALL_FONT_FAMILIES;
+  const isCustom = !knownFamilies.includes(value);
+  const staticGroups = trending ? FONT_GROUPS.filter((g) => g.label !== "Trending 2026") : FONT_GROUPS;
   return (
     <div>
       <label className="block text-[11px] font-semibold text-faint mb-1">{label}</label>
@@ -95,7 +103,14 @@ function FontField({ label, value, onChange }: { label: string; value: string; o
         onChange={(e) => onChange(e.target.value === "__custom__" ? "" : e.target.value)}
         className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
       >
-        {FONT_GROUPS.map((g) => (
+        {trending && (
+          <optgroup label={`🔥 ${trending.label}`}>
+            {trending.fonts.map((f) => (
+              <option key={`trend-${f.family}`} value={f.family}>{f.family}</option>
+            ))}
+          </optgroup>
+        )}
+        {staticGroups.map((g) => (
           <optgroup key={g.label} label={g.label}>
             {g.fonts.map((f) => (
               <option key={f.family} value={f.family}>{f.family}</option>
