@@ -10,7 +10,7 @@
 // blocks onto a generated background with safe-zone placement + a logo stamp.
 
 import sharp from "sharp";
-import { getFontFilePath } from "./font-files";
+import { getFontFile } from "./font-files";
 
 // Escape text for Pango markup (only these three are special).
 export function escapePango(s: string): string {
@@ -54,22 +54,22 @@ export async function renderTextImage(
   const shown = o.uppercase ? o.text.toUpperCase() : o.text;
   const markup = buildMarkup(shown, o.color, o.accentWord, o.accentColor);
 
-  // Resolve the actual .ttf. If the requested family can't be fetched at all,
-  // fall back to the house font — the serverless image has NO system fonts, so
-  // rendering without a real font file produces tofu boxes, never a "default".
-  let family = o.family;
-  let fontfile = await getFontFilePath(family, o.weight ?? 700, !!o.italic);
-  if (!fontfile) {
-    family = "Jost";
-    fontfile = await getFontFilePath(family, 700, false);
-  }
+  // Resolve a VERIFIED .ttf (glyph coverage checked). If the requested family
+  // can't be resolved, fall back to the house font — the serverless image has
+  // NO system fonts, so rendering without a real font file produces tofu
+  // boxes, never a graceful default.
+  let resolved = await getFontFile(o.family, o.weight ?? 700, !!o.italic);
+  if (!resolved) resolved = await getFontFile("Jost", 700, false);
 
-  // Pango font description — family, optional style, then an EXPLICIT trailing
-  // size. The explicit size is required so Pango does not misread a font family
-  // that ends in a number (e.g. "Baloo 2", "Source Sans 3") as a 2pt/3pt size.
-  // sharp auto-scales to the box because width + height are set, so this size is
-  // only a base and the family always parses correctly.
-  const fontDesc = `${family}${o.italic ? " Italic" : ""} 40`;
+  // Pango font description. Two hard-won rules:
+  //   • use the family name THE FILE ITSELF declares (resolved.family) — a
+  //     static cut's internal name can differ from the API family, and with
+  //     zero system fonts a name miss means tofu, not a fallback;
+  //   • end with an EXPLICIT size so a family ending in a number ("Baloo 2")
+  //     is never misread as a 2pt size. sharp auto-fits to the box, so the
+  //     size is only a parse anchor.
+  const fontDesc = `${resolved?.family ?? o.family}${o.italic ? " Italic" : ""} 40`;
+  const fontfile = resolved?.path;
 
   const textInput: Record<string, unknown> = {
     text: markup,

@@ -84,6 +84,29 @@ the font description had no explicit size; now `"<family> 40"` (`d04a3a4`, pushe
   **▶ Fox still to test (costs energy): regenerate a Ronin Man thumbnail → title in the real font
   (no tofu boxes), and an empty "video about" → real scene, not abstract geometry.**
 
+**🔴 ROUND 2 (post-deploy): tofu SURVIVED the `d04a3a4` fontDesc fix** — background/scene fix
+verified working (great drift-car scene), but titles still □□□□. So the problem is the FONT FILE
+itself, not the description. Vercel has ZERO system fonts → any unusable file = tofu, silently.
+Shipped a three-layer defense (couldn't reproduce locally, sandbox network is walled, so the fix
+covers every possible file failure mode):
+- **NEW `src/lib/studio/ttf-inspect.ts`** — dependency-free TTF/OTF parser (table dir, cmap
+  formats 4+12, name table). `inspectTtf(buf)` → `{ family, hasLatinCaps }`. Unit-tested against
+  real system TTFs + garbage input in the sandbox.
+- **`font-files.ts` rewritten:** css2 responses can carry per-script subset blocks — now picks
+  the `/* latin */` block (was: FIRST .ttf url = possibly a cyrillic/viet subset with NO Latin
+  glyphs = tofu). Every file — downloaded OR cache-hit — must pass the A–Z coverage check;
+  bad cached files (the pre-fix downloads still sitting in warm lambdas' tmp) are deleted and
+  re-fetched. New `getFontFile()` returns `{ path, family }` where family = the file's OWN
+  internal name (nameID 16/1) — static per-weight cuts can carry style-suffixed names that
+  don't match the API family, and with no system fonts a Pango name miss = tofu, not fallback.
+- **`text-overlay.ts`**: renders with the file's internal family name; Jost fallback when
+  nothing resolves. `pickTtfUrlFromCss` unit-tested (latin-preferred / single-block / no-ttf /
+  comment-less multi).
+- **IF TOFU STILL SURVIVES THIS:** the remaining suspect is fontconfig/Pango inside sharp
+  ignoring `fontfile` entirely — next step is an admin-gated diagnostic endpoint that runs
+  getFontFile + a test render on Vercel and reports back. Also consider bundling Jost-Regular.ttf
+  into /public/fonts (zero-network last resort; needs the file dropped in by Fox).
+
 **🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
 1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as
    2pt Baloo. KEY LESSON: this morning's commits were never pushed — always check
