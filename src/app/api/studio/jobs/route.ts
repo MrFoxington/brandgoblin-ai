@@ -137,6 +137,7 @@ export async function POST(request: Request) {
       videoAbout?: string; oneThing?: string;
       peopleMode?: string; styleNote?: string;
       logoHidden?: boolean; logoPosition?: string; photoStoragePath?: string;
+      textColor?: string; accentColor?: string;
     };
     const title = (t.title ?? "").trim();
     if (!title) {
@@ -165,6 +166,12 @@ export async function POST(request: Request) {
       ? t.logoPosition
       : "bottom-left") as ThumbnailOverlaySpec["logoPosition"];
 
+    // Optional user-chosen title + accent colors (hex). Fall back to a light
+    // title and the auto-picked brand accent.
+    const hexRe = /^#[0-9a-fA-F]{6}$/;
+    const textColor = typeof t.textColor === "string" && hexRe.test(t.textColor) ? t.textColor : "#F7F5EF";
+    const accentColor = typeof t.accentColor === "string" && hexRe.test(t.accentColor) ? t.accentColor : pickAccentColor(palette);
+
     overlaySpecToStore = {
       format,
       title: title.slice(0, 120),
@@ -175,8 +182,8 @@ export async function POST(request: Request) {
       uppercase: typo.headlineUppercase,
       bodyFont: typo.bodyFont,
       bodyItalic: typo.bodyItalic,
-      textColor: "#F7F5EF",
-      accentColor: pickAccentColor(palette),
+      textColor,
+      accentColor,
       logoShow: t.logoHidden !== true,
       logoPosition,
       scrim: true,

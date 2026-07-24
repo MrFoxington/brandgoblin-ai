@@ -224,6 +224,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [thumbPhotoPath, setThumbPhotoPath]   = useState<string | null>(null);
   const [thumbPhotoBusy, setThumbPhotoBusy]   = useState(false);
   const [thumbPhotoMsg, setThumbPhotoMsg]     = useState<string | null>(null);
+  const [thumbTextColor, setThumbTextColor]   = useState<string | null>(null);   // null = default light
+  const [thumbAccentColor, setThumbAccentColor] = useState<string | null>(null); // null = auto brand accent
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
@@ -471,6 +473,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const thumbFormat: "youtube" | "short" = imageType === "youtube_thumbnail" ? "youtube" : "short";
   const thumbTitleWordCount = thumbTitle.trim() ? thumbTitle.trim().split(/\s+/).length : 0;
   const thumbTitleMax = thumbFormat === "youtube" ? 4 : 3;
+  // Brand palette hexes → color swatch choices for the thumbnail title + accent.
+  const selectedBrandPalette = (((brands.find((b) => b.id === selectedBrandId)?.output_data as { colorPalette?: Array<{ hex?: string }> })?.colorPalette) ?? [])
+    .map((c) => c.hex)
+    .filter((h): h is string => typeof h === "string" && /^#?[0-9a-fA-F]{6}$/.test(h.trim()))
+    .map((h) => (h.startsWith("#") ? h : `#${h}`));
+  const titleColorOptions = Array.from(new Set(["#FFFFFF", "#F7F5EF", "#111111", ...selectedBrandPalette]));
+  const accentColorOptions = Array.from(new Set([...selectedBrandPalette, "#C8A24B", "#FF3B30", "#FFFFFF"]));
 
   // Does the selected brand have an official logo? (drives the stamp toggle)
   const brandHasOfficialLogo = !!selectedBrandId && jobs.some(
@@ -913,6 +922,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       logoHidden: thumbLogoHidden,
       logoPosition: thumbLogoPos,
       photoStoragePath: thumbPeople === "real_photo" ? thumbPhotoPath ?? undefined : undefined,
+      textColor: thumbTextColor ?? undefined,
+      accentColor: thumbAccentColor ?? undefined,
     });
   }
 
@@ -1367,6 +1378,49 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   placeholder="e.g. urgency, calm confidence, a big payoff"
                   className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1.5">
+                    Title color <span className="normal-case font-normal text-faint tracking-normal">· default white</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {titleColorOptions.map((hex) => (
+                      <button
+                        key={hex}
+                        type="button"
+                        onClick={() => { playButtonPress(); setThumbTextColor(hex); }}
+                        className={`h-7 w-7 rounded-full border-2 transition ${thumbTextColor === hex ? "border-white scale-110" : "border-white/25 hover:border-white/60"}`}
+                        style={{ backgroundColor: hex }}
+                        title={hex}
+                      />
+                    ))}
+                    {thumbTextColor && (
+                      <button type="button" onClick={() => setThumbTextColor(null)} className="text-[11px] text-faint underline">reset</button>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1.5">
+                    Accent word color <span className="normal-case font-normal text-faint tracking-normal">· default brand color</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {accentColorOptions.map((hex) => (
+                      <button
+                        key={hex}
+                        type="button"
+                        onClick={() => { playButtonPress(); setThumbAccentColor(hex); }}
+                        className={`h-7 w-7 rounded-full border-2 transition ${thumbAccentColor === hex ? "border-white scale-110" : "border-white/25 hover:border-white/60"}`}
+                        style={{ backgroundColor: hex }}
+                        title={hex}
+                      />
+                    ))}
+                    {thumbAccentColor && (
+                      <button type="button" onClick={() => setThumbAccentColor(null)} className="text-[11px] text-faint underline">reset</button>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>

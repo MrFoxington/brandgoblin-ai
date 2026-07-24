@@ -85,16 +85,23 @@ export function buildThumbnailScenePrompt(opts: {
   const people =
     opts.peopleMode === "silhouette"
       ? "Include a single anonymous dark silhouette of a person as a bold compositional element, with no facial detail."
-      : "No people, faces, or human figures at all.";
+      : "No people, faces, or human figures.";
   const shape = opts.format === "youtube" ? "wide 16:9 cinematic composition" : "tall 9:16 vertical composition";
+  const clear =
+    opts.format === "youtube"
+      ? "Keep the left side clean and uncluttered so a large title can be added there."
+      : "Keep the upper-middle area clean and uncluttered so a large title can be added there.";
   return [
-    `A premium, cinematic ${shape} background for a video thumbnail about: ${opts.videoAbout || "the topic"}.`,
-    opts.oneThing ? `The mood and energy should convey: ${opts.oneThing}.` : "",
+    `A premium, cinematic ${shape} background IMAGE with no text.`,
+    opts.videoAbout ? `Scene: ${opts.videoAbout}.` : "",
+    opts.oneThing ? `Mood and energy: ${opts.oneThing}.` : "",
     opts.styleNote ? `Art style: ${opts.styleNote}.` : "",
-    opts.colorWords ? `Use the brand colors: ${opts.colorWords}.` : "",
+    opts.colorWords ? `Color palette: ${opts.colorWords}.` : "",
     people,
-    "Bold high-contrast focal subject with strong depth. Leave clean, uncluttered negative space where a large title will be added later.",
-    "ABSOLUTELY NO text, letters, words, numbers, logos, wordmarks, captions, or watermarks anywhere in the image — all text is added separately.",
+    `Bold high-contrast focal subject with strong depth and lighting. ${clear}`,
+    // Firm, specific no-text rule — models were copying place names and words
+    // from the scene description onto the art. The title is drawn separately.
+    "CRITICAL: this is a WORDLESS background. Render absolutely ZERO text of any kind — no letters, words, names, place names, numbers, captions, titles, logos, wordmarks, watermarks, signage, billboards, shop signs, street signs, banners, license plates, or on-screen writing anywhere in the image. Do NOT turn any word from this description into visible text. Any surface that would normally carry text must be left blank, abstract, or blurred beyond reading.",
   ].filter(Boolean).join(" ");
 }
 
