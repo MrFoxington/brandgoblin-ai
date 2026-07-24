@@ -1,14 +1,348 @@
 {
+  "Jost": {
+    "400": "Jost-400.woff",
+    "500": "Jost-500.woff",
+    "700": "Jost-700.woff",
+    "900": "Jost-900.woff",
+    "400i": "Jost-400i.woff"
+  },
+  "Anton": {
+    "400": "Anton-400.woff"
+  },
+  "Bebas Neue": {
+    "400": "BebasNeue-400.woff"
+  },
+  "Oswald": {
+    "400": "Oswald-400.woff",
+    "500": "Oswald-500.woff",
+    "600": "Oswald-600.woff",
+    "700": "Oswald-700.woff"
+  },
+  "Archivo Black": {
+    "400": "ArchivoBlack-400.woff"
+  },
+  "Montserrat": {
+    "400": "Montserrat-400.woff",
+    "600": "Montserrat-600.woff",
+    "700": "Montserrat-700.woff",
+    "800": "Montserrat-800.woff",
+    "900": "Montserrat-900.woff",
+    "400i": "Montserrat-400i.woff"
+  },
   "Poppins": {
-    "400": "Poppins-Regular.ttf",
-    "400i": "Poppins-Italic.ttf",
-    "500": "Poppins-Medium.ttf",
-    "500i": "Poppins-MediumItalic.ttf",
-    "700": "Poppins-Bold.ttf",
-    "700i": "Poppins-BoldItalic.ttf"
+    "400": "Poppins-400.woff",
+    "500": "Poppins-500.woff",
+    "600": "Poppins-600.woff",
+    "700": "Poppins-700.woff",
+    "800": "Poppins-800.woff",
+    "400i": "Poppins-400i.woff"
+  },
+  "Space Grotesk": {
+    "400": "SpaceGrotesk-400.woff",
+    "500": "SpaceGrotesk-500.woff",
+    "600": "SpaceGrotesk-600.woff",
+    "700": "SpaceGrotesk-700.woff"
+  },
+  "Teko": {
+    "400": "Teko-400.woff",
+    "500": "Teko-500.woff",
+    "600": "Teko-600.woff",
+    "700": "Teko-700.woff"
+  },
+  "Fjalla One": {
+    "400": "FjallaOne-400.woff"
+  },
+  "Barlow Condensed": {
+    "400": "BarlowCondensed-400.woff",
+    "500": "BarlowCondensed-500.woff",
+    "600": "BarlowCondensed-600.woff",
+    "700": "BarlowCondensed-700.woff",
+    "400i": "BarlowCondensed-400i.woff"
+  },
+  "Kanit": {
+    "400": "Kanit-400.woff",
+    "500": "Kanit-500.woff",
+    "600": "Kanit-600.woff",
+    "700": "Kanit-700.woff",
+    "800": "Kanit-800.woff",
+    "400i": "Kanit-400i.woff"
+  },
+  "Sora": {
+    "400": "Sora-400.woff",
+    "500": "Sora-500.woff",
+    "600": "Sora-600.woff",
+    "700": "Sora-700.woff",
+    "800": "Sora-800.woff"
+  },
+  "Titan One": {
+    "400": "TitanOne-400.woff"
   },
   "Lora": {
-    "400": "Lora-Variable.ttf",
-    "400i": "Lora-Italic-Variable.ttf"
+    "400": "Lora-400.woff",
+    "500": "Lora-500.woff",
+    "600": "Lora-600.woff",
+    "700": "Lora-700.woff",
+    "400i": "Lora-400i.woff"
+  },
+  "Playfair Display": {
+    "400": "PlayfairDisplay-400.woff",
+    "500": "PlayfairDisplay-500.woff",
+    "600": "PlayfairDisplay-600.woff",
+    "700": "PlayfairDisplay-700.woff",
+    "800": "PlayfairDisplay-800.woff",
+    "900": "PlayfairDisplay-900.woff",
+    "400i": "PlayfairDisplay-400i.woff"
+  },
+  "Cormorant": {
+    "400": "Cormorant-400.woff",
+    "500": "Cormorant-500.woff",
+    "600": "Cormorant-600.woff",
+    "700": "Cormorant-700.woff",
+    "400i": "Cormorant-400i.woff"
+  },
+  "DM Serif Display": {
+    "400": "DMSerifDisplay-400.woff",
+    "400i": "DMSerifDisplay-400i.woff"
+  },
+  "Libre Baskerville": {
+    "400": "LibreBaskerville-400.woff",
+    "700": "LibreBaskerville-700.woff",
+    "400i": "LibreBaskerville-400i.woff"
+  },
+  "Merriweather": {
+    "400": "Merriweather-400.woff",
+    "700": "Merriweather-700.woff",
+    "900": "Merriweather-900.woff",
+    "400i": "Merriweather-400i.woff"
+  },
+  "PT Serif": {
+    "400": "PTSerif-400.woff",
+    "700": "PTSerif-700.woff",
+    "400i": "PTSerif-400i.woff"
+  },
+  "Bitter": {
+    "400": "Bitter-400.woff",
+    "500": "Bitter-500.woff",
+    "600": "Bitter-600.woff",
+    "700": "Bitter-700.woff",
+    "400i": "Bitter-400i.woff"
+  },
+  "EB Garamond": {
+    "400": "EBGaramond-400.woff",
+    "500": "EBGaramond-500.woff",
+    "600": "EBGaramond-600.woff",
+    "700": "EBGaramond-700.woff",
+    "400i": "EBGaramond-400i.woff"
+  },
+  "Spectral": {
+    "400": "Spectral-400.woff",
+    "500": "Spectral-500.woff",
+    "600": "Spectral-600.woff",
+    "700": "Spectral-700.woff",
+    "400i": "Spectral-400i.woff"
+  },
+  "Inter": {
+    "400": "Inter-400.woff",
+    "500": "Inter-500.woff",
+    "600": "Inter-600.woff",
+    "700": "Inter-700.woff",
+    "800": "Inter-800.woff",
+    "900": "Inter-900.woff",
+    "400i": "Inter-400i.woff"
+  },
+  "Work Sans": {
+    "400": "WorkSans-400.woff",
+    "500": "WorkSans-500.woff",
+    "600": "WorkSans-600.woff",
+    "700": "WorkSans-700.woff",
+    "400i": "WorkSans-400i.woff"
+  },
+  "Nunito Sans": {
+    "400": "NunitoSans-400.woff",
+    "600": "NunitoSans-600.woff",
+    "700": "NunitoSans-700.woff",
+    "800": "NunitoSans-800.woff",
+    "400i": "NunitoSans-400i.woff"
+  },
+  "Source Sans 3": {
+    "400": "SourceSans3-400.woff",
+    "600": "SourceSans3-600.woff",
+    "700": "SourceSans3-700.woff",
+    "400i": "SourceSans3-400i.woff"
+  },
+  "Roboto": {
+    "400": "Roboto-400.woff",
+    "500": "Roboto-500.woff",
+    "700": "Roboto-700.woff",
+    "900": "Roboto-900.woff",
+    "400i": "Roboto-400i.woff"
+  },
+  "Open Sans": {
+    "400": "OpenSans-400.woff",
+    "600": "OpenSans-600.woff",
+    "700": "OpenSans-700.woff",
+    "800": "OpenSans-800.woff",
+    "400i": "OpenSans-400i.woff"
+  },
+  "Lato": {
+    "400": "Lato-400.woff",
+    "700": "Lato-700.woff",
+    "900": "Lato-900.woff",
+    "400i": "Lato-400i.woff"
+  },
+  "DM Sans": {
+    "400": "DMSans-400.woff",
+    "500": "DMSans-500.woff",
+    "700": "DMSans-700.woff",
+    "400i": "DMSans-400i.woff"
+  },
+  "Manrope": {
+    "400": "Manrope-400.woff",
+    "500": "Manrope-500.woff",
+    "600": "Manrope-600.woff",
+    "700": "Manrope-700.woff",
+    "800": "Manrope-800.woff"
+  },
+  "Rubik": {
+    "400": "Rubik-400.woff",
+    "500": "Rubik-500.woff",
+    "600": "Rubik-600.woff",
+    "700": "Rubik-700.woff",
+    "400i": "Rubik-400i.woff"
+  },
+  "Raleway": {
+    "400": "Raleway-400.woff",
+    "500": "Raleway-500.woff",
+    "600": "Raleway-600.woff",
+    "700": "Raleway-700.woff",
+    "800": "Raleway-800.woff",
+    "400i": "Raleway-400i.woff"
+  },
+  "Nunito": {
+    "400": "Nunito-400.woff",
+    "600": "Nunito-600.woff",
+    "700": "Nunito-700.woff",
+    "800": "Nunito-800.woff",
+    "400i": "Nunito-400i.woff"
+  },
+  "Bangers": {
+    "400": "Bangers-400.woff"
+  },
+  "Luckiest Guy": {
+    "400": "LuckiestGuy-400.woff"
+  },
+  "Bowlby One": {
+    "400": "BowlbyOne-400.woff"
+  },
+  "Baloo 2": {
+    "400": "Baloo2-400.woff",
+    "500": "Baloo2-500.woff",
+    "600": "Baloo2-600.woff",
+    "700": "Baloo2-700.woff",
+    "800": "Baloo2-800.woff"
+  },
+  "Alfa Slab One": {
+    "400": "AlfaSlabOne-400.woff"
+  },
+  "Passion One": {
+    "400": "PassionOne-400.woff",
+    "700": "PassionOne-700.woff",
+    "900": "PassionOne-900.woff"
+  },
+  "Paytone One": {
+    "400": "PaytoneOne-400.woff"
+  },
+  "Staatliches": {
+    "400": "Staatliches-400.woff"
+  },
+  "Righteous": {
+    "400": "Righteous-400.woff"
+  },
+  "Changa One": {
+    "400": "ChangaOne-400.woff",
+    "700": "ChangaOne-700.woff"
+  },
+  "Bricolage Grotesque": {
+    "400": "BricolageGrotesque-400.woff",
+    "500": "BricolageGrotesque-500.woff",
+    "600": "BricolageGrotesque-600.woff",
+    "700": "BricolageGrotesque-700.woff",
+    "800": "BricolageGrotesque-800.woff"
+  },
+  "Unbounded": {
+    "400": "Unbounded-400.woff",
+    "500": "Unbounded-500.woff",
+    "700": "Unbounded-700.woff",
+    "900": "Unbounded-900.woff"
+  },
+  "Gabarito": {
+    "400": "Gabarito-400.woff",
+    "500": "Gabarito-500.woff",
+    "600": "Gabarito-600.woff",
+    "700": "Gabarito-700.woff",
+    "800": "Gabarito-800.woff",
+    "900": "Gabarito-900.woff"
+  },
+  "Hanken Grotesk": {
+    "400": "HankenGrotesk-400.woff",
+    "500": "HankenGrotesk-500.woff",
+    "600": "HankenGrotesk-600.woff",
+    "700": "HankenGrotesk-700.woff",
+    "800": "HankenGrotesk-800.woff",
+    "400i": "HankenGrotesk-400i.woff"
+  },
+  "Onest": {
+    "400": "Onest-400.woff",
+    "500": "Onest-500.woff",
+    "600": "Onest-600.woff",
+    "700": "Onest-700.woff",
+    "800": "Onest-800.woff"
+  },
+  "Fraunces": {
+    "400": "Fraunces-400.woff",
+    "500": "Fraunces-500.woff",
+    "600": "Fraunces-600.woff",
+    "700": "Fraunces-700.woff",
+    "900": "Fraunces-900.woff",
+    "400i": "Fraunces-400i.woff"
+  },
+  "Instrument Serif": {
+    "400": "InstrumentSerif-400.woff",
+    "400i": "InstrumentSerif-400i.woff"
+  },
+  "Pacifico": {
+    "400": "Pacifico-400.woff"
+  },
+  "Caveat": {
+    "400": "Caveat-400.woff",
+    "700": "Caveat-700.woff"
+  },
+  "Dancing Script": {
+    "400": "DancingScript-400.woff",
+    "700": "DancingScript-700.woff"
+  },
+  "Permanent Marker": {
+    "400": "PermanentMarker-400.woff"
+  },
+  "Satisfy": {
+    "400": "Satisfy-400.woff"
+  },
+  "Space Mono": {
+    "400": "SpaceMono-400.woff",
+    "700": "SpaceMono-700.woff",
+    "400i": "SpaceMono-400i.woff"
+  },
+  "JetBrains Mono": {
+    "400": "JetBrainsMono-400.woff",
+    "700": "JetBrainsMono-700.woff",
+    "800": "JetBrainsMono-800.woff",
+    "400i": "JetBrainsMono-400i.woff"
+  },
+  "IBM Plex Mono": {
+    "400": "IBMPlexMono-400.woff",
+    "500": "IBMPlexMono-500.woff",
+    "600": "IBMPlexMono-600.woff",
+    "700": "IBMPlexMono-700.woff",
+    "400i": "IBMPlexMono-400i.woff"
   }
 }
