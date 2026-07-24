@@ -18,7 +18,7 @@
 
 import sharp from "sharp";
 import { promises as fs } from "fs";
-import { getFontFile } from "./font-files";
+import { getFontFile, FIRST_BUNDLED_FAMILY } from "./font-files";
 
 export interface TextImageOpts {
   text: string;
@@ -75,10 +75,14 @@ async function loadParsedFont(
       return null;
     }
   };
+  // Fallback ladder: exact request → non-italic → house font → the first
+  // family in the bundled pack (always on disk, so text can NEVER silently
+  // vanish the way it did on July 24).
   return (
     (await tryOne(family, weight, italic)) ??
     (await tryOne(family, weight, false)) ??
-    (await tryOne("Jost", 700, false))
+    (await tryOne("Jost", 700, false)) ??
+    (FIRST_BUNDLED_FAMILY ? await tryOne(FIRST_BUNDLED_FAMILY, 700, false) : null)
   );
 }
 

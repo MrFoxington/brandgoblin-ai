@@ -2,12 +2,21 @@
 // IN the production runtime and reports exactly where it breaks. Admin-only.
 // Added July 24 after four blind-fix rounds on the tofu/empty-title bug: no
 // more guessing — this returns ground truth from the actual Vercel lambda.
+//
+// v3 (bundled font pack era) reports, in order:
+//   bundle    — what the committed font pack looks like from this lambda
+//   resolve   — which layer (bundled-fs / bundled-cdn / google / cache)
+//               actually serves the house font and the pack's first family
+//   a_css     — the raw Google css2 answer (the runtime last-resort layer)
+//   e_render  — a real render through the exact production code path
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { inspectTtf } from "@/lib/studio/ttf-inspect";
-import { pickTtfUrlFromCss } from "@/lib/studio/font-files";
+import { getFontFile, pickFontUrlFromCss, FIRST_BUNDLED_FAMILY } from "@/lib/studio/font-files";
 import { renderTextImage } from "@/lib/studio/text-overlay";
+import manifest from "@/lib/studio/font-manifest.json";
+import { promises as fs } from "fs";
+import path from "path";
 
 export const runtime = "nodejs";
 
@@ -27,63 +36,57 @@ export async function GET() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const report: Record<string, any> = {
-    node: process.version,
-    env: { FONTCONFIG_PATH: process.env.FONTCONFIG_PATH ?? null },
-  };
+  const report: Record<string, any> = { node: process.version };
 
-  // A: can this lambda reach Google Fonts css2 (old-UA TTF variant)?
+  // Bundle: is the committed font pack visible from this lambda?
+  try {
+    const fontDir = path.join(process.cwd(), "public", "fonts");
+    let onDisk: string[] | string;
+    try {
+      onDisk = (await fs.readdir(fontDir)).slice(0, 5);
+    } catch (e) {
+      onDisk = `unreadable: ${errMsg(e)}`;
+    }
+    report.bundle = {
+      manifestFamilies: Object.keys(manifest).length,
+      firstBundledFamily: FIRST_BUNDLED_FAMILY,
+      fontDirSample: onDisk,
+    };
+  } catch (e) {
+    report.bundle_error = errMsg(e);
+  }
+
+  // Resolve: which layer serves the fonts thumbnails actually ask for?
+  for (const [label, fam] of [["houseFont", "Jost"], ["firstBundled", FIRST_BUNDLED_FAMILY ?? ""]] as const) {
+    if (!fam) continue;
+    try {
+      const r = await getFontFile(fam, 700, false);
+      report[`resolve_${label}`] = r
+        ? { family: fam, source: r.source, file: path.basename(r.path) }
+        : { family: fam, resolved: null };
+    } catch (e) {
+      report[`resolve_${label}_error`] = errMsg(e);
+    }
+  }
+
+  // A: the Google last-resort layer — raw css2 answer, never blind again.
   try {
     const res = await fetch(
       "https://fonts.googleapis.com/css2?family=Jost:wght@700&display=swap",
       { headers: { "User-Agent": TTF_UA } }
     );
     const css = await res.text();
-    // Use the REAL production picker (not a private regex) so this endpoint
-    // exercises the exact code path thumbnails use — and echo the raw CSS
-    // body, because on July 24 a null ttfUrl with status 200 left us blind.
-    const ttfUrl = pickTtfUrlFromCss(css);
     report.a_css = {
       status: res.status,
       cssLength: css.length,
-      ttfUrl,
+      pickedUrl: pickFontUrlFromCss(css),
       cssBody: css.slice(0, 2000),
     };
-
-    // B: download + inspect the ttf
-    if (ttfUrl) {
-      const ttfRes = await fetch(ttfUrl);
-      const buf = Buffer.from(await ttfRes.arrayBuffer());
-      report.b_ttf = { status: ttfRes.status, bytes: buf.length, inspect: inspectTtf(buf) };
-
-      // C: opentype.js module shape + parse
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const m: any = await import("opentype.js");
-        report.c_opentype = {
-          keys: Object.keys(m).slice(0, 10),
-          hasParse: typeof m?.parse === "function",
-          hasDefaultParse: typeof m?.default?.parse === "function",
-        };
-        const ot = typeof m?.parse === "function" ? m : m?.default;
-        const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-        const font = ot.parse(ab);
-        const probe = font.getPath("A", 0, 0, 64).toPathData(1);
-        report.d_parse = {
-          ok: true,
-          unitsPerEm: font.unitsPerEm,
-          ascender: font.ascender,
-          probeLen: probe?.length ?? 0,
-        };
-      } catch (e) {
-        report.c_or_d_error = errMsg(e);
-      }
-    }
   } catch (e) {
     report.a_error = errMsg(e);
   }
 
-  // E: the full real renderer, exactly as thumbnails use it
+  // E: the full real renderer, exactly as thumbnails use it.
   try {
     const r = await renderTextImage({
       text: "TEST DRIFT OK",

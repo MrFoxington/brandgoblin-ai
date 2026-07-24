@@ -1,0 +1,14 @@
+{
+  "Poppins": {
+    "400": "Poppins-Regular.ttf",
+    "400i": "Poppins-Italic.ttf",
+    "500": "Poppins-Medium.ttf",
+    "500i": "Poppins-MediumItalic.ttf",
+    "700": "Poppins-Bold.ttf",
+    "700i": "Poppins-BoldItalic.ttf"
+  },
+  "Lora": {
+    "400": "Lora-Variable.ttf",
+    "400i": "Lora-Italic-Variable.ttf"
+  }
+}
