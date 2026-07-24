@@ -189,8 +189,17 @@ export async function POST(request: Request) {
       scrim: true,
     };
 
+    // An empty scene leaves the model with only "premium abstract focal
+    // subject" to chase — which it answers with random 3D geometry. When the
+    // user skips "what's the video about", derive the scene from the title
+    // (the title IS the topic) and explicitly forbid the abstract default.
+    const videoAbout =
+      (t.videoAbout ?? "").trim() ||
+      `a concrete, recognizable real-world scene that literally depicts the video topic "${title}" — ` +
+        `actual subject matter and environment, NOT abstract shapes, NOT geometric objects, NOT a generic gradient backdrop`;
+
     thumbnailScenePrompt = buildThumbnailScenePrompt({
-      videoAbout: t.videoAbout,
+      videoAbout,
       oneThing: t.oneThing,
       colorWords: paletteToWords(palette, 3),
       styleNote: t.styleNote,

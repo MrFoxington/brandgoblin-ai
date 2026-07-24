@@ -79,6 +79,21 @@ the font description had no explicit size; now `"<family> 40"` (`d04a3a4`, pushe
 - tsc exit 0. **▶ push lines below; live test = open a font picker → 🔥 group at top with this
   month's label; pick a trending font → thumbnail renders with it.**
 
+**🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
+1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as
+   2pt Baloo. KEY LESSON: this morning's commits were never pushed — always check
+   `git rev-list origin/main..main` when "fixed" bugs reappear.
+2. **Belt-and-braces added (text-overlay.ts):** if the requested family's .ttf can't be fetched
+   at all, fall back to the house font (Jost) INSTEAD of rendering with no fontfile — the Vercel
+   image has NO system fonts, so no-fontfile = tofu boxes, never a graceful default.
+3. **"Random geometry" backgrounds = starved prompt, not a glitch.** With "what's the video
+   about" left empty, buildThumbnailScenePrompt's only subject direction is "premium bold
+   high-contrast focal subject" → model outputs abstract 3D shapes in the brand palette. Fix in
+   jobs route: empty videoAbout now derives the scene from the TITLE ("concrete, recognizable
+   real-world scene that literally depicts the video topic '<title>'… NOT abstract shapes /
+   geometric objects / gradient backdrop"). Title is already required, so the fallback always
+   has material.
+
 ---
 
 ## 🗓️ SESSION LOG — July 18, 2026 (💜 BRAND IMPORTED INTO ITSELF · CREST SYSTEM · 🏆 TROPHY SHELF — ALL 8 BADGES MINTED)
