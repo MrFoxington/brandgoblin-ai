@@ -75,6 +75,37 @@ export const FONT_GROUPS: { label: string; hint: string; fonts: FontMeta[] }[] =
       { family: "DM Sans",      category: "sans", weights: [400, 500, 700], hasItalic: true, defaultHeadlineWeight: 700 },
       { family: "Manrope",      category: "sans", weights: [400, 500, 600, 700, 800], hasItalic: false, defaultHeadlineWeight: 700 },
       { family: "Rubik",        category: "sans", weights: [400, 500, 600, 700], hasItalic: true, defaultHeadlineWeight: 700 },
+      { family: "Raleway",      category: "sans", weights: [400, 500, 600, 700, 800], hasItalic: true, defaultHeadlineWeight: 700 },
+      { family: "Nunito",       category: "sans", weights: [400, 600, 700, 800], hasItalic: true, defaultHeadlineWeight: 700 },
+    ],
+  },
+  {
+    label: "Bold thumbnail",
+    hint: "High-impact, click-grabbing",
+    fonts: [
+      { family: "Bangers",       category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Luckiest Guy",  category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Bowlby One",    category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Baloo 2",       category: "display", weights: [400, 500, 600, 700, 800], hasItalic: false, defaultHeadlineWeight: 800 },
+      { family: "Alfa Slab One", category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Passion One",   category: "display", weights: [400, 700, 900], hasItalic: false, defaultHeadlineWeight: 700 },
+      { family: "Paytone One",   category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Staatliches",   category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Righteous",     category: "display", weights: [400], hasItalic: false, defaultHeadlineWeight: 400 },
+      { family: "Changa One",    category: "display", weights: [400, 700], hasItalic: false, defaultHeadlineWeight: 700 },
+    ],
+  },
+  {
+    label: "Trending 2026",
+    hint: "Fresh editorial & display faces",
+    fonts: [
+      { family: "Bricolage Grotesque", category: "display", weights: [400, 500, 600, 700, 800], hasItalic: false, defaultHeadlineWeight: 700 },
+      { family: "Unbounded",           category: "display", weights: [400, 500, 700, 900], hasItalic: false, defaultHeadlineWeight: 700 },
+      { family: "Gabarito",            category: "display", weights: [400, 500, 600, 700, 800, 900], hasItalic: false, defaultHeadlineWeight: 700 },
+      { family: "Hanken Grotesk",      category: "sans", weights: [400, 500, 600, 700, 800], hasItalic: true, defaultHeadlineWeight: 700 },
+      { family: "Onest",               category: "sans", weights: [400, 500, 600, 700, 800], hasItalic: false, defaultHeadlineWeight: 700 },
+      { family: "Fraunces",            category: "serif", weights: [400, 500, 600, 700, 900], hasItalic: true, defaultHeadlineWeight: 600 },
+      { family: "Instrument Serif",    category: "serif", weights: [400], hasItalic: true, defaultHeadlineWeight: 400 },
     ],
   },
   {
@@ -138,6 +169,18 @@ export function resolveTypography(t?: BrandTypography | null): Required<BrandTyp
     headlineUppercase: t?.headlineUppercase ?? DEFAULT_TYPOGRAPHY.headlineUppercase,
     bodyItalic: t?.bodyItalic ?? DEFAULT_TYPOGRAPHY.bodyItalic,
   };
+}
+
+// Snap a desired weight to the nearest weight a curated font actually offers,
+// so a brand default of 700 doesn't request a missing cut on a single-weight
+// display font (e.g. Bangers only has 400). Unknown/custom fonts pass through.
+export function nearestWeight(family: string, desired: number): number {
+  const meta = FONT_CATALOG[family];
+  if (!meta || meta.weights.length === 0) return desired;
+  return meta.weights.reduce(
+    (best, w) => (Math.abs(w - desired) < Math.abs(best - desired) ? w : best),
+    meta.weights[0]
+  );
 }
 
 // ── Validation / sanitizing (custom font names go straight into prompts) ─────

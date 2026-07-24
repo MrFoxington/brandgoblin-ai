@@ -60,17 +60,37 @@ export async function getFontFilePath(
   const cacheFile = path.join(CACHE_DIR, `${safeName(fam)}-${weight}${italic ? "i" : ""}.ttf`);
   if (await fileExists(cacheFile)) { memo.set(key, cacheFile); return cacheFile; }
 
-  // 3. download from Google Fonts
+  // 3. download from Google Fonts. Try the exact weight/italic first, then fall
+  //    back to looser requests so single-weight display fonts (Bangers, etc.)
+  //    and fonts without an italic cut still resolve instead of failing.
   try {
     const famParam = fam.replace(/ /g, "+");
-    const axis = italic ? `:ital,wght@1,${weight}` : `:wght@${weight}`;
-    const cssUrl = `https://fonts.googleapis.com/css2?family=${famParam}${axis}&display=swap`;
-    const cssRes = await fetch(cssUrl, { headers: { "User-Agent": TTF_UA } });
-    if (!cssRes.ok) throw new Error(`css ${cssRes.status}`);
-    const css = await cssRes.text();
-    const match = css.match(/src:\s*url\((https:\/\/[^)]+?\.ttf)\)/i);
-    if (!match) throw new Error("no ttf url in css");
-    const ttfRes = await fetch(match[1]);
+    const candidates = italic
+      ? [
+          `:ital,wght@1,${weight}`,
+          `:ital@1`,
+          `:wght@${weight}`,
+          ``,
+        ]
+      : [
+          `:wght@${weight}`,
+          ``,
+        ];
+
+    let ttfUrl: string | null = null;
+    for (const axis of candidates) {
+      try {
+        const cssUrl = `https://fonts.googleapis.com/css2?family=${famParam}${axis}&display=swap`;
+        const cssRes = await fetch(cssUrl, { headers: { "User-Agent": TTF_UA } });
+        if (!cssRes.ok) continue;
+        const css = await cssRes.text();
+        const match = css.match(/src:\s*url\((https:\/\/[^)]+?\.ttf)\)/i);
+        if (match) { ttfUrl = match[1]; break; }
+      } catch { /* try the next, looser request */ }
+    }
+    if (!ttfUrl) throw new Error("no ttf url in any css variant");
+
+    const ttfRes = await fetch(ttfUrl);
     if (!ttfRes.ok) throw new Error(`ttf ${ttfRes.status}`);
     const buf = Buffer.from(await ttfRes.arrayBuffer());
     await fs.mkdir(CACHE_DIR, { recursive: true });

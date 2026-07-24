@@ -5,7 +5,7 @@ import { reserveEnergy, refundEnergy } from "@/lib/energy";
 import { STUDIO_MODELS, IMAGE_TYPE_SIZES, computeStudioEnergyCost, getPinnedSize } from "@/lib/energy-config";
 import { submitImageJob } from "@/lib/studio/provider";
 import { paletteToWords } from "@/lib/studio/color-names";
-import { buildFontPromptClause, normalizeTypography, resolveTypography } from "@/lib/studio/fonts";
+import { buildFontPromptClause, normalizeTypography, resolveTypography, nearestWeight } from "@/lib/studio/fonts";
 import { buildThumbnailScenePrompt, pickAccentColor } from "@/lib/studio/thumbnail";
 import type { ThumbnailOverlaySpec } from "@/lib/studio/thumbnail";
 import type { BrandTypography } from "@/types";
@@ -178,7 +178,7 @@ export async function POST(request: Request) {
       accentWord: (t.accentWord ?? "").trim().slice(0, 40) || undefined,
       subtitle: (t.subtitle ?? "").trim().slice(0, 120) || undefined,
       headlineFont: typo.headlineFont,
-      headlineWeight: typo.headlineFontWeight,
+      headlineWeight: nearestWeight(typo.headlineFont, typo.headlineFontWeight),
       uppercase: typo.headlineUppercase,
       bodyFont: typo.bodyFont,
       bodyItalic: typo.bodyItalic,

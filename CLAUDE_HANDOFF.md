@@ -2444,3 +2444,18 @@ alter table studio_jobs add column if not exists overlay_spec jsonb;
 **Verified**: `tsc --noEmit` passes. NOTE: sharp can't run in the cloud bridge (macOS binary), so the overlay render itself is verified by typecheck + it reuses the same sharp path as the in-production logo overlay. Eyeball the first generated thumbnail locally (npm run dev on the Mac runs sharp fine). Fonts download at runtime the first time each weight is used.
 
 **Nice-to-haves left**: bundling static TTFs in /public/fonts (faster first render, offline-safe); a subtitle field in the form; drag-to-move logo. `text-overlay` + `thumbnail` are the shared engine for all of it.
+
+---
+
+## July 24 2026 — Thumbnail refinements + Node 24 / sharp fix
+
+- **No-text fix**: `buildThumbnailScenePrompt` in src/lib/studio/thumbnail.ts now has a firm, specific WORDLESS-background rule. Image engines were painting place names / words from the "what's it about" description onto the art. The description now only steers the scene; only the overlay Title creates on-image words.
+- **More fonts**: expanded `FONT_GROUPS` in src/lib/studio/fonts.ts — added Display (Teko, Fjalla One, Barlow Condensed, Kanit, Sora, Titan One), Serif (Merriweather, PT Serif, Bitter, EB Garamond, Spectral), Body sans (Roboto, Open Sans, Lato, DM Sans, Manrope, Rubik), plus new "Script / handwritten" and "Monospace" groups.
+- **Thumbnail color options**: the guided form now has Title color + Accent word color swatches (brand palette + white/black/gold). Sent as textColor/accentColor → validated hex in jobs route → overlay_spec. Defaults: white title, auto brand accent.
+
+### ⚠️ IMPORTANT environment note (cost Fox a debugging session)
+The Mac updated to **Node v24**, which the pinned **sharp 0.33.5** did not fully support — sharp's constructor returned undefined, so ALL sharp ops (thumbnail text overlay, logo stamp, bg-removal) silently failed and fell back to the un-overlaid image, while plain generation still worked. Symptom: thumbnails generated backgrounds but drew no title text on localhost. Fix was `npm install sharp@latest` (moved to sharp 0.34.x, Node-24-compatible) + restart dev. Quick test:
+```
+node -e "require('sharp')({text:{text:'hi',width:200,height:60,rgba:true}}).png().toBuffer().then(()=>console.log('OK')).catch(e=>console.log('FAIL',e.message))"
+```
+Vercel was unaffected (runs a supported Node), so the live site worked even before the sharp bump.
