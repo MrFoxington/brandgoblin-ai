@@ -102,10 +102,16 @@ covers every possible file failure mode):
 - **`text-overlay.ts`**: renders with the file's internal family name; Jost fallback when
   nothing resolves. `pickTtfUrlFromCss` unit-tested (latin-preferred / single-block / no-ttf /
   comment-less multi).
-- **IF TOFU STILL SURVIVES THIS:** the remaining suspect is fontconfig/Pango inside sharp
-  ignoring `fontfile` entirely — next step is an admin-gated diagnostic endpoint that runs
-  getFontFile + a test render on Vercel and reports back. Also consider bundling Jost-Regular.ttf
-  into /public/fonts (zero-network last resort; needs the file dropped in by Fox).
+- **🔴 TOFU SURVIVED ROUND 2 → ROOT CAUSE FOUND (round 3).** Live test (Claude-driven, Quick
+  engine 2⚡, "MIDNIGHT DRIFT KINGS"): scene ✓, logo watermark ✓, accent-word COLORING ✓ (orange
+  boxes for DRIFT!) — but every glyph tofu, on every font and every image type. Colors working +
+  all-fonts-affected = Pango runs fine but **fontconfig never initializes: the Vercel serverless
+  image ships NO fonts.conf**, so fontconfig silently ignores every font INCLUDING a verified
+  explicit `fontfile`. Canonical sharp-on-serverless issue. FIX: module-scope bootstrap in
+  `text-overlay.ts` writes a minimal `/tmp/fontconfig/fonts.conf` (with `/tmp/bg-font-cache` as
+  a font <dir> + /tmp cachedir) and sets `FONTCONFIG_PATH` at import time — BEFORE sharp's first
+  text render; respects a pre-existing FONTCONFIG_PATH env. Rounds 1-2 (parse fix, latin subset,
+  glyph verification, internal names, Jost fallback) all remain as hardening.
 
 **🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
 1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as

@@ -10,7 +10,40 @@
 // blocks onto a generated background with safe-zone placement + a logo stamp.
 
 import sharp from "sharp";
+import fsSync from "fs";
+import path from "path";
 import { getFontFile } from "./font-files";
+
+// ── fontconfig bootstrap (the REAL tofu fix, July 24) ───────────────────────
+// Pango renders text through fontconfig, and the Vercel serverless image ships
+// NO fontconfig configuration at all. Without a fonts.conf, fontconfig fails to
+// initialize, silently ignores every font we pass (even a verified `fontfile`),
+// and renders each glyph as a tofu box. The canonical fix: write a minimal
+// fonts.conf to /tmp and point FONTCONFIG_PATH at it BEFORE sharp's first text
+// render. This module-scope block runs at import time, ahead of any render.
+// Registering the download cache as a <dir> also makes every cached font
+// matchable by family name.
+const FONT_CACHE_DIR = "/tmp/bg-font-cache";
+(function ensureFontconfig() {
+  if (process.env.FONTCONFIG_PATH) return; // respect an explicit setup
+  try {
+    const dir = "/tmp/fontconfig";
+    fsSync.mkdirSync(dir, { recursive: true });
+    fsSync.mkdirSync(FONT_CACHE_DIR, { recursive: true });
+    fsSync.writeFileSync(
+      path.join(dir, "fonts.conf"),
+      `<?xml version="1.0"?>\n` +
+        `<!DOCTYPE fontconfig SYSTEM "fonts.dtd">\n` +
+        `<fontconfig>\n` +
+        `  <dir>${FONT_CACHE_DIR}</dir>\n` +
+        `  <cachedir>/tmp/fontconfig-cache</cachedir>\n` +
+        `</fontconfig>\n`
+    );
+    process.env.FONTCONFIG_PATH = dir;
+  } catch {
+    /* non-fatal — worst case we're no worse off than before */
+  }
+})();
 
 // Escape text for Pango markup (only these three are special).
 export function escapePango(s: string): string {
