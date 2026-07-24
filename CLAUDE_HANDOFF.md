@@ -112,6 +112,18 @@ covers every possible file failure mode):
   a font <dir> + /tmp cachedir) and sets `FONTCONFIG_PATH` at import time — BEFORE sharp's first
   text render; respects a pre-existing FONTCONFIG_PATH env. Rounds 1-2 (parse fix, latin subset,
   glyph verification, internal names, Jost fallback) all remain as hardening.
+- **🔴 TOFU SURVIVED ROUND 3 TOO (fontconfig bootstrap deployed, identical A/B test still boxes)
+  → ROUND 4 = STOP USING THE OS TEXT STACK AT ALL.** `text-overlay.ts` rewritten as a VECTOR
+  renderer: opentype.js (NEW dep, pure JS) parses the downloaded+verified .ttf, we do our own
+  layout (greedy wrap + 18-step binary-search auto-fit + accent-word coloring + left/centre
+  align), emit one SVG `<path>` per word, sharp rasterizes SHAPES — fontconfig/Pango completely
+  out of the loop (the logo badge + scrim SVGs prove shape rasterizing works in prod). Parsed-
+  font cache per process; parse sanity probe (glyph "A" must yield real path data); fallback
+  chain family→non-italic→Jost; 1×1 transparent last resort so composition never crashes.
+  Layout engine unit-tested in sandbox (wrap/fit/accent/edge cases). Same API; thumbnail.ts
+  unchanged. ⚠️ `npm install` REQUIRED before push (new dep must land in package-lock.json).
+  The Pango path is GONE — if this somehow still tofus, the remaining suspect would be sharp's
+  SVG rasterizer, but scrim/badge SVGs already render in prod so that's effectively ruled out.
 
 **🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
 1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as

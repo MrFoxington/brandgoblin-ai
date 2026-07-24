@@ -1,70 +1,24 @@
 // Goblin Studio — real text renderer (Saved Brand Fonts / Thumbnails, July 2026).
 //
-// Renders a block of text into a transparent RGBA image using the brand's REAL
-// font, so titles come out crisp and correctly spelled instead of hoping the
-// image model draws letters. Built on sharp's native text (Pango) so it loads a
-// specific .ttf via `fontfile` and supports per-word color via Pango markup —
-// the same sharp the official-logo overlay already uses in production.
+// V2 — VECTOR OUTLINES (July 24). The original renderer asked Pango to draw
+// text, and Pango depends on fontconfig — which is broken/absent on the Vercel
+// serverless image, so every glyph rendered as a tofu box no matter which font
+// file we supplied (three hardening rounds proved this empirically: colors and
+// layout applied, glyph shapes never did).
 //
-// This is the shared primitive; src/lib/studio/thumbnail.ts composes these
-// blocks onto a generated background with safe-zone placement + a logo stamp.
+// This version REMOVES the OS font stack from the loop entirely:
+//   1. we already download the brand's real .ttf (font-files.ts, verified);
+//   2. opentype.js (pure JS) reads the glyph OUTLINES straight from that file;
+//   3. we lay the words out ourselves (wrap, auto-fit, accent-word color) and
+//      emit plain SVG <path> shapes;
+//   4. sharp rasterizes shapes — no fonts needed at raster time. The logo badge
+//      and scrim SVGs already prove this pipeline works in production.
+//
+// Same public API as v1; src/lib/studio/thumbnail.ts is the only caller.
 
 import sharp from "sharp";
-import fsSync from "fs";
-import path from "path";
+import { promises as fs } from "fs";
 import { getFontFile } from "./font-files";
-
-// ── fontconfig bootstrap (the REAL tofu fix, July 24) ───────────────────────
-// Pango renders text through fontconfig, and the Vercel serverless image ships
-// NO fontconfig configuration at all. Without a fonts.conf, fontconfig fails to
-// initialize, silently ignores every font we pass (even a verified `fontfile`),
-// and renders each glyph as a tofu box. The canonical fix: write a minimal
-// fonts.conf to /tmp and point FONTCONFIG_PATH at it BEFORE sharp's first text
-// render. This module-scope block runs at import time, ahead of any render.
-// Registering the download cache as a <dir> also makes every cached font
-// matchable by family name.
-const FONT_CACHE_DIR = "/tmp/bg-font-cache";
-(function ensureFontconfig() {
-  if (process.env.FONTCONFIG_PATH) return; // respect an explicit setup
-  try {
-    const dir = "/tmp/fontconfig";
-    fsSync.mkdirSync(dir, { recursive: true });
-    fsSync.mkdirSync(FONT_CACHE_DIR, { recursive: true });
-    fsSync.writeFileSync(
-      path.join(dir, "fonts.conf"),
-      `<?xml version="1.0"?>\n` +
-        `<!DOCTYPE fontconfig SYSTEM "fonts.dtd">\n` +
-        `<fontconfig>\n` +
-        `  <dir>${FONT_CACHE_DIR}</dir>\n` +
-        `  <cachedir>/tmp/fontconfig-cache</cachedir>\n` +
-        `</fontconfig>\n`
-    );
-    process.env.FONTCONFIG_PATH = dir;
-  } catch {
-    /* non-fatal — worst case we're no worse off than before */
-  }
-})();
-
-// Escape text for Pango markup (only these three are special).
-export function escapePango(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-// Build Pango markup, coloring one accent word if given.
-function buildMarkup(text: string, color: string, accentWord?: string, accentColor?: string): string {
-  if (!accentWord || !accentWord.trim()) {
-    return `<span foreground="${color}">${escapePango(text)}</span>`;
-  }
-  const target = accentWord.trim().toLowerCase();
-  return text
-    .split(/(\s+)/)
-    .map((tok) =>
-      tok.trim() && tok.toLowerCase() === target
-        ? `<span foreground="${accentColor ?? color}">${escapePango(tok)}</span>`
-        : `<span foreground="${color}">${escapePango(tok)}</span>`
-    )
-    .join("");
-}
 
 export interface TextImageOpts {
   text: string;
@@ -76,45 +30,161 @@ export interface TextImageOpts {
   accentWord?: string;
   accentColor?: string;     // hex for the accent word
   boxWidth: number;         // wrap width in px
-  boxHeight: number;        // max height in px (sharp auto-fits the size)
+  boxHeight: number;        // max height in px
   align?: "left" | "centre" | "right";
 }
 
-// Render the text and return the RGBA PNG plus its actual pixel size.
+// ── Font loading (parsed-font cache per process) ────────────────────────────
+
+// opentype.js is CJS with bundled types that don't always match runtime usage;
+// keep it behind a narrow any-typed dynamic import so the Vercel build can
+// never fail on a typings mismatch.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+let opentypeMod: any | null = null;
+async function opentype(): Promise<any> {
+  opentypeMod ??= await import("opentype.js");
+  return opentypeMod;
+}
+
+const parsedFonts = new Map<string, any>();
+
+async function loadParsedFont(
+  family: string,
+  weight: number,
+  italic: boolean
+): Promise<any | null> {
+  const tryOne = async (fam: string, w: number, it: boolean): Promise<any | null> => {
+    const resolved = await getFontFile(fam, w, it);
+    if (!resolved) return null;
+    if (parsedFonts.has(resolved.path)) return parsedFonts.get(resolved.path);
+    try {
+      const buf = await fs.readFile(resolved.path);
+      const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+      const font = (await opentype()).parse(ab);
+      // Sanity: the font must produce a real outline for a capital letter.
+      const probe = font.getPath("A", 0, 0, 64).toPathData(1);
+      if (!probe || probe.length < 8) return null;
+      parsedFonts.set(resolved.path, font);
+      return font;
+    } catch {
+      return null;
+    }
+  };
+  return (
+    (await tryOne(family, weight, italic)) ??
+    (await tryOne(family, weight, false)) ??
+    (await tryOne("Jost", 700, false))
+  );
+}
+
+// ── Layout ──────────────────────────────────────────────────────────────────
+
+interface Word { text: string; accent: boolean }
+
+function wrapLines(
+  font: any,
+  words: Word[],
+  size: number,
+  maxWidth: number
+): { lines: Word[][]; maxLineWidth: number } {
+  const spaceW = Math.max(font.getAdvanceWidth(" ", size) || 0, size * 0.24);
+  const lines: Word[][] = [];
+  let line: Word[] = [];
+  let lineW = 0;
+  let maxLineWidth = 0;
+
+  for (const w of words) {
+    const ww = font.getAdvanceWidth(w.text, size);
+    const cand = line.length === 0 ? ww : lineW + spaceW + ww;
+    if (line.length > 0 && cand > maxWidth) {
+      lines.push(line);
+      maxLineWidth = Math.max(maxLineWidth, lineW);
+      line = [w];
+      lineW = ww;
+    } else {
+      line = [...line, w];
+      lineW = cand;
+    }
+  }
+  if (line.length > 0) {
+    lines.push(line);
+    maxLineWidth = Math.max(maxLineWidth, lineW);
+  }
+  return { lines, maxLineWidth };
+}
+
+// ── Renderer ────────────────────────────────────────────────────────────────
+
+const LINE_HEIGHT = 1.16;
+
 export async function renderTextImage(
   o: TextImageOpts
 ): Promise<{ buffer: Buffer; width: number; height: number }> {
-  const shown = o.uppercase ? o.text.toUpperCase() : o.text;
-  const markup = buildMarkup(shown, o.color, o.accentWord, o.accentColor);
+  const shown = (o.uppercase ? o.text.toUpperCase() : o.text).trim();
+  const boxW = Math.max(8, Math.round(o.boxWidth));
+  const boxH = Math.max(8, Math.round(o.boxHeight));
 
-  // Resolve a VERIFIED .ttf (glyph coverage checked). If the requested family
-  // can't be resolved, fall back to the house font — the serverless image has
-  // NO system fonts, so rendering without a real font file produces tofu
-  // boxes, never a graceful default.
-  let resolved = await getFontFile(o.family, o.weight ?? 700, !!o.italic);
-  if (!resolved) resolved = await getFontFile("Jost", 700, false);
+  const font = await loadParsedFont(o.family, o.weight ?? 700, !!o.italic);
+  if (!font || !shown) {
+    // Absolute last resort: a transparent 1×1 so composition never crashes.
+    const empty = await sharp({
+      create: { width: 1, height: 1, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    }).png().toBuffer();
+    return { buffer: empty, width: 1, height: 1 };
+  }
 
-  // Pango font description. Two hard-won rules:
-  //   • use the family name THE FILE ITSELF declares (resolved.family) — a
-  //     static cut's internal name can differ from the API family, and with
-  //     zero system fonts a name miss means tofu, not a fallback;
-  //   • end with an EXPLICIT size so a family ending in a number ("Baloo 2")
-  //     is never misread as a 2pt size. sharp auto-fits to the box, so the
-  //     size is only a parse anchor.
-  const fontDesc = `${resolved?.family ?? o.family}${o.italic ? " Italic" : ""} 40`;
-  const fontfile = resolved?.path;
+  const accentTarget = (o.accentWord ?? "").trim().toLowerCase();
+  const words: Word[] = shown
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((t) => ({ text: t, accent: !!accentTarget && t.toLowerCase() === accentTarget }));
 
-  const textInput: Record<string, unknown> = {
-    text: markup,
-    font: fontDesc,
-    width: Math.max(1, Math.round(o.boxWidth)),
-    height: Math.max(1, Math.round(o.boxHeight)),
-    align: o.align ?? "left",
-    rgba: true,
-  };
-  if (fontfile) textInput.fontfile = fontfile;
+  // Auto-fit: largest size whose wrapped layout fits both box dimensions.
+  // Binary search over font size (wrapping re-computed per candidate size).
+  let lo = 8;
+  let hi = boxH;
+  let best = { size: lo, ...wrapLines(font, words, lo, boxW) };
+  for (let i = 0; i < 18; i++) {
+    const mid = (lo + hi) / 2;
+    const layout = wrapLines(font, words, mid, boxW);
+    const totalH = layout.lines.length * mid * LINE_HEIGHT;
+    if (layout.maxLineWidth <= boxW && totalH <= boxH) {
+      best = { size: mid, ...layout };
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
 
-  const buffer = await sharp({ text: textInput as never }).png().toBuffer();
+  const size = best.size;
+  const lineH = size * LINE_HEIGHT;
+  const ascent = (size * (font.ascender ?? 800)) / (font.unitsPerEm ?? 1000);
+  const height = Math.ceil(best.lines.length * lineH);
+  const spaceW = Math.max(font.getAdvanceWidth(" ", size) || 0, size * 0.24);
+
+  // Emit one <path> per word — pure shapes, zero font-system involvement.
+  const paths: string[] = [];
+  best.lines.forEach((line, li) => {
+    const lineWidth =
+      line.reduce((acc, w) => acc + font.getAdvanceWidth(w.text, size), 0) +
+      spaceW * (line.length - 1);
+    let x =
+      o.align === "centre" ? (boxW - lineWidth) / 2 :
+      o.align === "right" ? boxW - lineWidth : 0;
+    const baseline = li * lineH + ascent;
+    for (const w of line) {
+      const d = font.getPath(w.text, x, baseline, size).toPathData(2);
+      const fill = w.accent ? (o.accentColor ?? o.color) : o.color;
+      if (d) paths.push(`<path d="${d}" fill="${fill}"/>`);
+      x += font.getAdvanceWidth(w.text, size) + spaceW;
+    }
+  });
+
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${boxW}" height="${height}" ` +
+    `viewBox="0 0 ${boxW} ${height}">${paths.join("")}</svg>`;
+
+  const buffer = await sharp(Buffer.from(svg)).png().toBuffer();
   const meta = await sharp(buffer).metadata();
-  return { buffer, width: meta.width ?? 0, height: meta.height ?? 0 };
+  return { buffer, width: meta.width ?? boxW, height: meta.height ?? height };
 }
