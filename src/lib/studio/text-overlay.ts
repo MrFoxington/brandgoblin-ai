@@ -54,9 +54,12 @@ export async function renderTextImage(
   const shown = o.uppercase ? o.text.toUpperCase() : o.text;
   const markup = buildMarkup(shown, o.color, o.accentWord, o.accentColor);
   const fontfile = (await getFontFilePath(o.family, o.weight ?? 700, !!o.italic)) ?? undefined;
-  // Pango font description — the family name plus style; the fontfile (when
-  // present) provides the exact letterforms.
-  const fontDesc = `${o.family}${o.italic ? " Italic" : ""}`;
+  // Pango font description — family, optional style, then an EXPLICIT trailing
+  // size. The explicit size is required so Pango does not misread a font family
+  // that ends in a number (e.g. "Baloo 2", "Source Sans 3") as a 2pt/3pt size.
+  // sharp auto-scales to the box because width + height are set, so this size is
+  // only a base and the family always parses correctly.
+  const fontDesc = `${o.family}${o.italic ? " Italic" : ""} 40`;
 
   const textInput: Record<string, unknown> = {
     text: markup,
