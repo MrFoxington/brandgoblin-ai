@@ -124,6 +124,13 @@ covers every possible file failure mode):
   unchanged. ⚠️ `npm install` REQUIRED before push (new dep must land in package-lock.json).
   The Pango path is GONE — if this somehow still tofus, the remaining suspect would be sharp's
   SVG rasterizer, but scrim/badge SVGs already render in prod so that's effectively ruled out.
+- **💡 REGRESSION TRIGGER FOUND (git archaeology, answers Fox's "everything worked before the
+  new fonts"):** the font session commit `1da608e` ALSO bumped **sharp ^0.33.5 → ^0.35.3** —
+  text rendered fine on Vercel under 0.33.5 and tofu'd from that deploy on. The fonts were
+  never the culprit; the library upgrade was. REVERTED sharp to ^0.33.5 (all APIs we use exist
+  in 0.33.5: text/unflatten/stats/raw/composite). Belt AND suspenders: the vector renderer stays
+  regardless — it works on any sharp version. LESSON: dependency bumps piggybacking on feature
+  commits are invisible regression triggers; keep them separate.
 
 **🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
 1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as
