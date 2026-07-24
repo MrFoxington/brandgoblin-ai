@@ -42,7 +42,12 @@ export interface TextImageOpts {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let opentypeMod: any | null = null;
 async function opentype(): Promise<any> {
-  opentypeMod ??= await import("opentype.js");
+  if (!opentypeMod) {
+    const m: any = await import("opentype.js");
+    // CJS/ESM interop: depending on the bundler the API surface lives on the
+    // namespace itself OR under .default. Pick whichever actually has parse().
+    opentypeMod = typeof m?.parse === "function" ? m : m?.default;
+  }
   return opentypeMod;
 }
 
