@@ -76,8 +76,13 @@ the font description had no explicit size; now `"<family> 40"` (`d04a3a4`, pushe
   hidden (it's the fallback, not a sibling); trending families count as "known" so the custom-font
   input doesn't pop open. Font FILES need no work — `font-files.ts` already downloads any Google
   Font on demand, and overlay rendering resolves them the same way.
-- tsc exit 0. **▶ push lines below; live test = open a font picker → 🔥 group at top with this
-  month's label; pick a trending font → thumbnail renders with it.**
+- **✅ SHIPPED + LIVE-VERIFIED July 24:** migration run (Fox), pushed (`d7deee4..02d4329`),
+  deploy green. First picker-open generated + cached July's list: Bricolage Grotesque, Fraunces,
+  Playfair Display, Special Gothic, Instrument Serif, Hanken Grotesk, Cherry Bomb One (Special
+  Gothic + Cherry Bomb One = net-new AI picks, not in any static list — the pipeline genuinely
+  sourced fresh fonts). Static "Trending 2026" group correctly hidden while the live list loads.
+  **▶ Fox still to test (costs energy): regenerate a Ronin Man thumbnail → title in the real font
+  (no tofu boxes), and an empty "video about" → real scene, not abstract geometry.**
 
 **🔴 SAME SESSION — Fox's thumbnail bugs (Ronin Man screenshots) diagnosed:**
 1. **Tofu-box titles (□□□□) = the UNPUSHED `d04a3a4`.** Live code still parses "Baloo 2" as
