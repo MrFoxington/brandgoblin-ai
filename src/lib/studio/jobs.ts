@@ -4,6 +4,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { refundEnergy, finalizeReservation } from "@/lib/energy";
 import type { StudioModelKey, ImageType } from "./models";
+import type { ThumbnailOverlaySpec } from "./thumbnail";
 
 export interface StudioJobRow {
   id: string;
@@ -57,6 +58,7 @@ export async function createJobRow(params: {
   prompt: string;
   reservationTxId: string;
   stampLogo?: boolean;
+  overlaySpec?: ThumbnailOverlaySpec | null;
 }): Promise<string> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -73,6 +75,7 @@ export async function createJobRow(params: {
       prompt:            params.prompt,
       reservation_tx_id: params.reservationTxId,
       stamp_logo:        params.stampLogo ?? true,
+      overlay_spec:      params.overlaySpec ?? null,
     })
     .select("id")
     .single();
@@ -180,18 +183,28 @@ export async function completeJob(params: {
   txId: string | null;
   energyReserved: number;
 }): Promise<string> {
-  // Stamp the brand's official logo onto original product art / social graphics.
-  // Non-fatal: if anything goes wrong we store the un-stamped image.
+  // Post-process the finished image. Non-fatal: if anything goes wrong we store
+  // the un-processed image.
   let buffer = params.buffer;
   let mimeType = params.mimeType;
   try {
-    const stamped = await maybeApplyOfficialLogo(params.userId, params.jobId, buffer);
-    if (stamped) {
-      buffer = stamped;
-      mimeType = "image/jpeg"; // compositeLogoBadge always returns JPEG
+    // Thumbnails: draw the title + accent + logo with the brand font (this owns
+    // its own logo placement, so it replaces the default corner stamp).
+    const thumb = await maybeApplyThumbnailOverlay(params.userId, params.jobId, buffer);
+    if (thumb) {
+      buffer = thumb;
+      mimeType = "image/jpeg";
+    } else {
+      // Everything else: stamp the brand's official logo onto product art /
+      // social graphics.
+      const stamped = await maybeApplyOfficialLogo(params.userId, params.jobId, buffer);
+      if (stamped) {
+        buffer = stamped;
+        mimeType = "image/jpeg"; // compositeLogoBadge always returns JPEG
+      }
     }
   } catch (err) {
-    console.error("[studio/jobs] official-logo overlay failed (storing original):", err);
+    console.error("[studio/jobs] overlay step failed (storing original):", err);
   }
 
   // NOTE (July 3, 2026): logo concepts are stored EXACTLY as generated (white
@@ -468,4 +481,41 @@ async function maybeApplyOfficialLogo(
   const logoBuf = Buffer.from(await blob.arrayBuffer());
   const { compositeLogoBadge } = await import("./logo-overlay");
   return compositeLogoBadge(baseBuf, logoBuf);
+}
+
+// If this job is a thumbnail with an overlay spec, draw the title + accent word
+// + secondary line in the brand font and stamp the logo inside the platform
+// safe zone. Returns the finished exact-size thumbnail, or null if not a
+// thumbnail / no spec. Sharp + fonts are dynamically imported so they never load
+// on paths that don't need them.
+async function maybeApplyThumbnailOverlay(
+  userId: string,
+  jobId: string,
+  baseBuf: Buffer
+): Promise<Buffer | null> {
+  const supabase = createAdminClient();
+
+  const { data: job } = await supabase
+    .from("studio_jobs")
+    .select("brand_id, image_type, overlay_spec")
+    .eq("id", jobId)
+    .single();
+
+  if (!job) return null;
+  if (job.image_type !== "youtube_thumbnail" && job.image_type !== "short_cover") return null;
+  const spec = job.overlay_spec as ThumbnailOverlaySpec | null;
+  if (!spec) return null;
+
+  // Load the brand's official logo if the spec asks for it.
+  let logoBuf: Buffer | null = null;
+  if (spec.logoShow && job.brand_id) {
+    const logoPath = await getOfficialLogoStoragePath(userId, job.brand_id);
+    if (logoPath) {
+      const { data: blob } = await supabase.storage.from("studio-assets").download(logoPath);
+      if (blob) logoBuf = Buffer.from(await blob.arrayBuffer());
+    }
+  }
+
+  const { renderThumbnail } = await import("./thumbnail");
+  return renderThumbnail(baseBuf, spec, logoBuf);
 }

@@ -7,8 +7,9 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { paletteToWords } from "@/lib/studio/color-names";
+import { buildFontPromptClause, normalizeTypography } from "@/lib/studio/fonts";
 import type { ImageType } from "@/lib/energy-config";
-import type { BrandKit } from "@/types";
+import type { BrandKit, BrandTypography } from "@/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 20;
@@ -25,7 +26,9 @@ function isRateLimited(userId: string): boolean {
   return false;
 }
 
-const ASSET_LABELS: Record<ImageType, string> = {
+// Cook-prompt only handles the four brand-asset types; thumbnails build their
+// own text-free scene prompt server-side, so they are intentionally absent here.
+const ASSET_LABELS: Partial<Record<ImageType, string>> = {
   logo_concept:   "logo concept / icon mark",
   social_graphic: "social media graphic (landscape, 4:3)",
   product_art:    "product hero image",
@@ -54,7 +57,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Slow down a bit — too many prompt requests." }, { status: 429 });
   }
 
-  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean; productLabelName?: string; modelKey?: string };
+  let body: { brandId?: string; imageType?: string; userNote?: string; showBrandName?: boolean; productLabelName?: string; modelKey?: string; typography?: Partial<BrandTypography> };
   try {
     body = await request.json();
   } catch {
@@ -82,6 +85,7 @@ export async function POST(request: Request) {
   // Build brand context from saved kit
   let brandContext = "";
   let brandName = "";
+  let savedTypography: BrandTypography | undefined;
   if (brandId) {
     const { data: brand } = await adminSb
       .from("brand_generations")
@@ -92,6 +96,7 @@ export async function POST(request: Request) {
 
     if (brand?.output_data) {
       const kit = brand.output_data as BrandKit;
+      savedTypography = kit.typography;
       // Plain color WORDS only — never raw hex (image models print hex as text).
       const palette = paletteToWords(kit.colorPalette);
       const traits  = kit.brandVoice?.personalityTraits?.slice(0, 4).join(", ") ?? "";
@@ -141,6 +146,13 @@ export async function POST(request: Request) {
   const isBrandedArt = imageType === "product_art" || imageType === "social_graphic";
   const wantsBrandName = isBrandedArt && showBrandName && brandName.trim().length > 0;
 
+  // Saved brand fonts (merged with any per-generation override from Studio).
+  // Only injected when the image will actually render text (the branded-name
+  // path) — a no-text image must never receive font wording, or the model may
+  // paint the font name onto the art.
+  const effectiveTypography: BrandTypography = { ...(savedTypography ?? {}), ...normalizeTypography(body.typography) };
+  const fontClause = buildFontPromptClause(effectiveTypography);
+
   const textRule = wantsBrandName
     ? `TEXT IN IMAGE: the design MUST display the brand name spelled EXACTLY as "${brandName}" in clean, legible, correctly-spelled typography that suits the brand style. BRAND LAW (July 17 2026 — a model once invented "POSEIDON BEARD COMPANY" on a Juicy Hazy bottle): "${brandName}" is the ONLY brand or company name that exists in this image — NEVER invent, substitute, or add any other brand name, company name, or wordmark anywhere, including on packaging, labels, engravings, accessories, and background props; if ANY object carries branding, it reads "${brandName}". ${
         productLabelName
@@ -179,7 +191,7 @@ Rules:
 - ONE flowing paragraph of roughly 80-130 words covering, in this order: the main subject and focal point; the setting or background treatment; composition and framing; lighting; artistic style or medium; mood; and the color palette.
 - COLORS: describe the palette using plain color WORDS only (e.g. "deep crimson, charcoal, warm gold"). NEVER write hex codes, "#" symbols, or numbers to specify color — image models print those characters as literal text on the artwork.
 - Stay strictly true to the brand's personality, tone, and logo direction — no generic stock-art aesthetic, no filler adjectives. Every visual choice must serve THIS brand.
-${modelHint ? `- ${modelHint}\n` : ""}- ${textRule}
+${modelHint ? `- ${modelHint}\n` : ""}- ${wantsBrandName ? `${textRule} ${fontClause}` : textRule}
 - Output must be ready to paste directly into a text-to-image model with no editing.
 
 GOLD-STANDARD EXAMPLES of the caliber expected (structure and specificity, not content to copy):

@@ -116,6 +116,12 @@ box (+ cap awareness in cook-prompt). Trimmed 830-char prompt worked.
 **5. Video:** TikTok episode LIVE since ~10PM July 17 ✓. YT Shorts re-post: pending — clean
 export + re-add sound from Shorts library (the JoJo sound lives in TikTok only).
 
+**✅ SESSION CLOSED CLEAN (July 18/19).** Everything pushed through `bb75d52`: brand
+import live, both crests + heroes deployed, Labs navbar tab live, Trophy Shelf + all 8
+badge arts live, handoff current, working tree clean (`Goblin Art/` + `Badges/`
+gitignored). Two-day arc complete — the lab is dressed, the shelf is stocked, the
+its-alive badge hangs in the case waiting for Phase 0d to make it earnable.
+
 **▶ NEXT SESSION — START HERE (fresh session):**
 1. ⚡ **PHASE 0d — VIDEO JOB PLUMBING. NO MORE DECORATING.** jobs route accepts video (drop
    defaultFor reject), provider.ts video input builders (4 engines), webhook video output,
@@ -2385,3 +2391,56 @@ Airo landing: V2 LANDED, V3 hero orange CTA live; pending nav-orange + Studio se
 cook-prompt endpoint, prompt textarea + debounce, NixCooking component, celebration reveal + XP/streak,
 idea sparks, amber Studio glow). tsc + npm run build clean. NOT yet pushed — review diff first.*
 *Earlier: June 20, 2026 (v3) — Live payments working end-to-end. Landing rebuilt (`32b406b`) + refill celebration shipped (`c9dd549`), both PUSHED + live. Security cleanup done: Stripe webhook secret rotated + scrubbed (`5c73e4f`); GitHub auth switched from PATs to SSH (`git push` works directly now). In progress externally: GoDaddy marketing-site sync (Arrow AI). Next: verify celebration live as a Pro user. Resume at "✅ HONEST STATUS → 🌅 START HERE" up top.*
+
+---
+
+## July 24 2026 — Saved Brand Fonts (Phase 1 of the fonts + thumbnails work)
+
+Fonts feature shipped. Thumbnails is the next phase and reuses this.
+
+**What changed**
+- Brand model: added optional `typography` to `BrandKit` (`src/types/index.ts`) — `headlineFont`, `bodyFont`, `headlineFontWeight`, `headlineUppercase`, `bodyItalic`. All optional; old brands never break.
+- New `src/lib/studio/fonts.ts`: curated Google Font list grouped by feel, house default pair (Jost 700 uppercase + Lora italic), `resolveTypography()`, `normalizeTypography()` (sanitizes custom names), and `buildFontPromptClause()` (the wording injected into prompts).
+- New endpoint `src/app/api/brands/update-fonts/route.ts`: saves fonts onto a brand (merges `typography` into `output_data`), copied from the update-names pattern.
+- Prompt injection: `src/app/api/studio/cook-prompt/route.ts` and `src/app/api/studio/jobs/route.ts` now inject the brand's fonts (or a per-generation override) into the prompt on the text-bearing branded branches. Both accept an optional `typography` override in the request body.
+- Studio UI: `src/components/studio/StudioImageGenerator.tsx` — new "Fonts" control near the Brand Kit selector. Defaults to saved fonts, curated dropdown + Custom option, "use once" vs "Save as brand default". Sends `typography` into cook-prompt and jobs.
+- Brand Kit UI: `src/components/BrandKitView.tsx` — new editable "Brand Fonts" section (headline/body font, weight, uppercase, italic) that saves via the new endpoint.
+- New `src/lib/studio/text-overlay.ts`: reusable sharp-based engine that draws real, crisp text (headline + accent word coloring + secondary line) with safe-zone placement and optional scrim. CODE COMPLETE + typechecks. NOT yet wired into live generation — it is the shared mechanism the Thumbnail makers will use in Phase 2.
+
+**Default fonts note**: the house default is Jost + Lora, so every brand (including Rōnin Man) shows Jost/Lora until changed. To make it a true saved value on Rōnin Man, open the brand → Brand Fonts → Save.
+
+**Phase 2 (thumbnails) — still to build**: YouTube 1280x720 + Short-form 1080x1920 as new image types with pinned sizes (`src/lib/energy-config.ts` `IMAGE_TYPE_SIZES` + `ImageType`), a guided form, and wiring `text-overlay.ts` for safe-zone titles + accent word + logo bottom-left. To bundle real fonts for the overlay, drop TTFs into `public/fonts/<Family>.ttf` (e.g. Jost.ttf, Jost-Italic.ttf, Lora-Italic.ttf); the engine embeds them for exact letterforms and falls back gracefully if missing. Note: one engine (gpt_image_2) needs sizes in multiples of 16, and 1080 wide is not — steer thumbnails to compatible engines or the overlay draws the text regardless.
+
+**Verify**: `node_modules/.bin/tsc --noEmit -p tsconfig.json` passes clean.
+
+---
+
+## July 24 2026 — Thumbnail makers (Phase 2, builds on Saved Brand Fonts)
+
+Two new "What to create" types: **YouTube Thumbnail** (1280×720) and **Short-form Cover** (1080×1920, for TikTok/Reels/Shorts). Guided form, not a blank prompt. The background is AI-generated text-free, then the completion step draws the title + accent word + logo in the brand font (the real text overlay from Phase 1).
+
+**⚠️ REQUIRED before thumbnails work — run this once in Supabase (SQL Editor → paste → Run):**
+```sql
+alter table studio_jobs add column if not exists overlay_spec jsonb;
+```
+(Also saved as supabase/migrations/20260724_studio_thumbnails.sql.)
+
+**New files**
+- `src/lib/studio/font-files.ts` — resolves a family+weight+italic to a real .ttf: bundled `/public/fonts` → temp cache → download from Google Fonts at runtime (server has network). Falls back to a system font, never throws.
+- `src/lib/studio/text-overlay.ts` — REWRITTEN to render text with sharp's native text (Pango) + `fontfile`, so the real brand font is used, with per-word accent coloring.
+- `src/lib/studio/thumbnail.ts` — safe-zone layout per platform, `renderThumbnail()`, `pickAccentColor()`, `buildThumbnailScenePrompt()`. Output sizes: YouTube 1280×720, Short 1080×1920.
+- `src/app/api/studio/upload-photo/route.ts` — real-photo upload; accepts PNG/JPG/WebP/HEIC, auto-converts to JPG, Claude-moderated, stored in studio-assets.
+- `supabase/migrations/20260724_studio_thumbnails.sql`.
+
+**Changed**
+- `src/lib/energy-config.ts` — ImageType + IMAGE_TYPE_SIZES gain youtube_thumbnail / short_cover (generation sizes; overlay outputs exact platform pixels).
+- `src/lib/studio/jobs.ts` — createJobRow stores overlay_spec; completeJob runs `maybeApplyThumbnailOverlay` (draws title/accent/logo, owns its own bottom-left logo, so it replaces the corner stamp for thumbnails).
+- `src/app/api/studio/jobs/route.ts` — thumbnail branch: builds the text-free scene prompt + overlay_spec; "real photo" mode skips fal and composes over the uploaded photo (flat 15 energy); generate mode reserves normally.
+- `src/app/api/studio/cook-prompt/route.ts` — ASSET_LABELS is now Partial (thumbnails skip the cooker).
+- `src/components/studio/StudioImageGenerator.tsx` — two new tiles, guided form (title, accent word, about, the one thing, people none/silhouette/real-photo, logo position/hide), thumbnail submit path, prompt box hidden for thumbnails.
+
+**People modes**: No people / Silhouette (both AI-generated, no faces) / Use a real photo (uploaded photo becomes the background — never generates a fake person).
+
+**Verified**: `tsc --noEmit` passes. NOTE: sharp can't run in the cloud bridge (macOS binary), so the overlay render itself is verified by typecheck + it reuses the same sharp path as the in-production logo overlay. Eyeball the first generated thumbnail locally (npm run dev on the Mac runs sharp fine). Fonts download at runtime the first time each weight is used.
+
+**Nice-to-haves left**: bundling static TTFs in /public/fonts (faster first render, offline-safe); a subtitle field in the form; drag-to-move logo. `text-overlay` + `thumbnail` are the shared engine for all of it.

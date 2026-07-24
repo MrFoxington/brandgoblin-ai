@@ -259,7 +259,12 @@ export const STUDIO_MODELS: Record<StudioModelKey, StudioModel> = {
 // Allowed output dimensions per image type — PIN these server-side to
 // prevent users from requesting arbitrary large sizes that erode margin.
 // Megapixels = ceil(width × height / 1_000_000).
-export type ImageType = "logo_concept" | "social_graphic" | "product_art" | "mascot";
+export type ImageType =
+  | "logo_concept" | "social_graphic" | "product_art" | "mascot"
+  // Thumbnail makers (July 2026). The image engine renders the background at
+  // these sizes; the overlay step resizes to the exact platform output
+  // (YouTube 1280×720, Short-form 1080×1920) and draws the title + logo.
+  | "youtube_thumbnail" | "short_cover";
 
 export interface PinnedSize {
   falSize: string;
@@ -274,6 +279,10 @@ export const IMAGE_TYPE_SIZES: Record<ImageType, PinnedSize> = {
   product_art:    { falSize: "square_hd",     width: 1024, height: 1024, label: "1024×1024" },
   // Full-body character reads best in portrait (July 10 2026 — Mascot generator)
   mascot:         { falSize: "portrait_4_3",  width: 768,  height: 1024, label: "768×1024"  },
+  // Thumbnails: engine-friendly generation sizes (multiples of 16). The overlay
+  // step outputs the exact platform pixel size (1280×720 / 1080×1920).
+  youtube_thumbnail: { falSize: "landscape_16_9", width: 1280, height: 720,  label: "YouTube 1280×720"  },
+  short_cover:       { falSize: "portrait_16_9",  width: 1024, height: 1792, label: "Short-form 1080×1920" },
 };
 
 /** ceil(pixels / 1_000_000) matching fal.ai billing rounding */

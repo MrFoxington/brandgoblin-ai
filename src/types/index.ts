@@ -225,6 +225,19 @@ export interface BrandDNAScore {
   why: string;     // one-sentence justification from the model
 }
 
+// ---------- Brand typography (saved fonts) ----------
+// Added July 2026 (Saved Brand Fonts feature). ALL fields optional so every
+// brand created before this feature still typechecks and renders. A brand with
+// no typography saved falls back to DEFAULT_TYPOGRAPHY in @/lib/studio/fonts.
+// headlineFont / bodyFont are Google Font family names (e.g. "Jost", "Lora").
+export interface BrandTypography {
+  headlineFont?: string;        // display / title font family
+  bodyFont?: string;            // body / accent font family
+  headlineFontWeight?: number;  // e.g. 700 (Bold) or 900 (Black)
+  headlineUppercase?: boolean;  // render display headlines in uppercase
+  bodyItalic?: boolean;         // use the italic cut for accent / quote lines
+}
+
 export interface BrandKit {
   // Legacy fields (kept for backwards compat with existing saved brands)
   brandNames?: BrandNameOption[];
@@ -249,4 +262,6 @@ export interface BrandKit {
   launchPlan: string[];
   // Brand DNA — model-computed scores with justifications
   brandDna?: BrandDNAScore[];
+  // Saved brand fonts (July 2026). Optional — old brands fall back to defaults.
+  typography?: BrandTypography;
 }

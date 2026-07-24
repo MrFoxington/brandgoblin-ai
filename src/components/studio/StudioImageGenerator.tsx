@@ -7,12 +7,13 @@ import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import JobCard from "./JobCard";
 import NixCooking from "./NixCooking";
-import type { BrandGenerationRow } from "@/types";
+import type { BrandGenerationRow, BrandTypography } from "@/types";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useXP } from "@/components/XPSystem";
 import { useSoundFx } from "@/components/primitives/SoundFx";
 import { shareImage } from "@/lib/studio/share";
 import { FAVORITES_LABEL } from "@/lib/studio/favorites";
+import { FONT_GROUPS, ALL_FONT_FAMILIES, resolveTypography } from "@/lib/studio/fonts";
 
 interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
@@ -23,11 +24,16 @@ interface Props {
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
-  { key: "logo_concept",   label: "Logo Concept",   desc: "Icon mark from your brand direction" },
-  { key: "mascot",         label: "Mascot",         desc: "Your brand's character, brought to life" },
-  { key: "social_graphic", label: "Social Graphic", desc: "Branded post image for social" },
-  { key: "product_art",    label: "Product Art",    desc: "Hero imagery for your brand" },
+  { key: "logo_concept",     label: "Logo Concept",    desc: "Icon mark from your brand direction" },
+  { key: "mascot",           label: "Mascot",          desc: "Your brand's character, brought to life" },
+  { key: "social_graphic",   label: "Social Graphic",  desc: "Branded post image for social" },
+  { key: "product_art",      label: "Product Art",     desc: "Hero imagery for your brand" },
+  { key: "youtube_thumbnail",label: "YouTube Thumbnail", desc: "Wide 1280×720 with your title" },
+  { key: "short_cover",      label: "Short-form Cover",  desc: "Tall 1080×1920 for TikTok / Reels / Shorts" },
 ];
+
+// Thumbnail types share a guided form instead of the free-form prompt box.
+const THUMBNAIL_TYPES = new Set<ImageType>(["youtube_thumbnail", "short_cover"]);
 
 // Wow Plan Phase 1 (July 16 2026): every asset type has a SPECIALIST engine that
 // Studio auto-selects when the user picks what to create. Manual override stays.
@@ -38,11 +44,16 @@ const RECOMMENDED_MODEL: Record<ImageType, StudioModelKey> = {
   // product art — Studio is the product default again, with the chip auto-selected.
   product_art:    "flux_2_flex",
   mascot:         "seedream_v45", // character art is its strength
+  // Thumbnails: cinematic scene engine (text is drawn by the overlay, not the model)
+  youtube_thumbnail: "flux_2_flex",
+  short_cover:       "flux_2_flex",
 };
 
 // Auto-selected style chip per asset type (user can change or clear it freely)
 const AUTO_STYLE_CHIP: Partial<Record<ImageType, string>> = {
-  product_art: "Photoreal studio",
+  product_art:       "Photoreal studio",
+  youtube_thumbnail: "Photoreal studio",
+  short_cover:       "Photoreal studio",
 };
 
 // Specialists first, Draft last (cheap explicit choice, never the default).
@@ -71,6 +82,40 @@ const STYLE_CHIPS: { label: string; emoji: string; note: string }[] = [
   { label: "Vintage badge",    emoji: "🏅", note: "vintage badge and emblem design, classic engraved-style linework, circular composition" },
   { label: "Watercolor",       emoji: "🎨", note: "soft watercolor artwork, gentle pigment blooms, textured paper feel" },
 ];
+
+// Saved Brand Fonts (July 2026) — a curated Google Font <select> with a "Custom
+// font…" escape hatch. Shared by the headline + body pickers in Studio.
+function FontField({ label, value, onChange }: { label: string; value: string; onChange: (family: string) => void }) {
+  const isCustom = !ALL_FONT_FAMILIES.includes(value);
+  return (
+    <div>
+      <label className="block text-[11px] font-semibold text-faint mb-1">{label}</label>
+      <select
+        value={isCustom ? "__custom__" : value}
+        onChange={(e) => onChange(e.target.value === "__custom__" ? "" : e.target.value)}
+        className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
+      >
+        {FONT_GROUPS.map((g) => (
+          <optgroup key={g.label} label={g.label}>
+            {g.fonts.map((f) => (
+              <option key={f.family} value={f.family}>{f.family}</option>
+            ))}
+          </optgroup>
+        ))}
+        <option value="__custom__">Custom font…</option>
+      </select>
+      {isCustom && (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Type any Google Font name"
+          className="mt-1.5 w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
+        />
+      )}
+    </div>
+  );
+}
 
 const IDEA_SPARKS = [
   { label: "moody hero shot",      imageType: "product_art"  as ImageType, note: "moody, dramatic hero shot with cinematic lighting" },
@@ -161,11 +206,31 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [uploadBusy, setUploadBusy]       = useState(false);
   const [uploadRights, setUploadRights]   = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  // Saved Brand Fonts (July 2026): per-generation font override (null = use the
+  // brand's saved fonts), a local echo of saves, and the picker panel state.
+  const [fontOverride, setFontOverride]     = useState<BrandTypography | null>(null);
+  const [savedFontsById, setSavedFontsById] = useState<Record<string, BrandTypography>>({});
+  const [fontPanelOpen, setFontPanelOpen]   = useState(false);
+  const [fontSaving, setFontSaving]         = useState(false);
+  const [fontSavedMsg, setFontSavedMsg]     = useState<string | null>(null);
+  // Thumbnail makers (July 2026) — guided form fields.
+  const [thumbTitle, setThumbTitle]           = useState("");
+  const [thumbAbout, setThumbAbout]           = useState("");
+  const [thumbOneThing, setThumbOneThing]     = useState("");
+  const [thumbAccentWord, setThumbAccentWord] = useState("");
+  const [thumbPeople, setThumbPeople]         = useState<"none" | "silhouette" | "real_photo">("none");
+  const [thumbLogoHidden, setThumbLogoHidden] = useState(false);
+  const [thumbLogoPos, setThumbLogoPos]       = useState<"bottom-left" | "bottom-right" | "top-left" | "top-right">("bottom-left");
+  const [thumbPhotoPath, setThumbPhotoPath]   = useState<string | null>(null);
+  const [thumbPhotoBusy, setThumbPhotoBusy]   = useState(false);
+  const [thumbPhotoMsg, setThumbPhotoMsg]     = useState<string | null>(null);
 
   // Seed ref — changes on ANY creative-intent change; stays fixed on quality-only change
   const seedRef         = useRef<number>(generateSeed());
   // Hidden file input for the bring-your-own-logo upload
   const fileInputRef    = useRef<HTMLInputElement>(null);
+  // Hidden file input for the thumbnail "real photo" upload
+  const thumbPhotoInputRef = useRef<HTMLInputElement>(null);
   // Stable refs — prevent stale closures in timers
   const awardedXPJobs        = useRef<Set<string>>(new Set());
   const cookDebounceRef      = useRef<ReturnType<typeof setTimeout>>();
@@ -393,6 +458,20 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     ? ((brands.find((b) => b.id === selectedBrandId)?.output_data as { recommendedName?: string })?.recommendedName ?? "Brand")
     : "Freeform";
 
+  // Saved Brand Fonts — resolve the effective fonts for the selected brand:
+  // local save echo → the brand's saved typography → house default. The
+  // per-generation override merges on top.
+  const brandSavedTypography: BrandTypography =
+    savedFontsById[selectedBrandId] ??
+    ((brands.find((b) => b.id === selectedBrandId)?.output_data as { typography?: BrandTypography })?.typography ?? {});
+  const effectiveTypography = resolveTypography({ ...brandSavedTypography, ...(fontOverride ?? {}) });
+
+  // Thumbnail makers use a guided form instead of the free-form prompt box.
+  const isThumbnail = THUMBNAIL_TYPES.has(imageType);
+  const thumbFormat: "youtube" | "short" = imageType === "youtube_thumbnail" ? "youtube" : "short";
+  const thumbTitleWordCount = thumbTitle.trim() ? thumbTitle.trim().split(/\s+/).length : 0;
+  const thumbTitleMax = thumbFormat === "youtube" ? 4 : 3;
+
   // Does the selected brand have an official logo? (drives the stamp toggle)
   const brandHasOfficialLogo = !!selectedBrandId && jobs.some(
     (j) => j.brand_id === selectedBrandId && j.official_logo && j.status === "completed"
@@ -413,6 +492,9 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   // ── Prompt cooking ─────────────────────────────────────────────────────────
 
   async function cookPrompt(type: ImageType, userNote?: string, modelForCook?: StudioModelKey): Promise<string> {
+    // Thumbnails don't use the prompt cooker — the guided form builds the scene
+    // server-side. Skip to avoid a wasted call with an unsupported asset type.
+    if (THUMBNAIL_TYPES.has(type)) return "";
     setIsCooking(true);
     try {
       // July 11 2026: the user can name the exact product for Product Art
@@ -437,6 +519,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           showBrandName,
           productLabelName: showBrandName ? productLabelName.trim() || undefined : undefined,
           modelKey: modelForCook ?? modelKey, // engine-aware prompt coaching
+          typography: fontOverride ?? undefined, // per-generation font override
         }),
       });
       if (!res.ok) return "";
@@ -446,6 +529,33 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       return "";
     } finally {
       setIsCooking(false);
+    }
+  }
+
+  // Save the current fonts (brand saved + override) as this brand's new default.
+  async function saveFontsAsDefault() {
+    if (!selectedBrandId) return;
+    setFontSaving(true);
+    setFontSavedMsg(null);
+    const merged: BrandTypography = { ...brandSavedTypography, ...(fontOverride ?? {}) };
+    try {
+      const res = await fetch("/api/brands/update-fonts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandGenerationId: selectedBrandId, typography: merged }),
+      });
+      const data = (await res.json()) as { ok?: boolean; typography?: BrandTypography; error?: string };
+      if (res.ok) {
+        setSavedFontsById((m) => ({ ...m, [selectedBrandId]: data.typography ?? merged }));
+        setFontOverride(null);
+        setFontSavedMsg("✓ Saved as this brand's default fonts");
+      } else {
+        setFontSavedMsg(data.error ?? "Could not save fonts.");
+      }
+    } catch {
+      setFontSavedMsg("Could not save fonts.");
+    } finally {
+      setFontSaving(false);
     }
   }
 
@@ -537,9 +647,32 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productLabelName]);
 
+  // Reset the per-generation font override + picker when the brand changes.
+  useEffect(() => {
+    setFontOverride(null);
+    setFontPanelOpen(false);
+    setFontSavedMsg(null);
+  }, [selectedBrandId]);
+
+  // Re-cook when the font override changes — only matters for branded art that
+  // is actually rendering the brand name (the sole text-bearing path today).
+  useEffect(() => {
+    if (imageType !== "product_art" && imageType !== "social_graphic") return;
+    if (!showBrandName) return;
+    if (suppressCookRef.current) return;
+    if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current);
+    cookDebounceRef.current = setTimeout(async () => {
+      if (suppressCookRef.current) return;
+      const cooked = await cookPrompt(imageType);
+      if (cooked) setPrompt(cooked);
+    }, 500);
+    return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fontOverride]);
+
   // ── Job submission ─────────────────────────────────────────────────────────
 
-  async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType): Promise<boolean> {
+  async function submitJob(jobPrompt: string, mk: StudioModelKey, it: ImageType, extra?: Record<string, unknown>): Promise<boolean> {
     setGenerating(true);
     setError(null);
     // Fire conjure-start synchronously (before first await) — still in gesture context,
@@ -561,6 +694,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           stampLogo,
           showBrandName,
           productLabelName: showBrandName ? productLabelName.trim() || undefined : undefined,
+          typography: fontOverride ?? undefined, // per-generation font override
+          ...(extra ?? {}),                       // thumbnail guided-form fields
         }),
       });
 
@@ -729,8 +864,64 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   // designed around ONE reveal moment at a time — two at once diluted the
   // celebration and cluttered the gallery. "Variation" on a finished image
   // covers the second-take need, one reveal at a time.
+  // Upload a real photo for the thumbnail (PNG/JPG/WebP/HEIC — auto-converted).
+  async function handleUploadThumbPhoto(file: File) {
+    if (thumbPhotoBusy) return;
+    setThumbPhotoMsg(null);
+    if (file.size > 12 * 1024 * 1024) {
+      setThumbPhotoMsg("Photo must be 12MB or smaller.");
+      return;
+    }
+    setThumbPhotoBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/studio/upload-photo", { method: "POST", body: fd });
+      const data = (await res.json().catch(() => ({}))) as { storagePath?: string; error?: string };
+      if (!res.ok || !data.storagePath) {
+        setThumbPhotoMsg(data.error ?? "Upload failed. Please try again.");
+        return;
+      }
+      setThumbPhotoPath(data.storagePath);
+      setThumbPhotoMsg("✓ Photo added — it will be the thumbnail background.");
+      playComplete();
+    } catch {
+      setThumbPhotoMsg("Connection error during upload. Please try again.");
+    } finally {
+      setThumbPhotoBusy(false);
+    }
+  }
+
+  // Submit a thumbnail generation (guided form → /api/studio/jobs).
+  async function submitThumbnail(): Promise<boolean> {
+    if (!thumbTitle.trim()) {
+      setError("Add a title for your thumbnail.");
+      return false;
+    }
+    if (thumbPeople === "real_photo" && !thumbPhotoPath) {
+      setError("Upload a photo, or choose No people / Silhouette.");
+      return false;
+    }
+    const chipNote = styleChip ? STYLE_CHIPS.find((c) => c.label === styleChip)?.note ?? "" : "";
+    return submitJob("", modelKey, imageType, {
+      title: thumbTitle.trim(),
+      accentWord: thumbAccentWord.trim() || undefined,
+      videoAbout: thumbAbout.trim() || undefined,
+      oneThing: thumbOneThing.trim() || undefined,
+      peopleMode: thumbPeople,
+      styleNote: chipNote || undefined,
+      logoHidden: thumbLogoHidden,
+      logoPosition: thumbLogoPos,
+      photoStoragePath: thumbPeople === "real_photo" ? thumbPhotoPath ?? undefined : undefined,
+    });
+  }
+
   async function handleGenerate() {
     playButtonPress(); // in gesture context — primes audio unlock chain for the loop
+    if (isThumbnail) {
+      await submitThumbnail();
+      return;
+    }
     await submitJob(prompt, modelKey, imageType);
   }
 
@@ -1106,6 +1297,149 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             </div>
           )}
 
+          {/* Thumbnail guided form — YouTube / Short-form. Fonts, colors, and
+              logo are pulled from the brand automatically. */}
+          {isThumbnail && (
+            <div className="mt-3 space-y-3 rounded-xl border border-primary/20 bg-primary/5 p-3.5">
+              <p className="text-xs text-muted">
+                {thumbFormat === "youtube"
+                  ? "Wide 1280×720 for YouTube."
+                  : "Tall 1080×1920 for TikTok, Reels & Shorts."}{" "}
+                Your saved fonts, colors, and logo are added automatically.
+              </p>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1">
+                  Title <span className="normal-case font-normal text-faint tracking-normal">· the words on the thumbnail</span>
+                </label>
+                <input
+                  type="text"
+                  value={thumbTitle}
+                  onChange={(e) => setThumbTitle(e.target.value)}
+                  maxLength={60}
+                  placeholder={thumbFormat === "youtube" ? "e.g. STOP WASTING TIME" : "e.g. DO THIS DAILY"}
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
+                />
+                <p className={`mt-1 text-[11px] ${thumbTitleWordCount > thumbTitleMax ? "text-amber-400" : "text-faint"}`}>
+                  {thumbTitleWordCount > thumbTitleMax
+                    ? `A bit long — ${thumbTitleMax} words or fewer reads best at small size.`
+                    : `Keep it short — about ${thumbTitleMax} words max.`}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1">
+                  Accent word <span className="normal-case font-normal text-faint tracking-normal">· optional, shown in your brand color</span>
+                </label>
+                <input
+                  type="text"
+                  value={thumbAccentWord}
+                  onChange={(e) => setThumbAccentWord(e.target.value)}
+                  maxLength={30}
+                  placeholder="one word from your title to make pop"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1">
+                  What&rsquo;s the video about? <span className="normal-case font-normal text-faint tracking-normal">· sets the background scene</span>
+                </label>
+                <textarea
+                  value={thumbAbout}
+                  onChange={(e) => setThumbAbout(e.target.value)}
+                  rows={2}
+                  maxLength={300}
+                  placeholder="A sentence or two about the video."
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1">
+                  The one thing to land <span className="normal-case font-normal text-faint tracking-normal">· optional, steers the mood</span>
+                </label>
+                <input
+                  type="text"
+                  value={thumbOneThing}
+                  onChange={(e) => setThumbOneThing(e.target.value)}
+                  maxLength={120}
+                  placeholder="e.g. urgency, calm confidence, a big payoff"
+                  className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1.5">People</label>
+                <div className="flex flex-wrap gap-2">
+                  {([{ k: "none", l: "No people" }, { k: "silhouette", l: "Silhouette only" }, { k: "real_photo", l: "Use a real photo" }] as const).map((opt) => (
+                    <button
+                      key={opt.k}
+                      type="button"
+                      onClick={() => { playButtonPress(); setThumbPeople(opt.k); }}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                        thumbPeople === opt.k
+                          ? "border-primary bg-primary/20 text-white"
+                          : "border-white/10 bg-white/3 text-muted hover:border-primary/40 hover:text-white"
+                      }`}
+                    >
+                      {opt.l}{thumbPeople === opt.k ? " ✓" : ""}
+                    </button>
+                  ))}
+                </div>
+                {thumbPeople === "real_photo" && (
+                  <div className="mt-2 rounded-lg border border-white/10 bg-white/3 p-3">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <p className="text-[11px] text-faint max-w-[60%]">
+                        PNG, JPG, or iPhone HEIC — converted automatically. No fake AI people are ever made.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => thumbPhotoInputRef.current?.click()}
+                        disabled={thumbPhotoBusy}
+                        className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-[11px] font-bold text-primary-light hover:bg-primary/20 disabled:opacity-50 transition"
+                      >
+                        {thumbPhotoBusy ? "Uploading…" : thumbPhotoPath ? "Replace photo" : "⤴ Upload photo"}
+                      </button>
+                    </div>
+                    <input
+                      ref={thumbPhotoInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/heic,image/heif,.heic,.heif"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadThumbPhoto(f); e.target.value = ""; }}
+                    />
+                    {thumbPhotoMsg && (
+                      <p className={`mt-1.5 text-[11px] ${thumbPhotoMsg.startsWith("✓") ? "text-secondary" : "text-red-400"}`}>{thumbPhotoMsg}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="flex items-center gap-2 text-xs text-muted cursor-pointer select-none">
+                  <input type="checkbox" checked={!thumbLogoHidden} onChange={(e) => setThumbLogoHidden(!e.target.checked)} className="accent-primary" />
+                  Stamp my logo
+                </label>
+                {!thumbLogoHidden && (
+                  <label className="flex items-center gap-2 text-xs text-muted">
+                    Position
+                    <select
+                      value={thumbLogoPos}
+                      onChange={(e) => setThumbLogoPos(e.target.value as typeof thumbLogoPos)}
+                      className="rounded-lg bg-white/5 border border-white/10 px-2 py-1.5 text-sm text-white focus:outline-none focus:border-primary/50"
+                    >
+                      <option value="bottom-left">Bottom left</option>
+                      <option value="bottom-right">Bottom right</option>
+                      <option value="top-left">Top left</option>
+                      <option value="top-right">Top right</option>
+                    </select>
+                  </label>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Brand name in the art — OPT-IN (July 11 2026). Default OFF: the
               model paints garbled fake wordmarks; clean art + logo stamp wins. */}
           {selectedBrandId && (imageType === "product_art" || imageType === "social_graphic") && (
@@ -1158,6 +1492,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           )}
         </div>
 
+        {!isThumbnail && (<>
         {/* Prompt textarea */}
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -1199,6 +1534,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             </span>
           ))}
         </p>
+        </>)}
 
         {/* Style chips — Cooker 2.0: one-tap art direction, re-cooks the prompt */}
         <div>
@@ -1222,6 +1558,79 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Brand Fonts — saved fonts with an on-demand override (Saved Brand
+            Fonts feature). Defaults to the brand's saved fonts; a change can be
+            used once or saved as the brand's new default. */}
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
+            🅰 Fonts <span className="normal-case tracking-normal font-normal text-faint">· {fontOverride ? "custom for this generation" : "using saved brand fonts"}</span>
+          </label>
+          <div className="rounded-xl border border-white/10 bg-white/3 p-3.5 space-y-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-sm text-white">
+                <span className="font-semibold">{effectiveTypography.headlineFont}</span>
+                <span className="text-faint"> for headlines · </span>
+                <span className="font-semibold">{effectiveTypography.bodyFont}</span>
+                <span className="text-faint"> for body</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => { playButtonPress(); setFontPanelOpen((v) => !v); }}
+                className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-muted hover:text-white hover:border-primary/40 transition"
+              >
+                {fontPanelOpen ? "Close" : "Change fonts"}
+              </button>
+            </div>
+
+            {fontPanelOpen && (
+              <div className="space-y-3 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FontField
+                    label="Headline / title font"
+                    value={effectiveTypography.headlineFont}
+                    onChange={(family) => setFontOverride((o) => ({ ...(o ?? {}), headlineFont: family }))}
+                  />
+                  <FontField
+                    label="Body / accent font"
+                    value={effectiveTypography.bodyFont}
+                    onChange={(family) => setFontOverride((o) => ({ ...(o ?? {}), bodyFont: family }))}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {fontOverride ? (
+                    <>
+                      <span className="text-[11px] text-secondary">Using these just for this generation.</span>
+                      {selectedBrandId && (
+                        <button
+                          type="button"
+                          onClick={saveFontsAsDefault}
+                          disabled={fontSaving}
+                          className="rounded-lg border border-secondary/50 bg-secondary/10 px-3 py-1.5 text-[11px] font-bold text-secondary hover:bg-secondary/20 disabled:opacity-50 transition"
+                        >
+                          {fontSaving ? "Saving…" : "Save as brand default"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => { setFontOverride(null); setFontSavedMsg(null); }}
+                        className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-muted hover:text-white transition"
+                      >
+                        Reset to saved
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-[11px] text-faint">
+                      Pick a different font to use it once, or save it as this brand&rsquo;s default.
+                    </span>
+                  )}
+                </div>
+                {fontSavedMsg && <p className="text-[11px] text-secondary">{fontSavedMsg}</p>}
+              </div>
+            )}
           </div>
         </div>
 

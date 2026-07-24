@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import type { BrandKit, BrandInput, NameStrengthCheck } from "@/types";
+import type { BrandKit, BrandInput, NameStrengthCheck, BrandTypography } from "@/types";
+import { FONT_GROUPS, ALL_FONT_FAMILIES, resolveTypography } from "@/lib/studio/fonts";
 import CopyButton from "./CopyButton";
 import BrandNamesSection from "./BrandNamesSection";
 import GoblinFavoritePick from "./GoblinFavoritePick";
@@ -134,6 +135,145 @@ function CompleteMoment({ onDone }: { onDone: () => void }) {
   );
 }
 
+// ── Brand Fonts (Saved Brand Fonts feature, July 2026) ──────────────────────
+// A curated Google Font <select> with a "Custom font…" escape hatch.
+function FontSelect({ value, onChange }: { value: string; onChange: (family: string) => void }) {
+  const isCustom = !ALL_FONT_FAMILIES.includes(value);
+  return (
+    <>
+      <select
+        value={isCustom ? "__custom__" : value}
+        onChange={(e) => onChange(e.target.value === "__custom__" ? "" : e.target.value)}
+        className="w-full rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
+      >
+        {FONT_GROUPS.map((g) => (
+          <optgroup key={g.label} label={g.label}>
+            {g.fonts.map((f) => (
+              <option key={f.family} value={f.family}>{f.family}</option>
+            ))}
+          </optgroup>
+        ))}
+        <option value="__custom__">Custom font…</option>
+      </select>
+      {isCustom && (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Type any Google Font name"
+          className="mt-1.5 w-full rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
+        />
+      )}
+    </>
+  );
+}
+
+// Editable saved fonts for a brand. Persists to /api/brands/update-fonts and
+// echoes the change up to the parent kit via onSaved.
+function BrandFontsSection({
+  typography, brandId, onSaved,
+}: {
+  typography?: BrandTypography; brandId?: string; onSaved: (t: BrandTypography) => void;
+}) {
+  const resolved = resolveTypography(typography);
+  const [headlineFont, setHeadlineFont] = useState(resolved.headlineFont);
+  const [bodyFont, setBodyFont]         = useState(resolved.bodyFont);
+  const [weight, setWeight]             = useState<number>(resolved.headlineFontWeight);
+  const [uppercase, setUppercase]       = useState<boolean>(resolved.headlineUppercase);
+  const [italic, setItalic]             = useState<boolean>(resolved.bodyItalic);
+  const [saving, setSaving]             = useState(false);
+  const [msg, setMsg]                   = useState<string | null>(null);
+
+  // Never-saved brands show the house default pair; allow persisting it with one
+  // click even though the form matches the resolved default.
+  const neverSaved =
+    !typography ||
+    (!typography.headlineFont && !typography.bodyFont &&
+      typography.headlineFontWeight === undefined &&
+      typography.headlineUppercase === undefined &&
+      typography.bodyItalic === undefined);
+  const changed =
+    headlineFont !== resolved.headlineFont ||
+    bodyFont !== resolved.bodyFont ||
+    weight !== resolved.headlineFontWeight ||
+    uppercase !== resolved.headlineUppercase ||
+    italic !== resolved.bodyItalic;
+  const dirty = changed || neverSaved;
+
+  async function save() {
+    if (!brandId) { setMsg("Save this brand first to keep its fonts."); return; }
+    setSaving(true);
+    setMsg(null);
+    const t: BrandTypography = {
+      headlineFont, bodyFont, headlineFontWeight: weight, headlineUppercase: uppercase, bodyItalic: italic,
+    };
+    try {
+      const res = await fetch("/api/brands/update-fonts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandGenerationId: brandId, typography: t }),
+      });
+      const data = (await res.json()) as { ok?: boolean; typography?: BrandTypography; error?: string };
+      if (res.ok) { onSaved(data.typography ?? t); setMsg("✓ Saved"); }
+      else setMsg(data.error ?? "Could not save fonts.");
+    } catch {
+      setMsg("Could not save fonts.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-4 text-sm">
+      <p className="text-xs text-muted">
+        These fonts apply automatically to everything you generate for this brand in Studio.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <p className="label mb-1.5">Headline / title font</p>
+          <FontSelect value={headlineFont} onChange={setHeadlineFont} />
+        </div>
+        <div>
+          <p className="label mb-1.5">Body / accent font</p>
+          <FontSelect value={bodyFont} onChange={setBodyFont} />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <label className="flex items-center gap-2 text-xs text-muted">
+          <span>Headline weight</span>
+          <select
+            value={weight}
+            onChange={(e) => setWeight(Number(e.target.value))}
+            className="rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-2 py-1.5 text-sm text-white focus:outline-none focus:border-primary/60"
+          >
+            <option value={400}>Regular (400)</option>
+            <option value={500}>Medium (500)</option>
+            <option value={600}>Semibold (600)</option>
+            <option value={700}>Bold (700)</option>
+            <option value={800}>Extra-bold (800)</option>
+            <option value={900}>Black (900)</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-xs text-muted cursor-pointer select-none">
+          <input type="checkbox" checked={uppercase} onChange={(e) => setUppercase(e.target.checked)} className="accent-primary" />
+          Uppercase headlines
+        </label>
+        <label className="flex items-center gap-2 text-xs text-muted cursor-pointer select-none">
+          <input type="checkbox" checked={italic} onChange={(e) => setItalic(e.target.checked)} className="accent-primary" />
+          Italic accent text
+        </label>
+      </div>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={save} disabled={saving || !dirty}
+          className="btn-primary !text-sm !py-1.5 !px-4 disabled:opacity-40 disabled:cursor-not-allowed">
+          {saving ? "Saving…" : dirty ? "Save fonts" : "Saved"}
+        </button>
+        {msg && <span className={`text-xs ${msg.startsWith("✓") ? "text-secondary" : "text-red-400"}`}>{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function BrandKitView({
   kit: initialKit, brandInput, brandGenerationId, initialRerollsUsed = [], userPlan = "free",
@@ -261,6 +401,15 @@ export default function BrandKitView({
           </div>
         ))}
       </div>
+    </SectionCard>,
+
+    // 6b: Brand Fonts (Saved Brand Fonts feature) — editable, persists to the brand
+    <SectionCard key="fonts" emoji="🅰" title="Brand Fonts" badge="Design" {...noReroll}>
+      <BrandFontsSection
+        typography={kit.typography}
+        brandId={brandGenerationId}
+        onSaved={(t) => setKit((p) => ({ ...p, typography: t }))}
+      />
     </SectionCard>,
 
     // 7: Brand Voice
