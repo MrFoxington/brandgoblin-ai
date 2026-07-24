@@ -78,12 +78,21 @@ async function tryBundled(family: string, italic: boolean): Promise<ResolvedFont
   return null;
 }
 
-// Pick the best .ttf URL from a css2 response. The response may hold several
-// @font-face blocks, one per script subset, each preceded by a comment like
-// /* latin */ — a non-Latin subset has NO Latin glyphs at all, which is
+// Pick the best TrueType URL from a css2 response. The response may hold
+// several @font-face blocks, one per script subset, each preceded by a comment
+// like /* latin */ — a non-Latin subset has NO Latin glyphs at all, which is
 // exactly the tofu bug. Prefer the latin block; fall back to the last block.
+//
+// JULY 24 PROD FINDING (font-debug ground truth): the old matcher required the
+// URL to literally end in ".ttf", but the live lambda's css2 response can
+// carry its TrueType URL without that extension — so ttfUrl came back null,
+// every family (including the Jost fallback) resolved to null, and titles
+// rendered as an invisible 1×1. Match on format('truetype'/'opentype') OR a
+// .ttf/.otf extension, and never accept woff/woff2 (opentype.js can't parse
+// woff2).
 export function pickTtfUrlFromCss(css: string): string | null {
-  const re = /\/\*\s*([\w-]+)\s*\*\/|url\((https:\/\/[^)]+?\.ttf)\)/gi;
+  const re =
+    /\/\*\s*([\w-]+)\s*\*\/|url\((https:\/\/[^)\s'"]+)\)(?:\s*format\(\s*['"]?([\w-]+)['"]?\s*\))?/gi;
   let currentSubset: string | null = null;
   let latinUrl: string | null = null;
   let lastUrl: string | null = null;
@@ -91,10 +100,16 @@ export function pickTtfUrlFromCss(css: string): string | null {
   while ((m = re.exec(css)) !== null) {
     if (m[1]) {
       currentSubset = m[1].toLowerCase();
-    } else if (m[2]) {
-      lastUrl = m[2];
-      if (currentSubset === "latin" && !latinUrl) latinUrl = m[2];
+      continue;
     }
+    const url = m[2];
+    if (!url) continue;
+    const fmt = (m[3] ?? "").toLowerCase();
+    const looksWoff = /\.woff2?($|\?)/i.test(url) || fmt === "woff" || fmt === "woff2";
+    const looksTtf = /\.(ttf|otf)($|\?)/i.test(url) || fmt === "truetype" || fmt === "opentype";
+    if (looksWoff || !looksTtf) continue;
+    lastUrl = url;
+    if (currentSubset === "latin" && !latinUrl) latinUrl = url;
   }
   return latinUrl ?? lastUrl;
 }

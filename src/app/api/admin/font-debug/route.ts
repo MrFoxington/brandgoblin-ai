@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { inspectTtf } from "@/lib/studio/ttf-inspect";
+import { pickTtfUrlFromCss } from "@/lib/studio/font-files";
 import { renderTextImage } from "@/lib/studio/text-overlay";
 
 export const runtime = "nodejs";
@@ -38,8 +39,16 @@ export async function GET() {
       { headers: { "User-Agent": TTF_UA } }
     );
     const css = await res.text();
-    const ttfUrl = css.match(/url\((https:\/\/[^)]+?\.ttf)\)/i)?.[1] ?? null;
-    report.a_css = { status: res.status, cssLength: css.length, ttfUrl };
+    // Use the REAL production picker (not a private regex) so this endpoint
+    // exercises the exact code path thumbnails use — and echo the raw CSS
+    // body, because on July 24 a null ttfUrl with status 200 left us blind.
+    const ttfUrl = pickTtfUrlFromCss(css);
+    report.a_css = {
+      status: res.status,
+      cssLength: css.length,
+      ttfUrl,
+      cssBody: css.slice(0, 2000),
+    };
 
     // B: download + inspect the ttf
     if (ttfUrl) {
