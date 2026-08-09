@@ -27,7 +27,7 @@ const HOW_IT_WORKS = [
     step: "01",
     emoji: "💡",
     title: "Describe your idea",
-    desc: "Tell Nix your concept, audience, and vibe. The more specific, the better the magic. Takes 30 seconds.",
+    desc: "Tell Nix your concept, audience, and vibe. The more specific, the better the result. Takes 30 seconds.",
     example: '"A calm, science-backed skincare brand for people overwhelmed by harsh chemicals."',
   },
   {
@@ -145,7 +145,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 text-center">
           <span className="badge-green mb-6">✦ What's Inside Every Kit</span>
           <h2 className="section-heading mb-4">
-            12 deliverables. <span className="gradient-text">One prompt.</span>
+            Your whole brand. One prompt. <span className="gradient-text">About two minutes.</span>
           </h2>
           <p className="section-sub mb-4 max-w-2xl mx-auto">
             No designer, no copywriter, no agency. Nix delivers everything you need to look and sound like a real brand — on day one.
@@ -197,9 +197,9 @@ export default function LandingPage() {
           <div className="mt-14">
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_24px_rgba(255,107,53,0.5)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_24px_rgba(255,107,53,0.5)] hover:opacity-90 transition-opacity"
             >
-              ✦ Try It Free →
+              Start free. No card needed.
             </Link>
           </div>
         </div>
@@ -299,8 +299,8 @@ export default function LandingPage() {
             <div className="pointer-events-none absolute inset-0 bg-hero-mesh opacity-40" />
             <div className="relative">
               <NixFloat
-                src="/nix/conjuring-nix.png"
-                alt="Nix conjuring your brand"
+                src="/nix/happy-waving-nix.png"
+                alt="Nix, your brand goblin"
                 width={160}
                 height={160}
                 className="mx-auto mb-6 drop-shadow-[0_0_30px_rgba(124,58,237,0.6)]"
@@ -322,7 +322,7 @@ export default function LandingPage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/signup" className="btn-primary px-10 py-4 text-lg">
-                  ✦ Start Creating — Free →
+                  Start free. No card needed.
                 </Link>
                 <Link href="/pricing" className="btn-secondary px-8 py-4 text-base">
                   See what's included

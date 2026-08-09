@@ -3,22 +3,14 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 const IDEAS = [
-  "a meditation app for gamers",
-  "hot sauce for people who cry at movies",
+  "a calm, science-backed skincare brand",
   "a finance newsletter for 20-somethings",
-  "a coffee brand for night owls",
-  "a skincare line that feels like Sunday",
-  "a podcast for recovering perfectionists",
-  "a travel brand for introverts",
-  "a cereal company for adults",
-  "a gym for people who hate gyms",
-  "a bakery that only bakes at midnight",
-  "a plant shop for serial plant killers",
-  "an app that texts you like a hype man",
-  "a wine brand for people who drink alone on purpose",
-  "a dog food brand with a villain arc",
-  "a streetwear brand for librarians",
-  "a co-working space for extroverted introverts",
+  "a specialty coffee roaster",
+  "a productivity app for ADHD founders",
+  "a sustainable activewear label",
+  "a coworking space for freelancers",
+  "hot sauce for people who cry at movies",
+  "a pet brand with main character energy",
 ];
 
 export default function IdeaSparkSection() {
@@ -34,12 +26,12 @@ export default function IdeaSparkSection() {
   return (
     <section className="py-20 overflow-hidden">
       <div className="mx-auto max-w-6xl px-4 text-center">
-        <span className="badge-green mb-6">✦ Not sure what to build?</span>
+        <span className="badge-green mb-6">Not sure what to build?</span>
         <h2 className="section-heading mb-4">
           Nix has <span className="gradient-text">ideas.</span>
         </h2>
         <p className="section-sub mb-10 max-w-xl mx-auto">
-          Click any idea below — Nix will conjure a brand for it instantly.
+          Click any idea below — Nix will build a brand for it instantly.
         </p>
 
         <div className="flex flex-wrap justify-center gap-3">

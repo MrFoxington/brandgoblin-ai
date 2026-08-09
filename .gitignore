@@ -31,3 +31,7 @@ next-env.d.ts
 Footage/
 Goblin Art/
 Badges/
+
+# Stray abandoned pre-src scaffold + multi-GB recordings/assets — never build or commit
+/brandgoblin/
+/_to_delete/

@@ -52,6 +52,93 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — August 9, 2026 (🎯 BRAND MATURITY P1 SHIPPED — new demonstration hero + credible chips, landing page. Committed, NOT pushed.)
+
+Terminal Claude Code session. Executed Brand Maturity Plan **Part 3 (wild-card hero) + Step 2
+(chip swap) + Step 3 (single H1)** on the app landing page. Copy-only, no redesign yet
+(design system = Phase 2). **tsc/`npm run build` GREEN. Committed locally, NOT pushed** (Fox
+pushes from Terminal).
+
+**What changed:**
+1. **New demonstration hero (`HeroInteractive.tsx`, the live demo/typewriter component).**
+   H1 → **"This brand didn't exist two minutes ago."** Subhead → **"One sentence in, twelve
+   deliverables out. Type your idea and watch Nix work."** The headline sits directly above
+   the live teaser input + typewriter, so the claim and the proof are seen together (Hopkins:
+   demonstration beats description). Interactive teaser (`/api/teaser`) still works —
+   `handleConjure`→`handleSubmit`, button "Conjure it"→"See it →" / "Nix is working…",
+   result label "Nix conjured →"→"Nix made →".
+2. **ONE H1 on the page (Step 3).** `HeroTypewriter.tsx` was **dead code** (defined, imported
+   nowhere) carrying a second, drifted hero ("Launch your [niche] in 2 minutes.", fake
+   "2,400+ founders / 4.9★" stats, a Nix quip). **Deleted it** — cleanest fix for the
+   "two competing headlines" note; the live page only ever rendered HeroInteractive's H1.
+   Verified: exactly one `<h1>` in the landing render path; all page.tsx sections are `<h2>`.
+3. **Eight credible chips (`IdeaSparkSection.tsx`, Step 2).** Replaced the 16 old idea chips
+   (incl. edgelord ones — meme coin/villain arc/drink alone/hype man) with exactly the eight
+   approved: calm science-backed skincare · finance newsletter for 20-somethings · specialty
+   coffee roaster · productivity app for ADHD founders · sustainable activewear label ·
+   coworking space for freelancers · hot sauce for people who cry at movies · pet brand with
+   main character energy. No emoji prefixes. "Nix will conjure"→"Nix will build".
+4. **12-deliverables section H2 (`page.tsx`).** "12 deliverables. One prompt." → **"Your whole
+   brand. One prompt. About two minutes."**
+5. **conjure/magic + sparkle purge on hero & CTAs.** Removed "conjure"/"magic" and the ✦ glyph
+   from the hero + all primary CTAs. **Primary signup CTA text is now "Start free. No card
+   needed."** everywhere on the page (hero, teaser-result, how-it-works, final CTA). Dropped
+   `animate-conjure-pulse` class; swapped final-CTA `conjuring-nix.png`→`happy-waving-nix.png`
+   (alt "Nix, your brand goblin"). "the better the magic"→"the better the result". Section-badge
+   ✦ glyphs left as-is (that's the broader Step-5 emoji purge = a separate prompt). **The one
+   allowed magic moment (LoadingScreen.tsx) was NOT touched.** Verified `grep -i "conjure|magic"`
+   is clean across page.tsx + live hero components.
+6. **⚠️ Build unblocker (not part of the plan, but required to make `npm run build` pass).**
+   The repo root holds two **untracked** junk dirs — `brandgoblin/` (the abandoned pre-`src/`
+   June scaffold + ~11 GB of `.mov` recordings/assets) and `_to_delete/`. `tsconfig` type-checks
+   `**/*.ts`, so `brandgoblin/app/api/generate/route.ts` (imports `openai`, not installed) was
+   failing the build — pre-existing, unrelated to this task. Added both to `tsconfig.json`
+   `exclude` and to `.gitignore` so they never build or get committed. **Neither dir was
+   deleted** — Fox's recordings are untouched on disk.
+
+**Files:** `src/components/HeroInteractive.tsx`, `src/components/IdeaSparkSection.tsx`,
+`src/app/page.tsx`, `src/components/HeroTypewriter.tsx` (deleted), `tsconfig.json`, `.gitignore`.
+
+**▶ NEXT (remaining Phase 1):** P2 = replace "The Loop" section ("Built for momentum"), ~80%
+marketing-emoji purge + dedupe, cut Nix to ≤2 spoken lines. Then Phase 2 design system.
+The plan's `docs/BRAND_MATURITY_PLAN.md` + `docs/BRAND_MATURITY_BUILD_PROMPTS.md` are still
+untracked — `git add` them in a future session (kept out of this commit to keep it focused).
+
+---
+
+## 🗓️ SESSION LOG — August 9, 2026 (🧭 BRAND MATURITY PLAN + BUILD PROMPTS — Kenji session, docs only, no code)
+
+Cowork session (Kenji copywriter skill). Fox uploaded an outside brand audit ("Aging the
+Brand Up to 18-35 Without Killing Nix"). Kenji audited the audit and produced two docs,
+both committed to Fox's local docs/ (NOT yet git-committed — next code session should
+`git add docs/BRAND_MATURITY_PLAN.md docs/BRAND_MATURITY_BUILD_PROMPTS.md`):
+
+1. **docs/BRAND_MATURITY_PLAN.md** — 16-step, 3-phase roadmap. Key calls (Fox approved
+   the purple decision explicitly): PURPLE DEMOTED TO NIX-ONLY (#7C3AED lives only where
+   Nix appears; site goes goblin green #2E7D5B + emerald #10B981 + gold #FBBF24 + ink
+   #141518 + warm off-white #FAF7F2); Fraunces display + Hanken Grotesk body; kill purple
+   gradient/emoji-UI/meme prompts/"The Loop"; Nix speaks max 2x on marketing (Clippy rule);
+   real $49 "Goblin Studio" anchor tier (3,000⚡/mo, built from existing pack economics,
+   NEVER a waitlist — Agency Edition lesson); pricing page possession promise "Anything
+   you finish is yours. Every plan, forever." (CapCut rule made public); consolidate to
+   ONE site (marketing into the app, root domain → Vercel, Airo dies in Phase 2).
+2. **docs/BRAND_MATURITY_BUILD_PROMPTS.md** — 10 copy-paste prompts for terminal Claude
+   Code (Fox will run them), in order: P1 hero ("This brand didn't exist two minutes
+   ago." demonstration hero) + chips + H1 fix; P2 Loop removal + emoji purge + dedupe +
+   Nix voice cut; P3 measurement baseline (hero_variant cookie + admin Funnel card +
+   ⚠️ migration + enable Vercel Analytics); P4 design system; P5 proof above fold +
+   prompt-visible gallery; P6 Studio tier (⚠️ Stripe price metadata energy_amount=3000,
+   the July 6 lesson); P7 domain consolidation (+ Fox's GoDaddy DNS steps); P8 A/B hero
+   coin-flip (WAIT for traffic); P9 NIX_USAGE_GUIDE.md; P10 traction counter. Plus the
+   Airo Option A interim paste-in (tie-in copy, all CTAs → app signup) and a quick
+   301-forward fallback.
+
+A/B strategy decided with Fox: no formal split test at current traffic; ship wild-card
+hero, before/after signup rate, test headlines as X posts; real coin-flip test only when
+~few hundred visitors/week (Prompt 8). Project memory updated: brand-maturity-plan.md.
+
+---
+
 ## 🗓️ SESSION LOG — July 24, 2026 (🔥 HOT RIGHT NOW FONTS — AI-curated monthly shelf · ⚠️ MIGRATION BEFORE DEPLOY)
 
 Cowork session. Also: found + committed an ORPHANED fix left uncommitted on Fox's Mac from a
@@ -2556,3 +2643,26 @@ The Mac updated to **Node v24**, which the pinned **sharp 0.33.5** did not fully
 node -e "require('sharp')({text:{text:'hi',width:200,height:60,rgba:true}}).png().toBuffer().then(()=>console.log('OK')).catch(e=>console.log('FAIL',e.message))"
 ```
 Vercel was unaffected (runs a supported Node), so the live site worked even before the sharp bump.
+
+---
+
+## July 24 2026 (afternoon) — FONT INDEPENDENCE: bundled font pack, Google demoted to last resort
+
+**The bug (live prod, all day)**: thumbnails rendered the AI background but NO title text — an invisible 1×1 png was composited instead. Root cause chain, proven by `/api/admin/font-debug` (ground truth from the real lambda, not guesses):
+1. The vector text renderer (opentype.js glyph outlines → SVG paths → sharp) needs a real font FILE.
+2. The runtime font loader fetched Google Fonts css2 with an ancient UA expecting `.ttf` URLs.
+3. Google now serves `format('woff')` to that UA — the response had NO .ttf match — so EVERY family, including the Jost fallback, resolved to null → transparent 1×1 → title silently gone.
+
+**The fix (Fox's call: "we should not be outsourcing to other websites")**:
+- **Bundled font pack**: `public/fonts/` now contains ~225 verified woff/ttf files covering ALL 61 catalog families (see `scripts/fetch-fonts.mjs`), mapped by `src/lib/studio/font-manifest.json` (family → weight/italic key → filename). Italics only at 400 (subtitle line is the only italic consumer).
+- **font-files.ts v3 layered resolver**: (1) bundled pack from lambda disk → (2) bundled pack via our own deployment CDN (`VERCEL_URL`/`NEXT_PUBLIC_SITE_URL`), cached in /tmp → (3) Google runtime download, now accepting woff AND ttf (opentype.js parses woff1; woff2 is impossible and always rejected). Every file from every layer is verified by parsing + probing real glyph outlines before being trusted.
+- **text-overlay fallback ladder**: requested font → non-italic → Jost 700 → FIRST_BUNDLED_FAMILY. A usable font is now ALWAYS on disk; titles can never silently vanish again.
+- **next.config.js**: `experimental.outputFileTracingIncludes` ships public/fonts into every lambda.
+- **font-debug v3**: reports pack visibility, per-layer resolution (`source: bundled-fs / bundled-cdn / google / cache`), the RAW css2 body, and a real render. Use it FIRST next time text misbehaves.
+
+**Adding a font later**: add it to FONT_GROUPS in fonts.ts AND to CATALOG in scripts/fetch-fonts.mjs → run `node scripts/fetch-fonts.mjs` on the Mac → commit public/fonts + font-manifest.json.
+
+**Workflow lessons (also in Cowork memory)**:
+- Fox pushes with the URL-form `git push https://user:PAT@...` — this NEVER updates local `origin/main`, so `git rev-list origin/main..main` overstates unpushed work; trust the push output range instead.
+- Sandbox commits leave `.git/HEAD.lock` / `index.lock` behind (mount can't unlink). If git says "another process is running", Fox runs: `rm -f .git/HEAD.lock .git/index.lock`.
+- A `_to_delete/` folder in the repo root holds moved-aside lock files; Fox can trash it anytime.

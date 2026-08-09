@@ -67,7 +67,7 @@ export default function HeroInteractive() {
     return () => window.removeEventListener("nix-idea", onNixIdea);
   }, []);
 
-  async function handleConjure(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = idea.trim();
     if (!trimmed || loading) return;
@@ -98,18 +98,23 @@ export default function HeroInteractive() {
     <div className="flex-1 text-center lg:text-left">
       {/* Badge */}
       <div className="mb-6 flex justify-center lg:justify-start">
-        <span className="badge-purple">✦ Create your brand free — no credit card</span>
+        <span className="badge-purple">Create your brand free — no card needed</span>
       </div>
 
-      {/* Headline */}
+      {/* Headline — the demonstration hero sits directly above the live demo */}
       <h1 className="section-heading mb-4 text-5xl sm:text-6xl lg:text-7xl leading-tight">
-        Watch your idea<br />
-        <span className="gradient-text">become a brand.</span>
+        This brand didn&rsquo;t exist<br />
+        <span className="gradient-text">two minutes ago.</span>
       </h1>
 
-      {/* Typewriter subline */}
-      <p className="mb-8 text-lg text-muted max-w-xl mx-auto lg:mx-0 min-h-[1.75rem]">
-        Try it →{" "}
+      {/* Subhead */}
+      <p className="mb-4 text-lg text-muted max-w-xl mx-auto lg:mx-0">
+        One sentence in, twelve deliverables out. Type your idea and watch Nix work.
+      </p>
+
+      {/* Typewriter example hint */}
+      <p className="mb-8 text-base text-secondary/90 max-w-xl mx-auto lg:mx-0 min-h-[1.75rem]">
+        Try{" "}
         <span className="text-secondary font-medium">
           {displayed}
           {!shouldReduce && <span className="animate-pulse text-primary">|</span>}
@@ -117,7 +122,7 @@ export default function HeroInteractive() {
       </p>
 
       {/* Interactive input */}
-      <form onSubmit={handleConjure} className="mb-6">
+      <form onSubmit={handleSubmit} className="mb-6">
         <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto lg:mx-0">
           <input
             ref={inputRef}
@@ -134,7 +139,7 @@ export default function HeroInteractive() {
             disabled={loading || !idea.trim()}
             className="btn-primary px-6 py-3 text-sm font-bold shrink-0 disabled:opacity-60"
           >
-            {loading ? "Conjuring…" : "✦ Conjure it →"}
+            {loading ? "Nix is working…" : "See it →"}
           </button>
         </div>
       </form>
@@ -166,7 +171,7 @@ export default function HeroInteractive() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="mb-6 rounded-2xl border border-primary/30 bg-primary/10 px-6 py-5 text-left max-w-xl mx-auto lg:mx-0"
           >
-            <p className="text-xs text-muted mb-2 uppercase tracking-widest">Nix conjured →</p>
+            <p className="text-xs text-muted mb-2 uppercase tracking-widest">Nix made →</p>
             <p className="font-display text-2xl font-black text-white mb-1">{result.name}</p>
             <p className="text-secondary font-medium text-sm mb-4">"{result.tagline}"</p>
             <div className="border-t border-white/10 pt-4">
@@ -177,7 +182,7 @@ export default function HeroInteractive() {
                 href="/signup"
                 className="btn-primary text-sm px-6 py-2.5 inline-flex"
               >
-                ✦ Get the full kit — free →
+                Start free. No card needed.
               </Link>
             </div>
           </motion.div>
@@ -203,7 +208,7 @@ export default function HeroInteractive() {
       {!result && !loading && (
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start mb-8">
           <Link href="/signup" className="btn-primary w-full sm:w-auto px-8 py-4 text-lg">
-            ✦ Start Creating — Free →
+            Start free. No card needed.
           </Link>
           <Link href="/pricing" className="btn-secondary w-full sm:w-auto px-6 py-4 text-base">
             See what's included
