@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ShowcaseMarquee from "@/components/showcase/ShowcaseMarquee";
 
 const BRAND = {
   name: "Solace Skincare",
@@ -60,19 +61,19 @@ export default function BrandKitPreview() {
   }, []);
 
   const TABS = [
-    { id: "names", label: "🏷️ Brand Names" },
-    { id: "colors", label: "🎨 Color Palette" },
-    { id: "voice", label: "🎭 Brand Voice" },
-    { id: "copy", label: "🌐 Website Copy" },
-    { id: "post", label: "📱 Social Post" },
+    { id: "names", label: "Brand Names" },
+    { id: "colors", label: "Color Palette" },
+    { id: "voice", label: "Brand Voice" },
+    { id: "copy", label: "Website Copy" },
+    { id: "post", label: "Social Post" },
   ] as const;
 
   return (
-    <section ref={ref} className="py-28">
+    <section ref={ref} className="py-32 sm:py-48">
       <div className="mx-auto max-w-6xl px-4">
         {/* Header */}
         <div className="mb-16 text-center">
-          <span className="badge-green mb-6">✦ See It In Action</span>
+          <span className="badge-green mb-6">See It In Action</span>
           <h2 className="section-heading mb-4">
             This is what Nix builds — <span className="gradient-text">in 2 minutes</span>
           </h2>
@@ -106,17 +107,14 @@ export default function BrandKitPreview() {
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="text-xs uppercase tracking-widest text-faint">Brand Name</span>
-                  <span className="rounded-full bg-secondary/15 border border-secondary/25 px-2 py-0.5 text-xs text-secondary">Nix Pick ✦</span>
+                  <span className="rounded-full bg-secondary/15 border border-secondary/25 px-2 py-0.5 text-xs text-secondary">Nix Pick</span>
                 </div>
                 <h3 className="font-display text-3xl font-black text-white">{BRAND.name}</h3>
                 <p className="text-base text-muted mt-1 italic">&ldquo;{BRAND.taglines[0]}&rdquo;</p>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/20 px-4 py-2">
-                <span className="text-2xl">🧌</span>
-                <div>
-                  <p className="text-xs text-faint">Generation time</p>
-                  <p className="text-sm font-bold text-white">1 min 52 sec</p>
-                </div>
+              <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-2">
+                <p className="text-xs text-faint">Generation time</p>
+                <p className="text-sm font-bold text-white">1 min 52 sec</p>
               </div>
             </div>
           </div>
@@ -249,11 +247,6 @@ export default function BrandKitPreview() {
                     <div className="ml-auto rounded-full bg-secondary/15 border border-secondary/25 px-2 py-0.5 text-xs text-secondary">Ready to post</div>
                   </div>
                   <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap">{BRAND.post}</p>
-                  <div className="mt-4 flex gap-2">
-                    {["❤️ 0", "💬 0", "↗️ Share"].map((a) => (
-                      <span key={a} className="text-xs text-faint">{a}</span>
-                    ))}
-                  </div>
                 </div>
                 <p className="text-xs text-faint text-center mt-4">+ 4 more launch posts included (X/Twitter, TikTok caption, LinkedIn, Pinterest)</p>
               </div>
@@ -281,6 +274,20 @@ export default function BrandKitPreview() {
 
         <div className="mt-10 text-center">
           <p className="text-muted text-sm">This is a <span className="text-white font-medium">real output</span> from BrandGoblin AI. Your brand. Your idea. Same quality.</p>
+        </div>
+
+        {/* Live wall of real Goblin Studio creations — merged into the proof
+            section (Brand Maturity P2) so the page keeps one showcase, not two. */}
+        <div className="mt-24">
+          <div className="mb-10 text-center">
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
+              Real brands, <span className="gradient-text">really made here.</span>
+            </h3>
+            <p className="section-sub max-w-xl mx-auto">
+              Actual logos, social graphics, and product art people created with Goblin Studio — live.
+            </p>
+          </div>
+          <ShowcaseMarquee />
         </div>
       </div>
     </section>

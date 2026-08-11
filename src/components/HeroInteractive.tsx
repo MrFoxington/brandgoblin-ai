@@ -154,7 +154,7 @@ export default function HeroInteractive() {
             exit={{ opacity: 0 }}
             className="mb-6 flex items-center gap-2 text-sm text-muted max-w-xl mx-auto lg:mx-0"
           >
-            <span className="inline-block animate-spin">🧌</span>
+            <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
             <span>Nix is obsessing over every detail…</span>
           </motion.div>
         )}

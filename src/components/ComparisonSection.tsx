@@ -40,11 +40,11 @@ export default function ComparisonSection() {
   }, []);
 
   return (
-    <section ref={ref} className="py-28 bg-section-alt">
+    <section ref={ref} className="py-32 sm:py-48 bg-section-alt">
       <div className="mx-auto max-w-6xl px-4">
         {/* Header */}
         <div className="mb-16 text-center">
-          <span className="badge-purple mb-6">✦ The Real Difference</span>
+          <span className="badge-purple mb-6">The Real Difference</span>
           <h2 className="section-heading mb-4">
             Stop doing it the <span className="text-red-400">hard way</span>
           </h2>
@@ -62,12 +62,9 @@ export default function ComparisonSection() {
             }`}
             style={{ transitionDelay: "0ms" }}
           >
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/20 text-xl">😤</div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-red-400 font-bold">The DIY Way</p>
-                <p className="text-sm text-muted">ChatGPT + Canva + Fiverr + vibes</p>
-              </div>
+            <div className="mb-6">
+              <p className="text-xs uppercase tracking-widest text-red-400 font-bold">The DIY Way</p>
+              <p className="text-sm text-muted">ChatGPT + Canva + Fiverr + vibes</p>
             </div>
             <ul className="space-y-3">
               {DIY.map((item, i) => (
@@ -84,7 +81,7 @@ export default function ComparisonSection() {
               ))}
             </ul>
             <div className="mt-6 rounded-xl bg-red-500/10 border border-red-500/20 p-4">
-              <p className="text-sm font-bold text-red-400">⏱ Average time: 6–40 hours</p>
+              <p className="text-sm font-bold text-red-400">Average time: 6–40 hours</p>
               <p className="text-xs text-muted mt-1">If you even finish. Most founders give up or ship something they hate.</p>
             </div>
           </div>
@@ -96,12 +93,9 @@ export default function ComparisonSection() {
             }`}
             style={{ transitionDelay: "150ms" }}
           >
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-xl">🧌</div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-secondary font-bold">The Nix Way</p>
-                <p className="text-sm text-muted">One prompt. World-class brand.</p>
-              </div>
+            <div className="mb-6">
+              <p className="text-xs uppercase tracking-widest text-secondary font-bold">The Nix Way</p>
+              <p className="text-sm text-muted">One prompt. World-class brand.</p>
             </div>
             <ul className="space-y-3">
               {NIX.map((item, i) => (
@@ -118,7 +112,7 @@ export default function ComparisonSection() {
               ))}
             </ul>
             <div className="mt-6 rounded-xl bg-secondary/10 border border-secondary/20 p-4">
-              <p className="text-sm font-bold text-secondary">⚡ Average time: 1 min 47 sec</p>
+              <p className="text-sm font-bold text-secondary">Average time: 1 min 47 sec</p>
               <p className="text-xs text-muted mt-1">12 deliverables. Launch-ready. No designer, no copywriter, no agency retainer.</p>
             </div>
           </div>

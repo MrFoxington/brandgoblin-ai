@@ -52,6 +52,87 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — August 11, 2026 (🧹 BRAND MATURITY P2 SHIPPED — 7 sections, no manipulation copy, emoji purge, Nix speaks once. Committed, NOT pushed.)
+
+Terminal Claude Code session. Executed Brand Maturity **Prompt 2** (plan Steps 4, 5, 6) on the
+marketing landing page + footer + navbar + pricing badge. Copy/structure only — no design
+system yet (that's Phase 2 / Prompt 4). **`npm run build` GREEN (tsc clean). Committed
+locally, NOT pushed** (Fox pushes from Terminal).
+
+**What changed:**
+1. **"The Loop" / manipulation section KILLED.** The old section ("The Loop" badge, "Once you
+   start, you won't want to stop.", "designed to make building feel addictive", the 6-emoji
+   loop strip) is gone entirely. Its replacement copy — **"Built for momentum"** + the
+   idea→name→logo→launch / milestones / "Earned by creating, never bought." paragraph — now
+   lives as a block INSIDE the how-it-works section, because the 7-section budget below has no
+   slot for a standalone momentum section. `grep -i "addictive|coming back|the loop|dopamine"`
+   across landing/pricing/footer is clean (one code comment aside).
+2. **SEVEN SECTIONS EXACTLY,** in the plan's order: (1) hero + live demo + idea chips,
+   (2) DIY-vs-Nix comparison, (3) real-output demo + live showcase wall, (4) the 12
+   deliverables, (5) how it works ×3 + Nix quote + Built for momentum, (6) pricing summary,
+   (7) FAQ + final CTA. Merges done: **Idea Sparks folded into the hero** (its chips feed the
+   hero input, so it's now a `<div>` inside the hero `<section>` with a quiet label instead of
+   its own badge/H2/sub); **ShowcaseMarquee folded into `BrandKitPreview`** so the page has ONE
+   showcase, not two; **`TestimonialsSection.tsx` DELETED** (founder note + "Be one of the
+   first" + emoji trust chips) — its single strongest sentence survives as an attributed Fox
+   quote in the final CTA. Dead-component lesson from the HeroTypewriter H1 bug applied: the
+   file is removed, not orphaned.
+3. **NEW FAQ section (§7)**, six honest Q&As written from verified product facts: what the 12
+   deliverables are, ~2 min with the name landing in ~15s (the live reveal feed), no card
+   needed, **"Anything you finish is yours… Energy limits how much you create — never what you
+   own"** (the CapCut law, now public on the landing page too), existing-name mode is real, and
+   a straight answer to "isn't this just a chatbot". No invented stats, no fake testimonials.
+4. **Emoji purge on marketing surfaces.** Removed: the 9 FEATURE card icons, the 3 how-it-works
+   step icons, the loop strip, the final-CTA "🧌 Nix has a message for you" chip (page.tsx);
+   😤/🧌 column icons + ⏱/⚡ in the time boxes + the ✦ badge glyph (ComparisonSection); the 5
+   emoji tab labels, the 🧌 generation-time chip, "Nix Pick ✦", and the fake "❤️ 0 · 💬 0 ·
+   ↗️ Share" engagement row (BrandKitPreview); the 🧌 spinner in the hero loading line
+   (HeroInteractive, now a CSS spinner); "Fresh creations coming soon ✨" (ShowcaseMarquee
+   empty state); all 7 ecosystem chip emoji + "Powered by NIX ✨" (Footer); the ✦ on every
+   section badge across landing + pricing. **KEPT deliberately:** ✓/✕ list markers (functional,
+   not decoration) and the ✨ inside the sample Instagram post (that's demoed product output,
+   not page furniture).
+5. **Prompt-1 leftovers fixed (both verified live by Fox):** navbar logged-out CTA
+   "✦ Start Creating Free" → **"Start free. No card needed."**; footer "Built with magic (and
+   Claude). … Nix says hi 🧙" → **"Powered by Claude. © 2026 BrandGoblin AI"**. Landing pricing
+   card CTA "Start Creating — Free" also aligned to "Start free. No card needed."
+6. **NIX SPEAKS ONCE.** Exactly one first-person Nix quote on the whole marketing site:
+   **"I take your idea as seriously as you do."** on the how-it-works section (plus the
+   untouched LoadingScreen). Audited login/signup/pricing/footer/navbar — there were no other
+   first-person Nix quotes to convert. All Nix IMAGES left exactly where they were (hero float,
+   final-CTA float, navbar/footer avatars).
+7. **Vertical spacing roughly doubled.** Shared `SECTION_PAD = "py-32 sm:py-48"` (was py-24/28)
+   applied to all seven sections, including ComparisonSection and BrandKitPreview.
+8. **Nav anchors repaired.** `/#features` now resolves (the deliverables section gained
+   `id="features"`; it never had one). The visitor link "About → /#about" pointed at an anchor
+   that has never existed in the app page — relabelled **FAQ → /#faq**, which now exists.
+9. **Housekeeping.** `docs/BRAND_MATURITY_PLAN.md` + `docs/BRAND_MATURITY_BUILD_PROMPTS.md`
+   are finally `git add`ed. The stray root-level `BRAND_MATURITY_PLAN.md` was byte-identical to
+   the docs/ copy (diff verified) → root copy deleted, docs/ copy kept.
+
+**Files:** `src/app/page.tsx` (rewritten), `src/app/pricing/page.tsx`,
+`src/components/{IdeaSparkSection,ComparisonSection,BrandKitPreview,HeroInteractive,Footer,Navbar}.tsx`,
+`src/components/showcase/ShowcaseMarquee.tsx`, `src/components/TestimonialsSection.tsx` (deleted),
+`docs/BRAND_MATURITY_{PLAN,BUILD_PROMPTS}.md` (now tracked), root `BRAND_MATURITY_PLAN.md` (deleted).
+
+**⚠️ NOT DONE / FLAGGED (deliberate, needs Fox's call):**
+- **The "Now Nix designs the visuals, too" dedupe (task item 2) is a no-op in this repo.** That
+  duplicated block only ever existed on the **GoDaddy/Airo** page (`docs/GODADDY_LANDING_*.md`,
+  `docs/AIRO_FIX_PACK_JULY_5_2026.md`); `grep -ri "designs the visuals" src/` returns nothing.
+  Fox: fix it via the Airo Option A paste-in, or let Prompt 7 delete Airo entirely.
+- **Navbar in-app emoji left alone on purpose** (🏠/🎨/✨/👑/💰 mobile links, 🎨 Studio, ✨ Nix,
+  🧪 Labs, 🧌 Admin, ✦ Generate, and the "Powered by NIX ✨" logo line). They render inside the
+  app for logged-in users and the brief said do not touch in-app UI. The logo's ✨ is the one
+  arguable case — one-line change whenever Fox wants it.
+- **Unverified claim still on the page:** ComparisonSection says Nix was "trained on thousands
+  of successful launches." That's an honesty-doctrine risk, not an emoji/structure issue, so it
+  was left for Fox to confirm or rewrite.
+
+**▶ NEXT:** Prompt 3 (measurement baseline: hero_variant cookie + admin Funnel card + migration
++ enable Vercel Analytics), then Phase 2 = Prompt 4 (Fraunces/Hanken + green-gold palette).
+
+---
+
 ## 🗓️ SESSION LOG — August 9, 2026 (🎯 BRAND MATURITY P1 SHIPPED — new demonstration hero + credible chips, landing page. Committed, NOT pushed.)
 
 Terminal Claude Code session. Executed Brand Maturity Plan **Part 3 (wild-card hero) + Step 2

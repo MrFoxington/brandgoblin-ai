@@ -38,7 +38,7 @@ export default function ShowcaseMarquee({ initialItems }: Props) {
   if (!items.length) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-2 text-center px-6">
-        <p className="text-base font-bold text-white">Fresh creations coming soon ✨</p>
+        <p className="text-base font-bold text-white">Fresh creations coming soon</p>
         <p className="text-sm text-muted">Real brands made with Goblin Studio will appear here.</p>
       </div>
     );

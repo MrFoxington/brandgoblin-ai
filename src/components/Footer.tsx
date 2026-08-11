@@ -7,13 +7,13 @@ import type { User } from "@supabase/supabase-js";
 import NixAvatar from "@/components/NixAvatar";
 
 const ECOSYSTEM: { label: string; active: boolean; href?: string }[] = [
-  { label: "✨ Creator Pro",      active: true, href: "/dashboard/creator-pro" },
-  { label: "🎨 Goblin Studio",    active: true, href: "/dashboard/studio" },
-  { label: "🧪 Goblin Labs",      active: false },
-  { label: "🌐 Goblin Sites",     active: false },
-  { label: "📈 Goblin Growth",    active: false },
-  { label: "📹 Goblin Motion",    active: false },
-  { label: "🏪 Goblin Bazaar", active: false },
+  { label: "Creator Pro",    active: true, href: "/dashboard/creator-pro" },
+  { label: "Goblin Studio",  active: true, href: "/dashboard/studio" },
+  { label: "Goblin Labs",    active: false },
+  { label: "Goblin Sites",   active: false },
+  { label: "Goblin Growth",  active: false },
+  { label: "Goblin Motion",  active: false },
+  { label: "Goblin Bazaar",  active: false },
 ];
 
 export default function Footer() {
@@ -51,7 +51,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-xs font-semibold tracking-wide text-amber-300/90">
-              BrandGoblin - Powered by NIX ✨
+              BrandGoblin — Powered by NIX
             </p>
             <p className="text-xs text-faint italic max-w-[220px] text-center sm:text-left">
               Everyone Has An Idea.<br />BrandGoblin Helps Bring It To Life.
@@ -112,7 +112,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <p className="text-center text-xs text-faint border-t border-[rgba(45,45,78,0.4)] pt-6">
-          Built with magic (and Claude). © 2026 BrandGoblin AI · Powered by NIX · Nix says hi 🧙
+          Powered by Claude. © 2026 BrandGoblin AI
         </p>
       </div>
     </footer>

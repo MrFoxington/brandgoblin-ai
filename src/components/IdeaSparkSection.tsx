@@ -23,15 +23,13 @@ export default function IdeaSparkSection() {
     if (hero) hero.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  // Not its own section any more — it lives inside the hero (Brand Maturity P2),
+  // because the chips feed the hero input directly.
   return (
-    <section className="py-20 overflow-hidden">
-      <div className="mx-auto max-w-6xl px-4 text-center">
-        <span className="badge-green mb-6">Not sure what to build?</span>
-        <h2 className="section-heading mb-4">
-          Nix has <span className="gradient-text">ideas.</span>
-        </h2>
-        <p className="section-sub mb-10 max-w-xl mx-auto">
-          Click any idea below — Nix will build a brand for it instantly.
+    <div className="mt-20 overflow-hidden">
+      <div className="text-center">
+        <p className="mb-6 text-xs uppercase tracking-[0.2em] text-faint">
+          Not sure what to build? Start from one of these.
         </p>
 
         <div className="flex flex-wrap justify-center gap-3">
@@ -52,6 +50,6 @@ export default function IdeaSparkSection() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

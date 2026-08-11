@@ -94,7 +94,7 @@ export default function PricingPage() {
 
       <main className="flex-1 px-4 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="badge-green mb-6">✦ Pricing</span>
+          <span className="badge-green mb-6">Pricing</span>
           <h1 className="section-heading mb-4">
             Simple, <span className="gradient-text">goblin-fair</span> pricing
           </h1>

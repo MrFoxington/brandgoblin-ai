@@ -14,7 +14,9 @@ const VISITOR_LINKS = [
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Examples", href: "/dashboard" },
   { label: "Pricing", href: "/pricing" },
-  { label: "About", href: "/#about" },
+  // Was "/#about" — that anchor died with the old founder-note section (Brand
+  // Maturity P2). The FAQ section is the honest replacement.
+  { label: "FAQ", href: "/#faq" },
 ];
 
 const APP_LINKS = [
@@ -159,7 +161,7 @@ export default function Navbar() {
                 Sign In
               </Link>
               <Link href="/signup" className="btn-primary !py-2.5 !px-5 text-sm">
-                ✦ Start Creating Free
+                Start free. No card needed.
               </Link>
             </>
           )}
