@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { NixToastProvider } from "@/components/NixToast";
 import { XPProvider } from "@/components/XPSystem";
@@ -84,6 +85,7 @@ export default function RootLayout({
             </NixToastProvider>
           </XPProvider>
         </SoundFxProvider>
+        <Analytics />
       </body>
     </html>
   );
