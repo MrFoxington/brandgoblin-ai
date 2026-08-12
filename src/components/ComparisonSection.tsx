@@ -121,8 +121,8 @@ export default function ComparisonSection() {
         {/* Bottom punch */}
         <div className="mt-12 text-center">
           <p className="text-lg text-muted max-w-xl mx-auto">
-            <span className="text-white font-semibold">The difference isn&rsquo;t skill — it&rsquo;s tools.</span>{" "}
-            Nix was built by brand strategists, trained on thousands of successful launches. It knows things ChatGPT doesn&rsquo;t.
+            <span className="text-white font-semibold">The difference isn&rsquo;t skill. It&rsquo;s tools.</span>{" "}
+            A chatbot answers one question at a time. Nix builds all twelve deliverables together, so your name, colors, voice, and copy actually match.
           </p>
         </div>
       </div>
