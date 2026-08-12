@@ -52,6 +52,63 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — August 12, 2026 (📈 BRAND MATURITY P3 SHIPPED — signup scoreboard + honesty fix. Committed, NOT pushed. ⚠️ MIGRATION BEFORE DEPLOY)
+
+Cowork (desktop app) session. Two commits: the flagged honesty fix from Aug 11, then Brand
+Maturity **Prompt 3** (measurement baseline). **`npx tsc --noEmit` clean on Fox's machine.
+Committed locally, NOT pushed** (Fox pushes from Terminal).
+
+**What changed:**
+1. **Honesty fix (commit `a629cb7`).** ComparisonSection's closing line claimed Nix was "built
+   by brand strategists, trained on thousands of successful launches." Both claims unverifiable
+   → replaced with copy that is true by construction: **"The difference isn't skill. It's
+   tools. A chatbot answers one question at a time. Nix builds all twelve deliverables
+   together, so your name, colors, voice, and copy actually match."** (Also removed the em
+   dash per Fox's writing rules.)
+2. **MIGRATION — `supabase/migrations/20260812_signup_events.sql`.** New `signup_events` table
+   (`user_id` PK, `hero_variant`, `landed_at`, `created_at`), RLS enabled with NO policies =
+   service-role only. Deliberately a separate table instead of a column on `public.users`:
+   recording the variant on `users` would have meant rewriting the live `handle_new_user`
+   trigger, and `schema.sql`'s copy of that trigger is stale vs the live energy-era DB —
+   overwriting it blind could have broken ALL signups. This way the signup path is untouched.
+3. **First-touch cookie in middleware.** Matcher now includes `/`. First visit to the marketing
+   homepage sets `bg_hero=wildcard-v1` + `bg_landed_at` (epoch ms), 90 days, httpOnly, lax.
+   The homepage branch early-returns before any Supabase auth work, so `/` gets no added
+   latency. The 50/50 coin flip is Prompt 8's job; for now every visitor is `wildcard-v1`.
+4. **Attribution wiring.** New `POST /api/signup-attrib` (service role): reads the variant from
+   the visitor's OWN cookies (never the request body, so it can't be spoofed to arbitrary
+   values), validates `userId` as a UUID, upserts with `ignoreDuplicates`. The signup page
+   fires it fire-and-forget with `keepalive` after a successful `signUp` — it can never block
+   or break signup.
+5. **Admin Funnel card** (full-width, top of `/admin`): signups last 7 / 28 days from
+   `public.users.created_at`, per-day list (last 7, UTC days), and by-hero-variant 7d/28d from
+   `signup_events`. Visitor counts deliberately NOT tracked in-app — Fox enables Vercel
+   Analytics instead (Vercel dashboard → project → Analytics → Enable; one click, free tier).
+6. **Build verification caveat.** Full `npm run build` could not run from this Cowork session —
+   the device bridge kills any process when a call ends (~45s), background or not. `npx tsc
+   --noEmit` passed clean. Fox: run `npm run build` in Terminal before pushing if you want the
+   full gate locally; Vercel's build is the backstop either way (a failed build never replaces
+   the live deploy).
+
+**Files:** `src/middleware.ts`, `src/app/signup/page.tsx`, `src/app/admin/page.tsx`,
+`src/app/api/signup-attrib/route.ts` (new), `supabase/migrations/20260812_signup_events.sql`
+(new), plus `src/components/ComparisonSection.tsx` in the prior commit.
+
+**⚠️ FOX'S DEPLOY ORDER:** (1) run the migration SQL in the Supabase SQL editor FIRST,
+(2) push, (3) enable Vercel Analytics. (The attribution route fails harmlessly if the table
+is missing, but run the migration first anyway.)
+
+**Noticed, not changed:** signup page button still reads "✦ Create account free →" /
+"Summoning account..." — magic-register leftovers outside Prompt 1/2 scope (those prompts
+covered landing/pricing/footer/navbar only). One-line fix whenever Fox wants; Prompt 4
+restyles these pages anyway.
+
+**▶ NEXT:** Phase 2 = Prompt 4 (Fraunces/Hanken Grotesk + green-gold palette, purple demoted
+to Nix-only), then Prompt 5 (proof above the fold), Prompt 6 ($49 Goblin Studio tier),
+Prompt 7 (one website — Airo dies). Still open from Phase 1: the Airo Option A paste-in.
+
+---
+
 ## 🗓️ SESSION LOG — August 11, 2026 (🧹 BRAND MATURITY P2 SHIPPED — 7 sections, no manipulation copy, emoji purge, Nix speaks once. Committed, NOT pushed.)
 
 Terminal Claude Code session. Executed Brand Maturity **Prompt 2** (plan Steps 4, 5, 6) on the

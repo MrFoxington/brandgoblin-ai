@@ -35,6 +35,17 @@ export default function SignupPage() {
       return;
     }
 
+    // Record which hero variant this signup first saw (Brand Maturity Prompt 3).
+    // Fire-and-forget: attribution must never block or break signup.
+    if (data.user?.id) {
+      fetch("/api/signup-attrib", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: data.user.id }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+
     setLoading(false);
     if (data.session) {
       router.push("/generate");

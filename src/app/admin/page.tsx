@@ -18,6 +18,11 @@ export default async function AdminPage() {
 
   const admin = createAdminClient();
 
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const nowMs = Date.now();
+  const since7Ms = nowMs - 7 * DAY_MS;
+  const since28Iso = new Date(nowMs - 28 * DAY_MS).toISOString();
+
   const [
     { count: totalBrands },
     { data: feedbackRows },
@@ -26,6 +31,8 @@ export default async function AdminPage() {
     { data: testimonialRows },
     { data: rerollRows },
     { data: nameModeRows },
+    { data: signupRows },
+    { data: signupEventRows },
   ] = await Promise.all([
     admin.from("brand_generations").select("*", { count: "exact", head: true }),
     admin.from("brand_feedback").select("rating"),
@@ -34,7 +41,39 @@ export default async function AdminPage() {
     admin.from("brand_testimonials").select("id, testimonial_text, created_at").order("created_at", { ascending: false }).limit(10),
     admin.from("brand_generations").select("rerolls_used").not("rerolls_used", "eq", "{}"),
     admin.from("brand_generations").select("input_data"),
+    admin.from("users").select("created_at").gte("created_at", since28Iso),
+    admin.from("signup_events").select("hero_variant, created_at").gte("created_at", since28Iso),
   ]);
+
+  // ── Funnel: signup scoreboard (Brand Maturity Prompt 3) ──
+  const signupsByDay: Record<string, number> = {};
+  let signups7 = 0;
+  let signups28 = 0;
+  for (const row of signupRows ?? []) {
+    const t = new Date(row.created_at as string).getTime();
+    if (Number.isNaN(t)) continue;
+    signups28++;
+    if (t >= since7Ms) signups7++;
+    const dayKey = new Date(t).toISOString().slice(0, 10);
+    signupsByDay[dayKey] = (signupsByDay[dayKey] ?? 0) + 1;
+  }
+  const perDay: { label: string; count: number }[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(nowMs - i * DAY_MS);
+    perDay.push({
+      label: d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }),
+      count: signupsByDay[d.toISOString().slice(0, 10)] ?? 0,
+    });
+  }
+  const variant7: Record<string, number> = {};
+  const variant28: Record<string, number> = {};
+  for (const row of signupEventRows ?? []) {
+    const v = (row.hero_variant as string | null) ?? "(no variant)";
+    variant28[v] = (variant28[v] ?? 0) + 1;
+    const t = new Date(row.created_at as string).getTime();
+    if (t >= since7Ms) variant7[v] = (variant7[v] ?? 0) + 1;
+  }
+  const sortedVariants = Object.keys(variant28).sort();
 
   // Feedback breakdown
   const feedbackCounts = { nailed_it: 0, pretty_close: 0, not_what_i_imagined: 0 };
@@ -117,6 +156,61 @@ export default async function AdminPage() {
             <StatCard label="Feedback Received" value={totalFeedback} emoji="🧌" />
             <StatCard label="Validations" value={totalValidation} emoji="🚀" />
             <StatCard label="Testimonials" value={testimonialRows?.length ?? 0} emoji="⭐" />
+          </div>
+
+          {/* Funnel — signup scoreboard (Brand Maturity Prompt 3) */}
+          <div className="bg-card p-6 rounded-2xl mb-8">
+            <div className="flex items-baseline justify-between mb-1">
+              <h2 className="font-display text-lg font-bold text-white">📈 Funnel</h2>
+              <span className="text-xs text-faint">Visitor counts: Vercel Analytics</span>
+            </div>
+            <p className="text-xs text-muted mb-5">
+              Signups recorded in Supabase. Hero attribution starts counting from the day this shipped.
+            </p>
+            <div className="mb-6 grid max-w-xs grid-cols-2 gap-4">
+              <div>
+                <p className="font-display text-3xl font-black text-white">{signups7.toLocaleString()}</p>
+                <p className="text-xs text-muted mt-1">Signups, last 7 days</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl font-black text-white">{signups28.toLocaleString()}</p>
+                <p className="text-xs text-muted mt-1">Signups, last 28 days</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-3">Signups per day (last 7)</h3>
+                <div className="space-y-2">
+                  {perDay.map((d) => (
+                    <div key={d.label} className="flex items-center justify-between text-sm">
+                      <span className="text-muted">{d.label}</span>
+                      <span className="badge-purple text-xs">{d.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-3">By hero variant</h3>
+                {sortedVariants.length === 0 ? (
+                  <p className="text-sm text-muted">No attributed signups yet. Counting starts with the first signup after this deploys.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-faint">
+                      <span>Variant</span>
+                      <span>7d / 28d</span>
+                    </div>
+                    {sortedVariants.map((v) => (
+                      <div key={v} className="flex items-center justify-between text-sm">
+                        <span className="text-muted font-mono text-xs">{v}</span>
+                        <span className="text-white font-semibold">
+                          {variant7[v] ?? 0} <span className="text-faint font-normal">/ {variant28[v] ?? 0}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
