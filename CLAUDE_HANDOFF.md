@@ -59,7 +59,7 @@ opens on the user's latest creation, a masonry gallery of everything, one green 
 and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
 night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
 one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
-one small polish commit (type list, scrollbars) awaiting push.
+polish live; a canvas-swap robustness commit (no exit animation on the swap) awaiting push.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
@@ -71,10 +71,9 @@ Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_
 (Fox's decisions + the four phases; Phase D section), (3) the Phase C + Phase B session logs
 below, (4) project memory `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-**Phases A, B and C are live.** First job: `git log origin/main..main` should be empty (the
-Phase C polish commit). Then ask Fox how the Studio FEELS after a real Conjure on the canvas
-(the one flow no session could exercise: Nix cooking over the dimmed previous image, the
-result landing, the celebration). Phase D per the plan: three first-timer tips (one bubble,
+**Phases A, B and C are live, and the canvas Conjure flow was exercised three times for real
+(logo, product art, thumbnail: all landed on the canvas with the celebration).** First job:
+`git log origin/main..main` should be empty (the canvas-swap commit). Phase D per the plan: three first-timer tips (one bubble,
 dismissable, never a tour), "Today in the Studio" on the Vault rail, the share-card frame,
 "Make it a set" after a finished creation. Keep the spark rule and the 390px check.
 
@@ -207,7 +206,19 @@ orange Conjure, Tools removes the bar, shows the backdrop and flips the sheet's 
 scrollbar; the rail scrollbar is thin. Not exercised live: an actual Conjure (costs Fox
 energy), so the "Nix cooks on the canvas" overlay + result landing are reasoning-verified only.
 
-**▶ NEXT:** Fox pushes the polish commit → Phase D (tips, "Today in the Studio", share frame).
+**✅ THREE REAL CONJURES ON THE CANVAS (Fox's OK, same night):** Logo Concept (Design Pro, ⚡23),
+Product Art with "coffee bag" + Neon glow (auto-switched to Studio engine, ⚡67; the rail
+re-cooked the prompt around the bag), and a YouTube thumbnail from the Thumbnail section
+("CANVAS TEST RUN", accent RUN, ⚡34). All three completed, landed as the canvas job (gallery
+card "On canvas", previous canvas job moved into the strip), fired the celebration, and the
+files look right (title + accent + logo stamp on the thumbnail, logo stamp on the product art).
+**Change made from it:** the hidden MCP tab showed that a job finishing while the tab is in
+the background left the OLD picture on the canvas until rAF resumed, because the swap used
+`AnimatePresence mode="wait"` (exit first). `StudioCanvas` now swaps by keyed remount with a
+fade-in and no exit, and the cooking overlay leaves instantly (no invisible z-20 layer left
+over the toolbar). Committed, NOT pushed.
+
+**▶ NEXT:** Fox pushes → Phase D (tips, "Today in the Studio", share frame).
 
 ---
 

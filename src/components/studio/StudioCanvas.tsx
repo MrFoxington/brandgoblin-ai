@@ -8,7 +8,9 @@
  * The floating toolbar under the picture carries every action a creation has,
  * through the same hook the gallery cards use, so behavior is identical.
  *
- * Mount with `key={job.id}` so the action state resets when the canvas swaps.
+ * Swaps are a keyed remount with a fade-in and NO exit animation on purpose:
+ * a job usually finishes while the user is in another tab, and an exit that
+ * waits for a frame would leave the old picture up until they come back.
  */
 
 import { useState } from "react";
@@ -33,42 +35,34 @@ export default function StudioCanvas({ job, activeCount, brandName, callbacks, o
   const cooking = activeCount > 0;
   return (
     <div className="relative overflow-hidden rounded-3xl border border-[rgba(250,247,242,0.08)] bg-surface">
-      <AnimatePresence mode="wait" initial={false}>
-        {job ? (
-          <CanvasJob key={job.id} job={job} brandName={brandName} callbacks={callbacks} dimmed={cooking} />
-        ) : (
-          <EmptyCanvas key="empty" cooking={cooking} onOpenTools={onOpenTools} />
-        )}
-      </AnimatePresence>
+      {job ? (
+        <CanvasJob key={job.id} job={job} brandName={brandName} callbacks={callbacks} dimmed={cooking} />
+      ) : (
+        <EmptyCanvas cooking={cooking} onOpenTools={onOpenTools} />
+      )}
 
-      {/* Nix cooking ON the canvas */}
-      <AnimatePresence>
-        {cooking && (
-          <motion.div
-            key="cooking"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.25 } }}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-bg/70 p-6 backdrop-blur-sm"
-          >
-            <div className="w-full max-w-sm">
-              <NixCooking count={activeCount} />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Nix cooking ON the canvas. Leaves instantly when the result lands so
+          nothing invisible ever sits over the toolbar. */}
+      {cooking && (
+        <motion.div
+          key="cooking"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="absolute inset-0 z-20 flex items-center justify-center bg-bg/70 p-6 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-sm">
+            <NixCooking count={activeCount} />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
 
 function EmptyCanvas({ cooking, onOpenTools }: { cooking: boolean; onOpenTools: () => void }) {
   return (
-    <motion.div
-      initial={false}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 0.12 } }}
-      className="flex min-h-[360px] flex-col items-center justify-center gap-4 p-8 text-center lg:min-h-[560px]"
-    >
+    <div className="flex min-h-[360px] flex-col items-center justify-center gap-4 p-8 text-center lg:min-h-[560px]">
       <Image
         src="/nix/conjuring-nix.png"
         alt="Nix ready to create"
@@ -86,7 +80,7 @@ function EmptyCanvas({ cooking, onOpenTools }: { cooking: boolean; onOpenTools: 
       <button type="button" onClick={onOpenTools} className="btn-green !py-2.5 !px-5 text-sm lg:hidden">
         Open the tools
       </button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -116,7 +110,6 @@ function CanvasJob({
     <motion.div
       initial={reduce ? false : { opacity: 0, scale: 0.99 }}
       animate={{ opacity: dimmed ? 0.4 : 1, scale: 1 }}
-      exit={reduce ? undefined : { opacity: 0, transition: { duration: 0.12 } }}
       transition={{ duration: 0.24, ease: "easeOut" }}
     >
       {/* The picture */}
