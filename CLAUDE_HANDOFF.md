@@ -98,9 +98,23 @@ only, marketing stays green. Everything else clickable is green.
   BrandKitView section icons, print/PDF page styling (still purple labels), CrystalIcon,
   admin page, generate-page vibe emoji.
 
-**▶ NEXT:** Fox pushes → Claude walks dashboard / Studio / brand kit / generate / settings
-live and fixes anything off (esp. Fraunces at big sizes, contrast on ink, any blank spot
-where an emoji used to be). Then Phase B (work-first Vault) per the plan doc.
+**✅ PUSHED + LIVE-CHECKED (Sept 6, evening).** Two follow-up commits: (1) `295b9de`
+tailwind.config.ts had been LEFT OUT of the Phase A commit (`git add -A src` doesn't cover
+the repo root!) so the first deploy had new fonts + nav but old colours; Fox committed it
+from Terminal. (2) Live audit fixes: brand-kit page purged too (BrandKitView section icons,
+CopyButton "📋", Re-Conjure, BrandDNA), `★ Favorites` label, Nix Zone label "Nix", generate
+mode-card icons, CreatorProHub empty icon span; spark discipline = nav "Create" is THE
+spark on every screen, plus Conjure (Studio), "Create in Studio" (brand kit), Upgrade/Buy
+(dashboard card, settings, EnergyWidget). In-page "Create a Brand", "Open Studio", "Save
+fonts", "Create Another Brand" went green. LESSON: `git add -A src <root files>` — always
+list root files (tailwind.config.ts, next.config.js, package.json) explicitly.
+Live check method: the Chrome MCP tab is hidden, so screenshots time out and CSS
+transitions freeze (a disabled spark still reads orange mid-transition). Audit with JS
+instead: computed button backgrounds, empty icon spans, leftover emoji text nodes.
+Still emoji (deliberate, later phases): personality chips on /generate, XPSystem
+achievement pills, LoadingScreen, Sparkles particles, print/PDF page.
+
+**▶ NEXT:** Phase B (work-first Vault) per `docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`.
 
 ---
 

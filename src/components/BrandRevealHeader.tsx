@@ -66,7 +66,7 @@ export default function BrandRevealHeader({ brandName }: { brandName: string }) 
         className="relative z-10 space-y-2"
       >
         <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">
-          Welcome to your new brand 
+          Welcome to your new brand
         </p>
         <h1 className="font-display text-4xl md:text-5xl font-black text-white">
           {brandName}

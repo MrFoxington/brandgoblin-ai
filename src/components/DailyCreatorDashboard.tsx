@@ -285,7 +285,7 @@ export default function DailyCreatorDashboard({
           transition={{ delay: 0.4 }}
           className="flex items-center gap-3 shrink-0"
         >
-          <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
+          <Link href="/generate" className="btn-green !py-2.5 !px-5 text-sm">
             Create a Brand
           </Link>
         </motion.div>
@@ -563,7 +563,7 @@ export default function DailyCreatorDashboard({
               <p className="text-xs text-muted">Social posts · Blog content · Email campaigns · Ad copy</p>
             </div>
           </div>
-          <Link href="/dashboard/creator-pro" className="btn-primary !py-2.5 !px-6 text-sm shrink-0">
+          <Link href="/dashboard/creator-pro" className="btn-green !py-2.5 !px-6 text-sm shrink-0">
             Open Studio →
           </Link>
         </motion.div>

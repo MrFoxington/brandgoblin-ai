@@ -238,7 +238,6 @@ export default function GeneratePage() {
                   : "border-[rgba(250,247,242,0.12)] hover:border-primary/40 hover:bg-[rgba(250,247,242,0.045)]"
               }`}
             >
-              <span className="text-3xl block mb-3">🧌</span>
               <p className="font-display font-bold text-white text-lg mb-1">Name My Brand For Me</p>
               <p className="text-sm text-muted">I have an idea, but I need the perfect name.</p>
             </button>
@@ -252,7 +251,6 @@ export default function GeneratePage() {
                   : "border-[rgba(250,247,242,0.12)] hover:border-secondary/40 hover:bg-[rgba(250,247,242,0.045)]"
               }`}
             >
-              <span className="text-3xl block mb-3">✨</span>
               <p className="font-display font-bold text-white text-lg mb-1">Build Around My Name</p>
               <p className="text-sm text-muted">I already have a name. Create the story, visuals, and launch kit around it.</p>
             </button>

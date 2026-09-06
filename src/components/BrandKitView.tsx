@@ -44,7 +44,7 @@ function SectionCard({
     <section className="bg-card flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="flex items-center gap-2 font-display text-lg font-bold text-white">
-          <span>{emoji}</span> {title}
+          {emoji ? <span>{emoji}</span> : null}{title}
         </h2>
         <div className="flex items-center gap-2 flex-wrap">
           {badge && <span className="badge-purple text-xs">{badge}</span>}
@@ -53,7 +53,7 @@ function SectionCard({
             <button type="button" disabled={used || isRerolling}
               onClick={() => onReroll(sectionKey)}
               className="btn-ghost !text-xs !py-1 !px-2.5 disabled:opacity-40 disabled:cursor-not-allowed">
-              {isRerolling ? "🧌 Remixing…" : used ? "Re-Conjure Used" : "🔄 Re-Conjure"}
+              {isRerolling ? "Remixing…" : used ? "Re-Conjure Used" : "Re-Conjure"}
             </button>
           )}
         </div>
@@ -128,7 +128,7 @@ function CompleteMoment({ onDone }: { onDone: () => void }) {
       <Sparkles count={14} />
       <NixPose pose="celebrating" size={130} glow priority />
       <div className="space-y-2">
-        <p className="text-xs font-bold tracking-[0.3em] uppercase text-green-400">✅ Brand Kit Complete</p>
+        <p className="text-xs font-bold tracking-[0.3em] uppercase text-green-400">✓ Brand Kit Complete</p>
         <h2 className="font-display text-3xl font-black text-white">Your brand is ready.</h2>
         <p className="text-sm text-muted">Every deliverable. Every word. All yours.</p>
       </div>
@@ -139,7 +139,7 @@ function CompleteMoment({ onDone }: { onDone: () => void }) {
 // ── Brand Fonts (Saved Brand Fonts feature, July 2026) ──────────────────────
 // A curated Google Font <select> with a "Custom font…" escape hatch.
 function FontSelect({ value, onChange }: { value: string; onChange: (family: string) => void }) {
-  // 🔥 AI-curated monthly shelf — replaces the static "Trending 2026" group
+  // AI-curated monthly shelf — replaces the static "Trending 2026" group
   // while it's loaded; the static group is the offline fallback.
   const trending = useTrendingFonts();
   const knownFamilies = trending
@@ -155,7 +155,7 @@ function FontSelect({ value, onChange }: { value: string; onChange: (family: str
         className="w-full rounded-lg bg-[rgba(250,247,242,0.06)] border border-[rgba(250,247,242,0.12)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
       >
         {trending && (
-          <optgroup label={`🔥 ${trending.label}`}>
+          <optgroup label={`${trending.label}`}>
             {trending.fonts.map((f) => (
               <option key={`trend-${f.family}`} value={f.family}>{f.family}</option>
             ))}
@@ -280,7 +280,7 @@ function BrandFontsSection({
       </div>
       <div className="flex items-center gap-3">
         <button type="button" onClick={save} disabled={saving || !dirty}
-          className="btn-primary !text-sm !py-1.5 !px-4 disabled:opacity-40 disabled:cursor-not-allowed">
+          className="btn-green !text-sm !py-1.5 !px-4 disabled:opacity-40 disabled:cursor-not-allowed">
           {saving ? "Saving…" : dirty ? "Save fonts" : "Saved"}
         </button>
         {msg && <span className={`text-xs ${msg.startsWith("✓") ? "text-secondary" : "text-red-400"}`}>{msg}</span>}
@@ -300,8 +300,8 @@ export default function BrandKitView({
   const [rerolling, setRerolling] = useState<string | null>(null);
   const [rerollErrors, setRerollErrors] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<"reveal" | "complete" | "done">("reveal");
-  const [showWebPreview, setShowWebPreview] = useState(false); // 🌐 Website Preview modal
-  // 🎨 Sticky "Create in Studio" bar (July 12 2026 — Fox's live-filming find:
+  const [showWebPreview, setShowWebPreview] = useState(false); // Website Preview modal
+  // Sticky "Create in Studio" bar (July 12 2026 — Fox's live-filming find:
   // the kit→Studio path was buried below a full page of scroll and the free
   // funnel dead-ended at Pro-locked text builders). Appears after the reveal
   // finishes OR 8s after mount, whichever comes first — never lost, never buried.
@@ -362,7 +362,7 @@ export default function BrandKitView({
     <BrandDNA key="dna" kit={kit} />,
 
     // 2: All Names
-    <SectionCard key="names" emoji="🏆" title="All Brand Names" badge="Naming" {...noReroll}>
+    <SectionCard key="names" emoji="" title="All Brand Names" badge="Naming" {...noReroll}>
       <BrandNamesSection favoriteName={kit.favoriteName} alternativeNames={kit.alternativeNames}
         brandNames={kit.brandNames} topThreeReasoning={kit.topThreeReasoning}
         recommendedName={kit.recommendedName} brandInput={brandInput}
@@ -372,13 +372,13 @@ export default function BrandKitView({
 
     // 3: Name Strength (conditional)
     ...(kit.nameStrengthCheck ? [
-      <SectionCard key="nsc" emoji="🔍" title="Name Strength Check" badge="Analysis" {...noReroll}>
+      <SectionCard key="nsc" emoji="" title="Name Strength Check" badge="Analysis" {...noReroll}>
         <NameStrengthCheckView nsc={kit.nameStrengthCheck} />
       </SectionCard>
     ] : []),
 
     // 4: Taglines
-    <SectionCard key="taglines" emoji="💬" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")} {...sp("taglines")}>
+    <SectionCard key="taglines" emoji="" title="Taglines" badge="Copywriting" copyText={kit.taglines.join("\n")} {...sp("taglines")}>
       <RerollError sectionKey="taglines" />
       <ul className="space-y-2">
         {kit.taglines.map((t, i) => (
@@ -390,7 +390,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 5: Brand Story
-    <SectionCard key="story" emoji="📖" title="Brand Story" badge="Storytelling"
+    <SectionCard key="story" emoji="" title="Brand Story" badge="Storytelling"
       copyText={`${kit.brandStory.originStory}\n\n${kit.brandStory.mission}`} {...sp("brandStory")}>
       <RerollError sectionKey="brandStory" />
       <p className="text-sm text-muted leading-relaxed">{kit.brandStory.originStory}</p>
@@ -400,7 +400,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 6: Color Palette
-    <SectionCard key="colors" emoji="🎨" title="Color Palette" badge="Design"
+    <SectionCard key="colors" emoji="" title="Color Palette" badge="Design"
       copyText={kit.colorPalette.map((c) => `${c.name}: ${c.hex}`).join("\n")} {...sp("colorPalette")}>
       <RerollError sectionKey="colorPalette" />
       <div className="space-y-2">
@@ -419,7 +419,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 6b: Brand Fonts (Saved Brand Fonts feature) — editable, persists to the brand
-    <SectionCard key="fonts" emoji="🅰" title="Brand Fonts" badge="Design" {...noReroll}>
+    <SectionCard key="fonts" emoji="" title="Brand Fonts" badge="Design" {...noReroll}>
       <BrandFontsSection
         typography={kit.typography}
         brandId={brandGenerationId}
@@ -428,7 +428,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 7: Brand Voice
-    <SectionCard key="voice" emoji="🎭" title="Brand Voice" badge="Strategy" {...sp("brandVoice")}>
+    <SectionCard key="voice" emoji="" title="Brand Voice" badge="Strategy" {...sp("brandVoice")}>
       <RerollError sectionKey="brandVoice" />
       <div className="space-y-4 text-sm">
         <div>
@@ -461,7 +461,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 8: Logo Direction (renamed from "Logo Prompt")
-    <SectionCard key="logo" emoji="🖼️" title="Logo Direction" badge="Design" copyText={kit.logoPrompt} {...sp("logoDirection")}>
+    <SectionCard key="logo" emoji="" title="Logo Direction" badge="Design" copyText={kit.logoPrompt} {...sp("logoDirection")}>
       <RerollError sectionKey="logoDirection" />
       <div className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-4 space-y-3">
         <p className="text-sm text-muted leading-relaxed">{kit.logoPrompt}</p>
@@ -471,7 +471,7 @@ export default function BrandKitView({
             onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "logo_direction" })}
             className="inline-block text-xs font-semibold text-primary-light hover:text-white transition-colors"
           >
-            🎨 Generate this logo in Goblin Studio →
+            Generate this logo in Goblin Studio →
           </Link>
           <p className="text-xs text-faint mt-0.5">It&apos;s live — one tap and Nix starts painting.</p>
         </div>
@@ -479,7 +479,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 9: Mascot
-    <SectionCard key="mascot" emoji="🐲" title="Mascot Concept" badge="Creative" copyText={kit.mascot.imagePrompt} {...sp("mascot")}>
+    <SectionCard key="mascot" emoji="" title="Mascot Concept" badge="Creative" copyText={kit.mascot.imagePrompt} {...sp("mascot")}>
       <RerollError sectionKey="mascot" />
       <p className="font-display text-xl font-bold text-white">{kit.mascot.name}</p>
       <p className="text-sm text-muted leading-relaxed">{kit.mascot.appearance}</p>
@@ -492,7 +492,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 10: Website Copy
-    <SectionCard key="web" emoji="🌐" title="Website Copy" badge="Copy"
+    <SectionCard key="web" emoji="" title="Website Copy" badge="Copy"
       copyText={websiteCopyText(kit)}
       {...sp("websiteCopy")}>
       <RerollError sectionKey="websiteCopy" />
@@ -503,7 +503,7 @@ export default function BrandKitView({
           rel="noopener noreferrer"
           className="btn-secondary inline-flex items-center gap-1.5 !py-1.5 !px-3 text-xs self-start"
         >
-          👁 Preview as Webpage
+          Preview as Webpage
         </a>
       )}
       <div className="space-y-4">
@@ -589,18 +589,18 @@ export default function BrandKitView({
           </div>
         )}
 
-        {/* 🌐 Website Preview — see the copy as a real homepage (zero energy) */}
+        {/* Website Preview — see the copy as a real homepage (zero energy) */}
         <button
           type="button"
           onClick={() => { setShowWebPreview(true); trackEvent("website_preview_opened", {}); }}
           className="w-full rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 text-sm font-bold text-primary-light transition-colors hover:bg-primary/20 hover:text-white"
         >
-          🌐 See it live — preview your website
+          See it live — preview your website
         </button>
 
         {/* Where to launch this — close the loop between copy and a live site */}
         <div className="rounded-xl border border-secondary/25 bg-secondary/5 p-4 space-y-1.5">
-          <p className="text-xs font-bold tracking-widest uppercase text-secondary">🚀 Where to launch this</p>
+          <p className="text-xs font-bold tracking-widest uppercase text-secondary">Where to launch this</p>
           <p className="text-sm text-muted leading-relaxed">
             Paste this copy into a free{" "}
             <a
@@ -623,14 +623,14 @@ export default function BrandKitView({
             >
               GoDaddy Airo
             </a>{" "}
-            — brandgoblinai.com was built with Airo, powered by Nix. Seeing your idea live changes everything. 🧌
+            — brandgoblinai.com was built with Airo, powered by Nix. Seeing your idea live changes everything. 
           </p>
         </div>
       </div>
     </SectionCard>,
 
     // 11: Social Kit
-    <SectionCard key="social" emoji="📱" title="Social Media Kit" badge="Social"
+    <SectionCard key="social" emoji="" title="Social Media Kit" badge="Social"
       copyText={`Instagram: ${kit.socialKit.instagramBio}\nX: ${kit.socialKit.twitterBio}\nTikTok: ${kit.socialKit.tiktokBio}`}
       {...sp("socialKit")}>
       <RerollError sectionKey="socialKit" />
@@ -660,7 +660,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 12: Marketing Ideas
-    <SectionCard key="mktg" emoji="🚀" title="Marketing & Meme Ideas" badge="Growth" {...sp("marketingIdeas")}>
+    <SectionCard key="mktg" emoji="" title="Marketing & Meme Ideas" badge="Growth" {...sp("marketingIdeas")}>
       <RerollError sectionKey="marketingIdeas" />
       <div className="space-y-5 text-sm">
         {[
@@ -681,7 +681,7 @@ export default function BrandKitView({
     </SectionCard>,
 
     // 13: Launch Plan
-    <SectionCard key="launch" emoji="📅" title="7-Day Launch Plan" badge="Launch" copyText={kit.launchPlan.join("\n")} {...sp("launchPlan")}>
+    <SectionCard key="launch" emoji="" title="7-Day Launch Plan" badge="Launch" copyText={kit.launchPlan.join("\n")} {...sp("launchPlan")}>
       <RerollError sectionKey="launchPlan" />
       <ol className="space-y-2">
         {kit.launchPlan.map((step, i) => (
@@ -712,7 +712,7 @@ export default function BrandKitView({
           >
             <NixPose pose="celebrating" size={110} glow priority />
             <div className="space-y-2">
-              <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">✦ Welcome to your new brand ✦</p>
+              <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">Welcome to your new brand</p>
               <h1 className="font-display text-4xl md:text-5xl font-black text-white">{kit.recommendedName}</h1>
               <p className="text-sm text-muted">Nix built this just for you. Every piece. Every word. Every detail.</p>
             </div>
@@ -754,7 +754,7 @@ export default function BrandKitView({
               </div>
             </motion.div>
 
-            {/* 🎨 THE next step — Goblin Studio (open to everyone, energy-gated).
+            {/* THE next step — Goblin Studio (open to everyone, energy-gated).
                 This is the #1 funnel moment: kit → real logo/mascot/product art. */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -762,7 +762,7 @@ export default function BrandKitView({
               transition={{ delay: 0.15 }}
               className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/20 via-primary/8 to-transparent p-6 text-center space-y-3"
             >
-              <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">✦ Your next step ✦</p>
+              <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">Your next step</p>
               <h3 className="font-display text-2xl font-black text-white">Bring {kit.recommendedName} to life</h3>
               <p className="text-sm text-muted max-w-md mx-auto">
                 Goblin Studio turns this kit into the real thing — your logo, your mascot, your product art. Your Creative Energy is waiting.
@@ -772,7 +772,7 @@ export default function BrandKitView({
                 onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "done_block" })}
                 className="btn-primary inline-block px-8 py-3.5 text-base font-bold"
               >
-                🎨 Create in Studio →
+                Create in Studio →
               </Link>
             </motion.div>
 
@@ -787,10 +787,10 @@ export default function BrandKitView({
         )}
       </RevealCard>
 
-      {/* 🌐 Website Preview modal — the kit's copy + palette as a live homepage */}
+      {/* Website Preview modal — the kit's copy + palette as a live homepage */}
       <WebsitePreview kit={kit} brandId={brandGenerationId} isOpen={showWebPreview} onClose={() => setShowWebPreview(false)} />
 
-      {/* 🎨 Sticky mobile-first Studio bar — the always-there answer to
+      {/* Sticky mobile-first Studio bar — the always-there answer to
           "where do I go next?". Spacer keeps it from covering the footer. */}
       {showStudioBar && <div className="h-20" aria-hidden />}
       {showStudioBar && (
@@ -802,7 +802,7 @@ export default function BrandKitView({
         >
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white truncate">Make it real 🧌</p>
+              <p className="text-sm font-bold text-white truncate">Make it real</p>
               <p className="text-[11px] text-faint truncate">Logo · Mascot · Product art</p>
             </div>
             <Link
@@ -810,7 +810,7 @@ export default function BrandKitView({
               onClick={() => trackEvent("studio_cta_clicked", { brandId: brandGenerationId, section: "sticky_bar" })}
               className="btn-primary shrink-0 px-6 py-2.5 text-sm font-bold"
             >
-              🎨 Create in Studio →
+              Create in Studio →
             </Link>
           </div>
         </motion.div>

@@ -55,7 +55,7 @@ export default function StudioFavoritesSection({ favorites }: Props) {
                   className="h-full w-full object-cover"
                 />
               )}
-              <span className="absolute top-1 right-1 text-xs drop-shadow-[0_0_4px_rgba(250,204,21,0.8)]">⭐</span>
+              <span className="absolute top-1 right-1 text-xs drop-shadow-[0_0_4px_rgba(250,204,21,0.8)]">★</span>
             </Link>
           </motion.div>
         ))}

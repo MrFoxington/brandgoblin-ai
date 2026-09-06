@@ -118,7 +118,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
             <h2 className="font-display text-xl font-extrabold text-white mb-2">Ready to keep building?</h2>
             <p className="text-muted mb-5">Every great brand started as just an idea. Now you have yours.</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/generate" className="btn-primary px-8 py-3">
+              <Link href="/generate" className="btn-green px-8 py-3">
                 Create Another Brand
               </Link>
               <Link href="/dashboard" className="btn-secondary px-8 py-3">

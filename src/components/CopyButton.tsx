@@ -13,8 +13,8 @@ const firstCopyFired = new Set<string>();
 
 const NIX_COPY_QUOTES = [
   "Copied! Go build something great.",
-  "That's a good one. Copied! ✨",
-  "Nix approves. Copied! 🧌",
+  "That's a good one. Copied!",
+  "Nix approves. Copied!",
   "Saved to clipboard!",
   "Copied! Use it well.",
 ];
@@ -42,7 +42,7 @@ export default function CopyButton({
     const ok = await copyToClipboard(text);
     if (!ok) {
       // Never fail silently — tell the user so they don't think a stale clipboard value worked.
-      showToast("Couldn't copy — please select the text and copy it manually.", "success", "⚠️");
+      showToast("Couldn't copy. Please select the text and copy it manually.", "success", "");
       return;
     }
     setCopied(true);
@@ -65,7 +65,7 @@ export default function CopyButton({
       onClick={handleCopy}
       className={clsx("btn-ghost !text-xs !py-1 !px-2.5", className)}
     >
-      {copied ? "✅ Copied" : `📋 ${label}`}
+      {copied ? "✓ Copied" : `${label}`}
     </button>
   );
 }

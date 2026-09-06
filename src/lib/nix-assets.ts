@@ -13,7 +13,7 @@
 
 // Single renamable section label — swap this one value to rename everywhere.
 // Options Fox may pick: "Nix Zone" · "Nix's Stash" · "Hang with Nix" · "Goblin Goodies" · "Nixville"
-export const NIX_ZONE_LABEL = "✨ Nix";
+export const NIX_ZONE_LABEL = "Nix";
 
 export interface Wallpaper {
   name: string;

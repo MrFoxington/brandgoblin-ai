@@ -19,7 +19,7 @@ export default function NixEmptyState({ label }: Props) {
         className="object-contain opacity-70"
       />
       <p className="text-sm text-muted">
-        {label} are on the way — Nix is working on more goodies. Check back soon! ✨
+        {label} are on the way. Nix is working on more goodies, check back soon.
       </p>
     </div>
   );

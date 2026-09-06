@@ -453,8 +453,6 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                   className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-[rgba(250,247,242,0.045)] transition"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-lg shrink-0">
-                    </span>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{item.title}</p>
                       <p className="text-xs text-faint">
