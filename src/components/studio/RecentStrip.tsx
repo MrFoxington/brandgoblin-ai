@@ -27,7 +27,7 @@ export default function RecentStrip({ jobs, currentId, onPick, onSeeAll, totalCo
   return (
     <div className="lg:sticky lg:top-24">
       <p className="mb-2 hidden text-[10px] font-bold uppercase tracking-widest text-faint lg:block">Recent</p>
-      <div className="flex gap-2 overflow-x-auto pb-1 lg:max-h-[calc(100vh-9rem)] lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 lg:pr-1">
+      <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-9rem)] lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 lg:pr-1">
         {jobs.map((job, i) => {
           const isCurrent = job.id === currentId;
           const label = IMAGE_TYPE_LABELS[job.image_type ?? ""] ?? "Creation";

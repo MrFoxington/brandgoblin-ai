@@ -1299,7 +1299,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           <aside
             id="studio-form"
             aria-label="Studio tools"
-            className={`fixed inset-x-0 bottom-0 z-40 max-h-[86vh] overflow-y-auto rounded-t-3xl border border-[rgba(250,247,242,0.10)] bg-surface shadow-2xl transition-[transform,visibility] duration-300 ease-out ${
+            className={`fixed inset-x-0 bottom-0 z-40 max-h-[86vh] overflow-y-auto [scrollbar-width:thin] rounded-t-3xl border border-[rgba(250,247,242,0.10)] bg-surface shadow-2xl transition-[transform,visibility] duration-300 ease-out ${
               toolsOpen ? "transform-none" : "invisible translate-y-full"
             } lg:visible lg:sticky lg:top-24 lg:z-auto lg:max-h-[calc(100vh-7rem)] lg:transform-none lg:rounded-2xl lg:shadow-none`}
           >
@@ -1406,7 +1406,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
               {/* What to make */}
               <RailSection id="type" title="What to make" summary={`${typeLabelNow} · ${pinnedSize.label}`} open={openSections.has("type")} onToggle={() => toggleSection("type")}>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-1.5">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
               <button key={key} onClick={() => {
                 setImageType(key);
@@ -1415,14 +1415,18 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 // when leaving its type (manual picks for other types are respected)
                 setStyleChip((prev) => AUTO_STYLE_CHIP[key] ?? (prev && Object.values(AUTO_STYLE_CHIP).includes(prev) ? null : prev));
               }}
-                className={`rounded-xl border p-3 text-left transition-all ${
+                aria-pressed={imageType === key}
+                className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition-all ${
                   imageType === key
                     ? "border-primary bg-primary/15 text-white"
                     : "border-white/10 bg-white/3 text-muted hover:border-primary/40"
                 }`}
               >
-                <div className="text-sm font-semibold">{label}</div>
-                <div className="text-xs text-faint mt-0.5">{desc}</div>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold">{label}</span>
+                  <span className="block truncate text-[11px] text-faint">{desc}</span>
+                </span>
+                {imageType === key && <span className="shrink-0 text-xs text-primary-light" aria-hidden>✓</span>}
               </button>
             ))}
           </div>

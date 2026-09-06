@@ -52,7 +52,7 @@ Thumbnail); energy, streak, Trophy Shelf move to a quiet right rail (desktop) or
 strip (phone). Quick Creates (the eight text types) fold into the Creator Pro page.
 Done when: a new user with one brand sees their kit big, not a button grid.
 
-### Phase C: the Studio canvas (2-3 sessions, the heart) · BUILT Sept 6 night (see CLAUDE_HANDOFF.md), live check pending
+### Phase C: the Studio canvas (2-3 sessions, the heart) · LIVE Sept 6 night, checked at 1440 + 390
 Three-column desktop: left tool rail (Brand · What to make · Prompt · Style · Fonts · Engine,
 collapsible sections, current choices visible at a glance) · center canvas (the working
 creation, big; generating state = Nix cooking ON the canvas; result lands in place with the

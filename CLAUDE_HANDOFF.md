@@ -56,33 +56,30 @@ type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure
 typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
 `design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
 opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
-and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is BUILT and
-committed (Sept 6, night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet
-tools on phones, one gallery for every brand.** Needs Fox's push + the live check.
+and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
+night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
+one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
+one small polish commit (type list, scrollbars) awaiting push.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE C, THEN PHASE D (tips + daily loop)
+## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE D (tips + the daily loop + share)
 
 Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
-(Fox's decisions + the four phases), (3) the Phase C + Phase B session logs below, (4) project
-memory `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
+(Fox's decisions + the four phases; Phase D section), (3) the Phase C + Phase B session logs
+below, (4) project memory `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-**Phase C (the Studio canvas) is BUILT and committed, awaiting Fox's push + the live check.**
-What to verify live (Chrome on Fox's Mac, JS audit + iframe probes, see the ship-workflow
-memory): at 1440 the Studio is rail (340px, sticky) · canvas · recent strip (88px, sticky); the
-rail's Conjure is the only spark besides the nav; the canvas shows the newest creation for the
-selected brand; a gallery card's "Open on canvas" swaps the canvas; Conjure puts Nix cooking ON
-the canvas and the result lands there (the celebration still fires). At 390: canvas first, a
-swipe row of recents, the gallery, a fixed bottom bar (Tools + Conjure); "Tools" opens the
-bottom sheet with every section; Esc / ✕ / backdrop closes it; Conjure closes it. Things that
-could only be reasoned about, never rendered: the sticky rail travelling the whole gallery
-height, the `display: contents` rail wrapper on phones, the sheet slide, the canvas crossfade.
+**Phases A, B and C are live.** First job: `git log origin/main..main` should be empty (the
+Phase C polish commit). Then ask Fox how the Studio FEELS after a real Conjure on the canvas
+(the one flow no session could exercise: Nix cooking over the dimmed previous image, the
+result landing, the celebration). Phase D per the plan: three first-timer tips (one bubble,
+dismissable, never a tour), "Today in the Studio" on the Vault rail, the share-card frame,
+"Make it a set" after a finished creation. Keep the spark rule and the 390px check.
 
-Still unseen on a real account from Phase B: the brand-kit hero, the empty-vault hero, and a
-free account's rail (Upgrade spark).
+Still unseen on a real account: the brand-kit hero on the Vault, the empty-vault hero, a free
+account's rail (Upgrade spark), and the Studio's empty canvas.
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -109,7 +106,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, night (🎨 CREATOR STUDIO PHASE C: the canvas. Committed, NOT pushed.)
+## 🗓️ SESSION LOG — September 6, 2026, night (🎨 CREATOR STUDIO PHASE C: the canvas. PUSHED + LIVE; polish commit pending push.)
 
 Fox: "Vercel is done. Continue." Straight into Phase C, same session as B. `npx tsc --noEmit`
 clean; subagent review caught 10 real issues before commit (all fixed, listed below).
@@ -193,7 +190,24 @@ Esc + focus for the sheet.
 
 **Not done (Phase D):** first-timer tips, "Today in the Studio", share card frame.
 
-**▶ NEXT:** Fox pushes → live audit at 1440 + 390 → fix-ups → Phase D.
+**✅ PUSHED BY FOX + LIVE-CHECKED (`2e4d131`, same night).** At 1440: grid 340 / 812 / 88, the
+rail is `position: sticky` with `transform: none`, max-height fits the viewport, Conjure pinned
+at its bottom (the only spark besides nav Create; the phone bar's copy is `display: none`),
+canvas 812 wide with a 16:9 thumbnail at 778×438, strip sticky with 14 + "+N more", gallery 3
+× 260px, no overflow. Strip tap + gallery "Open on canvas" both move the state (the "On
+canvas" chip and the strip update; the hidden MCP tab freezes framer's exit animation so the
+picture swap itself could not be watched; it is a 120 ms crossfade in a visible tab).
+`?job=<id>&brand=<id>` opens that exact creation (verified on a BG-removed logo), marks its
+card "On canvas", opens only "What to make". At 390 (iframe probe): canvas first (350×379),
+toolbar wraps to three rows, swipe row of 15, gallery single column, bottom bar with Tools +
+orange Conjure, Tools removes the bar, shows the backdrop and flips the sheet's classes
+(`transform-none`, no `invisible`; the slide itself is frozen in the hidden tab).
+**Polish commit after the check:** the six "What to make" tiles became a single-column list
+(label + one-line description + ✓) so the rail is shorter; the phone swipe row hides its
+scrollbar; the rail scrollbar is thin. Not exercised live: an actual Conjure (costs Fox
+energy), so the "Nix cooks on the canvas" overlay + result landing are reasoning-verified only.
+
+**▶ NEXT:** Fox pushes the polish commit → Phase D (tips, "Today in the Studio", share frame).
 
 ---
 
