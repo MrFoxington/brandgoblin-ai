@@ -23,9 +23,9 @@ const BRAND = {
     avoid: ["\"anti-aging\"", "\"fix\"", "\"perfect\""],
   },
   names: ["Solace", "Luminary", "Drift", "Vela", "Cairn"],
-  post: "Your skin isn't broken. It's just waiting for the right ritual. ✨ Introducing Solace — skincare that meets you where you are, not where beauty standards say you should be. Link in bio to try your first ritual free. #SolaceSkin #CleanBeauty #SkincareRitual",
+  post: "Your skin isn't broken. It's just waiting for the right ritual. ✨ Introducing Solace, skincare that meets you where you are, not where beauty standards say you should be. Link in bio to try your first ritual free. #SolaceSkin #CleanBeauty #SkincareRitual",
   heroHeadline: "Skin that feels like Sunday morning.",
-  heroSub: "Clean, science-backed formulas for skin that glows from within. No harsh chemicals. No empty promises. Just calm, nourished skin — every day.",
+  heroSub: "Clean, science-backed formulas for skin that glows from within. No harsh chemicals. No empty promises. Just calm, nourished skin, every day.",
 };
 
 function AnimatedNumber({ target, visible }: { target: number; visible: boolean }) {
@@ -69,22 +69,22 @@ export default function BrandKitPreview() {
   ] as const;
 
   return (
-    <section ref={ref} className="py-32 sm:py-48">
+    <section ref={ref} className="py-28 sm:py-40">
       <div className="mx-auto max-w-6xl px-4">
         {/* Header */}
         <div className="mb-16 text-center">
-          <span className="badge-green mb-6">See It In Action</span>
-          <h2 className="section-heading mb-4">
-            This is what Nix builds — <span className="gradient-text">in 2 minutes</span>
+          <span className="eyebrow mb-6">See it in action</span>
+          <h2 className="section-heading mb-5 text-4xl sm:text-5xl">
+            This is what Nix builds <span className="accent">in two minutes</span>
           </h2>
           <p className="section-sub max-w-2xl mx-auto">
-            Real output. One prompt: <em className="text-white not-italic">"A calm, science-backed skincare brand for people who are done with harsh chemicals."</em>
+            Real output. One prompt: <em className="text-ink not-italic font-medium">&ldquo;A calm, science-backed skincare brand for people who are done with harsh chemicals.&rdquo;</em>
           </p>
         </div>
 
         {/* Main preview card */}
         <div
-          className={`rounded-3xl border border-primary/20 bg-[rgba(12,10,24,0.95)] overflow-hidden transition-all duration-700 ${
+          className={`rounded-3xl border border-ink/10 bg-ink overflow-hidden shadow-[0_32px_64px_-32px_rgba(20,21,24,0.45)] transition-all duration-700 ${
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
@@ -96,7 +96,7 @@ export default function BrandKitPreview() {
             <div className="ml-4 flex-1 rounded-full bg-white/5 px-4 py-1 text-xs text-faint">
               brandgoblin.ai/dashboard/brand-kit
             </div>
-            <div className="rounded-full bg-secondary/20 border border-secondary/30 px-3 py-1 text-xs text-secondary font-medium">
+            <div className="rounded-full bg-emerald-400/15 border border-emerald-400/30 px-3 py-1 text-xs text-emerald-300 font-medium">
               ✓ Generated
             </div>
           </div>
@@ -107,12 +107,12 @@ export default function BrandKitPreview() {
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="text-xs uppercase tracking-widest text-faint">Brand Name</span>
-                  <span className="rounded-full bg-secondary/15 border border-secondary/25 px-2 py-0.5 text-xs text-secondary">Nix Pick</span>
+                  <span className="rounded-full bg-gold/15 border border-gold/30 px-2 py-0.5 text-xs text-gold">Nix Pick</span>
                 </div>
                 <h3 className="font-display text-3xl font-black text-white">{BRAND.name}</h3>
                 <p className="text-base text-muted mt-1 italic">&ldquo;{BRAND.taglines[0]}&rdquo;</p>
               </div>
-              <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-2">
+              <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-2">
                 <p className="text-xs text-faint">Generation time</p>
                 <p className="text-sm font-bold text-white">1 min 52 sec</p>
               </div>
@@ -127,7 +127,7 @@ export default function BrandKitPreview() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`shrink-0 rounded-t-lg px-4 py-2 text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? "bg-primary/20 text-primary-light border-t border-x border-primary/30"
+                    ? "bg-white/10 text-white border-t border-x border-white/15"
                     : "text-muted hover:text-white"
                 }`}
               >
@@ -145,19 +145,19 @@ export default function BrandKitPreview() {
                     key={name}
                     className={`rounded-2xl p-4 text-center transition-all duration-300 ${
                       i === 0
-                        ? "bg-gradient-to-b from-primary/30 to-primary/10 border-2 border-primary/40"
-                        : "bg-white/3 border border-white/8 hover:border-primary/30"
+                        ? "bg-emerald-400/10 border-2 border-emerald-400/50"
+                        : "bg-white/3 border border-white/8 hover:border-white/20"
                     }`}
                     style={{ transitionDelay: `${i * 60}ms` }}
                   >
-                    {i === 0 && <div className="text-[10px] uppercase tracking-wider text-secondary mb-1 font-bold">Nix Pick</div>}
+                    {i === 0 && <div className="text-[10px] uppercase tracking-wider text-gold mb-1 font-bold">Nix Pick</div>}
                     <p className="font-display text-lg font-bold text-white">{name}</p>
                     {i === 0 && <p className="text-[10px] text-muted mt-1">Strategic favorite</p>}
                   </div>
                 ))}
                 <div className="col-span-2 sm:col-span-5 rounded-xl bg-white/3 border border-white/8 p-4 mt-2">
                   <p className="text-xs text-faint mb-1 uppercase tracking-wide font-medium">Why &ldquo;Solace&rdquo;?</p>
-                  <p className="text-sm text-muted leading-relaxed">Evokes calm and relief — exactly what your customer wants when they&rsquo;re overwhelmed by harsh skincare. Memorable, one word, available as a .com, and works globally without translation issues.</p>
+                  <p className="text-sm text-muted leading-relaxed">Evokes calm and relief, exactly what your customer wants when they&rsquo;re overwhelmed by harsh skincare. Memorable, one word, available as a .com, and works globally without translation issues.</p>
                 </div>
               </div>
             )}
@@ -228,8 +228,8 @@ export default function BrandKitPreview() {
                   <p className="text-xs uppercase tracking-widest text-faint font-medium mb-3">Hero Subheadline</p>
                   <p className="text-base text-muted leading-relaxed">{BRAND.heroSub}</p>
                 </div>
-                <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 text-sm text-muted">
-                  <span className="text-primary-light font-semibold">+ 8 more copy blocks included:</span>{" "}
+                <div className="rounded-xl bg-emerald-400/10 border border-emerald-400/20 p-4 text-sm text-muted">
+                  <span className="text-emerald-300 font-semibold">+ 8 more copy blocks included:</span>{" "}
                   About section · Features · CTA · Footer tagline · Email subject lines · Product descriptions · FAQ intro · Press bio
                 </div>
               </div>
@@ -273,18 +273,18 @@ export default function BrandKitPreview() {
         </div>
 
         <div className="mt-10 text-center">
-          <p className="text-muted text-sm">This is a <span className="text-white font-medium">real output</span> from BrandGoblin AI. Your brand. Your idea. Same quality.</p>
+          <p className="text-ink-muted text-sm">This is a <span className="text-ink font-medium">real output</span> from BrandGoblin AI. Your brand. Your idea. Same quality.</p>
         </div>
 
         {/* Live wall of real Goblin Studio creations — merged into the proof
             section (Brand Maturity P2) so the page keeps one showcase, not two. */}
         <div className="mt-24">
           <div className="mb-10 text-center">
-            <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
-              Real brands, <span className="gradient-text">really made here.</span>
+            <h3 className="font-display text-3xl sm:text-4xl font-semibold text-ink mb-3">
+              Real brands, <span className="accent">really made here.</span>
             </h3>
             <p className="section-sub max-w-xl mx-auto">
-              Actual logos, social graphics, and product art people created with Goblin Studio — live.
+              Actual logos, social graphics, and product art people created with Goblin Studio, live.
             </p>
           </div>
           <ShowcaseMarquee />

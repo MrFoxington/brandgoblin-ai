@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import MarketingShell from "@/components/marketing/MarketingShell";
 import type { User } from "@supabase/supabase-js";
 
 const FREE_FEATURES = [
-  "Generate your brand — names, story, voice, colors, logo direction",
-  "Try Goblin Studio free — logos, social graphics & product art",
+  "Generate your brand: names, story, voice, colors, logo direction",
+  "Try Goblin Studio free: logos, social graphics & product art",
   "Creative Energy included to get started",
   "Free Nix stickers & wallpapers",
   "No credit card, ever",
@@ -17,12 +16,12 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Unlimited brand generations",
-  "Full content engine — social, blogs, emails & ads",
+  "Full content engine: social, blogs, emails & ads",
   "Monthly Creative Energy for Goblin Studio",
-  "Bring your own logo — stamped on every product art & social graphic",
+  "Bring your own logo, stamped on every product art & social graphic",
   "Product descriptions, headlines & campaign ideas",
   "Content calendars & brand voice tools",
-  "Top up energy anytime — packs from $19",
+  "Top up energy anytime, packs from $19",
 ];
 
 function PlanButton({
@@ -75,7 +74,7 @@ function PlanButton({
       >
         {loading ? "Redirecting..." : cta}
       </button>
-      {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+      {error && <p className="text-xs text-red-700 text-center">{error}</p>}
     </div>
   );
 }
@@ -89,54 +88,52 @@ export default function PricingPage() {
   }, [supabase]);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-
-      <main className="flex-1 px-4 py-24">
+    <MarketingShell>
+      <main className="flex-1 px-4 py-20 sm:py-28">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="badge-green mb-6">Pricing</span>
-          <h1 className="section-heading mb-4">
-            Simple, <span className="gradient-text">goblin-fair</span> pricing
+          <span className="eyebrow mb-6">Pricing</span>
+          <h1 className="section-heading mb-5 text-4xl sm:text-5xl">
+            Simple pricing. <span className="accent">Serious value.</span>
           </h1>
-          <p className="section-sub mb-16">
+          <p className="section-sub mb-14">
             Start free. Upgrade when your brand starts making you money.
           </p>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
             {/* ── Free ── */}
-            <div className="bg-card bg-card-hover flex flex-col p-6 text-left">
-              <h3 className="font-display text-xl font-bold text-white">Free</h3>
-              <p className="mt-1 mb-4 text-sm text-muted">Create your brand and taste Goblin Studio — free.</p>
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-display text-4xl font-black text-white">$0</span>
-                <span className="text-sm text-faint">forever</span>
+            <div className="bg-card bg-card-hover flex flex-col p-7 text-left">
+              <h3 className="font-display text-2xl font-semibold text-ink">Free</h3>
+              <p className="mt-1 mb-5 text-sm text-ink-muted">Create your brand and taste Goblin Studio. Free.</p>
+              <div className="mb-6 flex items-baseline gap-1.5">
+                <span className="font-display text-5xl font-semibold text-ink tracking-tight">$0</span>
+                <span className="text-sm text-ink-faint">forever</span>
               </div>
               <ul className="mb-8 flex-1 space-y-2.5">
                 {FREE_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                    <span className="text-secondary mt-0.5 shrink-0">✓</span>
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <span className="text-goblin mt-0.5 shrink-0 font-bold">✓</span>
                     {f}
                   </li>
                 ))}
               </ul>
-              <PlanButton plan={null} cta="Start Creating — Free" highlight={false} user={user} />
+              <PlanButton plan={null} cta="Start free. No card needed." highlight={false} user={user} />
             </div>
 
             {/* ── Creator Pro ── */}
-            <div className="bg-card bg-card-hover flex flex-col p-6 text-left border-primary/50 shadow-glow">
-              <span className="badge-purple mb-4 self-start">Most popular</span>
-              <h3 className="font-display text-xl font-bold text-white">Creator Pro</h3>
-              <p className="mt-0.5 mb-0.5 text-xs font-semibold text-secondary">Your AI Marketing Department</p>
-              <p className="mt-1 mb-4 text-sm text-muted">Monthly Creative Energy included. Your AI copywriter, social manager, and content strategist — all in one.</p>
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="font-display text-4xl font-black text-white">$19</span>
-                <span className="text-sm text-faint">/month</span>
+            <div className="bg-card bg-card-hover flex flex-col p-7 text-left !border-goblin/60 ring-1 ring-goblin/30">
+              <span className="badge-goblin mb-4 self-start">Most popular</span>
+              <h3 className="font-display text-2xl font-semibold text-ink">Creator Pro</h3>
+              <p className="mt-0.5 mb-0.5 text-xs font-semibold text-goblin">Your AI Marketing Department</p>
+              <p className="mt-1 mb-5 text-sm text-ink-muted">Monthly Creative Energy included. Your AI copywriter, social manager, and content strategist, all in one.</p>
+              <div className="mb-6 flex items-baseline gap-1.5">
+                <span className="font-display text-5xl font-semibold text-ink tracking-tight">$19</span>
+                <span className="text-sm text-ink-faint">/month</span>
               </div>
               <ul className="mb-8 flex-1 space-y-2.5">
                 {PRO_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-muted">
-                    <span className="text-secondary mt-0.5 shrink-0">✓</span>
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <span className="text-goblin mt-0.5 shrink-0 font-bold">✓</span>
                     {f}
                   </li>
                 ))}
@@ -146,13 +143,15 @@ export default function PricingPage() {
 
           </div>
 
-          {/* Reassurance line */}
-          <p className="mt-12 text-sm text-faint">
-            Genuinely free to start — no credit card. Cancel Creator Pro anytime; top up energy whenever you like.
+          {/* The possession promise (the CapCut rule, in public). */}
+          <p className="mt-12 font-display text-xl text-ink">
+            Anything you finish is yours. <span className="accent">Every plan, forever.</span>
+          </p>
+          <p className="mt-3 text-sm text-ink-faint">
+            Free to start, no credit card. Cancel Creator Pro anytime; top up energy whenever you like.
           </p>
         </div>
       </main>
-      <Footer />
-    </div>
+    </MarketingShell>
   );
 }

@@ -41,7 +41,13 @@ const MOBILE_APP_LINKS = [
 // never showed because of the extra 'e'.
 const ADMIN_EMAIL = "jopro@hotmail.com";
 
-export default function Navbar() {
+// Brand Maturity P4 (Sept 2026): the navbar follows the PAGE it sits on.
+// "light" = marketing pages inside `.theme-marketing` (paper + ink + goblin green);
+// "dark" = the in-app look, unchanged. Default dark so no app page moves.
+export type NavTone = "light" | "dark";
+
+export default function Navbar({ tone = "dark" }: { tone?: NavTone } = {}) {
+  const light = tone === "light";
   const [user, setUser] = useState<User | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -66,7 +72,9 @@ export default function Navbar() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "border-b border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.95)] backdrop-blur-md"
+          ? light
+            ? "border-b border-line bg-paper/90 backdrop-blur-md"
+            : "border-b border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.95)] backdrop-blur-md"
           : "bg-transparent"
       }`}
     >
@@ -77,22 +85,22 @@ export default function Navbar() {
           <NixAvatar size="lg" />
           <span className="hidden sm:flex flex-col leading-tight">
             <span className="font-display text-sm font-extrabold">
-              <span className="text-primary-light">Brand</span>
-              <span className="text-secondary">Goblin</span>
+              <span className={light ? "text-ink" : "text-primary-light"}>Brand</span>
+              <span className={light ? "text-goblin" : "text-secondary"}>Goblin</span>
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300/90">
-              Powered by NIX ✨
+            <span className={`text-[10px] font-bold uppercase tracking-[0.18em] ${light ? "text-gold-dark" : "text-amber-300/90"}`}>
+              {light ? "Powered by NIX" : "Powered by NIX ✨"}
             </span>
           </span>
         </Link>
 
         {/* Nav links */}
-        <nav className="hidden items-center gap-7 text-sm font-medium text-muted lg:flex">
+        <nav className={`hidden items-center gap-7 text-sm font-medium lg:flex ${light ? "text-ink-muted" : "text-muted"}`}>
           {(user ? APP_LINKS : VISITOR_LINKS).map((link) => (
             <Link
               key={link.label}
               href={link.href}
-              className="transition-colors hover:text-white"
+              className={`transition-colors ${light ? "hover:text-ink" : "hover:text-white"}`}
             >
               {link.label}
             </Link>
@@ -101,13 +109,13 @@ export default function Navbar() {
 
         {/* Auth */}
         <div className="flex items-center gap-3">
-          <SoundToggle />
+          <SoundToggle className={light ? "!border-line-2 !bg-white hover:!bg-paper-2" : ""} />
           {user ? (
             <>
               {user.email === ADMIN_EMAIL && (
                 <Link
                   href="/admin"
-                  className="hidden sm:inline-flex items-center text-xs font-medium text-faint hover:text-white transition-colors"
+                  className={`hidden sm:inline-flex items-center text-xs font-medium transition-colors ${light ? "text-ink-faint hover:text-ink" : "text-faint hover:text-white"}`}
                   title="Admin dashboard"
                 >
                   🧌 Admin
@@ -118,7 +126,11 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/dashboard/studio"
-                className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-medium text-amber-300 hover:text-amber-100 hover:bg-amber-400/15 shadow-studio-glow motion-safe:animate-studio-glow transition-colors"
+                className={
+                  light
+                    ? "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-gold/60 bg-gold-tint px-4 py-2 text-sm font-semibold text-gold-dark hover:bg-gold/25 transition-colors"
+                    : "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-2 text-sm font-medium text-amber-300 hover:text-amber-100 hover:bg-amber-400/15 shadow-studio-glow motion-safe:animate-studio-glow transition-colors"
+                }
               >
                 🎨 Studio
                 <span className="absolute -top-1.5 -right-1.5 rounded-full bg-amber-400 px-1 text-[9px] font-bold leading-4 text-black">
@@ -127,7 +139,11 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/dashboard/nix"
-                className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary-light hover:text-white hover:bg-primary/20 shadow-glow transition-colors"
+                className={
+                  light
+                    ? "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-nix/40 bg-nix/10 px-4 py-2 text-sm font-semibold text-nix hover:bg-nix/15 transition-colors"
+                    : "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary-light hover:text-white hover:bg-primary/20 shadow-glow transition-colors"
+                }
               >
                 ✨ Nix
                 <span className="absolute -top-1.5 -right-1.5 rounded-full bg-primary px-1 text-[9px] font-bold leading-4 text-white">
@@ -140,7 +156,11 @@ export default function Navbar() {
               {user.email === ADMIN_EMAIL && (
                 <Link
                   href="/dashboard/labs"
-                  className="relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/50 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300 hover:text-emerald-100 hover:bg-emerald-400/20 shadow-[0_0_16px_rgba(16,185,129,0.5)] transition-colors"
+                  className={
+                    light
+                      ? "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-goblin/40 bg-goblin-tint px-4 py-2 text-sm font-semibold text-goblin-dark hover:bg-goblin-light transition-colors"
+                      : "relative hidden lg:inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/50 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300 hover:text-emerald-100 hover:bg-emerald-400/20 shadow-[0_0_16px_rgba(16,185,129,0.5)] transition-colors"
+                  }
                 >
                   🧪 Labs
                   <span className="absolute -top-1.5 -right-1.5 rounded-full bg-emerald-400 px-1 text-[9px] font-bold leading-4 text-black">
@@ -148,15 +168,18 @@ export default function Navbar() {
                   </span>
                 </Link>
               )}
-              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-[0_0_20px_rgba(255,107,53,0.5)]">
-                ✦ Generate
+              <Link
+                href="/generate"
+                className={light ? "btn-primary !py-2.5 !px-5 text-sm" : "btn-primary !py-2.5 !px-5 text-sm !animate-none !shadow-[0_0_20px_rgba(255,107,53,0.5)]"}
+              >
+                {light ? "Generate" : "✦ Generate"}
               </Link>
             </>
           ) : (
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-muted transition-colors hover:text-white sm:block"
+                className={`hidden text-sm font-medium transition-colors sm:block ${light ? "text-ink-muted hover:text-ink" : "text-muted hover:text-white"}`}
               >
                 Sign In
               </Link>
@@ -172,7 +195,11 @@ export default function Navbar() {
             onClick={() => setMenuOpen((o) => !o)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            className="lg:hidden rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-base leading-none text-white hover:bg-white/10 transition-colors"
+            className={`lg:hidden rounded-xl border px-3 py-2 text-base leading-none transition-colors ${
+              light
+                ? "border-line-2 bg-white text-ink hover:bg-paper-2"
+                : "border-white/15 bg-white/5 text-white hover:bg-white/10"
+            }`}
           >
             {menuOpen ? "✕" : "☰"}
           </button>
@@ -181,13 +208,19 @@ export default function Navbar() {
 
       {/* Mobile menu panel */}
       {menuOpen && (
-        <nav className="lg:hidden border-t border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.97)] backdrop-blur-md px-5 pb-2">
+        <nav className={`lg:hidden border-t px-5 pb-2 backdrop-blur-md ${
+          light
+            ? "border-line bg-paper/95"
+            : "border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.97)]"
+        }`}>
           {(user ? MOBILE_APP_LINKS : VISITOR_LINKS).map((link) => (
             <Link
               key={link.label}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block border-b border-white/5 py-3.5 text-sm font-medium text-muted transition-colors hover:text-white last:border-0"
+              className={`block border-b py-3.5 text-sm font-medium transition-colors last:border-0 ${
+                light ? "border-line text-ink-2 hover:text-goblin" : "border-white/5 text-muted hover:text-white"
+              }`}
             >
               {link.label}
             </Link>
@@ -197,14 +230,18 @@ export default function Navbar() {
               <Link
                 href="/dashboard/labs"
                 onClick={() => setMenuOpen(false)}
-                className="block border-b border-white/5 py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
+                className={`block border-b py-3.5 text-sm font-medium transition-colors ${
+                  light ? "border-line text-ink-faint hover:text-ink" : "border-white/5 text-faint hover:text-white"
+                }`}
               >
                 🧪 Goblin Labs
               </Link>
               <Link
                 href="/admin"
                 onClick={() => setMenuOpen(false)}
-                className="block py-3.5 text-sm font-medium text-faint transition-colors hover:text-white"
+                className={`block py-3.5 text-sm font-medium transition-colors ${
+                  light ? "text-ink-faint hover:text-ink" : "text-faint hover:text-white"
+                }`}
               >
                 🧌 Admin
               </Link>
@@ -214,7 +251,9 @@ export default function Navbar() {
             <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
-              className="block py-3.5 text-sm font-medium text-muted transition-colors hover:text-white"
+              className={`block py-3.5 text-sm font-medium transition-colors ${
+                light ? "text-ink-2 hover:text-goblin" : "text-muted hover:text-white"
+              }`}
             >
               Sign In
             </Link>

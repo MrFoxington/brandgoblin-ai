@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import MarketingShell from "@/components/marketing/MarketingShell";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
@@ -33,28 +32,27 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
+    <MarketingShell>
       <main className="flex flex-1 items-center justify-center px-4 py-20">
-        <div className="bg-card w-full max-w-md p-8">
+        <div className="bg-card w-full max-w-md p-8 sm:p-10">
           <div className="mb-8 text-center">
-            <span className="logo-glow block text-5xl mb-3">🔑</span>
-            <h1 className="font-display text-2xl font-extrabold text-white">Reset your password</h1>
-            <p className="mt-1 text-sm text-muted">
+            <span className="block text-5xl mb-3">🔑</span>
+            <h1 className="font-display text-3xl font-semibold text-ink">Reset your password</h1>
+            <p className="mt-1 text-sm text-ink-muted">
               Enter your email and we&apos;ll send you a reset link.
             </p>
           </div>
 
           {sent ? (
             <div className="space-y-4 text-center">
-              <div className="rounded-lg border border-secondary/30 bg-secondary/10 p-4 text-sm text-secondary">
+              <div className="rounded-lg border border-goblin/30 bg-goblin-tint p-4 text-sm text-goblin-dark">
                 ✓ Reset link sent! Check your email and follow the link to set a new password.
               </div>
-              <p className="text-sm text-muted">
+              <p className="text-sm text-ink-muted">
                 Didn&apos;t get it? Check your spam folder or{" "}
                 <button
                   onClick={() => setSent(false)}
-                  className="font-semibold text-primary-light hover:text-white transition-colors"
+                  className="font-semibold text-goblin hover:text-goblin-dark transition-colors"
                 >
                   try again
                 </button>
@@ -77,7 +75,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               {error && (
-                <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+                <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   {error}
                 </p>
               )}
@@ -88,15 +86,14 @@ export default function ForgotPasswordPage() {
             </form>
           )}
 
-          <p className="mt-6 text-center text-sm text-muted">
+          <p className="mt-6 text-center text-sm text-ink-muted">
             Remember it?{" "}
-            <Link href="/login" className="font-semibold text-primary-light hover:text-white transition-colors">
+            <Link href="/login" className="font-semibold text-goblin hover:text-goblin-dark transition-colors">
               Back to sign in
             </Link>
           </p>
         </div>
       </main>
-      <Footer />
-    </div>
+    </MarketingShell>
   );
 }

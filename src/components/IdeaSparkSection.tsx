@@ -28,7 +28,7 @@ export default function IdeaSparkSection() {
   return (
     <div className="mt-20 overflow-hidden">
       <div className="text-center">
-        <p className="mb-6 text-xs uppercase tracking-[0.2em] text-faint">
+        <p className="mb-6 text-xs uppercase tracking-[0.2em] text-ink-faint font-semibold">
           Not sure what to build? Start from one of these.
         </p>
 
@@ -43,7 +43,7 @@ export default function IdeaSparkSection() {
               transition={{ delay: i * 0.04, duration: 0.35 }}
               whileHover={shouldReduce ? {} : { scale: 1.05 }}
               whileTap={shouldReduce ? {} : { scale: 0.97 }}
-              className="rounded-full border border-primary/25 bg-primary/8 px-4 py-2 text-sm text-white/80 hover:border-primary/60 hover:bg-primary/20 hover:text-white transition-colors cursor-pointer"
+              className="rounded-full border border-line-2 bg-white px-4 py-2 text-sm text-ink-2 hover:border-goblin hover:bg-goblin-tint hover:text-goblin-dark transition-colors cursor-pointer"
             >
               {idea}
             </motion.button>

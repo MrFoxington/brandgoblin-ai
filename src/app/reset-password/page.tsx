@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import MarketingShell from "@/components/marketing/MarketingShell";
 
 export default function ResetPasswordPage() {
   const supabase = createClient();
@@ -48,18 +47,17 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
+    <MarketingShell>
       <main className="flex flex-1 items-center justify-center px-4 py-20">
-        <div className="bg-card w-full max-w-md p-8">
+        <div className="bg-card w-full max-w-md p-8 sm:p-10">
           <div className="mb-8 text-center">
-            <span className="logo-glow block text-5xl mb-3">🔐</span>
-            <h1 className="font-display text-2xl font-extrabold text-white">Set new password</h1>
-            <p className="mt-1 text-sm text-muted">Choose a strong password for your account.</p>
+            <span className="block text-5xl mb-3">🔐</span>
+            <h1 className="font-display text-3xl font-semibold text-ink">Set new password</h1>
+            <p className="mt-1 text-sm text-ink-muted">Choose a strong password for your account.</p>
           </div>
 
           {!ready ? (
-            <div className="text-center text-sm text-muted py-4">
+            <div className="text-center text-sm text-ink-muted py-4">
               Verifying reset link
               <span className="animate-pulse">...</span>
             </div>
@@ -92,7 +90,7 @@ export default function ResetPasswordPage() {
               </div>
 
               {error && (
-                <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+                <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   {error}
                 </p>
               )}
@@ -104,7 +102,6 @@ export default function ResetPasswordPage() {
           )}
         </div>
       </main>
-      <Footer />
-    </div>
+    </MarketingShell>
   );
 }

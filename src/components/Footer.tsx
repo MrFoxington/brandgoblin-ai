@@ -16,7 +16,9 @@ const ECOSYSTEM: { label: string; active: boolean; href?: string }[] = [
   { label: "Goblin Bazaar",  active: false },
 ];
 
-export default function Footer() {
+// Brand Maturity P4 (Sept 2026): tone follows the page (see Navbar).
+export default function Footer({ tone = "dark" }: { tone?: "light" | "dark" } = {}) {
+  const light = tone === "light";
   const [user, setUser] = useState<User | null>(null);
   const supabase = createClient();
 
@@ -34,7 +36,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t border-[rgba(45,45,78,0.8)] pt-12 pb-8">
+    <footer className={`border-t pt-14 pb-10 ${light ? "border-line bg-paper-2" : "border-[rgba(45,45,78,0.8)]"}`}>
       <div className="mx-auto max-w-6xl px-4 space-y-8">
 
         {/* Main footer row */}
@@ -44,39 +46,39 @@ export default function Footer() {
             <div className="flex items-center gap-2.5">
               <NixAvatar size="sm" />
               <span className="font-display font-extrabold">
-                <span className="text-primary-light">Brand</span>
-                <span className="text-secondary">Goblin</span>
+                <span className={light ? "text-ink" : "text-primary-light"}>Brand</span>
+                <span className={light ? "text-goblin" : "text-secondary"}>Goblin</span>
                 {" "}
-                <span className="text-secondary">AI</span>
+                <span className={light ? "text-goblin" : "text-secondary"}>AI</span>
               </span>
             </div>
-            <p className="text-xs font-semibold tracking-wide text-amber-300/90">
-              BrandGoblin — Powered by NIX
+            <p className={`text-xs font-semibold tracking-wide ${light ? "text-gold-dark" : "text-amber-300/90"}`}>
+              BrandGoblin. Powered by NIX
             </p>
-            <p className="text-xs text-faint italic max-w-[220px] text-center sm:text-left">
+            <p className={`text-xs italic max-w-[220px] text-center sm:text-left ${light ? "text-ink-faint" : "text-faint"}`}>
               Everyone Has An Idea.<br />BrandGoblin Helps Bring It To Life.
             </p>
           </div>
 
           {/* Links — app links for logged-in users, auth links for visitors */}
-          <div className="flex gap-6 text-sm text-muted">
-            <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-            <Link href="/dashboard/creator-pro" className="hover:text-white transition-colors">Creator Pro</Link>
+          <div className={`flex gap-6 text-sm ${light ? "text-ink-muted" : "text-muted"}`}>
+            <Link href="/pricing" className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}>Pricing</Link>
+            <Link href="/dashboard/creator-pro" className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}>Creator Pro</Link>
             {user ? (
               <>
-                <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <Link href="/dashboard" className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}>Dashboard</Link>
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="hover:text-white transition-colors"
+                  className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-                <Link href="/signup" className="hover:text-white transition-colors">Sign Up</Link>
+                <Link href="/login" className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}>Sign In</Link>
+                <Link href="/signup" className={`transition-colors ${light ? "hover:text-goblin" : "hover:text-white"}`}>Sign Up</Link>
               </>
             )}
           </div>
@@ -84,7 +86,7 @@ export default function Footer() {
 
         {/* Ecosystem badges */}
         <div>
-          <p className="text-xs text-faint uppercase tracking-widest mb-3 text-center sm:text-left">
+          <p className={`text-xs uppercase tracking-widest mb-3 text-center sm:text-left ${light ? "text-ink-faint" : "text-faint"}`}>
             BrandGoblin Ecosystem
           </p>
           <div className="flex flex-wrap gap-2">
@@ -93,14 +95,20 @@ export default function Footer() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary-light transition hover:bg-primary/20 hover:text-white"
+                  className={
+                    light
+                      ? "rounded-full border border-goblin/40 bg-goblin-tint px-3 py-1 text-xs font-semibold text-goblin-dark transition hover:bg-goblin-light"
+                      : "rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary-light transition hover:bg-primary/20 hover:text-white"
+                  }
                 >
                   {item.label}
                 </Link>
               ) : (
                 <span
                   key={item.label}
-                  className="rounded-full border border-[rgba(45,45,78,0.6)] px-3 py-1 text-xs font-medium text-faint cursor-default transition"
+                  className={`rounded-full border px-3 py-1 text-xs font-medium cursor-default transition ${
+                    light ? "border-line-2 text-ink-faint" : "border-[rgba(45,45,78,0.6)] text-faint"
+                  }`}
                 >
                   {item.label}
                   <span className="ml-1.5 text-[10px] opacity-60">Soon</span>
@@ -111,7 +119,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <p className="text-center text-xs text-faint border-t border-[rgba(45,45,78,0.4)] pt-6">
+        <p className={`text-center text-xs border-t pt-6 ${light ? "text-ink-faint border-line" : "text-faint border-[rgba(45,45,78,0.4)]"}`}>
           Powered by Claude. © 2026 BrandGoblin AI
         </p>
       </div>

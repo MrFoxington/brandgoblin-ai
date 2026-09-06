@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Space_Grotesk, Inter, Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { NixToastProvider } from "@/components/NixToast";
@@ -15,6 +15,31 @@ const spaceGrotesk = Space_Grotesk({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+// Brand Maturity P4 (Sept 2026): the grown-up marketing type system.
+// Fraunces (display) + Hanken Grotesk (body) + JetBrains Mono (hex codes / labels).
+// Only the `.theme-marketing` scope uses them for now; the in-app surfaces keep
+// Space Grotesk + Inter until they inherit the system. See globals.css.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+const hanken = Hanken_Grotesk({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-hanken",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -72,11 +97,11 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon.svg" />
-        <meta name="theme-color" content="#7c3aed" />
+        <meta name="theme-color" content="#2E7D5B" />
         <meta name="application-name" content="BrandGoblin AI" />
       </head>
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen bg-bg font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${inter.variable} ${fraunces.variable} ${hanken.variable} ${jetbrainsMono.variable} min-h-screen bg-bg font-sans antialiased`}
       >
         <SoundFxProvider>
           <XPProvider>

@@ -98,26 +98,26 @@ export default function HeroInteractive() {
     <div className="flex-1 text-center lg:text-left">
       {/* Badge */}
       <div className="mb-6 flex justify-center lg:justify-start">
-        <span className="badge-purple">Create your brand free — no card needed</span>
+        <span className="badge-goblin">Create your brand free. No card needed.</span>
       </div>
 
       {/* Headline — the demonstration hero sits directly above the live demo */}
-      <h1 className="section-heading mb-4 text-5xl sm:text-6xl lg:text-7xl leading-tight">
+      <h1 className="section-heading mb-5 text-5xl sm:text-6xl lg:text-[4.75rem]">
         This brand didn&rsquo;t exist<br />
-        <span className="gradient-text">two minutes ago.</span>
+        <span className="accent">two minutes ago.</span>
       </h1>
 
       {/* Subhead */}
-      <p className="mb-4 text-lg text-muted max-w-xl mx-auto lg:mx-0">
+      <p className="mb-4 text-lg text-ink-muted max-w-xl mx-auto lg:mx-0 leading-relaxed">
         One sentence in, twelve deliverables out. Type your idea and watch Nix work.
       </p>
 
       {/* Typewriter example hint */}
-      <p className="mb-8 text-base text-secondary/90 max-w-xl mx-auto lg:mx-0 min-h-[1.75rem]">
+      <p className="mb-8 text-base text-ink-faint max-w-xl mx-auto lg:mx-0 min-h-[1.75rem]">
         Try{" "}
-        <span className="text-secondary font-medium">
+        <span className="text-goblin font-medium">
           {displayed}
-          {!shouldReduce && <span className="animate-pulse text-primary">|</span>}
+          {!shouldReduce && <span className="animate-pulse text-goblin">|</span>}
         </span>
       </p>
 
@@ -130,14 +130,14 @@ export default function HeroInteractive() {
             value={idea}
             onChange={e => setIdea(e.target.value)}
             placeholder="Type any idea… a cereal company for adults"
-            className="input flex-1 text-sm"
+            className="input flex-1 text-base"
             maxLength={200}
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !idea.trim()}
-            className="btn-primary px-6 py-3 text-sm font-bold shrink-0 disabled:opacity-60"
+            className="btn-primary px-6 py-3 text-sm font-bold shrink-0"
           >
             {loading ? "Nix is working…" : "See it →"}
           </button>
@@ -152,9 +152,9 @@ export default function HeroInteractive() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mb-6 flex items-center gap-2 text-sm text-muted max-w-xl mx-auto lg:mx-0"
+            className="mb-6 flex items-center gap-2 text-sm text-ink-muted max-w-xl mx-auto lg:mx-0"
           >
-            <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border-2 border-goblin/30 border-t-goblin animate-spin" />
             <span>Nix is obsessing over every detail…</span>
           </motion.div>
         )}
@@ -169,14 +169,14 @@ export default function HeroInteractive() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="mb-6 rounded-2xl border border-primary/30 bg-primary/10 px-6 py-5 text-left max-w-xl mx-auto lg:mx-0"
+            className="mb-6 rounded-2xl border border-goblin/40 bg-white px-6 py-5 text-left max-w-xl mx-auto lg:mx-0 shadow-[0_12px_32px_-20px_rgba(46,125,91,0.35)]"
           >
-            <p className="text-xs text-muted mb-2 uppercase tracking-widest">Nix made →</p>
-            <p className="font-display text-2xl font-black text-white mb-1">{result.name}</p>
-            <p className="text-secondary font-medium text-sm mb-4">"{result.tagline}"</p>
-            <div className="border-t border-white/10 pt-4">
-              <p className="text-xs text-muted mb-3">
-                That's 1 of 12. The full kit has names, colors, voice, story, launch plan — and it's yours, free.
+            <p className="text-xs text-goblin mb-2 uppercase tracking-widest font-bold">Nix made</p>
+            <p className="font-display text-3xl font-semibold text-ink mb-1">{result.name}</p>
+            <p className="text-ink-muted italic text-sm mb-4">&ldquo;{result.tagline}&rdquo;</p>
+            <div className="border-t border-line pt-4">
+              <p className="text-xs text-ink-muted mb-3">
+                That&rsquo;s 1 of 12. The full kit has names, colors, voice, story, launch plan. And it&rsquo;s yours, free.
               </p>
               <Link
                 href="/signup"
@@ -197,7 +197,7 @@ export default function HeroInteractive() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mb-6 text-sm text-amber-400 max-w-xl mx-auto lg:mx-0"
+            className="mb-6 text-sm text-red-700 max-w-xl mx-auto lg:mx-0"
           >
             {error}
           </motion.p>
@@ -217,10 +217,12 @@ export default function HeroInteractive() {
       )}
 
       {/* Honest trust signals */}
-      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-faint">
+      {/* Honest trust signals. "Built by brand strategists" was cut (unverifiable,
+          same honesty rule as the Aug 12 ComparisonSection fix). */}
+      <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-ink-faint">
         <span>✓ No card required</span>
-        <span>✓ Built by brand strategists</span>
-        <span>✓ Powered by Claude AI</span>
+        <span>✓ Yours to keep, forever</span>
+        <span>✓ Powered by Claude</span>
         <span>✓ Cancel anytime</span>
       </div>
     </div>

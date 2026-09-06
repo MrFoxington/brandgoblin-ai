@@ -30,7 +30,7 @@ export default function ShowcaseMarquee({ initialItems }: Props) {
   // ── Empty / loading states — never a broken or blank wall ──────────────────
   if (!loaded) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[200px] text-sm text-muted">
+      <div className="flex items-center justify-center h-full min-h-[200px] text-sm text-ink-faint">
         Loading creations…
       </div>
     );
@@ -38,8 +38,8 @@ export default function ShowcaseMarquee({ initialItems }: Props) {
   if (!items.length) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-2 text-center px-6">
-        <p className="text-base font-bold text-white">Fresh creations coming soon</p>
-        <p className="text-sm text-muted">Real brands made with Goblin Studio will appear here.</p>
+        <p className="text-base font-bold text-ink">Fresh creations coming soon</p>
+        <p className="text-sm text-ink-muted">Real brands made with Goblin Studio will appear here.</p>
       </div>
     );
   }
@@ -50,8 +50,9 @@ export default function ShowcaseMarquee({ initialItems }: Props) {
   return (
     <div className="group relative w-full overflow-hidden">
       {/* edge fades */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-bg to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-bg to-transparent" />
+      {/* Edge fades follow the page colour (dark in-app / embed, paper on marketing). */}
+      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-[var(--page)] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-[var(--page)] to-transparent" />
 
       {/*
         Motion-OK: seamless marquee, pause on hover.

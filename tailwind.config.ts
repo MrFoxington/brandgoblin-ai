@@ -22,11 +22,45 @@ const config: Config = {
         },
         muted: "#94a3b8",
         faint: "#64748b",
+        // ── Brand Maturity P4 (Sept 2026) — the grown-up marketing palette ──
+        // Warm off-white paper, ink text, goblin green as THE action colour,
+        // gold in small doses. Purple (#7C3AED) is Nix's personal colour and is
+        // only allowed where Nix himself appears (see `nix`).
+        paper: {
+          DEFAULT: "#FAF7F2",
+          2: "#F3EEE6",
+          3: "#ECE5DA",
+        },
+        ink: {
+          DEFAULT: "#141518",
+          2: "#2A2C31",
+          muted: "#575A62",
+          faint: "#8B8E96",
+        },
+        goblin: {
+          DEFAULT: "#2E7D5B",
+          dark: "#256649",
+          light: "#DCEDE4",
+          tint: "#EEF6F1",
+        },
+        gold: {
+          DEFAULT: "#FBBF24",
+          dark: "#9A6B00",
+          tint: "#FFF6DC",
+        },
+        nix: "#7C3AED",
+        line: {
+          DEFAULT: "#E6DFD3",
+          2: "#D9D0C2",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
-        mono: ["ui-monospace", "SFMono-Regular", "monospace"],
+        // Resolved through CSS variables so the marketing scope can swap the
+        // whole type system without touching a single component class
+        // (defaults live on `body`, overrides on `.theme-marketing` in globals.css).
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       backgroundImage: {
         "hero-gradient":
