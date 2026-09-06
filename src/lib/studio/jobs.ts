@@ -320,6 +320,80 @@ export async function listUserJobs(userId: string, limit = 20): Promise<StudioJo
   );
 }
 
+// ── List visible creations for the Vault gallery (Creator Studio Phase B) ─────
+// Completed + not hidden, newest first. Signs every storage path in ONE batch
+// call instead of one round trip per job (the dashboard shows up to ~40).
+
+export async function listUserGalleryJobs(userId: string, limit = 40): Promise<StudioJobRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("studio_jobs")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .eq("archived", false)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (!data?.length) return [];
+
+  const jobs = data as StudioJobRow[];
+  const paths = jobs.map((j) => j.storage_path).filter((p): p is string => !!p);
+  if (paths.length) {
+    try {
+      const { data: signed } = await supabase.storage
+        .from("studio-assets")
+        .createSignedUrls(paths, 60 * 60);
+      const byPath = new Map<string, string>();
+      for (const s of signed ?? []) {
+        if (s.path && s.signedUrl) byPath.set(s.path, s.signedUrl);
+      }
+      for (const job of jobs) {
+        if (job.storage_path && byPath.has(job.storage_path)) {
+          job.output_url = byPath.get(job.storage_path)!;
+        }
+      }
+    } catch {
+      // non-fatal: stored output_url (may be expired) is what the card gets
+    }
+  }
+  return jobs;
+}
+
+// ── Official logos, one per brand (for the Vault's brand cards) ──────────────
+// Independent of the gallery window (a logo set 60 creations ago must still
+// show on its brand card). Signed in one batch.
+
+export async function listOfficialLogos(userId: string): Promise<Map<string, string>> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("studio_jobs")
+    .select("brand_id, storage_path")
+    .eq("user_id", userId)
+    .eq("official_logo", true)
+    .eq("status", "completed")
+    .not("brand_id", "is", null)
+    .not("storage_path", "is", null);
+
+  const out = new Map<string, string>();
+  const rows = (data ?? []) as { brand_id: string; storage_path: string }[];
+  if (!rows.length) return out;
+  try {
+    const { data: signed } = await supabase.storage
+      .from("studio-assets")
+      .createSignedUrls(rows.map((r) => r.storage_path), 60 * 60);
+    const byPath = new Map<string, string>();
+    for (const s of signed ?? []) if (s.path && s.signedUrl) byPath.set(s.path, s.signedUrl);
+    for (const r of rows) {
+      const url = byPath.get(r.storage_path);
+      if (url && !out.has(r.brand_id)) out.set(r.brand_id, url);
+    }
+  } catch {
+    // non-fatal: cards fall back to the palette poster
+  }
+  return out;
+}
+
 // ── List favorited completed jobs (for the dashboard Favorites section) ───────
 
 export async function listUserFavoriteJobs(userId: string, limit = 6): Promise<StudioJobRow[]> {

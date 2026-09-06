@@ -15,7 +15,7 @@ import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { computeBadges, type BadgeStats, type BadgeState } from "@/lib/badges";
 
-const STREAK_KEY = "brandgoblin_streak_v1"; // same key DailyCreatorDashboard maintains
+const STREAK_KEY = "brandgoblin_streak_v1"; // same key VaultShell maintains
 
 function readStreak(): number {
   try {
@@ -60,18 +60,24 @@ function BadgeArt({ badge, size, dim }: { badge: BadgeState; size: number; dim: 
   );
 }
 
-export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
+/**
+ * `compact` = the Vault rail variant (Phase B, Sept 2026): four columns, smaller
+ * medallions, tighter padding. When `stats.streakDays` is supplied the shelf
+ * trusts it instead of reading localStorage itself.
+ */
+export default function BadgeShelf({ stats, compact = false }: { stats: BadgeStats; compact?: boolean }) {
   const reduce = useReducedMotion();
   const [streakDays, setStreakDays] = useState(0);
   const [selected, setSelected] = useState<BadgeState | null>(null);
 
-  // Streak lives client-side — merge it in after mount.
+  // Streak lives client-side — merge it in after mount (unless the parent
+  // already knows it and passed it down).
   useEffect(() => {
-    setStreakDays(readStreak());
-  }, []);
+    if (stats.streakDays === undefined) setStreakDays(readStreak());
+  }, [stats.streakDays]);
 
   const badges = useMemo(
-    () => computeBadges({ ...stats, streakDays }),
+    () => computeBadges({ ...stats, streakDays: stats.streakDays ?? streakDays }),
     [stats, streakDays]
   );
 
@@ -81,7 +87,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
 
   return (
     <>
-      <section className="rounded-2xl border border-[#D4AF37]/20 bg-white/3 p-5 sm:p-6">
+      <section className={`rounded-2xl border border-[#D4AF37]/20 bg-white/3 ${compact ? "p-4" : "p-5 sm:p-6"}`}>
         {/* Header */}
         <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
@@ -93,7 +99,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
         </div>
 
         {/* The shelf */}
-        <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
+        <div className={`grid grid-cols-4 gap-3 ${compact ? "" : "sm:grid-cols-8"}`}>
           {badges.map((b, i) => (
             <motion.button
               key={b.id}
@@ -112,7 +118,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
                     : ""
                 }`}
               >
-                <BadgeArt badge={b} size={64} dim={!b.earned} />
+                <BadgeArt badge={b} size={compact ? 52 : 64} dim={!b.earned} />
                 {!b.earned && (
                   <span className="absolute -bottom-0.5 -right-0.5 text-[11px]" aria-hidden>
                     {b.comingSoon ? "🔮" : "🔒"}
@@ -135,7 +141,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
             <span className="text-xs text-muted">
               <span className="text-faint font-medium">Next badge:</span>{" "}
               <span className="font-semibold text-white">{nextBadge.title}</span>
-              {" "}— {nextBadge.hint}
+              {": "}{nextBadge.hint}
               {nextBadge.progress && (
                 <span className="text-[#E9C75A] font-semibold tabular-nums">
                   {" "}({nextBadge.progress.current}/{nextBadge.progress.target})

@@ -11,12 +11,12 @@ import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
 import StudioHero from "@/components/studio/StudioHero";
 import type { BrandGenerationRow } from "@/types";
 import { hasProAccess } from "@/lib/access";
-import { getMaxConcurrentJobs } from "@/lib/energy-config";
+import { getMaxConcurrentJobs, IMAGE_TYPE_SIZES, type ImageType } from "@/lib/energy-config";
 
 export default async function StudioPage({
   searchParams,
 }: {
-  searchParams?: { brand?: string };
+  searchParams?: { brand?: string; type?: string };
 }) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
@@ -65,6 +65,10 @@ export default async function StudioPage({
   // Only honored if the brand actually belongs to this user's list.
   const requestedBrandId = searchParams?.brand;
   const initialBrandId = brandRows.find((b) => b.id === requestedBrandId)?.id;
+  // Deep link from the Vault's Create chooser (?type=youtube_thumbnail).
+  const requestedType = searchParams?.type;
+  const initialImageType =
+    requestedType && requestedType in IMAGE_TYPE_SIZES ? (requestedType as ImageType) : undefined;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -91,6 +95,7 @@ export default async function StudioPage({
                 isPro={isPro}
                 maxConcurrentJobs={maxConcurrentJobs}
                 initialBrandId={initialBrandId}
+                initialImageType={initialImageType}
               />
             </div>
 

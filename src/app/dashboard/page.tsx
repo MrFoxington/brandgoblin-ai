@@ -2,17 +2,18 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import EmptyState from "@/components/EmptyState";
-import DashboardGrid from "@/components/DashboardGrid";
-import DailyCreatorDashboard from "@/components/DailyCreatorDashboard";
 import PaymentRecoveryBanner from "@/components/PaymentRecoveryBanner";
+import VaultShell from "@/components/vault/VaultShell";
 import { headers } from "next/headers";
 import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan } from "@/lib/access";
-import StudioFavoritesSection from "@/components/studio/StudioFavoritesSection";
-import BadgeShelf from "@/components/BadgeShelf";
-import { listUserFavoriteJobs } from "@/lib/studio/jobs";
+import { listUserGalleryJobs, listOfficialLogos } from "@/lib/studio/jobs";
+import { buildVault } from "@/lib/vault";
 import type { BrandGenerationRow } from "@/types";
+
+// The Vault (Creator Studio Phase B, Sept 2026): the home screen opens on what
+// the user made. Latest creation big, everything else in a gallery, one Create
+// button, stats in a quiet rail. Data shaping lives in src/lib/vault.ts.
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -20,7 +21,7 @@ export default async function DashboardPage() {
   if (!authData.user) redirect("/login");
 
   // One-time free Goblin Studio starter energy for brand-new free users
-  // (idempotent + race-proof — guarded by has_received_free_studio_grant).
+  // (idempotent + race-proof: guarded by has_received_free_studio_grant).
   const rawIp = headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
   await grantFreeStudioStarterIfEligible(authData.user.id, {
     email: authData.user.email ?? "",
@@ -28,27 +29,29 @@ export default async function DashboardPage() {
     ipHash: rawIp ? hashIp(rawIp) : undefined,
   });
 
-  const [{ data: userRow }, { data: generations }, { data: jobRows }] = await Promise.all([
+  const [{ data: userRow }, { data: generations }, { data: jobRows }, galleryJobs, officialLogos] = await Promise.all([
     supabase.from("users").select("credits, plan, payment_status, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
     supabase
       .from("brand_generations")
       .select("id, input_data, output_data, created_at, favorite, archived")
       .eq("user_id", authData.user.id)
       .order("created_at", { ascending: false }),
-    // Trophy Shelf stats (July 18 2026) — lightweight flags only, capped
+    // Trophy Shelf stats: lightweight flags only, capped
     supabase
       .from("studio_jobs")
       .select("image_type, official_logo, status")
       .eq("user_id", authData.user.id)
       .eq("status", "completed")
       .limit(500),
+    // The gallery: visible Studio creations, signed in one batch
+    listUserGalleryJobs(authData.user.id, 40),
+    // Official logos per brand, for the brand cards + hero poster
+    listOfficialLogos(authData.user.id),
   ]);
 
   const rows = (generations ?? []) as BrandGenerationRow[];
-  const email = authData.user.email ?? "";
   const paymentStatus = userRow?.payment_status ?? "active";
 
-  // 🏆 Trophy Shelf stats — all from data we already have or one cheap query
   const jobs = (jobRows ?? []) as { image_type: string; official_logo: boolean }[];
   const badgeStats = {
     brandCount: rows.length,
@@ -57,60 +60,43 @@ export default async function DashboardPage() {
     hasOfficialLogo: jobs.some((j) => j.official_logo),
   };
 
-  // Studio favorites — anyone can now create in Studio (free starter energy),
-  // so surface favorites for all users; the query returns [] when there are none.
-  const studioFavorites = (await listUserFavoriteJobs(authData.user.id, 6)).map((j) => ({
-    id: j.id,
-    output_url: j.output_url,
-    image_type: j.image_type,
-  }));
+  const { items } = buildVault(rows, galleryJobs, officialLogos);
+  const activeRows = rows.filter((r) => !r.archived);
+  const brands = activeRows.map((r) => ({ id: r.id, name: r.output_data?.recommendedName || "Untitled brand" }));
+  const latestBrand = activeRows[0] ?? rows[0] ?? null;
+  const ideaSource = latestBrand
+    ? {
+        brandName: latestBrand.output_data?.recommendedName || "your brand",
+        ideas: latestBrand.output_data?.marketingIdeas?.viralContentIdeas ?? [],
+      }
+    : null;
 
   const effectivePlan = getEffectivePlan({
     plan: userRow?.plan ?? "free",
     is_trial: userRow?.is_trial ?? false,
     trial_ends_at: userRow?.trial_ends_at ?? null,
   });
-  // Creator Max shows as "max" on the dashboard plan card (still Pro access everywhere).
+  // Creator Max shows as "max" on the plan card (still Pro access everywhere).
   const displayPlan = userRow?.plan === "max" ? "max" : effectivePlan;
 
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-10">
-        <div className="mx-auto max-w-6xl space-y-10">
-
-          {/* Recovery banner — shows only on past_due */}
+      <main className="flex-1 px-4 py-8 sm:py-10">
+        <div className="mx-auto max-w-6xl space-y-8">
           {paymentStatus === "past_due" && <PaymentRecoveryBanner />}
 
-          {/* Daily Creator Dashboard — greeting, XP, quick actions */}
-          <DailyCreatorDashboard
-            email={email}
+          <VaultShell
             displayName={(authData.user.user_metadata?.display_name as string | undefined) ?? null}
             plan={displayPlan}
-            brandCount={rows.length}
-            latestBrand={rows[0]}
             signupDate={authData.user.created_at}
+            items={items}
+            brands={brands}
+            brandCount={rows.length}
+            latestBrandId={latestBrand?.id ?? null}
+            ideaSource={ideaSource}
+            badgeStats={badgeStats}
           />
-
-          {/* 🏆 Trophy Shelf — collector badges (July 18 2026) */}
-          <BadgeShelf stats={badgeStats} />
-
-          {/* Studio Favorites — treasure stash (hidden if none) */}
-          <StudioFavoritesSection favorites={studioFavorites} />
-
-          {/* Brand Vault grid */}
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-black text-white">Your Brand Vault</h2>
-              <p className="text-xs text-faint">
-                {rows.length === 0
-                  ? "No brands yet"
-                  : `${rows.length} brand${rows.length === 1 ? "" : "s"}`}
-              </p>
-            </div>
-            {rows.length === 0 ? <EmptyState /> : <DashboardGrid rows={rows} />}
-          </div>
-
         </div>
       </main>
       <Footer />

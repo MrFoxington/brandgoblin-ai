@@ -13,7 +13,7 @@ import type { BrandGenerationRow, CreatorContentRow } from "@/types";
 export default async function CreatorProPage({
   searchParams,
 }: {
-  searchParams: { refill?: string };
+  searchParams: { refill?: string; contentType?: string; brandId?: string };
 }) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
@@ -54,7 +54,7 @@ export default async function CreatorProPage({
             </h1>
             <p className="text-sm font-semibold text-secondary mb-4">Your AI Marketing Department</p>
             <p className="text-sm text-muted mb-6 leading-relaxed">
-              Unlock unlimited social posts, blog content, email campaigns, ad copy, content calendars, and more — all tailored to your brand.
+              Unlock unlimited social posts, blog content, email campaigns, ad copy, content calendars and more, all tailored to your brand.
             </p>
             <div className="space-y-2 text-left mb-8">
               {["Unlimited copywriter", "Unlimited social media manager", "Unlimited content strategist", "Unlimited marketing ideas"].map((f) => (
@@ -64,7 +64,7 @@ export default async function CreatorProPage({
               ))}
             </div>
             <Link href="/pricing" className="btn-primary w-full py-3 block text-center mb-3">
-              Upgrade to Creator Pro — $19/mo
+              Upgrade to Creator Pro, $19/mo
             </Link>
             <Link href="/dashboard" className="text-sm text-muted hover:text-white transition-colors">
               Back to Dashboard
@@ -107,7 +107,12 @@ export default async function CreatorProPage({
                   </Link>
                 </div>
               ) : (
-                <CreatorProHub brands={brandRows} recentContent={contentRows} />
+                <CreatorProHub
+                  brands={brandRows}
+                  recentContent={contentRows}
+                  initialContentType={searchParams.contentType}
+                  initialBrandId={searchParams.brandId}
+                />
               )}
             </div>
 

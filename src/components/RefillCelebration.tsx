@@ -81,7 +81,7 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
 
   // Refill packs (3,000 / 7,000 ⚡) can push the balance past the monthly
   // allowance — "3,013 / 1,000" reads as broken math. Same over-max pattern as
-  // EnergyWidget / DailyCreatorDashboard: full bar, honest total + breakdown.
+  // EnergyWidget / VaultRail: full bar, honest total + breakdown.
   const overMax = allowance > 0 && total > allowance;
 
   // Bar fills from the pre-refill level up to the new total (as % of allowance).

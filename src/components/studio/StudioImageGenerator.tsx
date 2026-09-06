@@ -24,6 +24,8 @@ interface Props {
   maxConcurrentJobs?: number;
   /** Deep link from the brand kit CTA (?brand=<id>) — preselects that brand. */
   initialBrandId?: string;
+  /** Deep link from the Vault's Create chooser (?type=youtube_thumbnail etc). */
+  initialImageType?: ImageType;
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
@@ -179,7 +181,7 @@ function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
 }
 
-export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId }: Props) {
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId, initialImageType }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -193,8 +195,9 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const reduce = useReducedMotion();
 
   const [selectedBrandId, setSelectedBrandId] = useState<string>(initialBrandId ?? brands[0]?.id ?? "");
-  const [imageType, setImageType]   = useState<ImageType>("logo_concept");
-  const [modelKey, setModelKey]     = useState<StudioModelKey>(RECOMMENDED_MODEL.logo_concept);
+  const startType: ImageType = initialImageType && IMAGE_TYPES.some((t) => t.key === initialImageType) ? initialImageType : "logo_concept";
+  const [imageType, setImageType]   = useState<ImageType>(startType);
+  const [modelKey, setModelKey]     = useState<StudioModelKey>(RECOMMENDED_MODEL[startType]);
   const [prompt, setPrompt]         = useState<string>("");
   const [isCooking, setIsCooking]   = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -208,7 +211,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [galleryTab, setGalleryTab] = useState<"all" | "favorites" | "hidden">("all");
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
-  const [styleChip, setStyleChip]       = useState<string | null>(null);
+  const [styleChip, setStyleChip]       = useState<string | null>(AUTO_STYLE_CHIP[startType] ?? null);
   // Per-creation opt-out for the official-logo stamp (default ON = stamp).
   const [stampLogo, setStampLogo] = useState(true);
   // Paint the brand name INTO the art (July 11 2026) — OPT-IN, default OFF.

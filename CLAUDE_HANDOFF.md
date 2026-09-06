@@ -54,28 +54,42 @@ rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on 
 Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink surfaces, same
 type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure, Buy), clean
 typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
-`design-v1-dark-purple`. Everything pushed and live, repo clean.
+`design-v1-dark-purple`. **Phase B (the work-first Vault) is BUILT and committed (Sept 6, late):
+the dashboard now opens on the user's latest creation, a masonry gallery of everything, one
+green Create chooser, and a quiet right rail.** Needs Fox's push + the live 390px check.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE B (the work-first Vault)
+## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE B, THEN CREATOR STUDIO PHASE C (the canvas)
 
 Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
-(Fox's decisions + the four phases), (3) the two Sept 6 session logs below, (4) project memory
+(Fox's decisions + the four phases), (3) the Phase B session log below, (4) project memory
 `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-**Phase B in one paragraph:** the dashboard (`src/app/dashboard/page.tsx` +
-`DailyCreatorDashboard.tsx` + `DashboardGrid.tsx`) becomes work-first. Hero = the user's latest
-creation (Studio art or brand kit card) big at the top; a gallery of everything they've made
-(brand kits + Studio art + thumbnails, filter chips by brand/type); ONE green "Create" entry
-that opens a small chooser (Brand kit / Studio / Thumbnail); energy, streak and Trophy Shelf
-move to a quiet right rail on desktop / compact strip on phone; the eight "Quick Creates" text
-tiles fold into the Creator Pro page. Done when a new user with one brand sees their kit big,
-not a button grid. Keep: greeting + Nix line, Today's Idea, Trophy Shelf, reveal/celebration
-logic. Data already available on the page: `rows` (brand_generations), `studioFavorites`
-(listUserFavoriteJobs), `badgeStats`; Studio jobs come from `listUserJobs` (see studio/page.tsx).
+**First job: live-check the Vault.** Fox pushes Phase B (`git push origin main`), Vercel deploys,
+then audit `app.brandgoblinai.com/dashboard` in Chrome on Fox's Mac with the JS method
+(computed button colours: ONE spark = the rail's "Upgrade to Creator Pro" on free accounts, none
+on Pro/Max besides the nav; everything else green or quiet), then the 390px iframe trick
+(greeting → phone strip → hero → gallery → rail must stack with no horizontal overflow).
+Things to eyeball on a real account: the art hero on a portrait short-form cover (capped at
+560px tall), the brand hero's palette poster vs official-logo variant, the masonry with mixed
+aspect ratios, the Create chooser on a phone (bottom sheet).
+
+**Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
+1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
+left tool rail (Brand · What to make · Prompt · Style · Fonts · Engine as collapsible sections
+with current choices visible), center canvas (the working creation, always the biggest thing;
+generating = Nix cooking ON the canvas; the result lands in place with the existing
+celebration), right strip (recent creations for this brand, tap to swap onto the canvas).
+Save / Share / Remove BG / Upscale / Variation as a floating toolbar under the canvas. Phone:
+canvas on top, tool rail as a bottom sheet, gallery as a swipe row. The Studio gallery = ALL
+assets (uploads, logos, art, thumbnails) with Favorites / Hidden / per-brand filters, reusing
+the existing archive/favorite/official-logo logic as-is. Done when opening the Studio to a
+finished product-art image is three taps with no scrolling on desktop and the result is never
+below the fold. The Vault's art cards already deep-link to `/dashboard/studio?brand=<id>`; Phase
+C should make them open that creation on the canvas (add `?job=<id>`).
 
 **Rules that never change:** never generate Nix; energy gates creation, never possession;
 nav "Create" is the spark, in-page buttons are green (`btn-green`) unless they buy; no emoji as
@@ -85,6 +99,105 @@ give Fox the push lines. Fox reports most users are on desktop, so design for de
 and collapse cleanly on phones.
 
 ---
+
+---
+
+## 🗓️ SESSION LOG — September 6, 2026, late (🗄️ CREATOR STUDIO PHASE B: the work-first Vault. Committed, NOT pushed.)
+
+Fox: "Do Phase B from the Creator Studio Plan." Built in one session. `npx tsc --noEmit` clean.
+The dashboard is no longer a control panel: it opens on what the user made.
+
+**New files (all in `src/components/vault/` + `src/lib/vault.ts`):**
+- **`src/lib/vault.ts`**: pure data shaping. `buildVault(rows, jobs)` turns brand_generations +
+  visible Studio jobs into ONE list of `VaultItem`s (`kind: "brand" | "art"`), newest first, and
+  picks the hero (newest non-archived item with something to show). Brand items carry name,
+  tagline, idea, industry, 2 traits, 5 palette colours, own-name flag, and the brand's official
+  logo URL when the Studio has one. Art items carry the signed URL, type label, brand name, and
+  the pixel size (so cards can reserve the right aspect ratio: thumbnails 1280×720 / 1080×1920).
+  `pickHero(items)` is the one rule for "what goes big" (the shell re-runs it client-side
+  when a kit is archived, so the hero never goes stale). `timeAgo()` lives here too (call after
+  mount only; the old grid computed it during render, which is a hydration mismatch waiting
+  to happen around midnight).
+- **`VaultShell.tsx`** (client): the layout + the state the old dashboard owned (streak in
+  localStorage, energy fetch, daily idea, refill modal, name-ask flag, `session_start` tracking).
+  Grid: greeting spans both columns; main column = hero + gallery; rail = 304px right column on
+  `lg`, stacks under the gallery on phones; `MobileStrip` (streak · energy bar · plan pill)
+  sits right under the greeting on phones only. The shell OWNS the item list (archive /
+  restore lives here, optimistic via `/api/brands/archive`, never deletes) and derives the hero
+  from it. The gallery only renders at 2+ items (one creation = the hero already shows it), or
+  whenever the only kits are archived (so they stay reachable; the gallery then opens on the
+  Archived chip).
+- **`VaultGreeting.tsx`**: greeting + Nix line + "N creations in the vault" + the one-time
+  "What should Nix call you?" ask + the ONE green "+ Create" button (opens the chooser).
+- **`CreateChooser.tsx`**: modal with three doors: Brand kit (`/generate`), Studio image
+  (`/dashboard/studio?brand=<latest>`), Thumbnail (`/dashboard/studio?brand=<latest>&type=youtube_thumbnail`),
+  plus a quiet "Need words? Creator Pro" link. Esc / backdrop / pick closes; bottom sheet on
+  phones; body scroll locked while open.
+- **`VaultHero.tsx`**: the latest creation, big. ART = the image as large as the column allows
+  (object-contain, portrait capped at 560px) + "Open in Studio" (green), Share (file-first
+  `shareImageFile`, label flips to "Shared ✓ / Link copied ✓"), Download. BRAND = poster layout:
+  name at 4xl/5xl Fraunces, tagline in italic green, idea, badges, "Open brand kit" (green) +
+  "Make art in the Studio" (ghost); right side = the official logo on paper with a palette
+  strip, or (no logo yet) the palette as full-height colour bars with hex on hover + a mono hex
+  line. EMPTY (no creations) = the old EmptyState reborn: waving Nix, "Your first brand is one
+  sentence away", green "Bring my idea to life", four example ideas.
+- **`VaultGallery.tsx`**: masonry via CSS columns (2 on phones, 3 on md+; `break-inside-avoid`).
+  Type chips: All · Brands · Art · Thumbnails · ★ Favorites · Archived (each only when it has
+  members; the row hides when only "All" would show). Brand chips (gold) appear at 2+ active
+  brands and filter both kits and art. Art cards = the image at its true aspect ratio, ★ badge,
+  hover caption (type + brand), link to `/dashboard/studio?brand=<id>`. Brand cards = palette
+  strip on top (official logo chip overlaid when set), name, tagline, idea, "Brand kit" pill +
+  industry + own-name; archive/restore (`/api/brands/archive`, optimistic, never deletes) on
+  hover. Archived kits only show under their own chip, dimmed.
+- **`VaultRail.tsx`**: streak (gold) · brands · plan strip (plan cell links to /settings or
+  /pricing) → compact XP bar → Creative Energy card (number, "of N this month" or the
+  monthly+refill breakdown, bar coloured by warning level, green Refill/Top up, "Resets in Nd"
+  after mount) → Today's Idea (Nix conjuring, dismissable, "Create this now" for Pro) → Trophy
+  Shelf (`compact`) → plan card: FREE = the page's one spark, "Upgrade to Creator Pro"; PRO/MAX =
+  quiet "Need words? Creator Pro" link card. `MobileStrip` exported from the same file.
+- **`listUserGalleryJobs(userId, 40)`** in `src/lib/studio/jobs.ts`: completed + not hidden,
+  newest first, signs every storage path in ONE `createSignedUrls` batch (was one round trip
+  per job). **`listOfficialLogos(userId)`** (same file): brand id → signed logo URL, independent
+  of the 40-item gallery window, so a logo set long ago still shows on its brand card.
+
+**Changed:**
+- `src/app/dashboard/page.tsx` rewritten: same auth + starter-energy grant + Trophy stats
+  query, plus `listUserGalleryJobs`; builds the vault, passes plain props to `VaultShell`. The
+  Today's Idea source is now just `{ brandName, ideas }` from the latest brand (the old page
+  serialised the whole kit into the client bundle).
+- **Quick Creates moved to Creator Pro**: `CreatorProHub` gained a "Quick creates" row (the same
+  eight text types) right under its hero; a tap selects the group + type and scrolls to the
+  workflow panel (`#workflow-panel`). Energy numbers dropped from the tiles (energy-config
+  marks CONTENT_COSTS "never shown to users"). `?contentType=` and `?brandId=` are now honoured
+  (`initialContentType` / `initialBrandId` props from the page's searchParams), so the Today's
+  Idea "Create this now" link and the old quick-create URLs land on the right workflow.
+- **Studio deep link `?type=`**: `StudioImageGenerator` takes `initialImageType` (validated
+  against IMAGE_TYPES; sets the recommended engine + auto style chip for that type); the Studio
+  page reads `searchParams.type`. This is what the chooser's Thumbnail door uses.
+- `BadgeShelf`: `compact` prop (4 columns, 52px medallions, p-4) and it trusts
+  `stats.streakDays` when the parent passes it (VaultShell does after mount, so the shelf and
+  the rail always agree). Next-badge line lost its em dash.
+- Creator Pro free gate: two em dashes removed.
+- **Deleted**: `DailyCreatorDashboard.tsx`, `DashboardGrid.tsx`, `studio/StudioFavoritesSection.tsx`,
+  `EmptyState.tsx`, `NixAvatar.tsx` (all dead after the rewrite; `git show design-v1-dark-purple:src/components/DailyCreatorDashboard.tsx`
+  brings any of them back). `src/lib/studio/favorites.ts` (FAVORITES_LABEL) stays, the Studio uses it.
+
+**Spark discipline on the Vault:** nav "Create" + (free accounts only) the rail's "Upgrade to
+Creator Pro". Every other button is `btn-green` or `btn-ghost`. The in-page "+ Create" is green
+on purpose (the plan's "one green Create entry").
+
+**Review pass (subagent, same session) fixed before commit:** archived-only accounts could not
+reach their kit (gallery now shows + opens on Archived); hero went stale after archiving it
+(items lifted to the shell); official logo only found within the gallery window
+(`listOfficialLogos`); `URL.revokeObjectURL` right after `click()` cancels downloads in
+Safari/Firefox (deferred 10s); duplicate palette keys; chooser now restores focus on close;
+`buildVault` guarded against a null `input_data` row (would have 500'd the whole page).
+
+**Not done / for the live check:** no local render is possible (device VM has no network, so
+next dev hangs on fonts), so the 390px pass is reasoning-only until Fox pushes. Phase C will
+want `?job=<id>` on Studio links so an art card opens that creation on the canvas.
+
+**▶ NEXT:** Fox pushes → live audit (JS method + 390px iframe) → fix-ups → Phase C.
 
 ---
 

@@ -37,14 +37,14 @@ box as a creative surface, the one allowed magic moment (LoadingScreen).
 
 ## Phases (each one ships on its own)
 
-### Phase A: the skin (1 session, low risk)
+### Phase A: the skin (1 session, low risk) · SHIPPED Sept 6
 Flip `body` font defaults to Fraunces/Hanken; move app tokens (bg, surface, border, primary
 button) to the ink/paper/green system; retire orange; replace nav pills with one quiet
 segmented nav (Vault · Studio · Nix · Labs) plus a single green Create button; emoji purge
 on in-app chrome. No layout changes. Done when: every app page reads as one brand with the
 marketing, `grep` finds no `#FF6B35` / `from-primary` / gradient buttons in the app.
 
-### Phase B: the Vault (1-2 sessions)
+### Phase B: the Vault (1-2 sessions) · BUILT Sept 6 late (see CLAUDE_HANDOFF.md), live check pending
 Dashboard becomes work-first: hero = latest creation (Studio art or brand kit card) at full
 width; masonry gallery of everything (brand kits + Studio art + thumbnails, filter chips by
 brand/type); one green "Create" entry that opens a small chooser (Brand kit / Studio /

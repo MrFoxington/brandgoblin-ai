@@ -122,6 +122,23 @@ const CONTENT_TYPE_LABELS: Partial<Record<CreatorContentType, string>> = {
   brand_voice_suggestions: "Voice",
 };
 
+// Quick Creates (moved here from the dashboard in Creator Studio Phase B,
+// Sept 2026): the eight most-used text types, one tap to the workflow panel.
+const QUICK_CREATES: { label: string; type: CreatorContentType }[] = [
+  { label: "Instagram posts",  type: "instagram_post" },
+  { label: "Blog article",     type: "blog_post" },
+  { label: "Email newsletter", type: "email_campaign" },
+  { label: "Video ideas",      type: "campaign_ideas" },
+  { label: "Promotion",        type: "promotion" },
+  { label: "Hashtags",         type: "hashtag_set" },
+  { label: "Product ideas",    type: "product_description" },
+  { label: "Ad copy",          type: "ad_copy" },
+];
+
+function groupForType(type: CreatorContentType): string | null {
+  return CARD_GROUPS.find((g) => g.types.some((t) => t.key === type))?.key ?? null;
+}
+
 // Format a timestamp identically on the server and in the browser.
 // toLocaleDateString() with no arguments uses the machine's own locale and
 // timezone, so the server (UTC) and the user's browser could print different
@@ -148,17 +165,25 @@ interface GenerationResult {
 interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
   recentContent: CreatorContentRow[];
+  /** Deep links: ?contentType=<type> opens that workflow, ?brandId=<id> preselects the brand. */
+  initialContentType?: string;
+  initialBrandId?: string;
 }
 
 // ─── Main component ─────────────────────────────────────────────────────────
 
-export default function CreatorProHub({ brands, recentContent: initialRecent }: Props) {
-  const [selectedBrandId, setSelectedBrandId] = useState<string>(brands[0]?.id ?? "custom");
+export default function CreatorProHub({ brands, recentContent: initialRecent, initialContentType, initialBrandId }: Props) {
+  const startType = QUICK_CREATES.some((q) => q.type === initialContentType) || CARD_GROUPS.some((g) => g.types.some((t) => t.key === initialContentType))
+    ? (initialContentType as CreatorContentType)
+    : null;
+  const [selectedBrandId, setSelectedBrandId] = useState<string>(
+    (initialBrandId && brands.find((b) => b.id === initialBrandId)?.id) || brands[0]?.id || "custom"
+  );
   const [customName, setCustomName]     = useState("");
   const [customIdea, setCustomIdea]     = useState("");
   const [brandVoice, setBrandVoice]     = useState<BrandVoiceMode>("friendly");
-  const [activeGroup, setActiveGroup]   = useState<string | null>(null);
-  const [activeType, setActiveType]     = useState<CreatorContentType | null>(null);
+  const [activeGroup, setActiveGroup]   = useState<string | null>(startType ? groupForType(startType) : null);
+  const [activeType, setActiveType]     = useState<CreatorContentType | null>(startType);
   const [loading, setLoading]           = useState(false);
   const [result, setResult]             = useState<GenerationResult | null>(null);
   const [error, setError]               = useState<string | null>(null);
@@ -186,6 +211,17 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
       setResult(null);
       setError(null);
     }
+  }
+
+  function handleQuickCreate(type: CreatorContentType) {
+    setActiveGroup(groupForType(type));
+    setActiveType(type);
+    setResult(null);
+    setError(null);
+    // Let the panel mount, then bring it into view.
+    setTimeout(() => {
+      document.getElementById("workflow-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 40);
   }
 
   async function handleGenerate() {
@@ -253,6 +289,30 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
             <span>Unlimited content strategist.</span>
             <span>Unlimited marketing ideas.</span>
           </div>
+        </div>
+      </div>
+
+      {/* ── Quick creates (from the old dashboard) ── */}
+      <div>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-bold text-white">Quick creates</h2>
+          <span className="text-xs text-faint">One tap, then Generate</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {QUICK_CREATES.map((q) => (
+            <button
+              key={q.type}
+              type="button"
+              onClick={() => handleQuickCreate(q.type)}
+              className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors ${
+                activeType === q.type
+                  ? "border-primary/60 bg-primary/15 text-white"
+                  : "border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.03)] text-muted hover:border-primary/40 hover:text-white"
+              }`}
+            >
+              {q.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -373,7 +433,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
       {activeGroup && (() => {
         const group = CARD_GROUPS.find((g) => g.key === activeGroup)!;
         return (
-          <div className="bg-card rounded-2xl p-6 space-y-5">
+          <div id="workflow-panel" className="bg-card rounded-2xl p-6 space-y-5 scroll-mt-24">
             <div className="flex items-center gap-3">
               <div>
                 <h2 className="font-display text-lg font-bold text-white">{group.title}</h2>
