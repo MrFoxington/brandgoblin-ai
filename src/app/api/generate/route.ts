@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { kitModelsFor } from "@/lib/models";
 import { BRAND_GOBLIN_SYSTEM_PROMPT, buildBrandKitPrompt, buildExistingNameBrandKitPrompt } from "@/lib/prompts";
 import type { BrandInput, BrandKit } from "@/types";
 
@@ -168,44 +169,61 @@ export async function POST(request: Request) {
         const specs = body.nameMode === "existing" ? EXISTING_SECTIONS : GENERATED_SECTIONS;
         const firedKeys = new Set<string>();
 
-        const anthropicStream = anthropic.messages.stream({
-          model: "claude-sonnet-4-6",
-          max_tokens: 16000,
-          system: BRAND_GOBLIN_SYSTEM_PROMPT,
-          messages: [
-            {
-              role: "user",
-              content: body.nameMode === "existing"
-                ? buildExistingNameBrandKitPrompt(body)
-                : buildBrandKitPrompt(body),
-            },
-          ],
-        });
+        // Creator Max → strongest model, with automatic fallback to the default
+        // if the preferred model rejects the request before any text arrives
+        // (unknown ID, model not enabled on the key, etc.). See lib/models.ts.
+        const candidates = kitModelsFor(userRow.plan);
+        const userContent = body.nameMode === "existing"
+          ? buildExistingNameBrandKitPrompt(body)
+          : buildBrandKitPrompt(body);
 
-        for await (const chunk of anthropicStream) {
-          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
-            accumulated += chunk.delta.text;
+        let anthropicStream: ReturnType<typeof anthropic.messages.stream> | null = null;
+        for (let i = 0; i < candidates.length; i++) {
+          const model = candidates[i];
+          const attempt = anthropic.messages.stream({
+            model,
+            max_tokens: 16000,
+            system: BRAND_GOBLIN_SYSTEM_PROMPT,
+            messages: [{ role: "user", content: userContent }],
+          });
+          try {
+            for await (const chunk of attempt) {
+              if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+                accumulated += chunk.delta.text;
 
-            // Stream each section's REAL content the moment its value is
-            // complete in the buffer. All unfired specs are checked every
-            // chunk, so an out-of-order model can never stall the feed.
-            for (const spec of specs) {
-              if (firedKeys.has(spec.key)) continue;
-              const value = extractCompleteValue(accumulated, spec.key);
-              if (value === undefined) continue;
-              firedKeys.add(spec.key);
-              if (!spec.emit) continue;
-              send(controller, {
-                status: "generating",
-                section: spec.section,
-                label: spec.label,
-                pose: spec.pose,
-                progress: firedKeys.size / specs.length,
-                content: value,
-              });
+                // Stream each section's REAL content the moment its value is
+                // complete in the buffer. All unfired specs are checked every
+                // chunk, so an out-of-order model can never stall the feed.
+                for (const spec of specs) {
+                  if (firedKeys.has(spec.key)) continue;
+                  const value = extractCompleteValue(accumulated, spec.key);
+                  if (value === undefined) continue;
+                  firedKeys.add(spec.key);
+                  if (!spec.emit) continue;
+                  send(controller, {
+                    status: "generating",
+                    section: spec.section,
+                    label: spec.label,
+                    pose: spec.pose,
+                    progress: firedKeys.size / specs.length,
+                    content: value,
+                  });
+                }
+              }
             }
+            anthropicStream = attempt;
+            if (i > 0) console.warn(`[generate] fell back to ${model} for user ${userId}`);
+            break;
+          } catch (err) {
+            const isLast = i === candidates.length - 1;
+            if (accumulated.length === 0 && !isLast) {
+              console.warn(`[generate] model ${model} failed before streaming — trying ${candidates[i + 1]}:`, err);
+              continue;
+            }
+            throw err;
           }
         }
+        if (!anthropicStream) throw new Error("No model was able to start the generation.");
 
         const finalMessage = await anthropicStream.finalMessage();
 

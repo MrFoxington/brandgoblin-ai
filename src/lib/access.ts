@@ -8,9 +8,32 @@ export interface UserAccess {
   has_used_trial?: boolean;
 }
 
-/** Returns "pro" if the user has paid Pro/agency OR is within an active trial window. */
+/**
+ * True for every PAID plan that unlocks Pro features: Creator Pro, Creator Max,
+ * and the legacy "agency" value. Use this instead of `plan === "pro"` so a new
+ * tier can never silently lock a paying member out of a feature.
+ */
+export function hasProAccess(plan: string | null | undefined): boolean {
+  return plan === "pro" || plan === "max" || plan === "agency";
+}
+
+/** True only for Creator Max ($49/mo). */
+export function isMaxPlan(plan: string | null | undefined): boolean {
+  return plan === "max";
+}
+
+/**
+ * The user's tier for display/limits: "max" | "pro" | "free". Trials count as
+ * "pro". (Prefer getEffectivePlan() when you only need pro-or-not.)
+ */
+export function getPlanTier(u: UserAccess): "max" | "pro" | "free" {
+  if (u.plan === "max") return "max";
+  return getEffectivePlan(u);
+}
+
+/** Returns "pro" if the user has paid Pro/Max/agency OR is within an active trial window. */
 export function getEffectivePlan(u: UserAccess): "pro" | "free" {
-  if (u.plan === "pro" || u.plan === "agency") return "pro";
+  if (hasProAccess(u.plan)) return "pro";
   if (u.is_trial && u.trial_ends_at && new Date(u.trial_ends_at) > new Date()) return "pro";
   return "free";
 }
@@ -21,8 +44,7 @@ export function isTrialing(u: UserAccess): boolean {
     u.is_trial &&
     !!u.trial_ends_at &&
     new Date(u.trial_ends_at) > new Date() &&
-    u.plan !== "pro" &&
-    u.plan !== "agency"
+    !hasProAccess(u.plan)
   );
 }
 
@@ -38,7 +60,6 @@ export function trialExpired(u: UserAccess): boolean {
   return (
     !!u.has_used_trial &&
     !u.is_trial &&
-    u.plan !== "pro" &&
-    u.plan !== "agency"
+    !hasProAccess(u.plan)
   );
 }

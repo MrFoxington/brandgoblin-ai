@@ -293,7 +293,7 @@ function BrandFontsSection({
 export default function BrandKitView({
   kit: initialKit, brandInput, brandGenerationId, initialRerollsUsed = [], userPlan = "free",
 }: {
-  kit: BrandKit; brandInput?: BrandInput; brandGenerationId?: string; initialRerollsUsed?: string[]; userPlan?: "free" | "pro" | "agency";
+  kit: BrandKit; brandInput?: BrandInput; brandGenerationId?: string; initialRerollsUsed?: string[]; userPlan?: "free" | "pro" | "max" | "agency";
 }) {
   const [kit, setKit] = useState<BrandKit>(initialKit);
   const [rerollsUsed, setRerollsUsed] = useState<Set<string>>(new Set(initialRerollsUsed));

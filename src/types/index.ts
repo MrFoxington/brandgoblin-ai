@@ -30,9 +30,12 @@ export interface StudioJobRow {
 
 // ---------- Database row types ----------
 
-export type Plan = "free" | "pro" | "agency";
+// "max" = Creator Max ($49/mo, Sept 2026). "agency" is a legacy value kept
+// only so old rows never break; it is treated as Pro everywhere.
+export type Plan = "free" | "pro" | "max" | "agency";
 
-export function planDisplayName(plan: Plan): string {
+export function planDisplayName(plan: Plan | string): string {
+  if (plan === "max") return "Creator Max";
   if (plan === "pro" || plan === "agency") return "Creator Pro";
   return "Free";
 }

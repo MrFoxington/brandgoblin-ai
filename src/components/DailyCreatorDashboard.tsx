@@ -138,7 +138,8 @@ export default function DailyCreatorDashboard({
   latestBrand?: BrandGenerationRow;
   signupDate?: string;
 }) {
-  const isPro = plan === "pro" || plan === "agency";
+  const isPro = plan === "pro" || plan === "max" || plan === "agency";
+  const isMax = plan === "max";
   const [name, setName] = useState<string | null>(displayName?.trim() || null);
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -320,8 +321,8 @@ export default function DailyCreatorDashboard({
           {/* Plan */}
           <div className={`rounded-2xl border p-4 text-center ${isPro ? "border-primary/20 bg-primary/5" : "border-white/8 bg-white/3"}`}>
             <p className="text-3xl mb-1">{isPro ? "✨" : "⚡"}</p>
-            <p className="font-display font-black text-white text-xl">{isPro ? "Pro" : "Free"}</p>
-            <p className="text-xs text-faint mt-0.5">{isPro ? "Creator Pro" : "upgrade available"}</p>
+            <p className="font-display font-black text-white text-xl">{isMax ? "Max" : isPro ? "Pro" : "Free"}</p>
+            <p className="text-xs text-faint mt-0.5">{isMax ? "Creator Max" : isPro ? "Creator Pro" : "upgrade available"}</p>
           </div>
         </motion.div>
       )}

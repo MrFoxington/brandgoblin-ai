@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { BRAND_GOBLIN_SYSTEM_PROMPT } from "@/lib/prompts";
 import { checkEnergyForGeneration, deductEnergy, refundEnergy } from "@/lib/energy";
 import { getEffectivePlan } from "@/lib/access";
+import { contentModelFor } from "@/lib/models";
 import { expireTrialIfNeeded } from "@/lib/trial";
 import type { CreatorContentType, BrandVoiceMode } from "@/types";
 
@@ -173,9 +174,12 @@ export async function POST(request: Request) {
     }, { status: 402 });
   }
 
+  // Creator Max → stronger model for the content engine (Sept 2026). See lib/models.ts.
+  const contentModel = contentModelFor(userRow.plan);
+
   try {
     const message = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: contentModel,
       max_tokens: 4000,
       system: BRAND_GOBLIN_SYSTEM_PROMPT,
       messages: [{ role: "user", content: buildPrompt(body) }],
@@ -207,7 +211,7 @@ export async function POST(request: Request) {
     // ⚡ Deduct Creative Energy after successful generation
     const { balanceAfter } = await deductEnergy(authData.user.id, body.contentType, {
       generationId: saved?.id,
-      modelUsed: "claude-haiku-4-5-20251001",
+      modelUsed: contentModel,
       promptTokens: message.usage?.input_tokens,
       completionTokens: message.usage?.output_tokens,
     });

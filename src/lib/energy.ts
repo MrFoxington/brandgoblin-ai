@@ -2,8 +2,8 @@
 // All balance reads/writes go through here. Never trust the client.
 
 import { createAdminClient } from "@/lib/supabase/server";
-import { ENERGY_CONFIG, getEnergyCost } from "@/lib/energy-config";
-import { getEffectivePlan } from "@/lib/access";
+import { ENERGY_CONFIG, getEnergyCost, getPlanPerks } from "@/lib/energy-config";
+import { getEffectivePlan, hasProAccess } from "@/lib/access";
 
 export interface EnergyBalance {
   monthlyTotal: number;
@@ -66,8 +66,7 @@ export async function checkEnergyForGeneration(
     userRow.is_trial &&
     userRow.trial_ends_at &&
     new Date(userRow.trial_ends_at) <= new Date() &&
-    userRow.plan !== "pro" &&
-    userRow.plan !== "agency"
+    !hasProAccess(userRow.plan)
   ) {
     await supabase.from("users").update({ is_trial: false }).eq("id", userId);
     return { allowed: false, cost: 0, totalRemaining: 0, reason: "not_pro" };
@@ -82,7 +81,7 @@ export async function checkEnergyForGeneration(
 
   // Lazy-init: if no balance row exists yet, create one (handles edge cases)
   if (!balance) {
-    await grantMonthlyEnergy(userId, undefined, undefined);
+    await grantMonthlyEnergy(userId, undefined, undefined, { plan: userRow.plan });
     const fresh = await getUserEnergyBalance(userId);
     const total = fresh?.totalRemaining ?? 0;
     return { allowed: total >= cost, cost, totalRemaining: total };
@@ -207,25 +206,74 @@ export async function refundEnergy(
 
 // ── Grant monthly energy (on new sub or renewal) ──────────────────────────
 
+export interface MonthlyGrantOptions {
+  /** "pro" | "max" (anything else is treated as Pro). Decides allowance + rollover. */
+  plan?: string;
+  /**
+   * Explicit allowance (e.g. read from the Stripe price's `energy_amount`
+   * metadata at checkout). Overrides the plan default when present.
+   */
+  allowance?: number;
+}
+
+/**
+ * Grant / reset the monthly Creative Energy for a billing period.
+ *
+ * Sept 2026 (Creator Max):
+ *  - allowance comes from opts.allowance (Stripe price metadata) or the plan's perks
+ *  - Max carries unused monthly energy forward one period, capped at one allowance
+ *  - IDEMPOTENT per period: if this user's row already carries the same
+ *    current_period_start, the grant is skipped. Stripe can fire both
+ *    `customer.subscription.updated` and `invoice.payment_succeeded` for one
+ *    renewal; without this guard a rollover plan would double-carry.
+ */
 export async function grantMonthlyEnergy(
   userId: string,
   periodStart?: string,
-  periodEnd?: string
+  periodEnd?: string,
+  opts: MonthlyGrantOptions = {}
 ): Promise<void> {
   const supabase = createAdminClient();
-  const allowance = ENERGY_CONFIG.MONTHLY_ALLOWANCE;
+  const plan = opts.plan === "max" ? "max" : "pro";
+  const perks = getPlanPerks(plan);
+  const allowance =
+    opts.allowance && Number.isFinite(opts.allowance) && opts.allowance > 0
+      ? Math.round(opts.allowance)
+      : perks.monthlyEnergy;
 
   const { data: existing } = await supabase
     .from("user_energy_balances")
-    .select("id, refill_energy_total, refill_energy_remaining")
+    .select("id, plan, monthly_energy_remaining, refill_energy_total, refill_energy_remaining, current_period_start")
     .eq("user_id", userId)
     .single();
 
+  // Idempotency: same period already granted → nothing to do.
+  if (
+    existing &&
+    periodStart &&
+    existing.current_period_start &&
+    existing.plan === plan &&
+    new Date(existing.current_period_start).getTime() === new Date(periodStart).getTime()
+  ) {
+    console.log(`[grantMonthlyEnergy] period ${periodStart} already granted for user ${userId} — skipping`);
+    return;
+  }
+
+  // Rollover (Max only): carry what's left of LAST month's monthly bucket,
+  // capped at one allowance, so a slow month is never wasted but the bucket
+  // can't grow without bound. Only carries when the user was already on a
+  // rollover plan (a fresh Pro→Max upgrade starts clean).
+  const carry =
+    perks.rolloverMonths > 0 && existing?.plan === plan
+      ? Math.max(0, Math.min(existing.monthly_energy_remaining ?? 0, allowance))
+      : 0;
+  const monthlyTotal = allowance + carry;
+
   const payload = {
     user_id:                  userId,
-    plan:                     "pro",
-    monthly_energy_total:     allowance,
-    monthly_energy_remaining: allowance,
+    plan,
+    monthly_energy_total:     monthlyTotal,
+    monthly_energy_remaining: monthlyTotal,
     refill_energy_total:      existing?.refill_energy_total     ?? 0,
     refill_energy_remaining:  existing?.refill_energy_remaining ?? 0,
     current_period_start:     periodStart ?? new Date().toISOString(),
@@ -241,14 +289,17 @@ export async function grantMonthlyEnergy(
     await supabase.from("user_energy_balances").insert(payload);
   }
 
-  const balanceAfter = allowance + (existing?.refill_energy_remaining ?? 0);
+  const balanceAfter = monthlyTotal + (existing?.refill_energy_remaining ?? 0);
 
   await supabase.from("energy_transactions").insert({
     user_id:          userId,
     transaction_type: "monthly_grant",
-    amount:           allowance,
+    amount:           monthlyTotal,
     balance_after:    balanceAfter,
-    description:      "Monthly Creative Energy grant",
+    description:
+      carry > 0
+        ? `Monthly Creative Energy grant (${perks.label}: ${allowance.toLocaleString()} + ${carry.toLocaleString()} rolled over)`
+        : `Monthly Creative Energy grant (${perks.label})`,
   });
 }
 

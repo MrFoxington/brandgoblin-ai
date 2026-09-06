@@ -20,6 +20,8 @@ interface Props {
   brands: Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
   initialJobs: StudioJobRow[];
   isPro?: boolean;
+  /** Studio jobs allowed at once (Creator Max = 4, everyone else = 2). Sept 2026. */
+  maxConcurrentJobs?: number;
   /** Deep link from the brand kit CTA (?brand=<id>) — preselects that brand. */
   initialBrandId?: string;
 }
@@ -177,7 +179,7 @@ function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
 }
 
-export default function StudioImageGenerator({ brands, initialJobs, isPro = false, initialBrandId }: Props) {
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -1087,14 +1089,14 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleVariation(celebratingJob)}
-                    disabled={generating || activeJobs.length >= 2}
+                    disabled={generating || activeJobs.length >= maxConcurrentJobs}
                     className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     🎨 Variation · ⚡{celebratingJobCost}
                   </button>
                   <button
                     onClick={() => handleNewStyle(celebratingJob)}
-                    disabled={generating || activeJobs.length >= 2 || isCooking}
+                    disabled={generating || activeJobs.length >= maxConcurrentJobs || isCooking}
                     className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     🪄 New style · ⚡{celebratingJobCost}
@@ -1773,15 +1775,15 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
         {/* Conjure button — orange, magnetic, the most visible thing on the page */}
         <button
           onClick={handleGenerate}
-          disabled={generating || isCooking || activeJobs.length >= 2}
+          disabled={generating || isCooking || activeJobs.length >= maxConcurrentJobs}
           className="w-full rounded-2xl py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_20px_rgba(255,107,53,0.45),0_0_40px_rgba(255,107,53,0.2)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90 active:opacity-80"
         >
           {generating
             ? "Submitting…"
             : isCooking
             ? "✨ Nix is writing your prompt…"
-            : activeJobs.length >= 2
-            ? "⏳ Generating… (2 active)"
+            : activeJobs.length >= maxConcurrentJobs
+            ? `⏳ Generating… (${maxConcurrentJobs} active)`
             : `⚡ Conjure for ${energyCost} energy`}
         </button>
       </div>

@@ -5,6 +5,8 @@ import EnergyRefillModal from "@/components/EnergyRefillModal";
 
 interface EnergyData {
   plan: string;
+  /** "max" | "pro" | "free" (Sept 2026) */
+  tier?: string;
   totalRemaining: number;
   monthlyRemaining?: number;
   refillRemaining?: number;
@@ -101,7 +103,7 @@ export default function EnergyWidget() {
             <span className="text-lg">⚡</span>
             <span className="text-sm font-bold text-white">Creative Energy</span>
           </div>
-          <span className="text-xs text-faint">{isFree ? "Free" : "Creator Pro"}</span>
+          <span className="text-xs text-faint">{isFree ? "Free" : energy?.tier === "max" ? "Creator Max" : "Creator Pro"}</span>
         </div>
 
         {/* Warning banner */}

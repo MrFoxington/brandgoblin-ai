@@ -52,6 +52,127 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — September 6, 2026 (🎨 BRAND MATURITY P4 SHIPPED: grown-up design system · 👑 CREATOR MAX $49 TIER BUILT (P6). Two commits, NOT pushed. ⚠️ MIGRATION + STRIPE STEPS BEFORE MAX GOES LIVE)
+
+Cowork session after a 3.5-week gap (nothing had moved since Aug 12). Fox's calls this
+session: (1) do the green/gold redesign now, keep Nix exactly as he is; (2) the $49 plan is
+a REAL recurring tier named **Creator Max** (not "Goblin Studio", which collides with the
+Studio feature); (3) roadmap after this = one site (Airo dies, root domain → app) → then
+Goblin Labs video "made fucking amazing" with the newest models (verify model IDs/prices
+when we start Labs, don't guess). `npx tsc --noEmit` clean after both commits.
+
+### Commit 1 — `fd55850` Brand Maturity P4: the marketing design system
+Marketing surfaces only (landing, pricing, login, signup, forgot/reset password, navbar +
+footer in light tone). In-app dashboard/Studio/generate untouched on purpose.
+- **Fonts** via next/font in `layout.tsx`: Fraunces (display, axes opsz+SOFT, italic),
+  Hanken Grotesk (body), JetBrains Mono (hex/labels; Geist Mono isn't on Google Fonts).
+  Space Grotesk + Inter stay loaded for the app. Tailwind `font-display/sans/mono` now
+  resolve through CSS vars `--font-display/--font-sans/--font-mono` whose DEFAULTS (the
+  app look) live on `body` and are overridden inside `.theme-marketing`. → The app
+  "inherits" the new type system later by flipping the body defaults. One line.
+- **Palette tokens** (tailwind.config.ts): `paper` #FAF7F2 (+ paper-2/-3), `ink` #141518
+  (+ ink-2/muted/faint), `goblin` #2E7D5B (+ dark/light/tint), `gold` #FBBF24 (+ dark/tint),
+  `nix` #7C3AED (Nix-only), `line` #E6DFD3. Old tokens (primary/secondary/bg/…) untouched.
+- **globals.css**: `.theme-marketing` scope (fonts, paper bg, light color-scheme, native
+  scrollbar via `html:has(.theme-marketing)`), scoped overrides of the SAME class names
+  (`.btn-primary` = solid green, no pulse/shimmer; `.btn-secondary`, `.bg-card`, `.input`,
+  `.label`, `.section-heading` = Fraunces 600), plus `.accent` (goblin green italic, the
+  gradient-text replacement), `.eyebrow` (green kicker), `.badge-neutral`, `.badge-goblin`.
+  `.section-heading` now uses `var(--font-display)` (was hardcoded Space Grotesk).
+- **`src/components/marketing/MarketingShell.tsx`** (new) wraps a marketing page in the
+  scope and renders `<Navbar tone="light" /> … <Footer tone="light" />`. Navbar/Footer
+  gained `tone?: "light" | "dark"` (default dark → no app page moved). Tone follows the
+  PAGE, not the login state (a logged-in Fox on the landing page sees the light nav).
+- **Landing**: grid/particles/purple mesh gone; one soft warm+green radial tint (the plan's
+  "one allowed gradient"); Nix keeps his purple aura in his container (his colour, allowed);
+  sections alternate paper / paper-2 with hairline borders; dark INK product window in
+  BrandKitPreview stays dark on purpose (the app IS dark, so it reads as a real screenshot)
+  with purple accents → green/gold inside; final CTA = ink block, green button; pricing
+  summary header → "Simple pricing. Serious value." + possession promise line.
+- **Copy honesty**: hero trust chip "Built by brand strategists" CUT (unverifiable, same
+  rule as the Aug 12 ComparisonSection fix) → "Yours to keep, forever". Signup "Summoning
+  account… / ✦ Create account free →" → "Creating your account… / Create account free";
+  login "🪄 Signing in…" → "Signing in…"; "🧙 Nix is ready to help…" → "Nix is ready when
+  you are." Em dashes removed from all marketing copy touched (Fox's writing rule).
+- theme-color meta → #2E7D5B. ShowcaseMarquee edge fades follow `--page` (dark in the
+  embed, paper on marketing). ShowcaseCard: purple border/shadow + ✦ removed.
+- **NOT DONE / can't from here**: no visual verification — the device VM has no browser
+  and no network, and next/font downloads fonts at build time, so `next build` and
+  `next dev` both hang there (tried both, ~3 min each). Verification = Fox pushes → Vercel
+  → Claude screenshots live (BEFORE shots taken in Chrome on Sept 6, pre-push).
+  Prompt 5 (real screenshot above the fold) still open: needs Fox's screenshots.
+
+### Commit 2 — Creator Max ($49/mo) — Brand Maturity P6, expanded per Fox
+**What Max is (all real today):** 4,000 Creative Energy/mo (Pro 1,000; the $49 pack is
+3,000 so Max beats buying packs monthly) · Nix on Claude's strongest model for kits + the
+content engine · unused monthly energy rolls over ONE month (capped at one allowance) ·
+4 Studio jobs at once (Pro/Free 2) · +30% on every top-up pack (Pro +20%) · everything in
+Pro · first access to new tools (Labs video the day it ships; NOT listed until then).
+Margin check: a Max user burning all 4,000⚡ ≈ $7.20 provider cost + a few $ of Claude.
+
+- **⚠️ MIGRATION FIRST — `supabase/migrations/20260906_creator_max_plan.sql`.** The live
+  `users.plan` CHECK constraint only allows free/pro/agency; a Max purchase would fail at
+  the webhook. The migration drops whatever check guards `users.plan` (name may differ from
+  schema.sql) and re-adds it with 'max'. Run in the Supabase SQL editor BEFORE deploying.
+- **`src/lib/access.ts`**: new `hasProAccess(plan)` (pro|max|agency), `isMaxPlan`,
+  `getPlanTier(u)` → "max"|"pro"|"free". `getEffectivePlan` still returns "pro" for Max
+  (it answers "pro access?"), so every existing `=== "pro"` check on its RESULT keeps
+  working. Every RAW `plan === "pro"` / `!== "pro"` gate was migrated to `hasProAccess`
+  (cook-prompt + process routes were `!== "pro"` and would have LOCKED Max out of Studio's
+  prompt cooker / Remove BG — found and fixed).
+- **`src/lib/energy-config.ts`**: `MAX_MONTHLY_ALLOWANCE` (env `CREATOR_MAX_MONTHLY_ENERGY`,
+  default 4000) + `PLAN_PERKS` {pro, max} (monthlyEnergy, packBonus, maxConcurrentJobs,
+  rolloverMonths) + helpers `getPlanPerks/getMonthlyAllowance/getMaxConcurrentJobs`.
+- **`src/lib/energy.ts` `grantMonthlyEnergy(userId, start, end, { plan, allowance })`**:
+  allowance from opts (Stripe metadata) → plan perks; Max rollover carry; **IDEMPOTENT per
+  period** (skips when the row already carries the same current_period_start + plan) — this
+  is what makes it safe for both renewal triggers to fire.
+- **Checkout (`api/stripe/checkout`)**: `body.plan` "pro"|"max" → `STRIPE_PRICE_ID_PRO` /
+  **`STRIPE_PRICE_ID_MAX`** (new env). Monthly energy = price `energy_amount` metadata →
+  code default, stamped on session + subscription metadata as `monthlyEnergy` (same rule as
+  refills: the webhook never guesses). 409 if already on that plan. Pack bonus now
+  `getPlanPerks(plan).packBonus` (Max 1.3).
+- **Webhook**: plan resolved by price ID → sub metadata → "pro" (never locks a payer out).
+  `checkout.session.completed` grants with the stamped allowance, then **cancels any OTHER
+  live subscription with proration** (Pro→Max switch = one bill, not two). The resulting
+  deleted/canceled events are guarded: if another live sub exists, the member is KEPT on
+  that plan (no phantom downgrade). Renewal grant now also fires on
+  `invoice.payment_succeeded` with `billing_reason: subscription_cycle` (the long-standing
+  "monthly reset is heuristic" TODO) — safe because the grant is idempotent.
+- **Concurrency**: jobs route cap is plan-aware (`getMaxConcurrentJobs`); Studio page passes
+  `maxConcurrentJobs` to StudioImageGenerator (button states follow it).
+- **Models — `src/lib/models.ts`** (new): `CLAUDE_MODEL_KIT` (default claude-sonnet-4-6,
+  what prod already used — the "haiku" note in the tech-stack table above was stale),
+  `CLAUDE_MODEL_KIT_MAX` (default **claude-opus-4-6**), `CLAUDE_MODEL_CONTENT` (haiku 4.5),
+  `CLAUDE_MODEL_CONTENT_MAX` (sonnet 4.6). The kit route tries the Max model first and
+  **falls back to the default automatically if the model errors before any text streams**
+  (unknown ID / not enabled on the key), so a wrong env value can't break a Max member.
+  ▶ Fox: if you want Max on a Claude 5 model, set `CLAUDE_MODEL_KIT_MAX` in Vercel to its
+  exact API ID and watch one generation (Opus-class is slower; route maxDuration is 300s).
+- **UI**: pricing page = 3 tiers most-expensive-first (Max = ink card with gold "Maximum
+  value" pill, Pro keeps "Most popular", Free), landing pricing summary = 3 cards;
+  Settings shows Max perks + "Upgrade to Creator Max" for Pro members; dashboard plan card,
+  EnergyWidget label, refill modal (+30% Max bonus from `/api/energy/balance` new fields
+  `tier` + `packBonus`), `planDisplayName("max")` = "Creator Max". `Plan` type gains "max".
+
+**⚠️ FOX'S DEPLOY ORDER FOR MAX:**
+1. Supabase SQL editor → run `supabase/migrations/20260906_creator_max_plan.sql`.
+2. Stripe (LIVE mode) → Products → add "Creator Max", $49/month recurring. On the PRICE
+   (not the product — the July 10 lesson) add metadata `energy_amount` = `4000`.
+3. Vercel → env → `STRIPE_PRICE_ID_MAX` = that price ID → redeploy.
+4. Push (both commits). Then one real live purchase of Max from a test account: confirm
+   `users.plan = 'max'`, energy shows 4,000 with "Creator Max" label, Studio allows 4 at
+   once, refill modal says +30%. Cancel/refund from the Stripe dashboard.
+5. Optional: Stripe Customer Portal → allow switching between the Pro and Max prices.
+
+**▶ NEXT:** (1) Fox pushes → Claude verifies the redesign live + AFTER screenshots →
+fix anything off; (2) Max go-live per the steps above; (3) P5 real screenshot above the
+fold (needs Fox's screenshots); (4) **P7 one website**: marketing to the root domain, Airo
+retired, GoDaddy DNS (~3 fields); (5) THEN Goblin Labs video (Phase 0d → Phase 1) with a
+fresh model/price research pass first.
+
+---
+
 ## 🗓️ SESSION LOG — August 12, 2026 (📈 BRAND MATURITY P3 SHIPPED — signup scoreboard + honesty fix. Committed, NOT pushed. ⚠️ MIGRATION BEFORE DEPLOY)
 
 Cowork (desktop app) session. Two commits: the flagged honesty fix from Aug 11, then Brand
@@ -2481,7 +2602,8 @@ content-population + distribution, not new code:
 | Plan | Price | Features |
 |---|---|---|
 | Free | $0 forever | Brand generation, try Goblin Studio with a one-time Creative Energy starter (250, tunable), free Nix stickers/wallpapers. No 7-day trial, no day-7 lockout. |
-| Creator Pro | $19/month | Unlimited generations, full content engine, monthly Creative Energy, top-ups. |
+| Creator Pro | $19/month | Unlimited generations, full content engine, 1,000 monthly Creative Energy, +20% on packs, top-ups. |
+| Creator Max | $49/month | (Sept 6, 2026 — built, needs migration + Stripe price + `STRIPE_PRICE_ID_MAX` before live) Everything in Pro + 4,000 monthly energy, 1-month rollover, strongest Claude model, 4 Studio jobs at once, +30% on packs, first access to new tools. |
 | ~~Agency Edition~~ | — | **Removed from all UI** June 24, 2026. `"agency"` retained in the `Plan` type for safety only. |
 
 ### Key Features Built

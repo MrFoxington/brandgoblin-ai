@@ -16,6 +16,7 @@ import {
 import { downloadAsset } from "@/lib/studio/provider";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
+import { hasProAccess } from "@/lib/access";
 
 export const runtime  = "nodejs";
 export const maxDuration = 60; // clarity-upscaler can take ~10-15s
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || userRow.plan !== "pro") {
+  if (!userRow || !hasProAccess(userRow.plan)) {
     return NextResponse.json({ error: "Creator Pro required." }, { status: 403 });
   }
 

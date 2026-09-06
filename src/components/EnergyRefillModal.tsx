@@ -20,8 +20,10 @@ interface Props {
   isEmpty?:  boolean;
 }
 
-// Creator Pro members get +20% bonus energy on every pack (July 17 2026 —
-// member bonus flywheel: subscription and packs reinforce, never cannibalize).
+// Members get bonus energy on every pack (July 17 2026 — member bonus
+// flywheel: subscription and packs reinforce, never cannibalize).
+// Creator Pro +20%, Creator Max +30% (Sept 2026). The live multiplier comes
+// from /api/energy/balance (`packBonus`); this is only the Pro default.
 const PRO_PACK_BONUS = 1.2;
 
 export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty }: Props) {
@@ -30,6 +32,8 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
   const [selectedPack, setSelectedPack] = useState<string>("value");
   // null = plan unknown (fetch in flight) — show neither nudge nor bonus until known
   const [isProMember, setIsProMember] = useState<boolean | null>(null);
+  const [packBonus, setPackBonus]     = useState<number>(PRO_PACK_BONUS);
+  const [tierLabel, setTierLabel]     = useState<string>("Pro");
 
   // Detect the user's plan when the modal opens — drives the same-price nudge
   // (free users, $19 pack) and the +20% member bonus display (Pro users).
@@ -40,8 +44,12 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
       try {
         const res = await fetch("/api/energy/balance");
         if (!res.ok) return;
-        const data = (await res.json()) as { plan?: string };
-        if (!cancelled) setIsProMember(data.plan === "pro");
+        const data = (await res.json()) as { plan?: string; tier?: string; packBonus?: number };
+        if (!cancelled) {
+          setIsProMember(data.plan === "pro");
+          if (typeof data.packBonus === "number" && data.packBonus > 1) setPackBonus(data.packBonus);
+          setTierLabel(data.tier === "max" ? "Max" : "Pro");
+        }
       } catch {
         /* fail soft — modal works without plan info */
       }
@@ -199,8 +207,8 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
                   <span className="text-xs text-faint">
                     {isProMember ? (
                       <>
-                        ⚡ {Math.round(pack.energy * PRO_PACK_BONUS).toLocaleString()} energy{" "}
-                        <span className="text-[#E9C75A] font-semibold">(+20% Pro bonus)</span> · {pack.capacity}
+                        ⚡ {Math.round(pack.energy * packBonus).toLocaleString()} energy{" "}
+                        <span className="text-[#E9C75A] font-semibold">(+{Math.round((packBonus - 1) * 100)}% {tierLabel} bonus)</span> · {pack.capacity}
                       </>
                     ) : (
                       <>⚡ {pack.energy.toLocaleString()} energy · {pack.capacity}</>
@@ -243,7 +251,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
 
         <p className="mb-6 text-center text-xs text-faint">
           {isProMember
-            ? "One-time purchase · Your Creator Pro subscription stays the same"
+            ? `One-time purchase · Your Creator ${tierLabel} subscription stays the same`
             : "One-time purchase · Energy never expires"}
         </p>
 

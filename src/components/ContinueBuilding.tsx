@@ -47,12 +47,12 @@ const NIX_RECS: Record<string, string> = {
 
 interface Props {
   brandId?: string;
-  userPlan?: "free" | "pro" | "agency";
+  userPlan?: "free" | "pro" | "max" | "agency";
   brandInput?: BrandInput;
 }
 
 export default function ContinueBuilding({ brandId, userPlan = "free", brandInput }: Props) {
-  const isPro = userPlan === "pro" || userPlan === "agency";
+  const isPro = userPlan === "pro" || userPlan === "max" || userPlan === "agency";
   const base = brandId ? `/dashboard/creator-pro?brandId=${brandId}` : "/dashboard/creator-pro";
   const recommended = pickRecommended(brandInput);
   const [lockedTap, setLockedTap] = useState<string | null>(null);

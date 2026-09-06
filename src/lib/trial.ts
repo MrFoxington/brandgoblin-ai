@@ -6,6 +6,7 @@
 // has_received_free_studio_grant flag + anti-abuse guards, and is race-proof via
 // an atomic flag claim.
 
+import { hasProAccess } from "@/lib/access";
 import { createHash } from "crypto";
 import { createAdminClient } from "@/lib/supabase/server";
 import { grantStudioStarterEnergy } from "@/lib/energy";
@@ -115,7 +116,7 @@ export async function grantFreeStudioStarterIfEligible(
  */
 export async function expireTrialIfNeeded(userId: string, u: UserAccess): Promise<void> {
   if (!u.is_trial || !u.trial_ends_at) return;
-  if (u.plan === "pro" || u.plan === "agency") return;
+  if (hasProAccess(u.plan)) return;
   if (new Date(u.trial_ends_at) > new Date()) return;
 
   const supabase = createAdminClient();

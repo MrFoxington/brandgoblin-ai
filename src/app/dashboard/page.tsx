@@ -70,6 +70,8 @@ export default async function DashboardPage() {
     is_trial: userRow?.is_trial ?? false,
     trial_ends_at: userRow?.trial_ends_at ?? null,
   });
+  // Creator Max shows as "max" on the dashboard plan card (still Pro access everywhere).
+  const displayPlan = userRow?.plan === "max" ? "max" : effectivePlan;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -84,7 +86,7 @@ export default async function DashboardPage() {
           <DailyCreatorDashboard
             email={email}
             displayName={(authData.user.user_metadata?.display_name as string | undefined) ?? null}
-            plan={effectivePlan}
+            plan={displayPlan}
             brandCount={rows.length}
             latestBrand={rows[0]}
             signupDate={authData.user.created_at}

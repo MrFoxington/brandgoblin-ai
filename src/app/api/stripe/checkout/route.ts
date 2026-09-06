@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
+import { getPlanPerks } from "@/lib/energy-config";
+import { hasProAccess } from "@/lib/access";
+
+// ── Subscription plans (Sept 2026: Creator Pro $19 + Creator Max $49) ─────────
+// Price IDs stay server-side. The client only ever sends a plan key.
+const SUBSCRIPTION_PRICE_IDS: Record<"pro" | "max", string | undefined> = {
+  pro: process.env.STRIPE_PRICE_ID_PRO,
+  max: process.env.STRIPE_PRICE_ID_MAX,
+};
 
 // Lazily construct the Stripe client so a missing key fails loudly with a
 // clear message rather than silently behaving as a fake "placeholder" account.
@@ -19,8 +28,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID_PRO;
-  if (!priceId) {
+  if (!SUBSCRIPTION_PRICE_IDS.pro) {
     return NextResponse.json(
       { error: "Payments aren't switched on yet. (STRIPE_PRICE_ID_PRO is missing.)" },
       { status: 503 }
@@ -165,18 +173,16 @@ export async function POST(request: Request) {
       }
 
       // ── MEMBER BONUS FLYWHEEL (July 17 2026, Fox-approved) ─────────────────
-      // Creator Pro subscribers get +20% bonus energy on every refill pack.
-      // Applied here (not the webhook) so the boosted amount rides the session
-      // metadata that the webhook already trusts. Raw plan === "pro" only —
-      // real subscribers, not trials.
-      const PRO_PACK_BONUS = 1.2;
-      const isProMember = userRow?.plan === "pro";
-      const grantedAmount = isProMember
-        ? Math.round(finalEnergyAmount * PRO_PACK_BONUS)
-        : finalEnergyAmount;
-      if (isProMember) {
+      // Subscribers get bonus energy on every refill pack: Creator Pro +20%,
+      // Creator Max +30% (Sept 2026). Applied here (not the webhook) so the
+      // boosted amount rides the session metadata that the webhook already
+      // trusts. Raw paid plan only — real subscribers, not trials.
+      const isMember = hasProAccess(userRow?.plan);
+      const packBonus = isMember ? getPlanPerks(userRow?.plan).packBonus : 1;
+      const grantedAmount = Math.round(finalEnergyAmount * packBonus);
+      if (isMember) {
         console.log(
-          `[checkout] Pro member bonus: ${finalEnergyAmount} → ${grantedAmount} (+20%) for user ${authData.user.id}`
+          `[checkout] ${getPlanPerks(userRow?.plan).label} member bonus: ${finalEnergyAmount} → ${grantedAmount} (x${packBonus}) for user ${authData.user.id}`
         );
       }
       const energyAmount = String(grantedAmount);
@@ -197,15 +203,60 @@ export async function POST(request: Request) {
       return NextResponse.json({ url: session.url });
     }
 
-    // ── Creator Pro subscription ───────────────────────────────────────────
+    // ── Subscription: Creator Pro ($19) or Creator Max ($49) ───────────────
+    const requestedPlan = body.plan === "max" ? "max" : "pro";
+    const priceId = SUBSCRIPTION_PRICE_IDS[requestedPlan];
+    if (!priceId) {
+      return NextResponse.json(
+        { error: `Creator ${requestedPlan === "max" ? "Max" : "Pro"} isn't switched on yet. (STRIPE_PRICE_ID_${requestedPlan.toUpperCase()} is missing.)` },
+        { status: 503 }
+      );
+    }
+
+    // Already on this plan? Don't sell it twice — send them to the portal instead.
+    if (userRow?.plan === requestedPlan) {
+      return NextResponse.json(
+        { error: `You're already on Creator ${requestedPlan === "max" ? "Max" : "Pro"}. Manage your plan from Settings.` },
+        { status: 409 }
+      );
+    }
+
+    // Monthly energy for this plan. Code map is authoritative; the Stripe
+    // price's `energy_amount` metadata may override it (tune without a deploy).
+    // Same rule as refills: the amount ALWAYS rides the session metadata so the
+    // webhook never has to guess.
+    const planAllowance = getPlanPerks(requestedPlan).monthlyEnergy;
+    let metadataMonthly: number | undefined;
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      const raw = price.metadata?.energy_amount;
+      const parsed = raw ? parseInt(raw, 10) : NaN;
+      if (Number.isFinite(parsed) && parsed > 0) metadataMonthly = parsed;
+    } catch (err) {
+      console.error("[checkout] subscription price metadata fetch failed:", err);
+    }
+    const monthlyEnergy = metadataMonthly ?? planAllowance;
+    if (metadataMonthly && metadataMonthly !== planAllowance) {
+      console.warn(
+        `[checkout] monthly energy drift for ${requestedPlan}: Stripe metadata says ${metadataMonthly}, code says ${planAllowance} — using metadata`
+      );
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       ...customerParams,
-      success_url: `${appUrl}/settings?upgraded=1`,
+      success_url: `${appUrl}/settings?upgraded=1&plan=${requestedPlan}`,
       cancel_url:  `${appUrl}/pricing`,
-      metadata: { userId: authData.user.id, plan: "pro", type: "subscription" },
-      subscription_data: { metadata: { userId: authData.user.id, plan: "pro" } },
+      metadata: {
+        userId: authData.user.id,
+        plan: requestedPlan,
+        type: "subscription",
+        monthlyEnergy: String(monthlyEnergy),
+      },
+      subscription_data: {
+        metadata: { userId: authData.user.id, plan: requestedPlan, monthlyEnergy: String(monthlyEnergy) },
+      },
     });
 
     return NextResponse.json({ url: session.url });

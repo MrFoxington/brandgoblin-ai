@@ -65,15 +65,26 @@ export default async function SettingsPage() {
                   <p className="text-sm text-muted">
                     {userRow?.plan === "free"
                       ? `${userRow?.credits ?? 0} generations remaining`
+                      : userRow?.plan === "max"
+                      ? "4,000 Creative Energy a month, unused energy rolls over, 4 Studio jobs at once, +30% on every pack"
                       : "Unlimited brand generations + Keep Growing content engine"}
                   </p>
                 </div>
                 {userRow?.plan === "free" && (
                   <div className="flex gap-2 flex-wrap">
-                    <UpgradeButton plan="pro" label="✦ Upgrade to Creator Pro" />
+                    <UpgradeButton plan="pro" label="Upgrade to Creator Pro" />
+                    <UpgradeButton plan="max" label="Go Creator Max" />
                   </div>
                 )}
-                {userRow?.plan !== "free" && (
+                {userRow?.plan === "pro" && (
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="badge-green">Active</span>
+                    {/* Pro → Max switch: checkout creates the Max sub and the webhook
+                        cancels the Pro one with proration (Sept 2026). */}
+                    <UpgradeButton plan="max" label="Upgrade to Creator Max" />
+                  </div>
+                )}
+                {(userRow?.plan === "max" || userRow?.plan === "agency") && (
                   <span className="badge-green">Active</span>
                 )}
               </div>

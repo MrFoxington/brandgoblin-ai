@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { reserveEnergy, refundEnergy } from "@/lib/energy";
-import { STUDIO_MODELS, IMAGE_TYPE_SIZES, computeStudioEnergyCost, getPinnedSize } from "@/lib/energy-config";
+import { STUDIO_MODELS, IMAGE_TYPE_SIZES, computeStudioEnergyCost, getPinnedSize, getMaxConcurrentJobs } from "@/lib/energy-config";
 import { submitImageJob } from "@/lib/studio/provider";
 import { paletteToWords } from "@/lib/studio/color-names";
 import { buildFontPromptClause, normalizeTypography, resolveTypography, nearestWeight } from "@/lib/studio/fonts";
@@ -19,7 +19,9 @@ import {
 } from "@/lib/studio/jobs";
 import type { StudioModelKey, ImageType } from "@/lib/studio/models";
 
-const MAX_CONCURRENT_JOBS = 2;
+// Per-user concurrency: Pro/Free 2, Creator Max 4 (fal account limit is 10).
+// The cap now comes from the plan perks (Sept 2026) — see getMaxConcurrentJobs.
+const FALLBACK_MAX_CONCURRENT_JOBS = 2;
 
 // ── POST /api/studio/jobs — create a generation job ─────────────────────────
 export async function POST(request: Request) {
@@ -114,11 +116,17 @@ export async function POST(request: Request) {
     height: pinnedSize.height,
   });
 
-  // Per-user concurrency guard — fal account limit is 10; we cap at 2 per user
+  // Per-user concurrency guard — plan-aware (Max = 4, everyone else = 2).
+  const { data: planRow } = await adminSb
+    .from("users")
+    .select("plan")
+    .eq("id", authData.user.id)
+    .single();
+  const concurrencyCap = planRow ? getMaxConcurrentJobs(planRow.plan) : FALLBACK_MAX_CONCURRENT_JOBS;
   const activeCount = await getUserActiveJobCount(authData.user.id);
-  if (activeCount >= MAX_CONCURRENT_JOBS) {
+  if (activeCount >= concurrencyCap) {
     return NextResponse.json(
-      { error: "You already have active generations running. Wait for one to finish before starting another." },
+      { error: `You already have ${concurrencyCap} generations running. Wait for one to finish before starting another.` },
       { status: 429 }
     );
   }

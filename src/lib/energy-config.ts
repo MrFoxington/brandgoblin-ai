@@ -5,6 +5,10 @@ export const ENERGY_CONFIG = {
   // Monthly allowance granted to Creator Pro users each billing cycle
   MONTHLY_ALLOWANCE: parseInt(process.env.CREATOR_PRO_MONTHLY_ENERGY ?? "1000"),
 
+  // Monthly allowance for Creator Max ($49/mo, Sept 2026). Four times Pro, and
+  // more than the $49 one-time pack (3,000) so Max beats buying packs every month.
+  MAX_MONTHLY_ALLOWANCE: parseInt(process.env.CREATOR_MAX_MONTHLY_ENERGY ?? "4000"),
+
   // Amount added when a user purchases a $19 refill
   REFILL_AMOUNT: parseInt(process.env.CREATOR_PRO_REFILL_ENERGY ?? "1000"),
 
@@ -58,6 +62,28 @@ export const ENERGY_CONFIG = {
     image_hires:            250,
     video_generation:       500,
   } as Record<string, number>,
+
+  // ── Subscription plan perks (Sept 2026) ──────────────────────────────────
+  // Everything a paid tier changes, in one place. Pro is the baseline; Max
+  // stacks on top. Free has no monthly grant (one-time starter energy only).
+  PLAN_PERKS: {
+    pro: {
+      label: "Creator Pro",
+      priceUsd: 19,
+      monthlyEnergy: parseInt(process.env.CREATOR_PRO_MONTHLY_ENERGY ?? "1000"),
+      packBonus: 1.2,          // +20% energy on every refill pack
+      maxConcurrentJobs: 2,    // Studio jobs running at once
+      rolloverMonths: 0,       // unused monthly energy does not carry
+    },
+    max: {
+      label: "Creator Max",
+      priceUsd: 49,
+      monthlyEnergy: parseInt(process.env.CREATOR_MAX_MONTHLY_ENERGY ?? "4000"),
+      packBonus: 1.3,          // +30% energy on every refill pack
+      maxConcurrentJobs: 4,
+      rolloverMonths: 1,       // unused monthly energy carries one month (capped at one allowance)
+    },
+  },
 
   // User-facing capacity estimates (shown as "enough for approx X")
   CAPACITY_ESTIMATES: [
@@ -351,4 +377,24 @@ export function getCapacityEstimates(totalRemaining: number): string[] {
       return `~${count} ${label}`;
     })
     .filter(Boolean) as string[];
+}
+
+
+// ── Plan perk helpers (Sept 2026) ─────────────────────────────────────────────
+export type PaidPlanKey = keyof typeof ENERGY_CONFIG.PLAN_PERKS; // "pro" | "max"
+
+/** Perks for a raw users.plan value. "agency" (legacy) and unknown paid values map to Pro. */
+export function getPlanPerks(plan: string | null | undefined) {
+  if (plan === "max") return ENERGY_CONFIG.PLAN_PERKS.max;
+  return ENERGY_CONFIG.PLAN_PERKS.pro;
+}
+
+/** Monthly energy allowance for a plan (Pro baseline for anything that isn't Max). */
+export function getMonthlyAllowance(plan: string | null | undefined): number {
+  return getPlanPerks(plan).monthlyEnergy;
+}
+
+/** Studio concurrency cap. Free users share the Pro cap (energy is the gate, not the plan). */
+export function getMaxConcurrentJobs(plan: string | null | undefined): number {
+  return getPlanPerks(plan).maxConcurrentJobs;
 }

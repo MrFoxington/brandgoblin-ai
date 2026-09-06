@@ -37,7 +37,7 @@ export default function ContentEngine({
   input: BrandInput;
   plan: Plan;
 }) {
-  const isPro = plan === "pro" || plan === "agency";
+  const isPro = plan === "pro" || plan === "max" || plan === "agency";
   const [results, setResults] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});

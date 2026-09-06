@@ -10,6 +10,7 @@ import { paletteToWords } from "@/lib/studio/color-names";
 import { buildFontPromptClause, normalizeTypography } from "@/lib/studio/fonts";
 import type { ImageType } from "@/lib/energy-config";
 import type { BrandKit, BrandTypography } from "@/types";
+import { hasProAccess } from "@/lib/access";
 
 export const runtime = "nodejs";
 export const maxDuration = 20;
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || userRow.plan !== "pro") {
+  if (!userRow || !hasProAccess(userRow.plan)) {
     return NextResponse.json({ error: "Creator Pro required." }, { status: 403 });
   }
 

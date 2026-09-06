@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUserEnergyBalance } from "@/lib/energy";
-import { getEffectivePlan } from "@/lib/access";
-import { ENERGY_CONFIG, getEnergyWarningLevel, getCapacityEstimates } from "@/lib/energy-config";
+import { getEffectivePlan, getPlanTier } from "@/lib/access";
+import { getEnergyWarningLevel, getCapacityEstimates, getPlanPerks } from "@/lib/energy-config";
 
 export async function GET() {
   const supabase = createClient();
@@ -18,6 +18,9 @@ export async function GET() {
     .single();
 
   const isPro   = !!userRow && getEffectivePlan(userRow) === "pro";
+  // "max" | "pro" | "free" — Max gets a bigger allowance + bigger pack bonus (Sept 2026)
+  const tier    = userRow ? getPlanTier(userRow) : "free";
+  const perks   = getPlanPerks(tier === "max" ? "max" : "pro");
   const balance = await getUserEnergyBalance(authData.user.id);
 
   // Free users without any energy — show the empty/upsell state.
@@ -26,11 +29,13 @@ export async function GET() {
       // Pro user without an initialized energy row yet — full shape with safe defaults.
       return NextResponse.json({
         plan:             "pro",
+        tier,
+        packBonus:        perks.packBonus,
         monthlyTotal:     0,
         monthlyRemaining: 0,
         refillRemaining:  0,
         totalRemaining:   0,
-        monthlyAllowance: ENERGY_CONFIG.MONTHLY_ALLOWANCE,
+        monthlyAllowance: perks.monthlyEnergy,
         percentRemaining: 0,
         warningLevel:     null,
         estimates:        [],
@@ -38,13 +43,15 @@ export async function GET() {
         uninitialized:    true,
       });
     }
-    return NextResponse.json({ plan: "free", totalRemaining: 0 });
+    return NextResponse.json({ plan: "free", tier: "free", packBonus: 1, totalRemaining: 0 });
   }
 
   // Bar denominator: Pro uses the monthly allowance; free uses its own granted
   // total (starter + any top-ups) so the gauge reads sensibly on the free tier.
+  // Paid: the row's own monthly total (includes any Max rollover) or the plan
+  // allowance if the row hasn't been granted yet.
   const allowance = isPro
-    ? ENERGY_CONFIG.MONTHLY_ALLOWANCE
+    ? Math.max(balance.monthlyTotal || 0, perks.monthlyEnergy)
     : Math.max(balance.monthlyTotal + balance.refillTotal, balance.totalRemaining, 1);
 
   const warningLevel = getEnergyWarningLevel(balance.totalRemaining, allowance);
@@ -52,6 +59,8 @@ export async function GET() {
 
   return NextResponse.json({
     plan:             isPro ? "pro" : "free",
+    tier,
+    packBonus:        isPro ? perks.packBonus : 1,
     monthlyTotal:     balance.monthlyTotal,
     monthlyRemaining: balance.monthlyRemaining,
     refillRemaining:  balance.refillRemaining,

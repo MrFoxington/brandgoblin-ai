@@ -10,6 +10,8 @@ import EnergyWidget from "@/components/EnergyWidget";
 import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
 import StudioHero from "@/components/studio/StudioHero";
 import type { BrandGenerationRow } from "@/types";
+import { hasProAccess } from "@/lib/access";
+import { getMaxConcurrentJobs } from "@/lib/energy-config";
 
 export default async function StudioPage({
   searchParams,
@@ -40,7 +42,9 @@ export default async function StudioPage({
     .select("plan")
     .eq("id", authData.user.id)
     .single();
-  const isPro = userRow?.plan === "pro" || userRow?.plan === "agency";
+  const isPro = hasProAccess(userRow?.plan);
+  // Creator Max runs up to 4 Studio jobs at once (Pro/Free: 2). Sept 2026.
+  const maxConcurrentJobs = getMaxConcurrentJobs(userRow?.plan);
 
   // Fetch brands for the brand selector
   const { data: brands } = await supabase
@@ -85,6 +89,7 @@ export default async function StudioPage({
                 brands={brandRows}
                 initialJobs={recentJobs}
                 isPro={isPro}
+                maxConcurrentJobs={maxConcurrentJobs}
                 initialBrandId={initialBrandId}
               />
             </div>

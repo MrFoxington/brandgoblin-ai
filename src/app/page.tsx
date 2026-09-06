@@ -49,6 +49,24 @@ const HOW_IT_WORKS = [
 
 const PLANS = [
   {
+    name: "Creator Max",
+    price: "$49",
+    period: "/month",
+    desc: "Nix at full power.",
+    highlight: false,
+    badge: "Maximum value",
+    subtext: "Four times the energy, strongest model, first access to new tools.",
+    cta: "Go Creator Max",
+    href: "/pricing",
+    features: [
+      "4,000 Creative Energy every month",
+      "Nix runs on Claude's strongest model",
+      "Unused energy rolls over",
+      "4 Studio generations at once",
+      "Everything in Creator Pro",
+    ],
+  },
+  {
     name: "Free",
     price: "$0",
     period: "forever",
@@ -251,13 +269,19 @@ export default function LandingPage() {
           <p className="text-sm text-goblin font-semibold mb-14">
             Upgrade when you&rsquo;re ready. Cancel any time.
           </p>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`bg-card bg-card-hover flex flex-col p-7 text-left ${plan.highlight ? "!border-goblin/60 ring-1 ring-goblin/30" : ""}`}
+                className={`bg-card bg-card-hover flex flex-col p-7 text-left ${plan.highlight ? "!border-goblin/60 ring-1 ring-goblin/30" : ""} ${
+                  plan.name === "Creator Max" ? "lg:order-1" : plan.name === "Creator Pro" ? "lg:order-2" : "lg:order-3"
+                }`}
               >
-                {plan.badge && <span className="badge-goblin mb-4 self-start">{plan.badge}</span>}
+                {plan.badge && (
+                  <span className={`mb-4 self-start ${plan.name === "Creator Max" ? "badge-neutral !border-gold/60 !bg-gold-tint !text-gold-dark" : "badge-goblin"}`}>
+                    {plan.badge}
+                  </span>
+                )}
                 <h3 className="font-display text-2xl font-semibold text-ink">{plan.name}</h3>
                 <p className="mt-1 mb-1 text-sm text-ink-muted">{plan.desc}</p>
                 {plan.subtext && <p className="mb-4 text-xs font-semibold text-goblin">{plan.subtext}</p>}

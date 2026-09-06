@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { setJobFavorite } from "@/lib/studio/jobs";
+import { hasProAccess } from "@/lib/access";
 
 export const runtime = "nodejs";
 
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     .eq("id", authData.user.id)
     .single();
 
-  if (!userRow || (userRow.plan !== "pro" && userRow.plan !== "agency")) {
+  if (!userRow || !hasProAccess(userRow.plan)) {
     return NextResponse.json({ error: "Creator Pro required." }, { status: 403 });
   }
 
