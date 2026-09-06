@@ -96,10 +96,17 @@ footer in light tone). In-app dashboard/Studio/generate untouched on purpose.
   you are." Em dashes removed from all marketing copy touched (Fox's writing rule).
 - theme-color meta → #2E7D5B. ShowcaseMarquee edge fades follow `--page` (dark in the
   embed, paper on marketing). ShowcaseCard: purple border/shadow + ✦ removed.
-- **NOT DONE / can't from here**: no visual verification — the device VM has no browser
-  and no network, and next/font downloads fonts at build time, so `next build` and
-  `next dev` both hang there (tried both, ~3 min each). Verification = Fox pushes → Vercel
-  → Claude screenshots live (BEFORE shots taken in Chrome on Sept 6, pre-push).
+- **✅ PUSHED BY FOX + LIVE-VERIFIED (Sept 6, same session).** Both commits deployed
+  (`a427ac9..740869a`). Walked the live landing (hero, comparison, product window,
+  showcase wall, how-it-works, FAQ, ink final CTA), pricing (3 tiers) and login in Chrome
+  on Fox's Mac: Fraunces + paper + green rendering exactly as designed, theme-color
+  #2E7D5B, Nix's aura intact, no purple leaks. Mobile width NOT checked (the extension
+  wouldn't resize below desktop) — Fox to eyeball on his phone.
+  NOTE for future live checks: the MCP tab runs backgrounded (`document.hidden = true`),
+  so CSS transitions freeze mid-way in screenshots (sticky nav looks transparent, fade-ins
+  look half-done). It's a screenshot artifact, not a bug — read computed styles if in doubt.
+  Local rendering is impossible: the device VM has no browser/network and next/font
+  downloads fonts at build time, so `next build` / `next dev` both hang there.
   Prompt 5 (real screenshot above the fold) still open: needs Fox's screenshots.
 
 ### Commit 2 — Creator Max ($49/mo) — Brand Maturity P6, expanded per Fox
