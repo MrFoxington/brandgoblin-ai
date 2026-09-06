@@ -39,16 +39,52 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ✅ HONEST STATUS (updated June 22, 2026) — READ FIRST
+## ✅ HONEST STATUS (updated September 6, 2026) — READ FIRST
 
 **REVENUE-CAPABLE AND WORKING END-TO-END IN LIVE MODE.** Real purchases, energy refills, the
-monthly Pro energy grant, dunning, and the customer portal all verified working with the live
-webhook actually firing. App lives at **`https://app.brandgoblinai.com`** (root `brandgoblinai.com`
-is the landing page). Email verification + Resend transactional email are live.
+monthly Pro/Max energy grant, dunning, and the customer portal all verified working with the
+live webhook actually firing. App lives at **`https://app.brandgoblinai.com`** (root
+`brandgoblinai.com` is STILL the old GoDaddy Airo landing page — retiring it is P7, next after
+the Vault). Email verification + Resend transactional email are live.
 
-**The constraint is DISTRIBUTION, not product.** The app is built, magical, charges money, and is
-protected against abuse. What's missing is real users → acquisition → conversion → retention.
-See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+**Plans (Sept 6, 2026):** Free · Creator Pro $19/mo (1,000⚡) · **Creator Max $49/mo** (4,000⚡,
+rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on it himself.
+
+**Design (Sept 6, 2026):** marketing pages = warm paper / ink / goblin green / Fraunces (Brand
+Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink surfaces, same
+type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure, Buy), clean
+typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
+`design-v1-dark-purple`. Everything pushed and live, repo clean.
+
+**The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
+
+---
+
+## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE B (the work-first Vault)
+
+Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
+(Fox's decisions + the four phases), (3) the two Sept 6 session logs below, (4) project memory
+`app-design-direction.md` + `brandgoblin-ship-workflow.md`.
+
+**Phase B in one paragraph:** the dashboard (`src/app/dashboard/page.tsx` +
+`DailyCreatorDashboard.tsx` + `DashboardGrid.tsx`) becomes work-first. Hero = the user's latest
+creation (Studio art or brand kit card) big at the top; a gallery of everything they've made
+(brand kits + Studio art + thumbnails, filter chips by brand/type); ONE green "Create" entry
+that opens a small chooser (Brand kit / Studio / Thumbnail); energy, streak and Trophy Shelf
+move to a quiet right rail on desktop / compact strip on phone; the eight "Quick Creates" text
+tiles fold into the Creator Pro page. Done when a new user with one brand sees their kit big,
+not a button grid. Keep: greeting + Nix line, Today's Idea, Trophy Shelf, reveal/celebration
+logic. Data already available on the page: `rows` (brand_generations), `studioFavorites`
+(listUserFavoriteJobs), `badgeStats`; Studio jobs come from `listUserJobs` (see studio/page.tsx).
+
+**Rules that never change:** never generate Nix; energy gates creation, never possession;
+nav "Create" is the spark, in-page buttons are green (`btn-green`) unless they buy; no emoji as
+icons; no em dashes in copy; every layout passes the 390px iframe check before commit; commit
+with `git add -A src tailwind.config.ts CLAUDE_HANDOFF.md docs` (root files explicitly!) and
+give Fox the push lines. Fox reports most users are on desktop, so design for desktop richness
+and collapse cleanly on phones.
+
+---
 
 ---
 
@@ -2916,7 +2952,11 @@ src/
 
 ---
 
-*Last updated: June 21, 2026 (v8) — Full Studio dopamine loop SHIPPED + LIVE: Phase 1.7 sound pack,
+*Last updated: September 6, 2026 (v9) — Brand Maturity P4 (marketing redesign) + Creator Max
+($49 tier) + Creator Studio Phase A (dark studio skin, wordmark, emoji purge) all pushed and
+live-verified. Old look tagged `design-v1-dark-purple`. Next: Phase B, the work-first Vault
+(see 🚀 START HERE at the top). — (v8 below)*
+*Earlier: June 21, 2026 (v8) — Full Studio dopamine loop SHIPPED + LIVE: Phase 1.7 sound pack,
 Share Celebration (`b7dc1d5`), and Favorites + button hierarchy + share-at-reveal (`7fbf43d`, migration
 run). create → ⭐ keep → 🟠 share → 🎉 grow → 🟢 build → repeat is fully wired. NEXT: Live Showcase Wall
 (`docs/GOBLIN_STUDIO_SHOWCASE_BRIEF.md`) — the bridge to DISTRIBUTION (the real growth lever). Also
