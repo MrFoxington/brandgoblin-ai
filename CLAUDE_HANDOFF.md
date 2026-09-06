@@ -56,8 +56,8 @@ type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure
 typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
 `design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
 opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
-and a quiet right rail.** Live-checked at 1440 and 390; one fix-up commit (bigger hero for wide
-art, Trophy Shelf stats via admin client, phone brand select) awaiting push.
+and a quiet right rail.** Live-checked at 1440 and 390, fix-up commit `b3b595d` live and
+verified (bigger hero for wide art, Trophy Shelf stats via admin client, phone brand select).
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
@@ -69,10 +69,9 @@ Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_
 (Fox's decisions + the four phases), (3) the Phase B session log below, (4) project memory
 `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-**First: confirm the Phase B fix-up commit is pushed** (`git log origin/main..main` should be
-empty). If Fox reports anything odd on the live Vault, check that first. Still unseen on a real
-account: the brand-kit hero (Fox's latest creation is a thumbnail, so the art hero was what
-rendered), the empty-vault hero, and a free account's rail (Upgrade spark).
+Phase B is fully live and verified. Still unseen on a real account: the brand-kit hero (Fox's
+latest creation is a thumbnail, so the art hero was what rendered), the empty-vault hero, and a
+free account's rail (Upgrade spark). Worth a look when a fresh test account exists.
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -99,7 +98,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, late (🗄️ CREATOR STUDIO PHASE B: the work-first Vault. PUSHED + LIVE; fix-up commit pending push.)
+## 🗓️ SESSION LOG — September 6, 2026, late (🗄️ CREATOR STUDIO PHASE B: the work-first Vault. PUSHED + LIVE + VERIFIED.)
 
 Fox: "Do Phase B from the Creator Studio Plan." Built in one session. `npx tsc --noEmit` clean.
 The dashboard is no longer a control panel: it opens on what the user made.
@@ -221,7 +220,12 @@ iframe at absolute top/left, force framer's frozen inline `opacity` to 1 and laz
 eager inside the iframe, then zoom. A 1440 probe fits the 614px MCP window with
 `transform: scale(0.4)`.
 
-**▶ NEXT:** Phase C (the Studio canvas). Fox pushes the fix-up commit first.
+**✅ Fix-up `b3b595d` pushed by Fox + verified live:** Trophy Shelf now reads 5/8 collected (was
+1/8), hero thumbnail 806×453 in the 808px column, phone strip says "fully charged", brand
+select present, Today's Idea free of dashes. Repo clean except the pre-existing
+`docs/NIX_CONTENT_QUEUE.md` change.
+
+**▶ NEXT:** Phase C (the Studio canvas).
 
 ---
 
