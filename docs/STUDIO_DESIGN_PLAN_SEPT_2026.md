@@ -44,7 +44,7 @@ segmented nav (Vault · Studio · Nix · Labs) plus a single green Create button
 on in-app chrome. No layout changes. Done when: every app page reads as one brand with the
 marketing, `grep` finds no `#FF6B35` / `from-primary` / gradient buttons in the app.
 
-### Phase B: the Vault (1-2 sessions) · BUILT Sept 6 late (see CLAUDE_HANDOFF.md), live check pending
+### Phase B: the Vault (1-2 sessions) · LIVE + VERIFIED Sept 6 late
 Dashboard becomes work-first: hero = latest creation (Studio art or brand kit card) at full
 width; masonry gallery of everything (brand kits + Studio art + thumbnails, filter chips by
 brand/type); one green "Create" entry that opens a small chooser (Brand kit / Studio /
@@ -52,7 +52,7 @@ Thumbnail); energy, streak, Trophy Shelf move to a quiet right rail (desktop) or
 strip (phone). Quick Creates (the eight text types) fold into the Creator Pro page.
 Done when: a new user with one brand sees their kit big, not a button grid.
 
-### Phase C: the Studio canvas (2-3 sessions, the heart)
+### Phase C: the Studio canvas (2-3 sessions, the heart) · BUILT Sept 6 night (see CLAUDE_HANDOFF.md), live check pending
 Three-column desktop: left tool rail (Brand · What to make · Prompt · Style · Fonts · Engine,
 collapsible sections, current choices visible at a glance) · center canvas (the working
 creation, big; generating state = Nix cooking ON the canvas; result lands in place with the

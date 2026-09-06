@@ -56,22 +56,33 @@ type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure
 typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
 `design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
 opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
-and a quiet right rail.** Live-checked at 1440 and 390, fix-up commit `b3b595d` live and
-verified (bigger hero for wide art, Trophy Shelf stats via admin client, phone brand select).
+and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is BUILT and
+committed (Sept 6, night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet
+tools on phones, one gallery for every brand.** Needs Fox's push + the live check.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE C (the canvas)
+## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE C, THEN PHASE D (tips + daily loop)
 
 Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
-(Fox's decisions + the four phases), (3) the Phase B session log below, (4) project memory
-`app-design-direction.md` + `brandgoblin-ship-workflow.md`.
+(Fox's decisions + the four phases), (3) the Phase C + Phase B session logs below, (4) project
+memory `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-Phase B is fully live and verified. Still unseen on a real account: the brand-kit hero (Fox's
-latest creation is a thumbnail, so the art hero was what rendered), the empty-vault hero, and a
-free account's rail (Upgrade spark). Worth a look when a fresh test account exists.
+**Phase C (the Studio canvas) is BUILT and committed, awaiting Fox's push + the live check.**
+What to verify live (Chrome on Fox's Mac, JS audit + iframe probes, see the ship-workflow
+memory): at 1440 the Studio is rail (340px, sticky) · canvas · recent strip (88px, sticky); the
+rail's Conjure is the only spark besides the nav; the canvas shows the newest creation for the
+selected brand; a gallery card's "Open on canvas" swaps the canvas; Conjure puts Nix cooking ON
+the canvas and the result lands there (the celebration still fires). At 390: canvas first, a
+swipe row of recents, the gallery, a fixed bottom bar (Tools + Conjure); "Tools" opens the
+bottom sheet with every section; Esc / ✕ / backdrop closes it; Conjure closes it. Things that
+could only be reasoned about, never rendered: the sticky rail travelling the whole gallery
+height, the `display: contents` rail wrapper on phones, the sheet slide, the canvas crossfade.
+
+Still unseen on a real account from Phase B: the brand-kit hero, the empty-vault hero, and a
+free account's rail (Upgrade spark).
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -95,6 +106,94 @@ give Fox the push lines. Fox reports most users are on desktop, so design for de
 and collapse cleanly on phones.
 
 ---
+
+---
+
+## 🗓️ SESSION LOG — September 6, 2026, night (🎨 CREATOR STUDIO PHASE C: the canvas. Committed, NOT pushed.)
+
+Fox: "Vercel is done. Continue." Straight into Phase C, same session as B. `npx tsc --noEmit`
+clean; subagent review caught 10 real issues before commit (all fixed, listed below).
+
+**The shape:** `StudioImageGenerator.tsx` keeps ALL its state, effects and handlers (cooking,
+polling, seeds, uploads, fonts, thumbnails, celebrations, sounds). Only its render changed:
+the long form became a tool rail, the gallery became a canvas + a strip + an all-brands
+gallery. Studio page container widened to `max-w-7xl`; the big StudioHero badge block is now a
+compact header row (badge 48px, "Goblin Studio / Bring your brand to life", "← Vault").
+`StudioHero.tsx` deleted.
+
+**New files (`src/components/studio/`):**
+- **`useJobActions.ts`**: JobCard's handlers extracted into one hook (download with the real
+  format + deferred `revokeObjectURL`, phone-first Save via the share sheet, share that
+  celebrates only on real success, Remove BG / Upscale, Variation, official logo, hide,
+  favorite; all optimistic with revert). Exports `IMAGE_TYPE_LABELS` / `MODEL_LABELS` /
+  `DERIVED_TAGS` (labels now match the engine picker: Quick, Design Pro, Poster Pro, Print
+  Pro, Studio, Artistic, + thumbnail types). `fav` / `official` follow the job prop via effects
+  so the canvas and the gallery card of the SAME job never disagree. JobCard now uses it and
+  gained `onOpenOnCanvas` + `onCanvas` (gold border + "On canvas" chip).
+- **`StudioCanvas.tsx`**: the center. The creation at its true aspect ratio (thumbnails
+  1280×720 / 1080×1920), `max-height: min(64vh, 720px)`, checkerboard behind transparent
+  files, click = the existing full-screen viewer (rendered OUTSIDE the dimmed box so its
+  z-index is not trapped). Under it: meta line (type · brand · engine · ⚡ used · derived tag ·
+  Official logo badge) and the floating toolbar: Share (green), Variation (emerald), ⤓ Save,
+  Remove BG ⚡, Upscale ⚡, ★, Make official logo, ✕ Hide. Generating = `NixCooking` ON the
+  canvas over the previous image dimmed to 40%. Empty = Nix + "Your canvas is waiting" + an
+  "Open the tools" button on phones. Swaps crossfade via one `AnimatePresence mode="wait"`
+  keyed by job id (`CanvasJob` keyed so the hook state resets per job).
+- **`RailSection.tsx`**: collapsible section with the current choice in the header (title in
+  green, gold for Fonts / Engine), height-animated body, `aria-expanded`.
+- **`RecentStrip.tsx`**: recents for the selected brand (canvas job excluded), gold ring on
+  the one on the canvas, ★ on favorites, "+N more" scrolls to the gallery. Rendered twice on
+  purpose: a swipe row under the canvas (`lg:hidden`) and a sticky vertical strip in column 3
+  (`hidden lg:block`).
+
+**The layout (in `StudioImageGenerator` render):**
+- Grid `lg:grid-cols-[340px_minmax(0,1fr)_88px]`. Column 2 = canvas → phone strip → failed-job
+  cards → **the gallery** (inside the column so the sticky rail + strip stay in reach while
+  browsing). Column 3 = desktop strip (`lg:sticky lg:top-24`). Column 1 = the rail wrapper
+  (`contents lg:block` so on phones the fixed sheet leaves no empty grid row).
+- **The rail** = one `<aside id="studio-form">` that is `lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)]
+  overflow-y-auto` on desktop and a `fixed inset-x-0 bottom-0` bottom sheet on phones
+  (`toolsOpen`; closed = `invisible translate-y-full`, open = `transform-none` so the
+  EnergyRefillModal inside stays viewport-fixed; `transition-[transform,visibility]` keeps the
+  slide-down). Sections: Brand (select + Bring-your-own-logo block) · What to make (6 tiles,
+  2 columns) · Details (product focus / thumbnail form / brand-name toggle / logo stamp; only
+  when relevant; titled "Thumbnail" for thumbnails) · Prompt (textarea + Re-cook + idea sparks;
+  hidden for thumbnails) · Style (chips) · Fonts (gold; the two FontFields + save/reset) ·
+  Creative engine (gold; 2-column tiles + notes + output size) · EnergyWidget. Sticky footer =
+  the error box + **Conjure (THE spark)**. Default open: What to make, Prompt, Details (just
+  What to make when arriving via `?job=`).
+- **Phones**: a fixed bottom bar (Tools + Conjure, shows the error too) while the sheet is
+  closed; sheet header has ✕; Esc closes; focus moves to ✕ on open; `handleGenerate` closes the
+  sheet so Nix cooks on the canvas; "Make another" / "Create something new" open the sheet on
+  phones and scroll to the canvas everywhere (`focusTools`). Root has `pb-24 lg:pb-0`.
+- **Canvas selection**: `canvasJobId` (from `?job=`, a strip tap, a gallery "Open on canvas",
+  or a job completing in `pollJob`). Lookup is NOT brand-filtered (a finished job lands on the
+  canvas even if the rail moved to another brand); fallback = newest visible for the selected
+  brand; the canvas meta shows the job's OWN brand. `openOnCanvas` switches the rail brand only
+  when that brand is in the picker (archived brands are not). Changing the brand select
+  clears `canvasJobId`.
+- **Gallery** = all completed jobs with its own brand filter (All brands · each brand ·
+  Freeform when any) + All / ★ Favorites / Hidden tabs, 3 columns on lg, JobCards with
+  "Open on canvas". Empty copy per tab.
+- Celebration overlay + share toast moved to the END of the root so `space-y` never shifts
+  the layout when they mount.
+
+**Data / links:** `listUserJobs` signs URLs in one batch and the page loads 60 (was 20).
+`?job=<id>` deep link: found in the window or fetched with `getJob` + signed and appended;
+`?brand=` falls back to the job's brand; a freeform job passes `initialBrandId=""`. Vault
+art cards + art hero now link `/dashboard/studio?job=<id>&brand=<id>`.
+
+**Review fixes (subagent, same session):** sticky rail/strip were inert under
+`lg:items-start` (removed, and the gallery moved into the column so the row is tall);
+fav/official desync between canvas + card (effects); freeform / archived-brand jobs showed
+the wrong creation (lookup + page fix); Conjure errors invisible on phones (bar shows them);
+"+N more" off by one; lightbox inside the dimmed wrapper; crossfade never ran (lifted);
+empty grid rows on phones (`contents`); sheet close animation lost (visibility transition);
+Esc + focus for the sheet.
+
+**Not done (Phase D):** first-timer tips, "Today in the Studio", share card frame.
+
+**▶ NEXT:** Fox pushes → live audit at 1440 + 390 → fix-ups → Phase D.
 
 ---
 

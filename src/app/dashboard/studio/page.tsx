@@ -1,14 +1,13 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { listUserJobs, sweepStaleJobs } from "@/lib/studio/jobs";
+import { listUserJobs, sweepStaleJobs, getJob, getSignedUrl } from "@/lib/studio/jobs";
 import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import EnergyWidget from "@/components/EnergyWidget";
+import Image from "next/image";
 import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
-import StudioHero from "@/components/studio/StudioHero";
 import type { BrandGenerationRow } from "@/types";
 import { hasProAccess } from "@/lib/access";
 import { getMaxConcurrentJobs, IMAGE_TYPE_SIZES, type ImageType } from "@/lib/energy-config";
@@ -16,7 +15,7 @@ import { getMaxConcurrentJobs, IMAGE_TYPE_SIZES, type ImageType } from "@/lib/en
 export default async function StudioPage({
   searchParams,
 }: {
-  searchParams?: { brand?: string; type?: string };
+  searchParams?: { brand?: string; type?: string; job?: string };
 }) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
@@ -55,16 +54,39 @@ export default async function StudioPage({
     .order("created_at", { ascending: false })
     .limit(20);
 
-  // Sweep stale jobs + fetch recent jobs directly from DB (avoids auth complexity)
+  // Sweep stale jobs + fetch recent jobs directly from DB (avoids auth complexity).
+  // Phase C: the Studio gallery holds every asset, so load a deeper window.
   await sweepStaleJobs(authData.user.id);
-  const recentJobs = await listUserJobs(authData.user.id, 20);
+  const recentJobs = await listUserJobs(authData.user.id, 60);
 
   const brandRows = (brands ?? []) as Pick<BrandGenerationRow, "id" | "output_data" | "input_data">[];
 
+  // Deep link from a Vault card (?job=<id>): open that creation on the canvas.
+  // If it is older than the loaded window, fetch it on its own and add it.
+  const requestedJobId = searchParams?.job;
+  let initialJobId: string | undefined;
+  if (requestedJobId) {
+    const inWindow = recentJobs.find((j) => j.id === requestedJobId);
+    if (inWindow) {
+      initialJobId = inWindow.id;
+    } else {
+      const extra = await getJob(requestedJobId, authData.user.id);
+      if (extra && extra.status === "completed" && extra.storage_path) {
+        try { extra.output_url = await getSignedUrl(extra.storage_path); } catch { /* card shows nothing */ }
+        recentJobs.push(extra);
+        initialJobId = extra.id;
+      }
+    }
+  }
+
   // Deep link from the brand kit's "Create in Studio" CTA (?brand=<id>).
-  // Only honored if the brand actually belongs to this user's list.
-  const requestedBrandId = searchParams?.brand;
-  const initialBrandId = brandRows.find((b) => b.id === requestedBrandId)?.id;
+  // Only honored if the brand actually belongs to this user's list. A ?job=
+  // link without a brand follows the creation's brand.
+  const initialJob = initialJobId ? recentJobs.find((j) => j.id === initialJobId) : undefined;
+  const initialBrandId =
+    initialJob && !initialJob.brand_id && !searchParams?.brand
+      ? "" // freeform creation: "" survives the client's `??` fallback to brands[0]
+      : brandRows.find((b) => b.id === (searchParams?.brand ?? initialJob?.brand_id ?? undefined))?.id;
   // Deep link from the Vault's Create chooser (?type=youtube_thumbnail).
   const requestedType = searchParams?.type;
   const initialImageType =
@@ -73,37 +95,39 @@ export default async function StudioPage({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1 px-4 py-12">
-        <div className="mx-auto max-w-6xl">
+      <main className="flex-1 px-4 py-6 sm:py-8">
+        <div className="mx-auto max-w-7xl">
 
-          <Link
-            href="/dashboard"
-            className="mb-8 inline-flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
-          >
-            ← Back to Brand Vault
-          </Link>
-
-          {/* Badge hero — matches the Labs arrival moment (July 18 2026) */}
-          <StudioHero />
-
-          <div className="flex flex-col xl:flex-row gap-8 items-start">
-            {/* Generator */}
-            <div className="flex-1 min-w-0">
-              <StudioImageGenerator
-                brands={brandRows}
-                initialJobs={recentJobs}
-                isPro={isPro}
-                maxConcurrentJobs={maxConcurrentJobs}
-                initialBrandId={initialBrandId}
-                initialImageType={initialImageType}
+          {/* Compact header: the badge, the name, the way back */}
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/badges/goblin-studio-badge.png"
+                alt=""
+                width={48}
+                height={48}
+                className="h-10 w-10 shrink-0 sm:h-12 sm:w-12"
+                priority
               />
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gold">Goblin Studio</p>
+                <h1 className="font-display text-xl font-bold leading-tight text-white sm:text-2xl">Bring your brand to life</h1>
+              </div>
             </div>
-
-            {/* Energy sidebar */}
-            <div className="w-full xl:w-72 shrink-0">
-              <EnergyWidget />
-            </div>
+            <Link href="/dashboard" className="shrink-0 text-sm text-muted transition-colors hover:text-white">
+              ← Vault
+            </Link>
           </div>
+
+          <StudioImageGenerator
+            brands={brandRows}
+            initialJobs={recentJobs}
+            isPro={isPro}
+            maxConcurrentJobs={maxConcurrentJobs}
+            initialBrandId={initialBrandId}
+            initialImageType={initialImageType}
+            initialJobId={initialJobId}
+          />
         </div>
       </main>
       <Footer />

@@ -96,7 +96,7 @@ function ArtHero({ item }: { item: VaultArtItem }) {
   const [downloading, setDownloading] = useState(false);
   const portrait = item.height > item.width;
   const landscape = item.width > item.height * 1.15;
-  const studioHref = item.brandId ? `/dashboard/studio?brand=${item.brandId}` : "/dashboard/studio";
+  const studioHref = `/dashboard/studio?job=${item.id}${item.brandId ? `&brand=${item.brandId}` : ""}`;
   const filename = `goblin-studio-${item.imageType ?? "image"}-${item.id.slice(0, 8)}.jpg`;
 
   async function handleShare() {

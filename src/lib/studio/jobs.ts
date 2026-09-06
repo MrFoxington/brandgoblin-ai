@@ -305,19 +305,27 @@ export async function listUserJobs(userId: string, limit = 20): Promise<StudioJo
 
   if (!data?.length) return [];
 
-  // Re-sign URLs for completed jobs — stored signed URLs expire after 1 hour
-  return Promise.all(
-    data.map(async (job: StudioJobRow) => {
-      if (job.status === "completed" && job.storage_path) {
-        try {
-          job.output_url = await getSignedUrl(job.storage_path);
-        } catch {
-          // non-fatal — client will just show a broken image
-        }
+  // Re-sign URLs for completed jobs (stored signed URLs expire after 1 hour),
+  // in ONE batch call (Phase C loads up to 60).
+  const jobs = data as StudioJobRow[];
+  const paths = jobs
+    .filter((j) => j.status === "completed" && !!j.storage_path)
+    .map((j) => j.storage_path as string);
+  if (paths.length) {
+    try {
+      const { data: signed } = await supabase.storage
+        .from("studio-assets")
+        .createSignedUrls(paths, 60 * 60);
+      const byPath = new Map<string, string>();
+      for (const s of signed ?? []) if (s.path && s.signedUrl) byPath.set(s.path, s.signedUrl);
+      for (const job of jobs) {
+        if (job.storage_path && byPath.has(job.storage_path)) job.output_url = byPath.get(job.storage_path)!;
       }
-      return job;
-    })
-  );
+    } catch {
+      // non-fatal: the stored (maybe expired) URL is what the client gets
+    }
+  }
+  return jobs;
 }
 
 // ── List visible creations for the Vault gallery (Creator Studio Phase B) ─────

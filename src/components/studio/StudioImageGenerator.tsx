@@ -6,7 +6,10 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
 import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import JobCard from "./JobCard";
-import NixCooking from "./NixCooking";
+import StudioCanvas from "./StudioCanvas";
+import RecentStrip from "./RecentStrip";
+import RailSection from "./RailSection";
+import EnergyWidget from "@/components/EnergyWidget";
 import type { BrandGenerationRow, BrandTypography } from "@/types";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useXP } from "@/components/XPSystem";
@@ -26,6 +29,8 @@ interface Props {
   initialBrandId?: string;
   /** Deep link from the Vault's Create chooser (?type=youtube_thumbnail etc). */
   initialImageType?: ImageType;
+  /** Deep link from a Vault card (?job=<id>): open that creation on the canvas. */
+  initialJobId?: string;
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
@@ -181,7 +186,9 @@ function generateSeed(): number {
   return Math.floor(Math.random() * 2147483647);
 }
 
-export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId, initialImageType }: Props) {
+type RailKey = "brand" | "type" | "details" | "prompt" | "style" | "fonts" | "engine";
+
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId, initialImageType, initialJobId }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -209,6 +216,15 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [shareMsgIndex, setShareMsgIndex]       = useState(0);
   // Gallery tab: All (visible) / Favorites (visible favs) / Hidden (archived, restorable)
   const [galleryTab, setGalleryTab] = useState<"all" | "favorites" | "hidden">("all");
+  // Phase C (Sept 2026): the canvas. Which creation is on it, which brand the
+  // gallery shows ("all" | "" freeform | brand id), the phone tool sheet, and
+  // which rail sections are open.
+  const [canvasJobId, setCanvasJobId] = useState<string | null>(initialJobId ?? null);
+  const [galleryBrand, setGalleryBrand] = useState<string>("all");
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<Set<RailKey>>(
+    () => new Set<RailKey>(initialJobId ? ["type"] : ["type", "prompt", "details"])
+  );
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
   const [styleChip, setStyleChip]       = useState<string | null>(AUTO_STYLE_CHIP[startType] ?? null);
@@ -271,6 +287,16 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   useEffect(() => { playStreakRef.current = playStreak; }, [playStreak]);
   useEffect(() => { streakRef.current = streak; }, [streak]);
 
+  // Phone tool sheet: Esc closes it, focus lands on its close button when it opens.
+  const sheetCloseRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!toolsOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setToolsOpen(false); };
+    window.addEventListener("keydown", onKey);
+    const t = setTimeout(() => sheetCloseRef.current?.focus(), 320);
+    return () => { window.removeEventListener("keydown", onKey); clearTimeout(t); };
+  }, [toolsOpen]);
+
   // Nudge — fires once when post-reveal CTAs first appear; never on hover/re-render
   useEffect(() => {
     if (celebratingJob) playNudge();
@@ -296,13 +322,21 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     setShareCelebrating(true);
   }
 
-  function handleShareKeepBuilding() {
-    setShareCelebrating(false);
+  // Bring the tools into reach: the sheet on phones, the canvas on desktop
+  // (the rail is already beside it).
+  function focusTools() {
+    const phone = typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
+    if (phone) setToolsOpen(true);
     requestAnimationFrame(() => {
-      document.getElementById("studio-form")?.scrollIntoView({
+      document.getElementById("studio-canvas")?.scrollIntoView({
         behavior: reduce ? "auto" : "smooth", block: "start",
       });
     });
+  }
+
+  function handleShareKeepBuilding() {
+    setShareCelebrating(false);
+    focusTools();
   }
 
   // Optimistic archive (hide/restore) toggle — reverts on API failure.
@@ -439,6 +473,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           playCompleteRef.current();       // reveal.mp3 — sparkle burst + warm chord
           playStreakRef.current(streakRef.current); // streak chime, pitch-scaled by real streak
           setCelebratingJob(updated);
+          setCanvasJobId(updated.id); // the result lands on the canvas
         }
       }
     } catch { /* ignore transient errors */ }
@@ -465,16 +500,36 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     selectedBrandId ? j.brand_id === selectedBrandId : !j.brand_id;
   // Brand-scoped completed jobs (drives the section + tab counts)
   const brandCompletedJobs = jobs.filter((j) => j.status === "completed" && filterByBrand(j));
-  const favoriteCount = brandCompletedJobs.filter((j) => j.favorite && !j.archived).length;
-  const hiddenCount   = brandCompletedJobs.filter((j) => j.archived).length;
-  // Tab filter composes with the brand filter; archived stays out of All + Favorites
-  const completedJobs =
-    galleryTab === "favorites"
-      ? brandCompletedJobs.filter((j) => j.favorite && !j.archived)
-      : galleryTab === "hidden"
-      ? brandCompletedJobs.filter((j) => j.archived)
-      : brandCompletedJobs.filter((j) => !j.archived);
   const failedJobs    = jobs.filter((j) => (j.status === "failed" || j.status === "moderation_blocked") && filterByBrand(j));
+
+  // The canvas: the creation the user opened (any brand: a finished job lands
+  // here even if the rail moved on), else the newest one for this brand.
+  const brandVisibleJobs = brandCompletedJobs.filter((j) => !j.archived && !!j.output_url);
+  const canvasJob =
+    jobs.find((j) => j.id === canvasJobId && j.status === "completed" && !!j.output_url) ??
+    brandVisibleJobs[0] ??
+    null;
+  const canvasBrandName = canvasJob
+    ? canvasJob.brand_id
+      ? ((brands.find((b) => b.id === canvasJob.brand_id)?.output_data as { recommendedName?: string })?.recommendedName ?? "Brand")
+      : "Freeform"
+    : "";
+  const stripPool = brandVisibleJobs.filter((j) => j.id !== canvasJob?.id);
+  const stripJobs = stripPool.slice(0, 14);
+
+  // The gallery (all assets): its own brand filter, independent of the rail.
+  const galleryFilterByBrand = (j: StudioJobRow) =>
+    galleryBrand === "all" ? true : galleryBrand ? j.brand_id === galleryBrand : !j.brand_id;
+  const galleryCompleted = jobs.filter((j) => j.status === "completed" && galleryFilterByBrand(j));
+  const galleryFavoriteCount = galleryCompleted.filter((j) => j.favorite && !j.archived).length;
+  const galleryHiddenCount   = galleryCompleted.filter((j) => j.archived).length;
+  const galleryJobs =
+    galleryTab === "favorites"
+      ? galleryCompleted.filter((j) => j.favorite && !j.archived)
+      : galleryTab === "hidden"
+      ? galleryCompleted.filter((j) => j.archived)
+      : galleryCompleted.filter((j) => !j.archived);
+  const hasFreeformJobs = jobs.some((j) => !j.brand_id && j.status === "completed");
 
   const selectedBrandName = selectedBrandId
     ? ((brands.find((b) => b.id === selectedBrandId)?.output_data as { recommendedName?: string })?.recommendedName ?? "Brand")
@@ -887,6 +942,34 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     );
   }
 
+  // ── Canvas + rail helpers (Phase C) ────────────────────────────────────────
+
+  function toggleSection(key: RailKey) {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
+
+  // Put a creation on the canvas. The rail follows the creation's brand so the
+  // canvas, the recent strip and the tools always agree.
+  function openOnCanvas(job: StudioJobRow) {
+    playButtonPress();
+    const target = job.brand_id ?? "";
+    const inPicker = target === "" || brands.some((b) => b.id === target);
+    if (inPicker && target !== selectedBrandId) setSelectedBrandId(target);
+    setCanvasJobId(job.id);
+    setToolsOpen(false);
+    requestAnimationFrame(() => {
+      document.getElementById("studio-canvas")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    });
+  }
+
+  function scrollToGallery() {
+    document.getElementById("studio-gallery")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }
+
   // ── CTA handlers ───────────────────────────────────────────────────────────
 
   // Conjure ×2 was built July 16 and REMOVED same day (Fox's call): the app is
@@ -949,6 +1032,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   async function handleGenerate() {
     playButtonPress(); // in gesture context — primes audio unlock chain for the loop
+    setToolsOpen(false); // phones: get the sheet out of the way so Nix cooks on the canvas
     if (isThumbnail) {
       await submitThumbnail();
       return;
@@ -960,11 +1044,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     playButtonPress();
     seedRef.current = generateSeed();
     setCelebratingJob(null);
-    requestAnimationFrame(() => {
-      document.getElementById("studio-form")?.scrollIntoView({
-        behavior: reduce ? "auto" : "smooth", block: "start",
-      });
-    });
+    focusTools();
   }
 
   async function handleVariation(job: StudioJobRow) {
@@ -1013,182 +1093,235 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  const typeLabelNow = IMAGE_TYPES.find((t) => t.key === imageType)?.label ?? "Image";
+  const engineLabelNow = MODEL_OPTIONS.find((m) => m.key === modelKey)?.label ?? modelKey;
+  const brandedArt = imageType === "product_art" || imageType === "social_graphic";
+  const detailsVisible = imageType === "product_art" || isThumbnail || (!!selectedBrandId && brandedArt) || stampToggleVisible;
+  const detailsSummary = isThumbnail
+    ? (thumbTitle.trim() || "Add a title")
+    : imageType === "product_art"
+    ? (productFocus.trim() ? `${productFocus.trim()}${showBrandName ? " · name on" : ""}` : showBrandName ? "Name on" : "Optional")
+    : showBrandName ? "Brand name on" : "Optional";
+  const promptSummary = isCooking ? "Nix is writing it" : prompt.trim() ? prompt.trim().slice(0, 70) : "Nix writes it for you";
+  const conjureDisabled = generating || isCooking || activeJobs.length >= maxConcurrentJobs;
+  const conjureLabel = generating
+    ? "Submitting…"
+    : isCooking
+    ? "Nix is writing your prompt…"
+    : activeJobs.length >= maxConcurrentJobs
+    ? `Generating… (${maxConcurrentJobs} active)`
+    : `⚡ Conjure for ${energyCost} energy`;
+
+  const jobCallbacks = {
+    onMoreLikeThis: handleMoreLikeThis,
+    onProcess: handleProcess,
+    onShareSuccess: handleShareSuccess,
+    onToggleFavorite: handleToggleFavorite,
+    onToggleArchive: handleToggleArchive,
+    onSetOfficialLogo: handleSetOfficialLogo,
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 pb-24 lg:pb-0">
 
-      {/* ── Celebration overlay ────────────────────────────────────────────── */}
+      {/* ── The workspace: tool rail · canvas (+ gallery) · recent strip ───────
+          The gallery lives in the canvas column so the sticky rail and strip
+          stay in reach while the user browses everything they have made. */}
+      <div className="grid gap-4 lg:grid-cols-[340px_minmax(0,1fr)_88px] lg:gap-5">
+
+        {/* Canvas column (first in the DOM so phones open on it) */}
+        <div className="min-w-0 space-y-4 lg:col-start-2 lg:row-start-1">
+          <div id="studio-canvas" className="scroll-mt-24">
+            <StudioCanvas
+              job={canvasJob}
+              activeCount={activeJobs.length}
+              brandName={canvasBrandName}
+              callbacks={jobCallbacks}
+              onOpenTools={() => setToolsOpen(true)}
+            />
+          </div>
+
+          {/* Recent creations: swipe row on phones (the desktop strip is column 3) */}
+          <div className="lg:hidden">
+            <RecentStrip
+              jobs={stripJobs}
+              currentId={canvasJob?.id ?? null}
+              onPick={openOnCanvas}
+              onSeeAll={scrollToGallery}
+              totalCount={stripPool.length}
+            />
+          </div>
+      {/* ── Failed jobs ───────────────────────────────────────────────────────  */}
       <AnimatePresence>
-        {celebratingJob && (
-          <motion.div
-            key="studio-celebrate"
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.2 } }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 backdrop-blur-sm px-4 py-10"
+        {failedJobs.slice(0, 3).map((job) => (
+          <motion.div key={job.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 flex items-center gap-3"
           >
-            <motion.div
-              initial={reduce ? false : { opacity: 0, scale: 0.9, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 22 }}
-              className="relative w-full max-w-lg rounded-3xl border border-primary/30 bg-card/95 px-8 py-10 text-center shadow-glow overflow-hidden"
+            <Image src="/nix/sleeping-nix.png" alt="Nix sleeping" width={48} height={48} className="object-contain shrink-0" />
+            <p className="text-sm text-red-400">
+              {job.error_message ?? "That one fizzled. Your energy is back. ⚡"}
+            </p>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
+
+      {/* ── The gallery: every asset, every brand ─────────────────────────────── */}
+      <section id="studio-gallery" aria-label="All creations" className="scroll-mt-24">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-xl font-bold text-white">All creations</h2>
+            <p className="text-xs text-faint">Uploads, logos, art and thumbnails. Tap one to open it on the canvas.</p>
+          </div>
+          {/* All / Favorites / Hidden */}
+          <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-0.5">
+            <button
+              onClick={() => setGalleryTab("all")}
+              className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                galleryTab === "all" ? "bg-white/10 text-white" : "text-muted hover:text-white"
+              }`}
             >
-              {!reduce && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  {/* Sparkle count scales with real streak: 7 base → up to 18 at streak 6+ */}
-                  {SPARKLES.slice(0, Math.min(7 + Math.max(0, streak - 1) * 2, SPARKLES.length)).map((s, i) => (
-                    <motion.span key={i} className="absolute text-xl select-none"
-                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
-                      animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0.4, 1.1, 0.6] }}
-                      transition={{ duration: 1.1, delay: 0.3 + s.d, ease: "easeOut" }}
-                    ></motion.span>
-                  ))}
-                </div>
-              )}
-
-              <div className="mb-4 flex justify-center">
-                <motion.div
-                  animate={reduce ? {} : { y: [0, -8, 0] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Image src="/nix/celebrating-nix.png" alt="Nix celebrating"
-                    width={140} height={140}
-                    className="drop-shadow-[0_0_24px_rgba(139,92,246,0.5)]" priority
-                  />
-                </motion.div>
-              </div>
-
-              <h2 className="font-display text-2xl font-black text-white mb-1">Boom — done!</h2>
-              <p className="text-sm font-semibold mb-4" style={{ color: "#10b981" }}>
-                +10 XP · {streak}-day streak 
-              </p>
-
-              {celebratingJob.output_url && (
-                <div className="mb-6 flex justify-center">
-                  <img src={celebratingJob.output_url} alt="Your creation"
-                    className="h-32 w-32 rounded-xl object-cover border border-white/10 shadow-card"
-                  />
-                </div>
-              )}
-
-              {/* Nix invite — share at peak intent */}
-              <p className="text-xs text-muted mb-2.5">Love it? Show the world .</p>
-
-              {/* Two paths at peak emotion: Share + Make another (both green; the spark is Conjure) */}
-              <div className="space-y-2.5 mb-4">
-                <button
-                  onClick={() => handleRevealShare(celebratingJob)}
-                  className="btn-green w-full !rounded-2xl text-sm transition-opacity hover:opacity-90"
-                >
-                  Share it
-                </button>
-                <button
-                  onClick={handleMakeAnother}
-                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-secondary hover:bg-secondary/85 shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-colors"
-                >
-                  Make another
-                </button>
-
-                {/* Secondary create paths — quieter so the two bold actions stay magnetic */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleVariation(celebratingJob)}
-                    disabled={generating || activeJobs.length >= maxConcurrentJobs}
-                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    Variation · ⚡{celebratingJobCost}
-                  </button>
-                  <button
-                    onClick={() => handleNewStyle(celebratingJob)}
-                    disabled={generating || activeJobs.length >= maxConcurrentJobs || isCooking}
-                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    New style · ⚡{celebratingJobCost}
-                  </button>
-                </div>
-              </div>
-
-              <button onClick={() => setCelebratingJob(null)} className="text-xs text-muted hover:text-white transition-colors">
-                Close
+              All
+            </button>
+            <button
+              onClick={() => setGalleryTab("favorites")}
+              className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                galleryTab === "favorites" ? "bg-amber-400/15 text-amber-300" : "text-muted hover:text-white"
+              }`}
+            >
+              {FAVORITES_LABEL} ({galleryFavoriteCount})
+            </button>
+            {galleryHiddenCount > 0 && (
+              <button
+                onClick={() => setGalleryTab("hidden")}
+                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  galleryTab === "hidden" ? "bg-white/10 text-white/70" : "text-faint hover:text-white"
+                }`}
+                title="Creations you've hidden. Restore any time."
+              >
+                Hidden ({galleryHiddenCount})
               </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            )}
+          </div>
+        </div>
 
-      {/* ── Share celebration toast ───────────────────────────────────────────── */}
-      <AnimatePresence>
-        {shareCelebrating && (
-          <motion.div
-            key="share-celebrate"
-            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, transition: { duration: 0.2 } }}
-            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 26 }}
-            className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-sm z-50"
-          >
-            <div className="relative rounded-2xl border border-primary/40 bg-card/95 backdrop-blur px-5 py-4 shadow-glow overflow-hidden">
-              {/* Sparkle burst — skipped under reduced motion */}
-              {!reduce && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  {SPARKLES.slice(0, 6).map((s, i) => (
-                    <motion.span key={i} className="absolute text-sm select-none"
-                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
-                      animate={{ opacity: [0, 1, 0], x: s.x * 0.5, y: s.y * 0.5, scale: [0.4, 1, 0.5] }}
-                      transition={{ duration: 1, delay: 0.1 + s.d, ease: "easeOut" }}
-                    ></motion.span>
-                  ))}
-                </div>
-              )}
-
-              <div className="relative flex items-start gap-3">
-                <motion.div
-                  className="shrink-0"
-                  animate={reduce ? {} : { y: [0, -5, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        {/* Brand filter */}
+        {(brands.length > 1 || hasFreeformJobs) && (
+          <div className="mb-4 flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setGalleryBrand("all")}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                galleryBrand === "all" ? "border-gold/50 bg-gold/15 text-gold" : "border-[rgba(250,247,242,0.12)] text-muted hover:border-gold/40 hover:text-white"
+              }`}
+            >
+              All brands
+            </button>
+            {brands.map((b) => {
+              const name = (b.output_data as { recommendedName?: string })?.recommendedName ?? "Brand";
+              return (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => setGalleryBrand(b.id)}
+                  className={`max-w-[160px] truncate rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    galleryBrand === b.id ? "border-gold/50 bg-gold/15 text-gold" : "border-[rgba(250,247,242,0.12)] text-muted hover:border-gold/40 hover:text-white"
+                  }`}
                 >
-                  <Image src="/nix/celebrating-nix.png" alt="Nix celebrating"
-                    width={56} height={56}
-                    className="drop-shadow-[0_0_14px_rgba(255,140,66,0.45)]"
-                  />
-                </motion.div>
-
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-white leading-snug mb-2.5">
-                    {SHARE_MESSAGES[shareMsgIndex]}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleShareKeepBuilding}
-                      className="btn-green !px-3 !py-1.5 text-xs !rounded-xl hover:opacity-90 transition-opacity"
-                    >
-                      Create something new
-                    </button>
-                    <button
-                      onClick={() => setShareCelebrating(false)}
-                      className="text-xs text-muted hover:text-white transition-colors"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+                  {name}
+                </button>
+              );
+            })}
+            {hasFreeformJobs && (
+              <button
+                type="button"
+                onClick={() => setGalleryBrand("")}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  galleryBrand === "" ? "border-gold/50 bg-gold/15 text-gold" : "border-[rgba(250,247,242,0.12)] text-muted hover:border-gold/40 hover:text-white"
+                }`}
+              >
+                Freeform
+              </button>
+            )}
+          </div>
         )}
-      </AnimatePresence>
 
-      {/* ── Generation panel ────────────────────────────────────────────────── */}
-      <div id="studio-form" className="rounded-2xl border border-primary/20 bg-card p-6 space-y-6">
+        {galleryJobs.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {galleryJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                onCanvas={job.id === canvasJob?.id}
+                onOpenOnCanvas={openOnCanvas}
+                onMoreLikeThis={handleMoreLikeThis}
+                onProcess={handleProcess}
+                onShareSuccess={handleShareSuccess}
+                onToggleFavorite={handleToggleFavorite}
+                onToggleArchive={handleToggleArchive}
+                onSetOfficialLogo={handleSetOfficialLogo}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-2xl border border-dashed border-[rgba(250,247,242,0.12)] py-12 text-center text-sm text-faint">
+            {galleryTab === "hidden"
+              ? "Nothing hidden. Tap ✕ Hide on any creation to tuck it away here."
+              : galleryTab === "favorites"
+              ? `No favorites yet. Tap the ☆ on any creation to add it to ${FAVORITES_LABEL}.`
+              : jobs.length === 0
+              ? "Your creations will collect here. Hit Conjure to make the first one."
+              : "Nothing here for this brand yet."}
+          </p>
+        )}
+      </section>
+        </div>
 
+        {/* Recent creations for this brand (desktop strip) */}
+        <div className="hidden min-w-0 lg:col-start-3 lg:row-start-1 lg:block">
+          <RecentStrip
+            jobs={stripJobs}
+            currentId={canvasJob?.id ?? null}
+            onPick={openOnCanvas}
+            onSeeAll={scrollToGallery}
+            totalCount={stripPool.length}
+          />
+        </div>
+
+        {/* Tool rail: left column on desktop, bottom sheet on phones. `contents`
+            on phones so the fixed sheet does not leave an empty grid row. */}
+        <div className="contents lg:block lg:col-start-1 lg:row-start-1">
+          <div
+            aria-hidden
+            onClick={() => setToolsOpen(false)}
+            className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden ${toolsOpen ? "" : "hidden"}`}
+          />
+          <aside
+            id="studio-form"
+            aria-label="Studio tools"
+            className={`fixed inset-x-0 bottom-0 z-40 max-h-[86vh] overflow-y-auto rounded-t-3xl border border-[rgba(250,247,242,0.10)] bg-surface shadow-2xl transition-[transform,visibility] duration-300 ease-out ${
+              toolsOpen ? "transform-none" : "invisible translate-y-full"
+            } lg:visible lg:sticky lg:top-24 lg:z-auto lg:max-h-[calc(100vh-7rem)] lg:transform-none lg:rounded-2xl lg:shadow-none`}
+          >
+            {/* Sheet handle (phones) */}
+            <div className="flex items-center justify-between px-4 pt-3 lg:hidden">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-faint">Tools</span>
+              <button ref={sheetCloseRef} type="button" onClick={() => setToolsOpen(false)} className="rounded-full border border-[rgba(250,247,242,0.12)] px-2.5 py-1 text-xs text-muted hover:text-white" aria-label="Close tools">
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2.5 p-3.5">
+
+              {/* Brand */}
+              {brands.length > 0 && (
+                <RailSection id="brand" title="Brand" summary={selectedBrandName} open={openSections.has("brand")} onToggle={() => toggleSection("brand")}>
         {/* Brand selector */}
         {brands.length > 0 && (
           <div>
-            <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-              Brand Kit
-            </label>
             <select
               value={selectedBrandId}
-              onChange={(e) => setSelectedBrandId(e.target.value)}
+              onChange={(e) => { setSelectedBrandId(e.target.value); setCanvasJobId(null); }}
               className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary/50"
             >
               <option value="">No brand (free-form)</option>
@@ -1268,12 +1401,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </div>
         )}
 
-        {/* Image type tabs */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            What to Create
-          </label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              </RailSection>
+              )}
+
+              {/* What to make */}
+              <RailSection id="type" title="What to make" summary={`${typeLabelNow} · ${pinnedSize.label}`} open={openSections.has("type")} onToggle={() => toggleSection("type")}>
+          <div className="grid grid-cols-2 gap-2">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
               <button key={key} onClick={() => {
                 setImageType(key);
@@ -1294,6 +1427,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             ))}
           </div>
 
+              </RailSection>
+
+              {/* Details: product, thumbnail form, brand name, logo stamp */}
+              {detailsVisible && (
+                <RailSection id="details" title={isThumbnail ? "Thumbnail" : "Details"} summary={detailsSummary} open={openSections.has("details")} onToggle={() => toggleSection("details")}>
+                  <div className="-mt-3">
           {/* Product focus — only for Product Art: name the exact product and
               Nix cooks the prompt around it instead of guessing. */}
           {imageType === "product_art" && (
@@ -1400,7 +1539,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-1.5">
                     Title color <span className="normal-case font-normal text-faint tracking-normal">· default white</span>
@@ -1564,13 +1703,18 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               </span>
             </label>
           )}
-        </div>
+                  </div>
+                </RailSection>
+              )}
 
-        {!isThumbnail && (<>
+              {/* Prompt */}
+              {!isThumbnail && (
+                <RailSection id="prompt" title="Prompt" summary={promptSummary} open={openSections.has("prompt")} onToggle={() => toggleSection("prompt")}>
+                  <div className="space-y-3">
         {/* Prompt textarea */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-xs uppercase tracking-widest text-primary-light font-bold">Prompt</label>
+            <span className="text-[11px] text-faint">Edit freely, or let Nix rewrite it.</span>
             <button
               onClick={async () => {
                 playButtonPress();
@@ -1608,60 +1752,37 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             </span>
           ))}
         </p>
-        </>)}
+                  </div>
+                </RailSection>
+              )}
 
-        {/* Style chips — Cooker 2.0: one-tap art direction, re-cooks the prompt */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            Style <span className="normal-case tracking-normal font-normal text-faint">· optional, tap to toggle</span>
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {STYLE_CHIPS.map((chip) => {
-              const selected = styleChip === chip.label;
-              return (
-                <button
-                  key={chip.label}
-                  onClick={() => { playButtonPress(); setStyleChip(selected ? null : chip.label); }}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                    selected
-                      ? "border-secondary bg-secondary/15 text-secondary shadow-[0_0_10px_rgba(16,185,129,0.25)]"
-                      : "border-white/10 bg-white/3 text-muted hover:border-secondary/40 hover:text-white"
-                  }`}
-                >
-                  {chip.label}{selected ? " ✓" : ""}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+              {/* Style */}
+              <RailSection id="style" title="Style" summary={styleChip ?? "None"} open={openSections.has("style")} onToggle={() => toggleSection("style")}>
+                <div className="flex flex-wrap gap-2">
+                  {STYLE_CHIPS.map((chip) => {
+                    const selected = styleChip === chip.label;
+                    return (
+                      <button
+                        key={chip.label}
+                        onClick={() => { playButtonPress(); setStyleChip(selected ? null : chip.label); }}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                          selected
+                            ? "border-secondary bg-secondary/15 text-secondary shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+                            : "border-white/10 bg-white/3 text-muted hover:border-secondary/40 hover:text-white"
+                        }`}
+                      >
+                        {chip.label}{selected ? " ✓" : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px] text-faint">Optional. Tap to toggle; Nix re-cooks the prompt.</p>
+              </RailSection>
 
-        {/* Brand Fonts — saved fonts with an on-demand override (Saved Brand
-            Fonts feature). Defaults to the brand's saved fonts; a change can be
-            used once or saved as the brand's new default. */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            Fonts <span className="normal-case tracking-normal font-normal text-faint">· {fontOverride ? "custom for this generation" : "using saved brand fonts"}</span>
-          </label>
-          <div className="rounded-xl border border-white/10 bg-white/3 p-3.5 space-y-3">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-sm text-white">
-                <span className="font-semibold">{effectiveTypography.headlineFont}</span>
-                <span className="text-faint"> for headlines · </span>
-                <span className="font-semibold">{effectiveTypography.bodyFont}</span>
-                <span className="text-faint"> for body</span>
-              </p>
-              <button
-                type="button"
-                onClick={() => { playButtonPress(); setFontPanelOpen((v) => !v); }}
-                className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-muted hover:text-white hover:border-primary/40 transition"
-              >
-                {fontPanelOpen ? "Close" : "Change fonts"}
-              </button>
-            </div>
-
-            {fontPanelOpen && (
-              <div className="space-y-3 pt-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Fonts */}
+              <RailSection id="fonts" title="Fonts" tone="gold" summary={`${effectiveTypography.headlineFont} · ${effectiveTypography.bodyFont}`} open={openSections.has("fonts")} onToggle={() => toggleSection("fonts")}>
+                <p className="mb-3 text-[11px] text-faint">{fontOverride ? "Custom for this generation." : "Using this brand's saved fonts."}</p>
+                <div className="grid grid-cols-1 gap-3">
                   <FontField
                     label="Headline / title font"
                     value={effectiveTypography.headlineFont}
@@ -1703,18 +1824,11 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   )}
                 </div>
                 {fontSavedMsg && <p className="text-[11px] text-secondary">{fontSavedMsg}</p>}
-              </div>
-            )}
-          </div>
-        </div>
+              </RailSection>
 
-        {/* Engine selector — the specialist for the chosen asset type is
-            auto-picked and badged; every engine stays available as an override */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            Creative Engine
-          </label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {/* Engine */}
+              <RailSection id="engine" title="Creative engine" tone="gold" summary={`${engineLabelNow} · ⚡ ${energyCost}`} open={openSections.has("engine")} onToggle={() => toggleSection("engine")}>
+          <div className="grid grid-cols-2 gap-2">
             {MODEL_OPTIONS.filter(({ nameOnOnly }) =>
               !nameOnOnly || (showBrandName && (imageType === "product_art" || imageType === "social_graphic"))
             ).map(({ key, label, desc, isAltEngine }) => {
@@ -1753,136 +1867,212 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </div>
           {modelKey === "seedream_v45" && (
             <p className="mt-2 text-xs text-amber-400/80">
-              Artistic uses a different AI engine — it will reimagine your prompt with a painterly style, not just improve quality.
+              Artistic uses a different AI engine. It will reimagine your prompt with a painterly style, not just improve quality.
             </p>
           )}
           {modelKey === "recraft_v3" && selectedBrandId && (
             <p className="mt-2 text-xs text-secondary/80">
-              Design Pro receives your brand&apos;s exact palette colors — expect the closest color match of any engine.
+              Design Pro receives your brand&apos;s exact palette colors, so expect the closest color match of any engine.
             </p>
           )}
+                <div className="mt-2 text-[11px] text-faint">Output: {pinnedSize.label} ({pinnedSize.width}×{pinnedSize.height}px)</div>
+              </RailSection>
+
+              {/* Energy */}
+              <EnergyWidget />
+            </div>
+
+            {/* Conjure: THE spark, always in reach at the bottom of the rail */}
+            <div className="sticky bottom-0 border-t border-[rgba(250,247,242,0.08)] bg-surface/95 p-3.5 backdrop-blur">
+              {error && (
+                <div className="mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
+              )}
+              <button onClick={handleGenerate} disabled={conjureDisabled} className="btn-primary w-full !rounded-2xl !py-3.5 text-base">
+                {conjureLabel}
+              </button>
+            </div>
+          </aside>
         </div>
-
-        {/* Resolution badge */}
-        <div className="text-xs text-faint">
-          Output: {pinnedSize.label} — {pinnedSize.width}×{pinnedSize.height}px
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
-            {error}
-          </div>
-        )}
-
-        {/* Conjure button — THE spark: the one orange button on this screen (Sept 6 2026) */}
-        <button
-          onClick={handleGenerate}
-          disabled={generating || isCooking || activeJobs.length >= maxConcurrentJobs}
-          className="btn-primary w-full !rounded-2xl !py-4 text-base"
-        >
-          {generating
-            ? "Submitting…"
-            : isCooking
-            ? "Nix is writing your prompt…"
-            : activeJobs.length >= maxConcurrentJobs
-            ? `Generating… (${maxConcurrentJobs} active)`
-            : `⚡ Conjure for ${energyCost} energy`}
-        </button>
       </div>
 
-      {/* ── Nix performing ────────────────────────────────────────────────────── */}
-      {activeJobs.length > 0 && <NixCooking count={activeJobs.length} />}
-
-      {/* ── Completed jobs — brand-scoped trophy case ─────────────────────────  */}
-      {brandCompletedJobs.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-            <h2 className="text-xs uppercase tracking-widest text-primary-light font-bold">
-              {selectedBrandId ? `${selectedBrandName} Creations` : "Freeform Creations"} ({brandCompletedJobs.length})
-            </h2>
-            {/* All / Favorites / Hidden filter tabs */}
-            <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-0.5">
-              <button
-                onClick={() => setGalleryTab("all")}
-                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  galleryTab === "all" ? "bg-white/10 text-white" : "text-muted hover:text-white"
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setGalleryTab("favorites")}
-                className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  galleryTab === "favorites" ? "bg-amber-400/15 text-amber-300" : "text-muted hover:text-white"
-                }`}
-              >
-                {FAVORITES_LABEL} ({favoriteCount})
-              </button>
-              {hiddenCount > 0 && (
-                <button
-                  onClick={() => setGalleryTab("hidden")}
-                  className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                    galleryTab === "hidden" ? "bg-white/10 text-white/70" : "text-faint hover:text-white"
-                  }`}
-                  title="Creations you've hidden — restore any time"
-                >
-                  Hidden ({hiddenCount})
-                </button>
-              )}
-            </div>
-          </div>
-
-          {completedJobs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {completedJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  onMoreLikeThis={handleMoreLikeThis}
-                  onProcess={handleProcess}
-                  onShareSuccess={handleShareSuccess}
-                  onToggleFavorite={handleToggleFavorite}
-                  onToggleArchive={handleToggleArchive}
-                  onSetOfficialLogo={handleSetOfficialLogo}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-faint py-6 text-center">
-              {galleryTab === "hidden"
-                ? "Nothing hidden — tap the ✕ on any creation to tuck it away here."
-                : `No favorites yet — tap the ☆ on any creation to add it to ${FAVORITES_LABEL}.`}
-            </p>
+      {/* ── Phone bar: Tools + Conjure ─────────────────────────────────────────── */}
+      {!toolsOpen && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[rgba(250,247,242,0.10)] bg-surface/95 p-3 backdrop-blur lg:hidden">
+          {error && (
+            <div className="mx-auto mb-2 max-w-lg rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
           )}
+          <div className="mx-auto flex max-w-lg items-center gap-2">
+            <button type="button" onClick={() => setToolsOpen(true)} className="btn-secondary !px-4 !py-3 text-sm">
+              Tools
+            </button>
+            <button onClick={handleGenerate} disabled={conjureDisabled} className="btn-primary min-w-0 flex-1 !rounded-2xl !py-3 text-sm">
+              {conjureLabel}
+            </button>
+          </div>
         </div>
       )}
 
-      {/* ── Failed jobs ───────────────────────────────────────────────────────  */}
+      {/* ── Celebration overlay ────────────────────────────────────────────── */}
       <AnimatePresence>
-        {failedJobs.slice(0, 3).map((job) => (
-          <motion.div key={job.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4 flex items-center gap-3"
+        {celebratingJob && (
+          <motion.div
+            key="studio-celebrate"
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 backdrop-blur-sm px-4 py-10"
           >
-            <Image src="/nix/sleeping-nix.png" alt="Nix sleeping" width={48} height={48} className="object-contain shrink-0" />
-            <p className="text-sm text-red-400">
-              {job.error_message ?? "That one fizzled — your energy's back. ⚡"}
-            </p>
+            <motion.div
+              initial={reduce ? false : { opacity: 0, scale: 0.9, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 22 }}
+              className="relative w-full max-w-lg rounded-3xl border border-primary/30 bg-card/95 px-8 py-10 text-center shadow-glow overflow-hidden"
+            >
+              {!reduce && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  {/* Sparkle count scales with real streak: 7 base → up to 18 at streak 6+ */}
+                  {SPARKLES.slice(0, Math.min(7 + Math.max(0, streak - 1) * 2, SPARKLES.length)).map((s, i) => (
+                    <motion.span key={i} className="absolute text-xl select-none"
+                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
+                      animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0.4, 1.1, 0.6] }}
+                      transition={{ duration: 1.1, delay: 0.3 + s.d, ease: "easeOut" }}
+                    ></motion.span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mb-4 flex justify-center">
+                <motion.div
+                  animate={reduce ? {} : { y: [0, -8, 0] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Image src="/nix/celebrating-nix.png" alt="Nix celebrating"
+                    width={140} height={140}
+                    className="drop-shadow-[0_0_24px_rgba(139,92,246,0.5)]" priority
+                  />
+                </motion.div>
+              </div>
+
+              <h2 className="font-display text-2xl font-black text-white mb-1">Boom — done!</h2>
+              <p className="text-sm font-semibold mb-4" style={{ color: "#10b981" }}>
+                +10 XP · {streak}-day streak 
+              </p>
+
+              {celebratingJob.output_url && (
+                <div className="mb-6 flex justify-center">
+                  <img src={celebratingJob.output_url} alt="Your creation"
+                    className="h-32 w-32 rounded-xl object-cover border border-white/10 shadow-card"
+                  />
+                </div>
+              )}
+
+              {/* Nix invite — share at peak intent */}
+              <p className="text-xs text-muted mb-2.5">Love it? Show the world .</p>
+
+              {/* Two paths at peak emotion: Share + Make another (both green; the spark is Conjure) */}
+              <div className="space-y-2.5 mb-4">
+                <button
+                  onClick={() => handleRevealShare(celebratingJob)}
+                  className="btn-green w-full !rounded-2xl text-sm transition-opacity hover:opacity-90"
+                >
+                  Share it
+                </button>
+                <button
+                  onClick={handleMakeAnother}
+                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-secondary hover:bg-secondary/85 shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-colors"
+                >
+                  Make another
+                </button>
+
+                {/* Secondary create paths — quieter so the two bold actions stay magnetic */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleVariation(celebratingJob)}
+                    disabled={generating || activeJobs.length >= maxConcurrentJobs}
+                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    Variation · ⚡{celebratingJobCost}
+                  </button>
+                  <button
+                    onClick={() => handleNewStyle(celebratingJob)}
+                    disabled={generating || activeJobs.length >= maxConcurrentJobs || isCooking}
+                    className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    New style · ⚡{celebratingJobCost}
+                  </button>
+                </div>
+              </div>
+
+              <button onClick={() => setCelebratingJob(null)} className="text-xs text-muted hover:text-white transition-colors">
+                Close
+              </button>
+            </motion.div>
           </motion.div>
-        ))}
+        )}
       </AnimatePresence>
 
-      {/* ── Empty state ───────────────────────────────────────────────────────  */}
-      {jobs.length === 0 && activeJobs.length === 0 && (
-        <div className="text-center py-16">
-          <Image src="/nix/conjuring-nix.png" alt="Nix ready to create"
-            width={100} height={100} className="mx-auto mb-4 object-contain opacity-60"
-          />
-          <p className="text-sm text-faint">
-            Pick an image type above and hit Conjure to create your first Studio image.
-          </p>
-        </div>
-      )}
+      {/* ── Share celebration toast ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {shareCelebrating && (
+          <motion.div
+            key="share-celebrate"
+            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, transition: { duration: 0.2 } }}
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 26 }}
+            className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-sm z-50"
+          >
+            <div className="relative rounded-2xl border border-primary/40 bg-card/95 backdrop-blur px-5 py-4 shadow-glow overflow-hidden">
+              {/* Sparkle burst — skipped under reduced motion */}
+              {!reduce && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  {SPARKLES.slice(0, 6).map((s, i) => (
+                    <motion.span key={i} className="absolute text-sm select-none"
+                      initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
+                      animate={{ opacity: [0, 1, 0], x: s.x * 0.5, y: s.y * 0.5, scale: [0.4, 1, 0.5] }}
+                      transition={{ duration: 1, delay: 0.1 + s.d, ease: "easeOut" }}
+                    ></motion.span>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative flex items-start gap-3">
+                <motion.div
+                  className="shrink-0"
+                  animate={reduce ? {} : { y: [0, -5, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Image src="/nix/celebrating-nix.png" alt="Nix celebrating"
+                    width={56} height={56}
+                    className="drop-shadow-[0_0_14px_rgba(255,140,66,0.45)]"
+                  />
+                </motion.div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white leading-snug mb-2.5">
+                    {SHARE_MESSAGES[shareMsgIndex]}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleShareKeepBuilding}
+                      className="btn-green !px-3 !py-1.5 text-xs !rounded-xl hover:opacity-90 transition-opacity"
+                    >
+                      Create something new
+                    </button>
+                    <button
+                      onClick={() => setShareCelebrating(false)}
+                      className="text-xs text-muted hover:text-white transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

@@ -3,227 +3,39 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { computeStudioEnergyCost, IMAGE_TYPE_SIZES } from "@/lib/energy-config";
-import type { StudioModelKey, ImageType } from "@/lib/energy-config";
 import type { StudioJobRow } from "@/lib/studio/jobs";
-import { useSoundFx } from "@/components/primitives/SoundFx";
-import { shareImageFile, canShareFiles, isTouchDevice } from "@/lib/studio/share";
 import StudioLightbox, { CHECKERBOARD_STYLE } from "./StudioLightbox";
+import { useJobActions, type JobActionCallbacks } from "./useJobActions";
 
-interface Props {
+interface Props extends JobActionCallbacks {
   job: StudioJobRow;
-  onMoreLikeThis?: (job: StudioJobRow) => Promise<void>;
-  onProcess?: (job: StudioJobRow, operation: "bg_removal" | "clarity_upscaler") => Promise<void>;
-  onShareSuccess?: (job: StudioJobRow) => void;
-  onToggleFavorite?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
-  onToggleArchive?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
-  onSetOfficialLogo?: (job: StudioJobRow, next: boolean) => Promise<boolean>;
+  /** Phase C: put this creation on the Studio canvas. */
+  onOpenOnCanvas?: (job: StudioJobRow) => void;
+  /** True when this creation is the one on the canvas right now. */
+  onCanvas?: boolean;
 }
 
-const IMAGE_TYPE_LABELS: Record<string, string> = {
-  logo_concept:   "Logo Concept",
-  mascot:         "Mascot",
-  social_graphic: "Social Graphic",
-  product_art:    "Product Art",
-};
-
-const MODEL_LABELS: Record<string, string> = {
-  flux_schnell:    "Standard",
-  flux_pro_v1:     "Premium",
-  seedream_v45:    "Artistic",
-  bg_removal:      "BG Removed",
-  clarity_upscaler: "Upscaled",
-  upload:          "Your file",
-};
-
-// Tags for derived (post-processed / uploaded) jobs
-const DERIVED_TAGS: Record<string, string> = {
-  bg_removal:      "Background removed",
-  clarity_upscaler: "Upscaled",
-  upload:          "⤴ Uploaded",
-};
-
-export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess, onToggleFavorite, onToggleArchive, onSetOfficialLogo }: Props) {
-  const { playShare, playButtonPress } = useSoundFx();
+export default function JobCard({ job, onOpenOnCanvas, onCanvas = false, ...callbacks }: Props) {
+  const { onMoreLikeThis, onProcess, onToggleFavorite, onToggleArchive, onSetOfficialLogo } = callbacks;
   const reduce = useReducedMotion();
-  const [downloading, setDownloading]   = useState(false);
-  const [sharing, setSharing]           = useState(false);
-  const [saving, setSaving]             = useState(false);
-  const [copied, setCopied]             = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [processing, setProcessing]     = useState<"bg_removal" | "clarity_upscaler" | null>(null);
-  const [moreLikeThis, setMoreLikeThis] = useState(false);
-  const [fav, setFav]                   = useState<boolean>(job.favorite);
-  const [favBusy, setFavBusy]           = useState(false);
-  const [official, setOfficial]         = useState<boolean>(job.official_logo);
-  const [officialBusy, setOfficialBusy] = useState(false);
-  const [archiveBusy, setArchiveBusy]   = useState(false);
-
-  const pinnedSize = job.image_type
-    ? IMAGE_TYPE_SIZES[job.image_type as ImageType] ?? IMAGE_TYPE_SIZES.logo_concept
-    : IMAGE_TYPE_SIZES.logo_concept;
-
-  const bgRemovalCost = computeStudioEnergyCost("bg_removal", {
-    width: pinnedSize.width,
-    height: pinnedSize.height,
-  });
-  const upscaleCost = computeStudioEnergyCost("clarity_upscaler", {
-    width: pinnedSize.width,
-    height: pinnedSize.height,
-  });
-
-  const isOriginalImage = job.job_type === "image";
-  const isUpload        = job.job_type === "upload";
-  const derivedTag = DERIVED_TAGS[job.job_type] ?? null;
-  // Uploaded logos + bg-removed logo variants can be the brand's official logo
-  // (backend allows any completed logo_concept — these UI gates just match it).
-  const canBeOfficial =
-    job.image_type === "logo_concept" &&
-    (isOriginalImage || isUpload || job.job_type === "bg_removal");
-
-  async function handleDownload() {
-    if (!job.output_url || downloading) return;
-    setDownloading(true);
-    try {
-      const res = await fetch(job.output_url);
-      const blob = await res.blob();
-      // Keep the real format — bg-removed images are transparent PNGs and must
-      // NOT be renamed .jpg (that loses the transparency promise of the file).
-      const ext = blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg";
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.${ext}`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch { /* non-fatal */ } finally {
-      setDownloading(false);
-    }
-  }
-
-  // Best-effort extension for the share-sheet filename (actual blob type wins
-  // in handleDownload). bg-removal outputs are PNG.
-  const saveExt =
-    job.job_type === "bg_removal" || /\.png(\?|$)/i.test(job.output_url ?? "") ? "png" : "jpg";
-  const saveFilename = `goblin-studio-${job.image_type ?? "image"}-${job.id.slice(0, 8)}.${saveExt}`;
-
-  async function handleShare() {
-    if (!job.output_url || sharing) return;
-    setSharing(true);
-    // File-first share — puts the actual creation on the native sheet
-    // (IG / TikTok / X / Save to Photos), URL → clipboard as the fallback.
-    const result = await shareImageFile(job.output_url, { filename: saveFilename });
-    if (result === "copied") {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-    setSharing(false);
-    // Celebrate ONLY a genuine success (shared or copied) — never on cancel.
-    if (result === "shared" || result === "copied") {
-      playShare();
-      onShareSuccess?.(job);
-    }
-  }
-
-  // Phone-first "Save to Photos": on mobile, open the OS sheet (offers "Save
-  // Image" → camera roll); on desktop, fall back to the blob download.
-  //
-  // Desktop Chrome reports canShare({files}) = true, but rejects the actual
-  // share() call because the user-gesture window expires while we fetch the
-  // image — so the old code silently did nothing. Fix: only take the share-
-  // sheet path on touch devices, and if the sheet never really opened, still
-  // hand the user their file via download.
-  async function handleSave() {
-    if (!job.output_url || saving) return;
-    if (!canShareFiles() || !isTouchDevice()) {
-      await handleDownload();
-      return;
-    }
-    setSaving(true);
-    try {
-      const result = await shareImageFile(job.output_url, { filename: saveFilename });
-      // "cancelled" = user closed the sheet on purpose — respect that.
-      // "failed"/"copied" = no real file share happened — download instead.
-      if (result === "failed" || result === "copied") await handleDownload();
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleProcess(operation: "bg_removal" | "clarity_upscaler") {
-    if (!onProcess || processing) return;
-    setProcessing(operation);
-    try {
-      await onProcess(job, operation);
-    } finally {
-      setProcessing(null);
-    }
-  }
-
-  async function handleMoreLikeThis() {
-    if (!onMoreLikeThis || moreLikeThis) return;
-    setMoreLikeThis(true);
-    try {
-      await onMoreLikeThis(job);
-    } finally {
-      setMoreLikeThis(false);
-    }
-  }
-
-  async function handleSetOfficial() {
-    if (!onSetOfficialLogo || officialBusy) return;
-    const next = !official;
-    setOfficial(next);     // optimistic
-    setOfficialBusy(true);
-    playButtonPress();
-    try {
-      const ok = await onSetOfficialLogo(job, next);
-      if (!ok) setOfficial(!next); // revert on API failure
-    } catch {
-      setOfficial(!next);          // revert on network failure
-    } finally {
-      setOfficialBusy(false);
-    }
-  }
-
-  // Hide (archive) / restore — the parent flips job.archived optimistically,
-  // which removes the card from the current tab, so no local state to sync.
-  async function handleToggleArchive() {
-    if (!onToggleArchive || archiveBusy) return;
-    setArchiveBusy(true);
-    playButtonPress();
-    try {
-      await onToggleArchive(job, !job.archived);
-    } finally {
-      setArchiveBusy(false);
-    }
-  }
-
-  async function handleToggleFavorite() {
-    if (!onToggleFavorite || favBusy) return;
-    const next = !fav;
-    setFav(next);          // optimistic
-    setFavBusy(true);
-    playButtonPress();
-    try {
-      const ok = await onToggleFavorite(job, next);
-      if (!ok) setFav(!next); // revert on API failure
-    } catch {
-      setFav(!next);          // revert on network failure
-    } finally {
-      setFavBusy(false);
-    }
-  }
+  const a = useJobActions(job, callbacks);
+  const {
+    downloading, sharing, saving, copied, processing, moreLikeThis,
+    fav, favBusy, official, officialBusy, archiveBusy,
+    typeLabel, modelLabel, derivedTag, isOriginalImage, isUpload, canBeOfficial,
+    bgRemovalCost, upscaleCost,
+    handleDownload, handleShare, handleSave, handleProcess, handleMoreLikeThis,
+    handleSetOfficial, handleToggleArchive, handleToggleFavorite,
+  } = a;
 
   if (!job.output_url) return null;
-
-  const typeLabel  = IMAGE_TYPE_LABELS[job.image_type ?? ""] ?? job.image_type ?? "Image";
-  const modelLabel = MODEL_LABELS[job.model_key] ?? job.model_key;
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.97 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="rounded-2xl border border-primary/20 bg-card overflow-hidden"
+      className={`rounded-2xl border bg-card overflow-hidden transition-colors ${onCanvas ? "border-gold/60" : "border-primary/20"}`}
     >
       {/* Image — click to open the full-screen viewer. Transparent (bg-removed)
           images sit on a light checkerboard so dark logos stay visible. */}
@@ -287,11 +99,27 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
 
       {/* Meta + actions */}
       <div className="p-4 space-y-3">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{typeLabel}</p>
-          <p className="text-xs text-faint">
-            {isUpload ? "Your file · no energy used" : <>{modelLabel} · ⚡ {job.energy_reserved} used</>}
-          </p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white truncate">{typeLabel}</p>
+            <p className="text-xs text-faint">
+              {isUpload ? "Your file · no energy used" : <>{modelLabel} · ⚡ {job.energy_reserved} used</>}
+            </p>
+          </div>
+          {onOpenOnCanvas && (
+            <button
+              type="button"
+              onClick={() => onOpenOnCanvas(job)}
+              disabled={onCanvas}
+              className={`shrink-0 rounded-lg border px-2 py-1 text-[11px] font-semibold transition-colors ${
+                onCanvas
+                  ? "border-gold/50 bg-gold/10 text-gold"
+                  : "border-white/12 text-muted hover:border-gold/50 hover:text-white"
+              }`}
+            >
+              {onCanvas ? "On canvas" : "Open on canvas"}
+            </button>
+          )}
         </div>
 
         {/* Primary loop actions — only Share (orange) + More like this (green) get bold color */}

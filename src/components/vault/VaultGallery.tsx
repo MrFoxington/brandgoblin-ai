@@ -181,7 +181,7 @@ export default function VaultGallery({ items, brands, onToggleArchive }: Props) 
 // ── Cards ─────────────────────────────────────────────────────────────────────
 
 function ArtCard({ item }: { item: VaultArtItem }) {
-  const href = item.brandId ? `/dashboard/studio?brand=${item.brandId}` : "/dashboard/studio";
+  const href = `/dashboard/studio?job=${item.id}${item.brandId ? `&brand=${item.brandId}` : ""}`;
   return (
     <Link
       href={href}
