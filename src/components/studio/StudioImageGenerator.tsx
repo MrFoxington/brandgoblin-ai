@@ -553,11 +553,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const stripPool = brandVisibleJobs.filter((j) => j.id !== canvasJob?.id);
   const stripJobs = stripPool.slice(0, 14);
 
-  // Share card brand meta for any job (its OWN brand, freeform gets the house frame).
+  // Share card brand meta for any job (its OWN brand; a freeform creation gets a
+  // plain ink frame). No BrandGoblin mark on any tier: clean sharing (Fox, Sept 6).
   function cardBrandFor(job: StudioJobRow | null): ShareCardBrand {
     const b = job?.brand_id ? brands.find((x) => x.id === job.brand_id) : undefined;
     const out = b?.output_data as { recommendedName?: string; taglines?: string[]; colorPalette?: Array<{ hex?: string }> } | undefined;
-    if (!out) return { name: "Goblin Studio", tagline: null, colors: ["#141518", "#2E7D5B", "#FBBF24"] };
+    if (!out) return { name: "", tagline: null, colors: ["#141518"] };
     return {
       name: out.recommendedName ?? "Brand",
       tagline: out.taglines?.[0] ?? null,

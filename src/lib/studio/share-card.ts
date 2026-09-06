@@ -11,6 +11,8 @@ export interface ShareCardBrand {
   /** Palette hexes, primary first. */
   colors: string[];
 }
+// Fox's rule (Sept 6, 2026): the card is the USER's brand, never ours. No
+// BrandGoblin mark on anything a member makes, on any tier. Clean sharing only.
 
 export type ShareCardResult = ShareResult | "downloaded";
 
@@ -148,20 +150,20 @@ export async function buildShareCard(imageUrl: string, brand: ShareCardBrand): P
   ctx.drawImage(art as CanvasImageSource, dx, dy, dw, dh);
   ctx.restore();
 
-  // Words: brand name, tagline, palette, and a small maker line.
+  // Words: brand name, tagline, palette. Nothing of ours.
   const font = displayFont();
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   ctx.fillStyle = text;
   ctx.font = `700 64px "${font}", Georgia, serif`;
   const name = brand.name.length > 26 ? brand.name.slice(0, 25) + "…" : brand.name;
-  ctx.fillText(name, W / 2, 1122);
+  if (name) ctx.fillText(name, W / 2, 1138);
 
   if (brand.tagline) {
     ctx.globalAlpha = 0.8;
     ctx.font = `italic 400 32px "${font}", Georgia, serif`;
     const tag = brand.tagline.length > 60 ? brand.tagline.slice(0, 59) + "…" : brand.tagline;
-    ctx.fillText(`“${tag}”`, W / 2, 1176);
+    ctx.fillText(`“${tag}”`, W / 2, 1194);
     ctx.globalAlpha = 1;
   }
 
@@ -174,7 +176,7 @@ export async function buildShareCard(imageUrl: string, brand: ShareCardBrand): P
     let x = (W - total) / 2 + size / 2;
     for (const c of dots) {
       ctx.beginPath();
-      ctx.arc(x, 1228, size / 2, 0, Math.PI * 2);
+      ctx.arc(x, 1256, size / 2, 0, Math.PI * 2);
       ctx.fillStyle = c;
       ctx.fill();
       ctx.lineWidth = 2;
@@ -184,11 +186,7 @@ export async function buildShareCard(imageUrl: string, brand: ShareCardBrand): P
     }
   }
 
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = text;
-  ctx.font = `600 22px system-ui, -apple-system, "Segoe UI", sans-serif`;
-  ctx.fillText("Made in Goblin Studio  ·  brandgoblinai.com", W / 2, 1296);
-  ctx.globalAlpha = 1;
+
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/jpeg", 0.92);
@@ -230,7 +228,8 @@ export async function shareCard(
     const file = new File([blob], filename, { type: "image/jpeg" });
     try {
       if (nav.canShare({ files: [file] })) {
-        await nav.share({ files: [file], title: `${brand.name} on BrandGoblin`, text: `Made in Goblin Studio` });
+        // Sheet metadata stays theirs too: the brand name, nothing of ours.
+        await nav.share({ files: [file], title: brand.name || "My creation" });
         return "shared";
       }
     } catch (err) {

@@ -59,9 +59,9 @@ opens on the user's latest creation, a masonry gallery of everything, one green 
 and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
 night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
 one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
-all pushed. **Phase D (first-timer coach, "Today in the Studio", share card) is BUILT and
-committed (Sept 6, late night), awaiting push + live check.** The Creator Studio plan is complete
-once D is verified.
+all pushed. **Phase D (first-timer coach, "Today in the Studio", share card) is LIVE and checked
+(Sept 6, late night); a clean-card follow-up (no watermark on any tier, Fox's rule) awaits push.
+The Creator Studio plan is complete.**
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
@@ -73,15 +73,12 @@ Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_
 (3) the Phase D + C + B session logs below, (4) project memory `app-design-direction.md` +
 `brandgoblin-ship-workflow.md`.
 
-**All four Creator Studio phases are built. A, B, C are live and checked; D is committed and
-awaits Fox's push + the live check.** What to verify for D: the Vault rail's "Today" card
-(Studio suggestion with a green "Make it" + the content idea); `/dashboard/studio?coach=1`
-shows the six coach tips in their slots (What to make → Details after picking Product Art →
-Conjure footer → canvas toolbar for Save, then Share); a Today link (`?brand=&type=&spark=`)
-arrives with the prompt cooked for the idea; "Share card" on the canvas toolbar downloads a
-1080×1350 card on desktop ("Card saved ✓") and opens the share sheet on a phone. The
-Creator Studio plan is then complete; next per Fox's roadmap: P7 one website (Airo dies, root
-domain → app), then Goblin Labs video.
+**All four Creator Studio phases are live and checked.** One follow-up commit (the share card
+with no BrandGoblin mark, Fox's no-watermark rule) may still need `git push origin main`; check
+`git log origin/main..main`. The Creator Studio plan is complete. Next per Fox's roadmap: P7 one
+website (Airo dies, root domain → app), then Goblin Labs video. Untested live only because it
+needs a real tap: the share sheet opening from "Share card" (the build pipeline itself is
+verified). `/dashboard/studio?coach=1` previews the coach on any account.
 
 Still unseen on a real account: the brand-kit hero on the Vault, the empty-vault hero, a free
 account's rail (Upgrade spark), the Studio's empty canvas, and a true first-timer's coach run.
@@ -111,7 +108,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, late night (🧭 CREATOR STUDIO PHASE D: coach + Today + share card. Committed, NOT pushed.)
+## 🗓️ SESSION LOG — September 6, 2026, late night (🧭 CREATOR STUDIO PHASE D: coach + Today + share card. PUSHED + LIVE; clean-card follow-up pending push.)
 
 Fox: "Yes, go ahead with phase D." Built straight after C. `npx tsc --noEmit` clean; subagent
 review found 5 real issues, all fixed before commit (listed below).
@@ -168,8 +165,33 @@ had no busy guard.
 **Not done:** "Make it a set" after a creation (plan mentions it in passing; needs a product
 decision on what a set is). Streak on the rail and badge progress were already in Phase B.
 
-**▶ NEXT:** Fox pushes → live check (Today card, `?coach=1`, a `?spark=` arrival, Share card on
-desktop = download) → then the roadmap: P7 one website, Labs video.
+**✅ PUSHED BY FOX + LIVE-CHECKED (`f39ccc7`, same night).** Today card renders on the Vault rail
+("Today for Rōnin Man · In the Studio: A moody hero shot of your product · Make it · Also today:
+three other brands · Content idea"). `?coach=1`: tip 2 sat in the open "What to make" section
+(brand already picked), picking Product Art moved tip 3 into Details (auto-opened), naming the
+product jumped to tip 5 on the canvas toolbar (Fox's canvas already holds a finished original,
+so the Conjure step counted as done), Save moved it to tip 6 on Share. The phone-bar copy of the
+tip is in the DOM (hidden at desktop). Share card: the whole pipeline verified in the page
+(fetch 200 → createImageBitmap 1280×720 → Fraunces loaded via `document.fonts` → 53 KB JPEG);
+the only failure in the MCP tab was `navigator.share` refusing a synthetic click ("Must be
+handling a user gesture"), which a real click satisfies. Rendered two cards through the
+compiled compositor (dark brand → ink frame, light brand → paper frame): they look right.
+**NOTE for desktop Chrome on macOS:** `canShare({files})` is TRUE, so a real click opens the
+macOS share sheet rather than downloading; the download path is for browsers without file
+sharing.
+
+**FOX'S RULE, decided during this check: NO WATERMARKS, ANY TIER.** He first floated "a very
+light mark for free, none for Pro/Max", then took it back within the minute: "when people make
+images or videos with our site they don't wanna have fucking watermarks on it, that would piss
+them off and it kind of makes it unusable. Clean sharing options." So the share card carries
+ONLY the user's brand (name, tagline, palette dots); the "Made in Goblin Studio" maker line is
+gone, the share-sheet title is just the brand name, and a freeform creation gets a plain ink
+frame with no words. The one shape he does like, for later: a small "Made with BrandGoblin"
+END CARD on a shared VIDEO (a closing frame, never an overlay). Saved in project memory
+`never-gate-the-finish-line.md` (Rule 5). Committed as the follow-up commit, NOT pushed.
+
+**▶ NEXT:** Fox pushes the clean-card commit → the Creator Studio plan is complete → roadmap:
+P7 one website (Airo dies), then Goblin Labs video.
 
 ---
 
