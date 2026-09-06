@@ -1637,7 +1637,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             used once or saved as the brand's new default. */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            🅰 Fonts <span className="normal-case tracking-normal font-normal text-faint">· {fontOverride ? "custom for this generation" : "using saved brand fonts"}</span>
+            Fonts <span className="normal-case tracking-normal font-normal text-faint">· {fontOverride ? "custom for this generation" : "using saved brand fonts"}</span>
           </label>
           <div className="rounded-xl border border-white/10 bg-white/3 p-3.5 space-y-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">

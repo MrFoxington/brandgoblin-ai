@@ -67,24 +67,6 @@ const PLANS = [
     ],
   },
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    desc: "Create your brand free. No card needed.",
-    highlight: false,
-    badge: null,
-    subtext: null,
-    cta: "Start free. No card needed.",
-    href: "/signup",
-    features: [
-      "Generate your brand: names, story, voice, colors, logo direction",
-      "Try Goblin Studio free: real logos, social graphics & product art",
-      "Creative Energy included to get started",
-      "Free Nix stickers & wallpapers",
-      "No credit card, ever",
-    ],
-  },
-  {
     name: "Creator Pro",
     price: "$19",
     period: "/month",
@@ -100,6 +82,24 @@ const PLANS = [
       "Monthly Creative Energy for Goblin Studio",
       "Ongoing marketing ideas",
       "Top up energy anytime",
+    ],
+  },
+  {
+    name: "Free",
+    price: "$0",
+    period: "forever",
+    desc: "Create your brand free. No card needed.",
+    highlight: false,
+    badge: null,
+    subtext: null,
+    cta: "Start free. No card needed.",
+    href: "/signup",
+    features: [
+      "Generate your brand: names, story, voice, colors, logo direction",
+      "Try Goblin Studio free: real logos, social graphics & product art",
+      "Creative Energy included to get started",
+      "Free Nix stickers & wallpapers",
+      "No credit card, ever",
     ],
   },
 ];
@@ -273,9 +273,7 @@ export default function LandingPage() {
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`bg-card bg-card-hover flex flex-col p-7 text-left ${plan.highlight ? "!border-goblin/60 ring-1 ring-goblin/30" : ""} ${
-                  plan.name === "Creator Max" ? "lg:order-1" : plan.name === "Creator Pro" ? "lg:order-2" : "lg:order-3"
-                }`}
+                className={`bg-card bg-card-hover flex flex-col p-7 text-left ${plan.highlight ? "!border-goblin/60 ring-1 ring-goblin/30" : ""}`}
               >
                 {plan.badge && (
                   <span className={`mb-4 self-start ${plan.name === "Creator Max" ? "badge-neutral !border-gold/60 !bg-gold-tint !text-gold-dark" : "badge-goblin"}`}>

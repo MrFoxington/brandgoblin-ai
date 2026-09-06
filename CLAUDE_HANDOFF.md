@@ -114,6 +114,24 @@ instead: computed button backgrounds, empty icon spans, leftover emoji text node
 Still emoji (deliberate, later phases): personality chips on /generate, XPSystem
 achievement pills, LoadingScreen, Sparkles particles, print/PDF page.
 
+**Follow-up commit (same evening) — wordmark + mobile pass:**
+- **Fox's call: the old full-lockup logo PNG (Nix + "BrandGoblin AI" text) is GONE from the
+  navbar and footer.** New `src/components/Wordmark.tsx` = clean Fraunces type
+  "BrandGoblin" (Goblin in green) + tiny gold "Powered by NIX" kicker, both tones. Nix is the
+  mascot INSIDE the app, never the logo. Login/signup cards now show the real waving Nix
+  PNG instead of the lockup. `NixAvatar.tsx` still exists (used by EmptyState only).
+- **Mobile check at 390px** (method: inject a same-origin 390px `<iframe>` into the page in
+  Chrome and `zoom`-screenshot it — the extension can't resize the window below ~1440):
+  landing hero, dashboard, Studio all stack cleanly, no horizontal overflow. FIXED: plan
+  cards were Max → Free → Pro on phones (DOM order + `lg:order` hack) → now Max → Pro → Free
+  in the DOM on both pricing and the landing summary, no order classes.
+- Fox reports most usage so far is on desktop (Vercel Analytics). Design for desktop
+  richness, keep mobile-first CSS discipline; Phase B/C layouts must pass the 390px iframe
+  check before commit.
+- Fox is now on Creator Max himself (energy widget showed "4,000 monthly + refill"), so
+  the live Max grant works end to end.
+- Still to sweep later: em dashes in in-app helper copy (Studio hints etc.), Fox's writing rule.
+
 **▶ NEXT:** Phase B (work-first Vault) per `docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`.
 
 ---

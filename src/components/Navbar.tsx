@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import NixAvatar from "@/components/NixAvatar";
+import Wordmark from "@/components/Wordmark";
 import { SoundToggle } from "@/components/primitives/SoundFx";
 
 // Marketing links sell the product to visitors. Logged-in users are already
@@ -89,19 +89,9 @@ export default function Navbar({ tone = "dark" }: { tone?: NavTone } = {}) {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
 
-        {/* Logo */}
-        <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 group">
-          <NixAvatar size="lg" />
-          <span className="hidden sm:flex flex-col leading-tight">
-            <span className="font-display text-sm font-bold">
-              <span className={light ? "text-ink" : "text-paper"}>Brand</span>
-              <span className={light ? "text-goblin" : "text-primary-light"}>Goblin</span>
-            </span>
-            <span className={`text-[10px] font-bold uppercase tracking-[0.18em] ${light ? "text-gold-dark" : "text-gold/90"}`}>
-              Powered by NIX
-            </span>
-          </span>
-        </Link>
+        {/* Wordmark — clean type, no lockup PNG (Fox, Sept 6 2026). Nix is the
+            mascot inside the app, not the logo. */}
+        <Wordmark tone={tone} href={user ? "/dashboard" : "/"} />
 
         {/* Nav links */}
         <nav className="hidden items-center gap-6 text-sm font-medium lg:flex">

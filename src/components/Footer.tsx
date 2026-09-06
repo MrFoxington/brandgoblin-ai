@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import NixAvatar from "@/components/NixAvatar";
+import Wordmark from "@/components/Wordmark";
 
 const ECOSYSTEM: { label: string; active: boolean; href?: string }[] = [
   { label: "Creator Pro",    active: true, href: "/dashboard/creator-pro" },
@@ -43,18 +43,7 @@ export default function Footer({ tone = "dark" }: { tone?: "light" | "dark" } = 
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           {/* Brand */}
           <div className="flex flex-col items-center gap-2 sm:items-start">
-            <div className="flex items-center gap-2.5">
-              <NixAvatar size="sm" />
-              <span className="font-display font-extrabold">
-                <span className={light ? "text-ink" : "text-primary-light"}>Brand</span>
-                <span className={light ? "text-goblin" : "text-secondary"}>Goblin</span>
-                {" "}
-                <span className={light ? "text-goblin" : "text-secondary"}>AI</span>
-              </span>
-            </div>
-            <p className={`text-xs font-semibold tracking-wide ${light ? "text-gold-dark" : "text-amber-300/90"}`}>
-              BrandGoblin. Powered by NIX
-            </p>
+            <Wordmark tone={tone} size="sm" />
             <p className={`text-xs italic max-w-[220px] text-center sm:text-left ${light ? "text-ink-faint" : "text-faint"}`}>
               Everyone Has An Idea.<br />BrandGoblin Helps Bring It To Life.
             </p>

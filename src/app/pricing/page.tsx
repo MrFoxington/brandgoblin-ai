@@ -121,7 +121,7 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
             {/* ── Creator Max (the anchor: most expensive first) ── */}
-            <div className="relative flex flex-col rounded-[1.25rem] bg-ink p-7 text-left text-paper shadow-[0_24px_48px_-24px_rgba(20,21,24,0.6)] lg:order-1">
+            <div className="relative flex flex-col rounded-[1.25rem] bg-ink p-7 text-left text-paper shadow-[0_24px_48px_-24px_rgba(20,21,24,0.6)]">
               <div
                 className="pointer-events-none absolute inset-0 rounded-[1.25rem]"
                 style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(46,125,91,0.35) 0%, transparent 60%)" }}
@@ -149,27 +149,8 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* ── Free ── */}
-            <div className="bg-card bg-card-hover flex flex-col p-7 text-left lg:order-3">
-              <h3 className="font-display text-2xl font-semibold text-ink">Free</h3>
-              <p className="mt-1 mb-5 text-sm text-ink-muted">Create your brand and taste Goblin Studio. Free.</p>
-              <div className="mb-6 flex items-baseline gap-1.5">
-                <span className="font-display text-5xl font-semibold text-ink tracking-tight">$0</span>
-                <span className="text-sm text-ink-faint">forever</span>
-              </div>
-              <ul className="mb-8 flex-1 space-y-2.5">
-                {FREE_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
-                    <span className="text-goblin mt-0.5 shrink-0 font-bold">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <PlanButton plan={null} cta="Start free. No card needed." highlight={false} user={user} />
-            </div>
-
             {/* ── Creator Pro ── */}
-            <div className="bg-card bg-card-hover flex flex-col p-7 text-left !border-goblin/60 ring-1 ring-goblin/30 lg:order-2">
+            <div className="bg-card bg-card-hover flex flex-col p-7 text-left !border-goblin/60 ring-1 ring-goblin/30">
               <span className="badge-goblin mb-4 self-start">Most popular</span>
               <h3 className="font-display text-2xl font-semibold text-ink">Creator Pro</h3>
               <p className="mt-0.5 mb-0.5 text-xs font-semibold text-goblin">Your AI Marketing Department</p>
@@ -187,6 +168,25 @@ export default function PricingPage() {
                 ))}
               </ul>
               <PlanButton plan="pro" cta="Upgrade to Creator Pro" highlight={true} user={user} />
+            </div>
+
+            {/* ── Free ── */}
+            <div className="bg-card bg-card-hover flex flex-col p-7 text-left">
+              <h3 className="font-display text-2xl font-semibold text-ink">Free</h3>
+              <p className="mt-1 mb-5 text-sm text-ink-muted">Create your brand and taste Goblin Studio. Free.</p>
+              <div className="mb-6 flex items-baseline gap-1.5">
+                <span className="font-display text-5xl font-semibold text-ink tracking-tight">$0</span>
+                <span className="text-sm text-ink-faint">forever</span>
+              </div>
+              <ul className="mb-8 flex-1 space-y-2.5">
+                {FREE_FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-ink-2">
+                    <span className="text-goblin mt-0.5 shrink-0 font-bold">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <PlanButton plan={null} cta="Start free. No card needed." highlight={false} user={user} />
             </div>
 
           </div>

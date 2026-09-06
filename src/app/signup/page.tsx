@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import MarketingShell from "@/components/marketing/MarketingShell";
-import NixAvatar from "@/components/NixAvatar";
+import Image from "next/image";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -60,7 +60,14 @@ export default function SignupPage() {
         <div className="bg-card w-full max-w-md p-8 sm:p-10">
           <div className="mb-8 text-center">
             <div className="flex justify-center mb-4">
-              <NixAvatar size="xl" glow />
+              <Image
+                src="/nix/happy-waving-nix.png"
+                alt="Nix, your brand goblin"
+                width={112}
+                height={112}
+                priority
+                className="drop-shadow-[0_12px_28px_rgba(124,58,237,0.35)]"
+              />
             </div>
             <h1 className="font-display text-3xl font-semibold text-ink">
               Start Building Your Brand
