@@ -64,7 +64,7 @@ and per-brand filters. Existing archive/favorite/official-logo logic reused as-i
 Done when: from opening the Studio to a finished product-art image is three taps with no
 scrolling on desktop, and the result is never below the fold.
 
-### Phase D: first-timer tips + the daily loop (1-2 sessions)
+### Phase D: first-timer tips + the daily loop (1-2 sessions) · BUILT Sept 6 night (see CLAUDE_HANDOFF.md), live check pending
 Tips: a six-step coach for the first visit (pick a brand → pick Product Art → name the
 product → Conjure → Save → Share), one short sentence per tip, anchored to the control it
 points at, dismissable, never shown again once the step is done (localStorage + the

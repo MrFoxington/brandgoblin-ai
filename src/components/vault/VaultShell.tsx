@@ -20,7 +20,8 @@ import { pickHero, type VaultItem } from "@/lib/vault";
 import VaultGreeting from "./VaultGreeting";
 import VaultHero from "./VaultHero";
 import VaultGallery from "./VaultGallery";
-import VaultRail, { MobileStrip, type EnergyData, type DailyIdea } from "./VaultRail";
+import VaultRail, { MobileStrip, type EnergyData, type DailyIdea, type TodayStudio } from "./VaultRail";
+import { pickTodayIdea } from "@/lib/studio/today";
 import CreateChooser from "./CreateChooser";
 
 // ── Streak (same key BadgeShelf reads) ────────────────────────────────────────
@@ -132,6 +133,7 @@ export default function VaultShell({
   const [showRefill, setShowRefill] = useState(false);
   const [chooserOpen, setChooserOpen] = useState(false);
   const [idea, setIdea] = useState<DailyIdea>({ idea: FALLBACK_IDEAS[0] });
+  const [today, setToday] = useState<TodayStudio | null>(null);
   const [ideaDismissed, setIdeaDismissed] = useState(false);
 
   const fetchEnergy = useCallback(() => {
@@ -147,6 +149,16 @@ export default function VaultShell({
     setGreeting(getTimeOfDay());
     setNixSays(NIX_GREETINGS[Math.floor(Math.random() * NIX_GREETINGS.length)]);
     setIdea(getDailyIdea(ideaSource));
+    // Today in the Studio: the latest brand's pick, plus up to three others.
+    const lead = brands.find((b) => b.id === latestBrandId) ?? brands[0];
+    if (lead) {
+      setToday({
+        brandId: lead.id,
+        brandName: lead.name,
+        idea: pickTodayIdea(lead.id),
+        others: brands.filter((b) => b.id !== lead.id).slice(0, 3).map((b) => ({ brandId: b.id, brandName: b.name, idea: pickTodayIdea(b.id) })),
+      });
+    }
     try {
       setAskDismissed(localStorage.getItem(NAME_ASK_DISMISSED_KEY) === "1");
     } catch {
@@ -220,6 +232,7 @@ export default function VaultShell({
           energy={energy}
           onRefill={openRefill}
           idea={idea}
+          today={today}
           ideaDismissed={ideaDismissed}
           onDismissIdea={dismissIdea}
           latestBrandId={latestBrandId}

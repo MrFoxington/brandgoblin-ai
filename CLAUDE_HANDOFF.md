@@ -59,26 +59,32 @@ opens on the user's latest creation, a masonry gallery of everything, one green 
 and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
 night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
 one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
-polish live; a canvas-swap robustness commit (no exit animation on the swap) awaiting push.
+all pushed. **Phase D (first-timer coach, "Today in the Studio", share card) is BUILT and
+committed (Sept 6, late night), awaiting push + live check.** The Creator Studio plan is complete
+once D is verified.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE D (tips + the daily loop + share)
+## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE D, THEN THE ROADMAP (P7 one site, Labs video)
 
-Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
-(Fox's decisions + the four phases; Phase D section), (3) the Phase C + Phase B session logs
-below, (4) project memory `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
+Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**,
+(3) the Phase D + C + B session logs below, (4) project memory `app-design-direction.md` +
+`brandgoblin-ship-workflow.md`.
 
-**Phases A, B and C are live, and the canvas Conjure flow was exercised three times for real
-(logo, product art, thumbnail: all landed on the canvas with the celebration).** First job:
-`git log origin/main..main` should be empty (the canvas-swap commit). Phase D per the plan: three first-timer tips (one bubble,
-dismissable, never a tour), "Today in the Studio" on the Vault rail, the share-card frame,
-"Make it a set" after a finished creation. Keep the spark rule and the 390px check.
+**All four Creator Studio phases are built. A, B, C are live and checked; D is committed and
+awaits Fox's push + the live check.** What to verify for D: the Vault rail's "Today" card
+(Studio suggestion with a green "Make it" + the content idea); `/dashboard/studio?coach=1`
+shows the six coach tips in their slots (What to make → Details after picking Product Art →
+Conjure footer → canvas toolbar for Save, then Share); a Today link (`?brand=&type=&spark=`)
+arrives with the prompt cooked for the idea; "Share card" on the canvas toolbar downloads a
+1080×1350 card on desktop ("Card saved ✓") and opens the share sheet on a phone. The
+Creator Studio plan is then complete; next per Fox's roadmap: P7 one website (Airo dies, root
+domain → app), then Goblin Labs video.
 
 Still unseen on a real account: the brand-kit hero on the Vault, the empty-vault hero, a free
-account's rail (Upgrade spark), and the Studio's empty canvas.
+account's rail (Upgrade spark), the Studio's empty canvas, and a true first-timer's coach run.
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -102,6 +108,68 @@ give Fox the push lines. Fox reports most users are on desktop, so design for de
 and collapse cleanly on phones.
 
 ---
+
+---
+
+## 🗓️ SESSION LOG — September 6, 2026, late night (🧭 CREATOR STUDIO PHASE D: coach + Today + share card. Committed, NOT pushed.)
+
+Fox: "Yes, go ahead with phase D." Built straight after C. `npx tsc --noEmit` clean; subagent
+review found 5 real issues, all fixed before commit (listed below).
+
+**1. The first-timer coach (`src/components/studio/StudioCoach.tsx`).** Six one-sentence tips:
+pick the brand → choose Product Art → name the product → hit Conjure → save → share.
+`useStudioCoach` derives the current step from LIVE state (selected brand, image type, product
+focus, whether the canvas holds a finished original, saved/shared flags) so a step vanishes
+the moment it is done; ✕ writes `brandgoblin_studio_coach_v1 = done` and the coach never
+returns; finishing all six writes the same key. Only for accounts with NO completed job at
+page load (`firstTimer`, decided once). `CoachTip` = Nix face + "Nix tip n of 6" + sentence + ✕,
+optional action link. Slots: `RailSection` gained a `tip` prop (bubble under the header, green
+border on the section; the coach also auto-opens that section); the Conjure footer; the canvas
+toolbar (Save/Share tips live in `CanvasJob`, so `hasCompleted` is judged on the CANVAS job,
+never on a hidden/other-brand one); a copy above the phone bottom bar while the sheet is closed
+with an "Open the tools" action. The conjure tip hides while a job is running. Arriving with a
+Today idea (`?spark=`) counts the type + product steps as done (the idea did the choosing).
+With zero brands the brand step counts as done (nothing to pick). **`?coach=1` previews the
+coach on any account** (Fox's testing switch; ignores the remembered dismissal).
+
+**2. "Today in the Studio" (`src/lib/studio/today.ts`).** `STUDIO_IDEAS` = nine curated
+creations (moody hero shot, flatlay, packaging close-up, in someone's hands, mascot scene,
+minimalist logo card, announcement social, one-bold-line social, thumbnail for your next
+video). `pickTodayIdea(brandId)` hashes brand + date so the Vault, the Studio and a reload
+agree. The Vault rail's two "Today" bits merged into ONE card: "Today for <brand>" → gold
+"In the Studio" box (label + green **Make it** → `/dashboard/studio?brand=&type=&spark=<key>`
++ "Also today: Brand B · Brand C" links for up to three other brands) → "Content idea" (the
+existing daily text idea, "Write it now" for Pro). Studio page reads `?spark=` (validated) and
+`StudioImageGenerator` runs `handleSpark(idea, { silent: true })` on mount: sets the type +
+specialist engine, cooks the prompt with the idea's note, and stays silent (a mount-time sound
+would mis-prime the audio unlock). Thumbnail ideas just open the Thumbnail section.
+
+**3. Share card (`src/lib/studio/share-card.ts`).** `buildShareCard(url, brand)` draws a
+1080×1350 JPEG on a `<canvas>`: gradient from the brand's primary hex (ink-deepened, or
+paper-lightened when the primary is light), the creation fitted in a 920 box with rounded
+corners + shadow on a paper backing (transparent BG-removed files read as prints), brand name
+in the site display font (read from `--font-display` on body, loaded via `document.fonts`),
+tagline in italics, palette dots, "Made in Goblin Studio · brandgoblinai.com". Image comes in
+via fetch + `createImageBitmap` (untainted), crossOrigin `<img>` fallback. `shareCard()` puts
+the File on the native sheet; desktop (no file sheet) downloads it ("downloaded");
+`NotAllowedError` / `InvalidStateError` return "failed" instead of surprising with a download.
+**Safari trap handled:** the tap's user activation dies in about a second, so cards are
+PREBUILT (`prepareShareCard`, bounded cache by job id) 0.9 s after a creation lands on the
+canvas and the moment the reveal opens; the tap then awaits a settled promise and shares.
+Wired: canvas toolbar "Share card" (states: Building card… / Shared ✓ / Card saved ✓ / Try
+again) and the reveal overlay "Share as a branded card" (busy-guarded). A real share fires the
+existing Share Celebration and marks the coach's share step.
+
+**Review fixes:** Safari activation window (prebuild cache); coach stuck without a slot when the
+canvas job was hidden/other brand (judge on the canvas); black slab behind transparent art
+(paper backing); a `null` palette entry would have thrown in render (`c?.hex`); reveal card
+had no busy guard.
+
+**Not done:** "Make it a set" after a creation (plan mentions it in passing; needs a product
+decision on what a set is). Streak on the rail and badge progress were already in Phase B.
+
+**▶ NEXT:** Fox pushes → live check (Today card, `?coach=1`, a `?spark=` arrival, Share card on
+desktop = download) → then the roadmap: P7 one website, Labs video.
 
 ---
 

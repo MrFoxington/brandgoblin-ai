@@ -10,6 +10,9 @@ import StudioCanvas from "./StudioCanvas";
 import RecentStrip from "./RecentStrip";
 import RailSection from "./RailSection";
 import EnergyWidget from "@/components/EnergyWidget";
+import { useStudioCoach, CoachTip } from "./StudioCoach";
+import { findStudioIdea } from "@/lib/studio/today";
+import { shareCard, prepareShareCard, type ShareCardBrand } from "@/lib/studio/share-card";
 import type { BrandGenerationRow, BrandTypography } from "@/types";
 import type { StudioJobRow } from "@/lib/studio/jobs";
 import { useXP } from "@/components/XPSystem";
@@ -31,6 +34,10 @@ interface Props {
   initialImageType?: ImageType;
   /** Deep link from a Vault card (?job=<id>): open that creation on the canvas. */
   initialJobId?: string;
+  /** "Today in the Studio" (?spark=<key>): cook the prompt for that idea on arrival. */
+  initialSpark?: string;
+  /** ?coach=1 previews the first-timer tips on any account (Fox's testing switch). */
+  forceCoach?: boolean;
 }
 
 const IMAGE_TYPES: { key: ImageType; label: string; desc: string }[] = [
@@ -188,7 +195,7 @@ function generateSeed(): number {
 
 type RailKey = "brand" | "type" | "details" | "prompt" | "style" | "fonts" | "engine";
 
-export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId, initialImageType, initialJobId }: Props) {
+export default function StudioImageGenerator({ brands, initialJobs, isPro = false, maxConcurrentJobs = 2, initialBrandId, initialImageType, initialJobId, initialSpark, forceCoach = false }: Props) {
   const { addXP } = useXP();
   const {
     playComplete,
@@ -225,6 +232,10 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [openSections, setOpenSections] = useState<Set<RailKey>>(
     () => new Set<RailKey>(initialJobId ? ["type"] : ["type", "prompt", "details"])
   );
+  // Phase D: the first-timer coach. "First timer" is decided once, at load.
+  const [firstTimer] = useState(() => forceCoach || !initialJobs.some((j) => j.status === "completed"));
+  const [coachSaved, setCoachSaved] = useState(false);
+  const [coachShared, setCoachShared] = useState(false);
   // Product Art focus — the user names the exact product ("coffee bag", "hoodie"…)
   const [productFocus, setProductFocus] = useState("");
   const [styleChip, setStyleChip]       = useState<string | null>(AUTO_STYLE_CHIP[startType] ?? null);
@@ -320,7 +331,32 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   function handleShareSuccess() {
     setShareMsgIndex(0);
     setShareCelebrating(true);
+    setCoachShared(true);
   }
+
+  // Share card from the reveal: the creation on its brand's frame.
+  const [revealCardBusy, setRevealCardBusy] = useState(false);
+  async function handleRevealShareCard(job: StudioJobRow) {
+    if (!job.output_url || revealCardBusy) return;
+    setRevealCardBusy(true);
+    try {
+      const result = await shareCard(job.output_url, cardBrandFor(job), `${brandSlugFor(job)}-share-card.jpg`, job.id);
+      if (result === "shared") {
+        playShare();
+        setCelebratingJob(null);
+        handleShareSuccess();
+      }
+    } finally {
+      setRevealCardBusy(false);
+    }
+  }
+
+  // The reveal is peak share intent: have the card ready before the tap.
+  useEffect(() => {
+    if (!celebratingJob?.output_url) return;
+    prepareShareCard(celebratingJob.id, celebratingJob.output_url, cardBrandFor(celebratingJob)).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [celebratingJob?.id]);
 
   // Bring the tools into reach: the sheet on phones, the canvas on desktop
   // (the rail is already beside it).
@@ -516,6 +552,49 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     : "";
   const stripPool = brandVisibleJobs.filter((j) => j.id !== canvasJob?.id);
   const stripJobs = stripPool.slice(0, 14);
+
+  // Share card brand meta for any job (its OWN brand, freeform gets the house frame).
+  function cardBrandFor(job: StudioJobRow | null): ShareCardBrand {
+    const b = job?.brand_id ? brands.find((x) => x.id === job.brand_id) : undefined;
+    const out = b?.output_data as { recommendedName?: string; taglines?: string[]; colorPalette?: Array<{ hex?: string }> } | undefined;
+    if (!out) return { name: "Goblin Studio", tagline: null, colors: ["#141518", "#2E7D5B", "#FBBF24"] };
+    return {
+      name: out.recommendedName ?? "Brand",
+      tagline: out.taglines?.[0] ?? null,
+      colors: (out.colorPalette ?? []).map((c) => c?.hex).filter((h): h is string => typeof h === "string"),
+    };
+  }
+  function brandSlugFor(job: StudioJobRow | null): string {
+    return cardBrandFor(job).name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "brandgoblin";
+  }
+
+  // The coach follows the live state of the rail and the canvas.
+  // Arriving with a Today idea already did the choosing, so those steps count.
+  const arrivedWithIdea = !!findStudioIdea(initialSpark);
+  const coach = useStudioCoach({
+    firstTimer,
+    hasBrand: !!selectedBrandId || brands.length === 0, // nothing to pick without brands
+    isProductArt: imageType === "product_art" || arrivedWithIdea,
+    hasProduct: productFocus.trim().length > 0 || arrivedWithIdea,
+    // Judged on the canvas, so the save/share tips always have a place to sit.
+    hasCompleted: !!canvasJob && canvasJob.job_type === "image",
+    saved: coachSaved,
+    shared: coachShared,
+  });
+  const coachTipFor = (step: typeof coach.step) =>
+    coach.active && coach.step === step && !(step === "conjure" && activeJobs.length > 0) ? (
+      <CoachTip text={coach.text} index={coach.index} total={coach.total} onDismiss={coach.dismiss} />
+    ) : undefined;
+
+  // The coach opens the rail section it points at.
+  useEffect(() => {
+    if (!coach.active || !coach.step) return;
+    const map: Partial<Record<NonNullable<typeof coach.step>, RailKey>> = { brand: "brand", type: "type", product: "details" };
+    const key = map[coach.step];
+    if (key) setOpenSections((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coach.active, coach.step]);
+
 
   // The gallery (all assets): its own brand filter, independent of the rail.
   const galleryFilterByBrand = (j: StudioJobRow) =>
@@ -730,6 +809,14 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     return () => { if (cookDebounceRef.current) clearTimeout(cookDebounceRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productLabelName]);
+
+  // "Today in the Studio" arrival (?spark=): cook the day's idea once, on mount.
+  useEffect(() => {
+    const idea = findStudioIdea(initialSpark);
+    if (!idea || THUMBNAIL_TYPES.has(idea.imageType)) return;
+    handleSpark({ label: idea.label, imageType: idea.imageType, note: idea.note }, { silent: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reset the per-generation font override + picker when the brand changes.
   useEffect(() => {
@@ -1076,8 +1163,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
     }
   }
 
-  async function handleSpark(spark: (typeof IDEA_SPARKS)[number]) {
-    playButtonPress();
+  async function handleSpark(spark: (typeof IDEA_SPARKS)[number], opts?: { silent?: boolean }) {
+    if (!opts?.silent) playButtonPress(); // a mount-time spark has no gesture: never prime audio from it
     seedRef.current = generateSeed();
     suppressCookRef.current = true;
     setImageType(spark.imageType);
@@ -1136,8 +1223,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               job={canvasJob}
               activeCount={activeJobs.length}
               brandName={canvasBrandName}
+              cardBrand={cardBrandFor(canvasJob)}
+              cardFilename={`${brandSlugFor(canvasJob)}-share-card.jpg`}
               callbacks={jobCallbacks}
               onOpenTools={() => setToolsOpen(true)}
+              onSaved={() => setCoachSaved(true)}
+              coachTip={coachTipFor("save") ?? coachTipFor("share")}
             />
           </div>
 
@@ -1315,7 +1406,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
               {/* Brand */}
               {brands.length > 0 && (
-                <RailSection id="brand" title="Brand" summary={selectedBrandName} open={openSections.has("brand")} onToggle={() => toggleSection("brand")}>
+                <RailSection id="brand" title="Brand" summary={selectedBrandName} open={openSections.has("brand")} onToggle={() => toggleSection("brand")} tip={coachTipFor("brand")}>
         {/* Brand selector */}
         {brands.length > 0 && (
           <div>
@@ -1405,7 +1496,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               )}
 
               {/* What to make */}
-              <RailSection id="type" title="What to make" summary={`${typeLabelNow} · ${pinnedSize.label}`} open={openSections.has("type")} onToggle={() => toggleSection("type")}>
+              <RailSection id="type" title="What to make" summary={`${typeLabelNow} · ${pinnedSize.label}`} open={openSections.has("type")} onToggle={() => toggleSection("type")} tip={coachTipFor("type")}>
           <div className="grid grid-cols-1 gap-1.5">
             {IMAGE_TYPES.map(({ key, label, desc }) => (
               <button key={key} onClick={() => {
@@ -1435,7 +1526,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
               {/* Details: product, thumbnail form, brand name, logo stamp */}
               {detailsVisible && (
-                <RailSection id="details" title={isThumbnail ? "Thumbnail" : "Details"} summary={detailsSummary} open={openSections.has("details")} onToggle={() => toggleSection("details")}>
+                <RailSection id="details" title={isThumbnail ? "Thumbnail" : "Details"} summary={detailsSummary} open={openSections.has("details")} onToggle={() => toggleSection("details")} tip={coachTipFor("product")}>
                   <div className="-mt-3">
           {/* Product focus — only for Product Art: name the exact product and
               Nix cooks the prompt around it instead of guessing. */}
@@ -1888,6 +1979,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
 
             {/* Conjure: THE spark, always in reach at the bottom of the rail */}
             <div className="sticky bottom-0 border-t border-[rgba(250,247,242,0.08)] bg-surface/95 p-3.5 backdrop-blur">
+              {coachTipFor("conjure") && <div className="mb-2">{coachTipFor("conjure")}</div>}
               {error && (
                 <div className="mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
               )}
@@ -1902,6 +1994,17 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
       {/* ── Phone bar: Tools + Conjure ─────────────────────────────────────────── */}
       {!toolsOpen && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[rgba(250,247,242,0.10)] bg-surface/95 p-3 backdrop-blur lg:hidden">
+          {coach.active && (coach.step === "brand" || coach.step === "type" || coach.step === "product" || (coach.step === "conjure" && activeJobs.length === 0)) && (
+            <div className="mx-auto mb-2 max-w-lg">
+              <CoachTip
+                text={coach.text}
+                index={coach.index}
+                total={coach.total}
+                onDismiss={coach.dismiss}
+                action={coach.step === "conjure" ? undefined : { label: "Open the tools", onClick: () => setToolsOpen(true) }}
+              />
+            </div>
+          )}
           {error && (
             <div className="mx-auto mb-2 max-w-lg rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</div>
           )}
@@ -1980,6 +2083,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   className="btn-green w-full !rounded-2xl text-sm transition-opacity hover:opacity-90"
                 >
                   Share it
+                </button>
+                <button
+                  onClick={() => handleRevealShareCard(celebratingJob)}
+                  disabled={revealCardBusy}
+                  className="w-full rounded-2xl border border-primary/40 bg-primary/10 px-4 py-2.5 text-xs font-semibold text-primary-light transition-colors hover:bg-primary/20 hover:text-white disabled:opacity-60"
+                >
+                  {revealCardBusy ? "Building your card…" : "Share as a branded card"}
                 </button>
                 <button
                   onClick={handleMakeAnother}

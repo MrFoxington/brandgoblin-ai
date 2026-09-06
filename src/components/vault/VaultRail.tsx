@@ -14,6 +14,7 @@ import NixPose from "@/components/primitives/NixPose";
 import BadgeShelf from "@/components/BadgeShelf";
 import { XPBar } from "@/components/XPSystem";
 import type { BadgeStats } from "@/lib/badges";
+import { studioHrefFor, type StudioIdea } from "@/lib/studio/today";
 
 export interface EnergyData {
   plan?: string;
@@ -33,6 +34,15 @@ export interface DailyIdea {
   brandName?: string;
 }
 
+/** "Today in the Studio": one suggested creation per brand per day (Phase D). */
+export interface TodayStudio {
+  brandId: string;
+  brandName: string;
+  idea: StudioIdea;
+  /** Other brands' picks, for the small links under the card. */
+  others: { brandId: string; brandName: string; idea: StudioIdea }[];
+}
+
 interface RailProps {
   plan: string;
   isPro: boolean;
@@ -43,6 +53,7 @@ interface RailProps {
   energy: EnergyData | null;
   onRefill: () => void;
   idea: DailyIdea;
+  today: TodayStudio | null;
   ideaDismissed: boolean;
   onDismissIdea: () => void;
   latestBrandId: string | null;
@@ -81,6 +92,7 @@ export default function VaultRail({
   energy,
   onRefill,
   idea,
+  today,
   ideaDismissed,
   onDismissIdea,
   latestBrandId,
@@ -179,17 +191,17 @@ export default function VaultRail({
         <p className="mt-2 text-center text-[11px] text-faint">Energy powers new creations. Saving and sharing are free.</p>
       </motion.section>
 
-      {/* Today's Idea */}
+      {/* Today: one Studio creation + one content idea, per brand, per day */}
       <AnimatePresence initial={false}>
         {mounted && !ideaDismissed && (
           <motion.section
-            key="idea"
+            key="today"
             initial={reduce ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0, marginTop: 0, transition: { duration: 0.2 } }}
             transition={{ delay: 0.2, duration: 0.3 }}
             className="relative overflow-hidden rounded-2xl border border-nix/25 bg-nix/5 p-4"
-            aria-label="Today's idea"
+            aria-label="Today"
           >
             <button
               type="button"
@@ -203,22 +215,49 @@ export default function VaultRail({
               <div className="shrink-0">
                 <NixPose pose="conjuring" size={44} glow={false} float={false} animated={false} />
               </div>
-              <div className="min-w-0 pr-4">
+              <div className="min-w-0 flex-1 pr-4">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-nix">
-                  Today&apos;s idea
-                  {idea.brandName && (
-                    <span className="ml-1.5 font-normal normal-case tracking-normal text-faint">for {idea.brandName}</span>
+                  Today
+                  {(today?.brandName ?? idea.brandName) && (
+                    <span className="ml-1.5 font-normal normal-case tracking-normal text-faint">for {today?.brandName ?? idea.brandName}</span>
                   )}
                 </p>
-                <p className="mt-1 text-sm font-medium leading-relaxed text-white">{idea.idea}</p>
-                {isPro && latestBrandId && (
-                  <Link
-                    href={`/dashboard/creator-pro?brandId=${latestBrandId}`}
-                    className="mt-1.5 inline-block text-xs text-primary-light hover:underline"
-                  >
-                    Create this now →
-                  </Link>
+
+                {today && (
+                  <div className="mt-2 rounded-xl border border-gold/25 bg-gold/5 p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">In the Studio</p>
+                    <p className="mt-0.5 text-sm font-medium leading-snug text-white">{today.idea.label}</p>
+                    <Link href={studioHrefFor(today.brandId, today.idea)} className="btn-green mt-2 !px-3 !py-1.5 text-xs">
+                      Make it
+                    </Link>
+                    {today.others.length > 0 && (
+                      <p className="mt-2 text-[11px] text-faint">
+                        Also today:{" "}
+                        {today.others.map((o, i) => (
+                          <span key={o.brandId}>
+                            {i > 0 && " · "}
+                            <Link href={studioHrefFor(o.brandId, o.idea)} className="text-muted hover:text-white hover:underline" title={o.idea.label}>
+                              {o.brandName}
+                            </Link>
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                  </div>
                 )}
+
+                <div className="mt-2.5">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-nix/80">Content idea</p>
+                  <p className="mt-0.5 text-sm leading-relaxed text-white">{idea.idea}</p>
+                  {isPro && latestBrandId && (
+                    <Link
+                      href={`/dashboard/creator-pro?brandId=${latestBrandId}`}
+                      className="mt-1 inline-block text-xs text-primary-light hover:underline"
+                    >
+                      Write it now →
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </motion.section>

@@ -11,11 +11,12 @@ import StudioImageGenerator from "@/components/studio/StudioImageGenerator";
 import type { BrandGenerationRow } from "@/types";
 import { hasProAccess } from "@/lib/access";
 import { getMaxConcurrentJobs, IMAGE_TYPE_SIZES, type ImageType } from "@/lib/energy-config";
+import { findStudioIdea } from "@/lib/studio/today";
 
 export default async function StudioPage({
   searchParams,
 }: {
-  searchParams?: { brand?: string; type?: string; job?: string };
+  searchParams?: { brand?: string; type?: string; job?: string; spark?: string; coach?: string };
 }) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
@@ -91,6 +92,8 @@ export default async function StudioPage({
   const requestedType = searchParams?.type;
   const initialImageType =
     requestedType && requestedType in IMAGE_TYPE_SIZES ? (requestedType as ImageType) : undefined;
+  // "Today in the Studio" (?spark=<key>): validated against the idea list.
+  const initialSpark = findStudioIdea(searchParams?.spark)?.key;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -127,6 +130,8 @@ export default async function StudioPage({
             initialBrandId={initialBrandId}
             initialImageType={initialImageType}
             initialJobId={initialJobId}
+            initialSpark={initialSpark}
+            forceCoach={searchParams?.coach === "1"}
           />
         </div>
       </main>

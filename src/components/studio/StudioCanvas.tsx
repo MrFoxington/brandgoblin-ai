@@ -13,7 +13,7 @@
  * waits for a frame would leave the old picture up until they come back.
  */
 
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { IMAGE_TYPE_SIZES, type ImageType } from "@/lib/energy-config";
@@ -21,22 +21,41 @@ import type { StudioJobRow } from "@/lib/studio/jobs";
 import NixCooking from "./NixCooking";
 import StudioLightbox, { CHECKERBOARD_STYLE } from "./StudioLightbox";
 import { useJobActions, type JobActionCallbacks } from "./useJobActions";
+import { shareCard, prepareShareCard, type ShareCardBrand, type ShareCardResult } from "@/lib/studio/share-card";
+import { useSoundFx } from "@/components/primitives/SoundFx";
 
 interface Props {
   job: StudioJobRow | null;
   activeCount: number;
   brandName: string;
+  /** Brand meta for the share card (the job's own brand). */
+  cardBrand: ShareCardBrand;
+  cardFilename: string;
   callbacks: JobActionCallbacks;
   /** Phone only: open the tool sheet from the empty state. */
   onOpenTools: () => void;
+  /** Coach: the user saved a creation (Phase D). */
+  onSaved?: () => void;
+  /** Coach tip pinned above the toolbar (Phase D). */
+  coachTip?: ReactNode;
 }
 
-export default function StudioCanvas({ job, activeCount, brandName, callbacks, onOpenTools }: Props) {
+export default function StudioCanvas({ job, activeCount, brandName, cardBrand, cardFilename, callbacks, onOpenTools, onSaved, coachTip }: Props) {
   const cooking = activeCount > 0;
   return (
     <div className="relative overflow-hidden rounded-3xl border border-[rgba(250,247,242,0.08)] bg-surface">
       {job ? (
-        <CanvasJob key={job.id} job={job} brandName={brandName} callbacks={callbacks} dimmed={cooking} />
+        <CanvasJob
+          key={job.id}
+          job={job}
+          brandName={brandName}
+          cardBrand={cardBrand}
+          cardFilename={cardFilename}
+          callbacks={callbacks}
+          dimmed={cooking}
+          onSaved={onSaved}
+          coachTip={coachTip}
+        />
       ) : (
         <EmptyCanvas cooking={cooking} onOpenTools={onOpenTools} />
       )}
@@ -87,17 +106,55 @@ function EmptyCanvas({ cooking, onOpenTools }: { cooking: boolean; onOpenTools: 
 function CanvasJob({
   job,
   brandName,
+  cardBrand,
+  cardFilename,
   callbacks,
   dimmed,
+  onSaved,
+  coachTip,
 }: {
   job: StudioJobRow;
   brandName: string;
+  cardBrand: ShareCardBrand;
+  cardFilename: string;
   callbacks: JobActionCallbacks;
   dimmed: boolean;
+  onSaved?: () => void;
+  coachTip?: ReactNode;
 }) {
   const reduce = useReducedMotion();
+  const { playShare } = useSoundFx();
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [cardState, setCardState] = useState<"idle" | "busy" | ShareCardResult>("idle");
   const a = useJobActions(job, callbacks);
+
+  // Prebuild the share card once the creation is on the canvas, so the tap
+  // itself is instant (Safari drops the share sheet if the tap goes stale).
+  useEffect(() => {
+    if (!job.output_url) return;
+    const t = setTimeout(() => { prepareShareCard(job.id, job.output_url as string, cardBrand).catch(() => undefined); }, 900);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job.id, job.output_url]);
+
+  // One-tap share card: the creation on its brand's frame, straight to the
+  // share sheet (desktop downloads it). Celebrates only on a real share.
+  async function handleShareCard() {
+    if (!job.output_url || cardState === "busy") return;
+    setCardState("busy");
+    const result = await shareCard(job.output_url, cardBrand, cardFilename, job.id);
+    setCardState(result);
+    if (result === "shared") {
+      playShare();
+      callbacks.onShareSuccess?.(job);
+    }
+    setTimeout(() => setCardState("idle"), 2200);
+  }
+
+  function handleSaveTracked() {
+    onSaved?.();
+    return a.handleSave();
+  }
   const { onMoreLikeThis, onProcess, onToggleFavorite, onToggleArchive, onSetOfficialLogo } = callbacks;
 
   const size = IMAGE_TYPE_SIZES[(job.image_type ?? "logo_concept") as ImageType] ?? IMAGE_TYPE_SIZES.logo_concept;
@@ -149,6 +206,8 @@ function CanvasJob({
           {a.official && <span className="rounded-md border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-[10px] font-bold text-gold">Official logo</span>}
         </div>
 
+        {coachTip && <div className="mb-3">{coachTip}</div>}
+
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -157,6 +216,23 @@ function CanvasJob({
             className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#3A9A70] disabled:opacity-60"
           >
             {a.copied ? "✓ Copied" : a.sharing ? "…" : "Share it"}
+          </button>
+          <button
+            type="button"
+            onClick={handleShareCard}
+            disabled={cardState === "busy"}
+            title="The creation on a branded card, ready for Instagram, TikTok or Messages"
+            className="rounded-xl border border-primary/50 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary-light transition-colors hover:bg-primary/20 hover:text-white disabled:opacity-60"
+          >
+            {cardState === "busy"
+              ? "Building card…"
+              : cardState === "shared"
+              ? "Shared ✓"
+              : cardState === "downloaded"
+              ? "Card saved ✓"
+              : cardState === "failed"
+              ? "Try again"
+              : "Share card"}
           </button>
           {(a.isOriginalImage || job.job_type === "bg_removal") && onMoreLikeThis && (
             <button
@@ -170,7 +246,7 @@ function CanvasJob({
           )}
           <button
             type="button"
-            onClick={a.handleSave}
+            onClick={handleSaveTracked}
             disabled={a.saving || a.downloading}
             title="Save to Photos"
             className="rounded-xl border border-white/12 px-3 py-2 text-xs font-semibold text-muted transition-colors hover:border-white/25 hover:text-white disabled:opacity-60"
@@ -247,8 +323,8 @@ function CanvasJob({
             typeLabel={a.typeLabel}
             onClose={() => setLightboxOpen(false)}
             onShare={a.handleShare}
-            onSave={a.handleSave}
-            onDownload={a.handleDownload}
+            onSave={handleSaveTracked}
+            onDownload={() => { onSaved?.(); return a.handleDownload(); }}
             onMoreLikeThis={onMoreLikeThis ? a.handleMoreLikeThis : undefined}
             onToggleFavorite={onToggleFavorite ? a.handleToggleFavorite : undefined}
             isFavorite={a.fav}

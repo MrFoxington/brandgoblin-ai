@@ -19,13 +19,15 @@ interface Props {
   children: ReactNode;
   /** Gold = Studio signature sections (engine, fonts). */
   tone?: "green" | "gold";
+  /** A coach tip pinned under the header (Phase D). */
+  tip?: ReactNode;
 }
 
-export default function RailSection({ id, title, summary, open, onToggle, children, tone = "green" }: Props) {
+export default function RailSection({ id, title, summary, open, onToggle, children, tone = "green", tip }: Props) {
   const reduce = useReducedMotion();
   const panelId = `rail-${id}`;
   return (
-    <section className="rounded-xl border border-[rgba(250,247,242,0.08)] bg-[rgba(250,247,242,0.025)]">
+    <section className={`rounded-xl border bg-[rgba(250,247,242,0.025)] ${tip ? "border-primary/40" : "border-[rgba(250,247,242,0.08)]"}`}>
       <button
         type="button"
         onClick={onToggle}
@@ -50,6 +52,7 @@ export default function RailSection({ id, title, summary, open, onToggle, childr
           ▾
         </motion.span>
       </button>
+      {tip && <div className="px-3 pb-2">{tip}</div>}
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
