@@ -9,19 +9,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0a0a0f",
-        surface: "rgba(15,15,26,0.8)",
-        border: "rgba(45,45,78,0.8)",
+        // ── Creator Studio Phase A (Sept 6, 2026): the dark studio ──
+        // Warm ink surfaces, paper text. `primary` is now goblin GREEN so every
+        // existing border-primary/20, bg-primary/5, text-primary-light tint in
+        // the app turns green in one move. Purple lives only in `nix`.
+        bg: "#141518",
+        surface: "#1B1D22",
+        raised: "#22252B",
+        border: "rgba(250,247,242,0.08)",
         primary: {
-          DEFAULT: "#7c3aed",
-          light: "#a78bfa",
+          DEFAULT: "#2E7D5B",
+          light: "#8FD9B3",
         },
         secondary: {
           DEFAULT: "#10b981",
           dark: "#059669",
         },
-        muted: "#94a3b8",
-        faint: "#64748b",
+        // THE SPARK — the one orange action per screen (create / buy).
+        spark: {
+          DEFAULT: "#FF6B35",
+          hover: "#FF7A48",
+        },
+        muted: "rgba(250,247,242,0.62)",
+        faint: "rgba(250,247,242,0.42)",
         // ── Brand Maturity P4 (Sept 2026) — the grown-up marketing palette ──
         // Warm off-white paper, ink text, goblin green as THE action colour,
         // gold in small doses. Purple (#7C3AED) is Nix's personal colour and is
@@ -63,23 +73,25 @@ const config: Config = {
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       backgroundImage: {
+        // Ink-era values: one soft tint at most, no multi-stop purple washes.
         "hero-gradient":
-          "linear-gradient(180deg, #0d0d1a 0%, #0a0a0f 100%)",
+          "linear-gradient(180deg, #17191E 0%, #141518 100%)",
         "hero-mesh":
-          "radial-gradient(ellipse 80% 60% at 60% 40%, rgba(124,58,237,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(16,185,129,0.08) 0%, transparent 60%)",
+          "radial-gradient(ellipse 80% 60% at 60% 40%, rgba(46,125,91,0.10) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(251,191,36,0.06) 0%, transparent 60%)",
         "cta-gradient":
-          "linear-gradient(135deg, #7c3aed 0%, #10b981 100%)",
+          "linear-gradient(135deg, #2E7D5B 0%, #2E7D5B 100%)",
         "text-gradient":
-          "linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #10b981 100%)",
+          "linear-gradient(135deg, #8FD9B3 0%, #8FD9B3 100%)",
         "section-alt":
-          "linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)",
+          "linear-gradient(180deg, #141518 0%, #17191E 100%)",
       },
       boxShadow: {
-        glow: "0 0 28px rgba(124,58,237,0.45)",
-        "glow-lg": "0 0 48px rgba(124,58,237,0.75)",
-        "glow-green": "0 0 28px rgba(16,185,129,0.35)",
-        card: "0 0 30px rgba(124,58,237,0.15)",
-        "studio-glow": "0 0 12px rgba(251,191,36,0.45), 0 0 24px rgba(251,191,36,0.2)",
+        // "glow" is now a quiet green ring, not a purple halo.
+        glow: "0 0 0 1px rgba(46,125,91,0.35), 0 12px 32px -20px rgba(46,125,91,0.4)",
+        "glow-lg": "0 0 0 1px rgba(46,125,91,0.5), 0 20px 48px -24px rgba(46,125,91,0.5)",
+        "glow-green": "0 0 0 1px rgba(16,185,129,0.35), 0 12px 32px -20px rgba(16,185,129,0.4)",
+        card: "0 12px 32px -20px rgba(0,0,0,0.6)",
+        "studio-glow": "0 0 0 1px rgba(251,191,36,0.35), 0 12px 28px -18px rgba(251,191,36,0.35)",
       },
       animation: {
         float: "float 4s ease-in-out infinite",
@@ -96,8 +108,8 @@ const config: Config = {
           "50%": { transform: "translateY(-6px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 28px rgba(255,107,53,0.45)" },
-          "50%": { boxShadow: "0 0 48px rgba(255,107,53,0.7)" },
+          "0%, 100%": { boxShadow: "0 10px 24px -12px rgba(255,107,53,0.55)" },
+          "50%": { boxShadow: "0 12px 28px -12px rgba(255,107,53,0.7)" },
         },
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
@@ -112,12 +124,12 @@ const config: Config = {
           "50%": { transform: "translateY(-30px)", opacity: "0.8" },
         },
         "studio-glow": {
-          "0%, 100%": { boxShadow: "0 0 8px rgba(251,191,36,0.4), 0 0 16px rgba(251,191,36,0.2)" },
-          "50%":       { boxShadow: "0 0 16px rgba(251,191,36,0.7), 0 0 32px rgba(251,191,36,0.35)" },
+          "0%, 100%": { boxShadow: "0 0 0 1px rgba(251,191,36,0.3)" },
+          "50%":       { boxShadow: "0 0 0 1px rgba(251,191,36,0.55)" },
         },
         "conjure-pulse": {
-          "0%, 100%": { boxShadow: "0 0 16px rgba(255,107,53,0.45), 0 0 32px rgba(255,107,53,0.2)" },
-          "50%":       { boxShadow: "0 0 28px rgba(255,107,53,0.7), 0 0 56px rgba(255,107,53,0.35)" },
+          "0%, 100%": { boxShadow: "0 10px 24px -12px rgba(255,107,53,0.55)" },
+          "50%":       { boxShadow: "0 12px 28px -12px rgba(255,107,53,0.7)" },
         },
       },
       borderRadius: {
