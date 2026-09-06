@@ -7,7 +7,7 @@ import VaultShell from "@/components/vault/VaultShell";
 import { headers } from "next/headers";
 import { grantFreeStudioStarterIfEligible, hashIp } from "@/lib/trial";
 import { getEffectivePlan } from "@/lib/access";
-import { listUserGalleryJobs, listOfficialLogos } from "@/lib/studio/jobs";
+import { listUserGalleryJobs, listOfficialLogos, getStudioBadgeStats } from "@/lib/studio/jobs";
 import { buildVault } from "@/lib/vault";
 import type { BrandGenerationRow } from "@/types";
 
@@ -29,20 +29,15 @@ export default async function DashboardPage() {
     ipHash: rawIp ? hashIp(rawIp) : undefined,
   });
 
-  const [{ data: userRow }, { data: generations }, { data: jobRows }, galleryJobs, officialLogos] = await Promise.all([
+  const [{ data: userRow }, { data: generations }, studioStats, galleryJobs, officialLogos] = await Promise.all([
     supabase.from("users").select("credits, plan, payment_status, is_trial, trial_ends_at").eq("id", authData.user.id).single(),
     supabase
       .from("brand_generations")
       .select("id, input_data, output_data, created_at, favorite, archived")
       .eq("user_id", authData.user.id)
       .order("created_at", { ascending: false }),
-    // Trophy Shelf stats: lightweight flags only, capped
-    supabase
-      .from("studio_jobs")
-      .select("image_type, official_logo, status")
-      .eq("user_id", authData.user.id)
-      .eq("status", "completed")
-      .limit(500),
+    // Trophy Shelf stats (admin client: the user-scoped query returned nothing)
+    getStudioBadgeStats(authData.user.id),
     // The gallery: visible Studio creations, signed in one batch
     listUserGalleryJobs(authData.user.id, 40),
     // Official logos per brand, for the brand cards + hero poster
@@ -52,13 +47,7 @@ export default async function DashboardPage() {
   const rows = (generations ?? []) as BrandGenerationRow[];
   const paymentStatus = userRow?.payment_status ?? "active";
 
-  const jobs = (jobRows ?? []) as { image_type: string; official_logo: boolean }[];
-  const badgeStats = {
-    brandCount: rows.length,
-    completedJobs: jobs.length,
-    productArtJobs: jobs.filter((j) => j.image_type === "product_art").length,
-    hasOfficialLogo: jobs.some((j) => j.official_logo),
-  };
+  const badgeStats = { brandCount: rows.length, ...studioStats };
 
   const { items } = buildVault(rows, galleryJobs, officialLogos);
   const activeRows = rows.filter((r) => !r.archived);
@@ -92,7 +81,7 @@ export default async function DashboardPage() {
             signupDate={authData.user.created_at}
             items={items}
             brands={brands}
-            brandCount={rows.length}
+            brandCount={activeRows.length}
             latestBrandId={latestBrand?.id ?? null}
             ideaSource={ideaSource}
             badgeStats={badgeStats}

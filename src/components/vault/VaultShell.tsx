@@ -63,9 +63,15 @@ const FALLBACK_IDEAS = [
 
 export interface IdeaSource { brandName: string; ideas: string[] }
 
+// Generated ideas sometimes arrive with dashes as joints; read them as plain
+// sentences on the card (Fox's writing rule).
+function plainCopy(text: string): string {
+  return text.replace(/\s*[\u2014\u2013]\s*/g, ", ").replace(/\s+/g, " ").trim();
+}
+
 function getDailyIdea(source: IdeaSource | null): DailyIdea {
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-  if (source?.ideas.length) return { idea: source.ideas[dayOfYear % source.ideas.length], brandName: source.brandName };
+  if (source?.ideas.length) return { idea: plainCopy(source.ideas[dayOfYear % source.ideas.length]), brandName: source.brandName };
   return { idea: FALLBACK_IDEAS[dayOfYear % FALLBACK_IDEAS.length] };
 }
 

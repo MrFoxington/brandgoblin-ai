@@ -360,6 +360,29 @@ export async function listUserGalleryJobs(userId: string, limit = 40): Promise<S
   return jobs;
 }
 
+// ── Trophy Shelf stats (admin client) ────────────────────────────────────────
+// The dashboard used to count these through the user-scoped client, which
+// returned nothing for studio_jobs (RLS), so "The Conjurer" never unlocked
+// even for users with dozens of creations. Counted here with the admin client.
+
+export async function getStudioBadgeStats(
+  userId: string
+): Promise<{ completedJobs: number; productArtJobs: number; hasOfficialLogo: boolean }> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("studio_jobs")
+    .select("image_type, official_logo")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .limit(500);
+  const jobs = (data ?? []) as { image_type: string | null; official_logo: boolean }[];
+  return {
+    completedJobs: jobs.length,
+    productArtJobs: jobs.filter((j) => j.image_type === "product_art").length,
+    hasOfficialLogo: jobs.some((j) => j.official_logo),
+  };
+}
+
 // ── Official logos, one per brand (for the Vault's brand cards) ──────────────
 // Independent of the gallery window (a logo set 60 creations ago must still
 // show on its brand card). Signed in one batch.

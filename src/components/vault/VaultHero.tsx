@@ -95,6 +95,7 @@ function ArtHero({ item }: { item: VaultArtItem }) {
   const [shareState, setShareState] = useState<"idle" | "busy" | "shared" | "copied">("idle");
   const [downloading, setDownloading] = useState(false);
   const portrait = item.height > item.width;
+  const landscape = item.width > item.height * 1.15;
   const studioHref = item.brandId ? `/dashboard/studio?brand=${item.brandId}` : "/dashboard/studio";
   const filename = `goblin-studio-${item.imageType ?? "image"}-${item.id.slice(0, 8)}.jpg`;
 
@@ -133,38 +134,81 @@ function ArtHero({ item }: { item: VaultArtItem }) {
     }
   }
 
+  const eyebrow = (
+    <p className="text-xs font-bold uppercase tracking-widest text-gold">
+      Latest creation{when ? <span className="font-normal normal-case tracking-normal text-faint"> · {when}</span> : null}
+    </p>
+  );
+  const openBtn = (
+    <Link href={studioHref} className="btn-green w-full !py-2.5 !px-5 text-sm sm:w-auto">
+      Open in Studio
+    </Link>
+  );
+  const shareBtn = (
+    <button type="button" onClick={handleShare} disabled={!item.url || shareState === "busy"} className="btn-ghost justify-center disabled:opacity-50">
+      {shareState === "shared" ? "Shared ✓" : shareState === "copied" ? "Link copied ✓" : shareState === "busy" ? "Sharing" : "Share"}
+    </button>
+  );
+  const downloadBtn = (
+    <button type="button" onClick={handleDownload} disabled={!item.url || downloading} className="btn-ghost justify-center disabled:opacity-50">
+      {downloading ? "Saving" : "Download"}
+    </button>
+  );
+  const picture = (
+    <Link href={studioHref} className="group relative block bg-black/30" aria-label={`Open ${item.typeLabel} in the Studio`}>
+      <div
+        className="relative mx-auto w-full"
+        style={{ aspectRatio: `${item.width} / ${item.height}`, maxHeight: portrait ? 560 : 600 }}
+      >
+        {item.url && (
+          <Image
+            src={item.url}
+            alt={`${item.typeLabel}${item.brandName ? ` for ${item.brandName}` : ""}`}
+            fill
+            unoptimized
+            priority
+            sizes={landscape ? "(max-width: 1024px) 100vw, 808px" : "(max-width: 768px) 100vw, 60vw"}
+            className="object-contain transition-transform duration-300 ease-out motion-safe:group-hover:scale-[1.01]"
+          />
+        )}
+      </div>
+    </Link>
+  );
+
+  // Wide creations (thumbnails, social graphics) take the full column so the
+  // picture is the biggest thing on screen; the words sit in a bar under it.
+  if (landscape) {
+    return (
+      <div className="overflow-hidden rounded-3xl border border-[rgba(250,247,242,0.08)] bg-surface">
+        {picture}
+        <div className="flex flex-col gap-4 border-t border-[rgba(250,247,242,0.08)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="min-w-0">
+            {eyebrow}
+            <h2 className="mt-1 font-display text-2xl font-bold leading-tight text-white sm:text-3xl">
+              {item.typeLabel}
+              {item.brandName && <span className="text-muted"> for {item.brandName}</span>}
+            </h2>
+            <p className="mt-1 text-[11px] text-faint">
+              {item.favorite ? "★ Favorite · " : ""}Yours to keep. Saving and sharing never cost energy.
+            </p>
+          </div>
+          <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+            <div className="col-span-2 sm:col-auto">{openBtn}</div>
+            {shareBtn}
+            {downloadBtn}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-3xl border border-[rgba(250,247,242,0.08)] bg-surface">
-      <div className={`grid ${portrait ? "md:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]" : "md:grid-cols-[minmax(0,1.6fr)_minmax(240px,0.8fr)]"}`}>
-        {/* The creation */}
-        <Link href={studioHref} className="group relative block bg-black/30" aria-label={`Open ${item.typeLabel} in the Studio`}>
-          <div
-            className="relative mx-auto w-full"
-            style={{
-              aspectRatio: `${item.width} / ${item.height}`,
-              maxHeight: portrait ? 560 : 520,
-            }}
-          >
-            {item.url && (
-              <Image
-                src={item.url}
-                alt={`${item.typeLabel}${item.brandName ? ` for ${item.brandName}` : ""}`}
-                fill
-                unoptimized
-                priority
-                sizes="(max-width: 768px) 100vw, 60vw"
-                className="object-contain transition-transform duration-300 ease-out motion-safe:group-hover:scale-[1.01]"
-              />
-            )}
-          </div>
-        </Link>
-
-        {/* The words */}
+      <div className={`grid ${portrait ? "md:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]" : "md:grid-cols-[minmax(0,1.3fr)_minmax(240px,0.7fr)]"}`}>
+        {picture}
         <div className="flex flex-col gap-4 p-5 sm:p-6 md:border-l md:border-[rgba(250,247,242,0.08)]">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-gold">
-              Latest creation{when ? <span className="font-normal normal-case tracking-normal text-faint"> · {when}</span> : null}
-            </p>
+            {eyebrow}
             <h2 className="mt-1 font-display text-2xl font-bold leading-tight text-white sm:text-3xl">{item.typeLabel}</h2>
             {item.brandName && (
               <p className="mt-1 text-sm text-muted">
@@ -173,18 +217,11 @@ function ArtHero({ item }: { item: VaultArtItem }) {
             )}
             {item.favorite && <p className="mt-2 text-xs font-semibold text-gold">★ Favorite</p>}
           </div>
-
           <div className="mt-auto flex flex-col gap-2">
-            <Link href={studioHref} className="btn-green !py-2.5 !px-5 text-sm">
-              Open in Studio
-            </Link>
+            {openBtn}
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={handleShare} disabled={!item.url || shareState === "busy"} className="btn-ghost justify-center disabled:opacity-50">
-                {shareState === "shared" ? "Shared ✓" : shareState === "copied" ? "Link copied ✓" : shareState === "busy" ? "Sharing" : "Share"}
-              </button>
-              <button type="button" onClick={handleDownload} disabled={!item.url || downloading} className="btn-ghost justify-center disabled:opacity-50">
-                {downloading ? "Saving" : "Download"}
-              </button>
+              {shareBtn}
+              {downloadBtn}
             </div>
             <p className="text-[11px] text-faint">Yours to keep. Saving and sharing never cost energy.</p>
           </div>

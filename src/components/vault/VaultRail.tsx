@@ -287,7 +287,7 @@ export function MobileStrip({
       <button type="button" onClick={onRefill} className="min-w-0 text-left" aria-label="Creative Energy, tap to refill">
         <div className="mb-1 flex items-center justify-between gap-2 text-[11px]">
           <span className="font-semibold text-white">⚡ {energy ? e.total.toLocaleString() : "…"}</span>
-          <span className="text-faint">{e.allowance > 0 ? `of ${e.allowance.toLocaleString()}` : "energy"}</span>
+          <span className="text-faint">{e.overMax ? "fully charged" : e.allowance > 0 ? `of ${e.allowance.toLocaleString()}` : "energy"}</span>
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/8">
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${e.pct}%`, backgroundColor: e.barColor }} />

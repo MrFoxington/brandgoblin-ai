@@ -97,8 +97,25 @@ export default function VaultGallery({ items, brands, onToggleArchive }: Props) 
         )}
       </div>
 
+      {showBrandChips && brands.length > 6 && (
+        <div className="mb-5 flex items-center gap-2 md:hidden">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-faint">Brand</span>
+          <select
+            value={brandId ?? ""}
+            onChange={(e) => setBrandId(e.target.value || null)}
+            className="min-w-0 flex-1 rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-3 py-2 text-sm text-white focus:border-gold/60 focus:outline-none"
+            aria-label="Filter by brand"
+          >
+            <option value="">All brands</option>
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {showBrandChips && (
-        <div className="mb-5 flex flex-wrap items-center gap-1.5">
+        <div className={`mb-5 flex-wrap items-center gap-1.5 ${brands.length > 6 ? "hidden md:flex" : "flex"}`}>
           <span className="mr-1 text-[11px] font-semibold uppercase tracking-widest text-faint">Brand</span>
           <button
             type="button"

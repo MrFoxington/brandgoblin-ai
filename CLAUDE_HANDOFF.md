@@ -54,28 +54,25 @@ rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on 
 Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink surfaces, same
 type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure, Buy), clean
 typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
-`design-v1-dark-purple`. **Phase B (the work-first Vault) is BUILT and committed (Sept 6, late):
-the dashboard now opens on the user's latest creation, a masonry gallery of everything, one
-green Create chooser, and a quiet right rail.** Needs Fox's push + the live 390px check.
+`design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
+opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
+and a quiet right rail.** Live-checked at 1440 and 390; one fix-up commit (bigger hero for wide
+art, Trophy Shelf stats via admin client, phone brand select) awaiting push.
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE B, THEN CREATOR STUDIO PHASE C (the canvas)
+## 🚀 START HERE — NEXT SESSION = CREATOR STUDIO PHASE C (the canvas)
 
 Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**
 (Fox's decisions + the four phases), (3) the Phase B session log below, (4) project memory
 `app-design-direction.md` + `brandgoblin-ship-workflow.md`.
 
-**First job: live-check the Vault.** Fox pushes Phase B (`git push origin main`), Vercel deploys,
-then audit `app.brandgoblinai.com/dashboard` in Chrome on Fox's Mac with the JS method
-(computed button colours: ONE spark = the rail's "Upgrade to Creator Pro" on free accounts, none
-on Pro/Max besides the nav; everything else green or quiet), then the 390px iframe trick
-(greeting → phone strip → hero → gallery → rail must stack with no horizontal overflow).
-Things to eyeball on a real account: the art hero on a portrait short-form cover (capped at
-560px tall), the brand hero's palette poster vs official-logo variant, the masonry with mixed
-aspect ratios, the Create chooser on a phone (bottom sheet).
+**First: confirm the Phase B fix-up commit is pushed** (`git log origin/main..main` should be
+empty). If Fox reports anything odd on the live Vault, check that first. Still unseen on a real
+account: the brand-kit hero (Fox's latest creation is a thumbnail, so the art hero was what
+rendered), the empty-vault hero, and a free account's rail (Upgrade spark).
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -102,7 +99,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, late (🗄️ CREATOR STUDIO PHASE B: the work-first Vault. Committed, NOT pushed.)
+## 🗓️ SESSION LOG — September 6, 2026, late (🗄️ CREATOR STUDIO PHASE B: the work-first Vault. PUSHED + LIVE; fix-up commit pending push.)
 
 Fox: "Do Phase B from the Creator Studio Plan." Built in one session. `npx tsc --noEmit` clean.
 The dashboard is no longer a control panel: it opens on what the user made.
@@ -197,7 +194,34 @@ Safari/Firefox (deferred 10s); duplicate palette keys; chooser now restores focu
 next dev hangs on fonts), so the 390px pass is reasoning-only until Fox pushes. Phase C will
 want `?job=<id>` on Studio links so an art card opens that creation on the canvas.
 
-**▶ NEXT:** Fox pushes → live audit (JS method + 390px iframe) → fix-ups → Phase C.
+**✅ PUSHED BY FOX + LIVE-CHECKED (same evening, `d320e95`).** Vault live at 1440 and 390 (iframe
+probes, computed geometry): grid 808px + 304px rail on desktop, single column with the phone
+strip on 390, no horizontal overflow either way, only spark = nav Create (Fox is on Max, so no
+upgrade card), greens = + Create / Open in Studio / Refill. The chooser opens with the three
+doors and locks body scroll. Screenshots of the phone view looked right (greeting, full-width
+green Create, strip, hero thumbnail, chips, masonry, rail).
+**Fix-up commit from the live check:**
+- **Trophy Shelf was silently broken (pre-existing):** the dashboard counted Studio jobs
+  through the USER-scoped Supabase client, which returns nothing for `studio_jobs` (RLS), so
+  "The Conjurer" stayed locked for Fox with 40 creations. New `getStudioBadgeStats(userId)`
+  (admin client) in `lib/studio/jobs.ts` feeds the shelf.
+- Wide creations (thumbnails, social graphics) now take the FULL column in the hero with the
+  words in a bar underneath (was a 1.6fr/0.8fr split that left a 16:9 thumbnail ~350px wide on
+  desktop). Square/portrait keep the side-by-side layout.
+- Phone strip said "10,983 of 4,000" when refill energy pushes past the allowance → "fully
+  charged". Rail brand count now = active brands (matched the "Brands 15" chip; was 19 incl.
+  archived).
+- Brand filter: with more than 6 brands, phones get a select instead of five rows of chips
+  (desktop keeps chips).
+- Today's Idea shows generated ideas with dashes turned into commas (Fox's writing rule; the
+  kit generation prompt itself still produces em dashes, a later sweep).
+Screenshot method that worked this time: `zoom` regions are in SCREENSHOT pixels (viewport ×
+~1.6), not CSS pixels; hide the parent's body children with `visibility:hidden`, put the probe
+iframe at absolute top/left, force framer's frozen inline `opacity` to 1 and lazy images to
+eager inside the iframe, then zoom. A 1440 probe fits the 614px MCP window with
+`transform: scale(0.4)`.
+
+**▶ NEXT:** Phase C (the Studio canvas). Fox pushes the fix-up commit first.
 
 ---
 
