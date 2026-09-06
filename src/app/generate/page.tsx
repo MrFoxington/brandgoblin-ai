@@ -170,7 +170,7 @@ export default function GeneratePage() {
           }
           if (evt.status === "done" && evt.id) {
             trackGeneration();
-            showToast("Brand conjured! Welcome to your new brand ✨", "success", "🎉");
+            showToast("Brand created. Welcome to your new brand.", "success");
             setDoneBrandId(evt.id);
             return;
           }
@@ -218,7 +218,7 @@ export default function GeneratePage() {
       <main className="flex-1 px-4 py-16">
         <div className="mx-auto max-w-2xl">
           <div className="mb-10 text-center">
-            <span className="badge-purple mb-4 inline-block">✦ Brand Creator</span>
+            <span className="badge-purple mb-4 inline-block">Brand Creator</span>
             <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
               What would you like BrandGoblin to do?
             </h1>
@@ -235,7 +235,7 @@ export default function GeneratePage() {
               className={`rounded-2xl border-2 p-6 text-left transition-all ${
                 nameMode === "generated"
                   ? "border-primary/60 bg-primary/10"
-                  : "border-[rgba(45,45,78,0.8)] hover:border-primary/40 hover:bg-[rgba(45,45,78,0.2)]"
+                  : "border-[rgba(250,247,242,0.12)] hover:border-primary/40 hover:bg-[rgba(250,247,242,0.045)]"
               }`}
             >
               <span className="text-3xl block mb-3">🧌</span>
@@ -249,7 +249,7 @@ export default function GeneratePage() {
               className={`rounded-2xl border-2 p-6 text-left transition-all ${
                 nameMode === "existing"
                   ? "border-secondary/60 bg-secondary/10"
-                  : "border-[rgba(45,45,78,0.8)] hover:border-secondary/40 hover:bg-[rgba(45,45,78,0.2)]"
+                  : "border-[rgba(250,247,242,0.12)] hover:border-secondary/40 hover:bg-[rgba(250,247,242,0.045)]"
               }`}
             >
               <span className="text-3xl block mb-3">✨</span>
@@ -370,8 +370,8 @@ export default function GeneratePage() {
                           selected
                             ? "border-primary/60 bg-primary/20 text-primary-light shadow-[0_0_10px_rgba(139,92,246,0.3)]"
                             : disabled
-                            ? "border-[rgba(45,45,78,0.4)] text-[rgba(255,255,255,0.2)] cursor-not-allowed"
-                            : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
+                            ? "border-[rgba(250,247,242,0.08)] text-[rgba(255,255,255,0.2)] cursor-not-allowed"
+                            : "border-[rgba(250,247,242,0.12)] text-muted hover:border-primary/40 hover:text-white"
                         }`}
                       >
                         <span>{emoji}</span>
@@ -396,15 +396,15 @@ export default function GeneratePage() {
 
                 {/* Divider */}
                 <div className="my-5 flex items-center gap-3">
-                  <div className="flex-1 border-t border-[rgba(45,45,78,0.6)]" />
+                  <div className="flex-1 border-t border-[rgba(250,247,242,0.10)]" />
                   <span className="text-xs text-faint font-medium">OR</span>
-                  <div className="flex-1 border-t border-[rgba(45,45,78,0.6)]" />
+                  <div className="flex-1 border-t border-[rgba(250,247,242,0.10)]" />
                 </div>
 
                 {/* Vibe description */}
                 <div>
                   <label className="label !mb-1.5">
-                    ✨ Describe Your Vibe
+                    Describe Your Vibe
                     <span className="ml-2 text-xs text-faint font-normal">(optional)</span>
                   </label>
                   <textarea
@@ -452,7 +452,7 @@ export default function GeneratePage() {
               )}
 
               <button type="submit" className="btn-primary w-full py-4 text-base">
-                ✦ Bring My Brand To Life →
+                Bring My Brand To Life
               </button>
             </form>
           )}

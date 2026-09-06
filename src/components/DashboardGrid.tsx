@@ -54,9 +54,9 @@ export default function DashboardGrid({ rows: initialRows }: { rows: BrandGenera
   const filters: { key: Filter; label: string; show: boolean }[] = [
     { key: "all", label: `All (${active.length})`, show: true },
     { key: "favorites", label: `★ Favorites`, show: hasFavorites },
-    { key: "generated", label: `🧌 Named by Goblin`, show: hasExisting },
-    { key: "existing", label: `✨ My Own Name`, show: hasExisting },
-    { key: "archived", label: `🗄 Archived (${archivedRows.length})`, show: hasArchived },
+    { key: "generated", label: `Named by Goblin`, show: hasExisting },
+    { key: "existing", label: `My Own Name`, show: hasExisting },
+    { key: "archived", label: `Archived (${archivedRows.length})`, show: hasArchived },
   ];
 
   // Snap back to All if the last archived brand gets restored while on that tab
@@ -74,7 +74,7 @@ export default function DashboardGrid({ rows: initialRows }: { rows: BrandGenera
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
                 filter === f.key
                   ? "border-primary/60 bg-primary/20 text-primary-light"
-                  : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
+                  : "border-[rgba(250,247,242,0.12)] text-muted hover:border-primary/40 hover:text-white"
               }`}
             >
               {f.label}
@@ -124,12 +124,10 @@ function BrandCard({
       {/* Top row */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          {isExisting ? (
+          {isExisting && (
             <span className="rounded-full border border-secondary/30 bg-secondary/10 px-2.5 py-0.5 text-xs font-semibold text-secondary">
-              ✨ Own Name
+              Own Name
             </span>
-          ) : (
-            <span className="text-xl logo-glow">🧌</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -188,7 +186,7 @@ function BrandCard({
       )}
 
       {/* Bottom badges */}
-      <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[rgba(45,45,78,0.4)] mt-auto">
+      <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-[rgba(250,247,242,0.08)] mt-auto">
         {(row.input_data as { brandTraits?: string[] }).brandTraits?.length
           ? (row.input_data as { brandTraits: string[] }).brandTraits.slice(0, 2).map((t) => (
               <span key={t} className="badge-purple text-xs capitalize">{t}</span>

@@ -25,7 +25,7 @@ export default function BrandActions({
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <ActionCard
-          emoji="🚀"
+          emoji=""
           title="Create Another Brand"
           desc="Start fresh with a new idea."
           href="/generate"
@@ -33,14 +33,14 @@ export default function BrandActions({
           primary
         />
         <ActionCard
-          emoji="💾"
+          emoji=""
           title="Save This Brand"
           desc="It's already saved in your Brand Vault."
           href="/dashboard"
           onClick={() => track(brandGenerationId, "save_click")}
         />
         <ActionCard
-          emoji="📥"
+          emoji=""
           title="Export My Launch Kit"
           desc="Print or save as a clean dark-mode PDF."
           onClick={() => {
@@ -49,7 +49,7 @@ export default function BrandActions({
           }}
         />
         <ActionCard
-          emoji="👁"
+          emoji=""
           title="Preview Website"
           desc="See your copy as a real, downloadable landing page."
           onClick={() => {
@@ -58,7 +58,7 @@ export default function BrandActions({
           }}
         />
         <ActionCard
-          emoji="📣"
+          emoji=""
           title="Share My Brand"
           desc="Show the world what you built."
           onClick={() => {
@@ -99,12 +99,11 @@ function ActionCard({
   const cls = `flex items-start gap-4 rounded-xl border-2 p-5 text-left transition cursor-pointer ${
     primary
       ? "border-primary/50 bg-primary/10 hover:bg-primary/20"
-      : "border-[rgba(45,45,78,0.8)] hover:border-primary/40 hover:bg-[rgba(45,45,78,0.3)]"
+      : "border-[rgba(250,247,242,0.12)] hover:border-primary/40 hover:bg-[rgba(250,247,242,0.06)]"
   }`;
 
   const inner = (
     <>
-      <span className="text-3xl shrink-0">{emoji}</span>
       <div>
         <p className="font-display font-bold text-white">{title}</p>
         <p className="text-sm text-muted mt-0.5">{desc}</p>

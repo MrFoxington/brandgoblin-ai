@@ -68,7 +68,7 @@ export default function NixWallpapers({ wallpapers }: Props) {
                     disabled={busy === `${wp.name}-desktop`}
                     className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary/85 disabled:opacity-60 transition-colors"
                   >
-                    {busy === `${wp.name}-desktop` ? "Preparing…" : "🖥 Desktop"}
+                    {busy === `${wp.name}-desktop` ? "Preparing…" : "Desktop"}
                   </button>
                 )}
                 {wp.phone && (
@@ -77,7 +77,7 @@ export default function NixWallpapers({ wallpapers }: Props) {
                     disabled={busy === `${wp.name}-phone`}
                     className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white hover:bg-primary/85 disabled:opacity-60 transition-colors"
                   >
-                    {busy === `${wp.name}-phone` ? "Preparing…" : "📱 Phone"}
+                    {busy === `${wp.name}-phone` ? "Preparing…" : "Phone"}
                   </button>
                 )}
               </div>

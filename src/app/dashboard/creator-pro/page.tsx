@@ -49,7 +49,6 @@ export default async function CreatorProPage({
         <Navbar />
         <main className="flex-1 flex items-center justify-center px-4 py-24">
           <div className="bg-card w-full max-w-md rounded-2xl border border-primary/20 p-10 text-center">
-            <span className="text-5xl block mb-4">✨</span>
             <h1 className="font-display text-2xl font-extrabold text-white mb-2">
               Creator Pro
             </h1>
@@ -65,7 +64,7 @@ export default async function CreatorProPage({
               ))}
             </div>
             <Link href="/pricing" className="btn-primary w-full py-3 block text-center mb-3">
-              ✦ Upgrade to Creator Pro — $19/mo
+              Upgrade to Creator Pro — $19/mo
             </Link>
             <Link href="/dashboard" className="text-sm text-muted hover:text-white transition-colors">
               Back to Dashboard
@@ -101,11 +100,10 @@ export default async function CreatorProPage({
             <div id="content-generator" className="flex-1 min-w-0">
               {brandRows.length === 0 ? (
                 <div className="text-center py-24">
-                  <span className="text-4xl block mb-4">🧌</span>
                   <h2 className="font-display text-xl font-bold text-white mb-2">Generate a brand first</h2>
                   <p className="text-sm text-muted mb-6">Creator Pro needs at least one saved brand to generate content for.</p>
                   <Link href="/generate" className="btn-primary px-8 py-3">
-                    ✦ Create Your First Brand
+                    Create Your First Brand
                   </Link>
                 </div>
               ) : (
@@ -134,7 +132,7 @@ export default async function CreatorProPage({
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold tracking-widest uppercase text-amber-400 mb-0.5">🎨 Goblin Studio</p>
+                  <p className="text-xs font-bold tracking-widest uppercase text-amber-400 mb-0.5">Goblin Studio</p>
                   <p className="text-sm font-semibold text-white leading-snug">Turn your brand into real images</p>
                 </div>
                 <span className="text-muted group-hover:text-amber-300 transition-colors shrink-0">→</span>

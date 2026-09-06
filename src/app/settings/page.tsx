@@ -25,7 +25,7 @@ export default async function SettingsPage() {
         <div className="mx-auto max-w-2xl">
 
           <div className="mb-10">
-            <span className="badge-purple mb-3 block w-fit">✦ Account</span>
+            <span className="badge-purple mb-3 block w-fit">Account</span>
             <h1 className="font-display text-3xl font-extrabold text-white">Settings</h1>
             <p className="mt-1 text-sm text-muted">Manage your account, plan, and credits.</p>
           </div>
@@ -33,9 +33,9 @@ export default async function SettingsPage() {
           {/* Account */}
           <div className="bg-card mb-5 p-6 space-y-3">
             <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
-              👤 Account
+              Account
             </h2>
-            <div className="border-t border-[rgba(45,45,78,0.6)] pt-4 space-y-2 text-sm">
+            <div className="border-t border-[rgba(250,247,242,0.10)] pt-4 space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted">Email</span>
                 <span className="text-white">{userRow?.email ?? authData.user.email}</span>
@@ -54,9 +54,9 @@ export default async function SettingsPage() {
           {/* Plan & credits */}
           <div className="bg-card mb-5 p-6 space-y-4">
             <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
-              🪙 Plan & Credits
+              Plan & Credits
             </h2>
-            <div className="border-t border-[rgba(45,45,78,0.6)] pt-4">
+            <div className="border-t border-[rgba(250,247,242,0.10)] pt-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-display font-bold text-white text-lg">
@@ -94,7 +94,7 @@ export default async function SettingsPage() {
           {/* Session */}
           <div className="bg-card p-6">
             <h2 className="font-display text-lg font-bold text-white mb-4 flex items-center gap-2">
-              🚪 Session
+              Session
             </h2>
             <LogoutButton />
           </div>

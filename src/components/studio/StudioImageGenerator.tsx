@@ -76,20 +76,20 @@ const MODEL_OPTIONS: { key: StudioModelKey; label: string; desc: string; isAltEn
 // Cooker 2.0 style chips (July 16 2026) — one-tap art direction, productizing
 // Fox's hand-editing habit for everyone. The note is injected into the prompt cook.
 const STYLE_CHIPS: { label: string; emoji: string; note: string }[] = [
-  { label: "Retro poster",     emoji: "🖼️", note: "retro vintage poster style, screen-print texture, bold simplified shapes, slightly distressed ink" },
-  { label: "Hand-drawn",       emoji: "✏️", note: "hand-drawn illustration style, organic linework, sketchbook charm, subtle paper texture" },
-  { label: "Photoreal studio", emoji: "📷", note: "photorealistic studio photography, softbox lighting, crisp focus, premium commercial look" },
-  { label: "Neon glow",        emoji: "🌆", note: "dark cinematic scene with vivid neon glow accents and rim lighting" },
-  { label: "Minimal flat",     emoji: "◻️", note: "minimal flat design, generous negative space, crisp geometry, restrained detail" },
-  { label: "3D clay",          emoji: "🧸", note: "cute 3D clay render style, soft rounded forms, gentle studio lighting" },
-  { label: "Vintage badge",    emoji: "🏅", note: "vintage badge and emblem design, classic engraved-style linework, circular composition" },
-  { label: "Watercolor",       emoji: "🎨", note: "soft watercolor artwork, gentle pigment blooms, textured paper feel" },
+  { label: "Retro poster",     emoji: "", note: "retro vintage poster style, screen-print texture, bold simplified shapes, slightly distressed ink" },
+  { label: "Hand-drawn",       emoji: "", note: "hand-drawn illustration style, organic linework, sketchbook charm, subtle paper texture" },
+  { label: "Photoreal studio", emoji: "", note: "photorealistic studio photography, softbox lighting, crisp focus, premium commercial look" },
+  { label: "Neon glow",        emoji: "", note: "dark cinematic scene with vivid neon glow accents and rim lighting" },
+  { label: "Minimal flat",     emoji: "", note: "minimal flat design, generous negative space, crisp geometry, restrained detail" },
+  { label: "3D clay",          emoji: "", note: "cute 3D clay render style, soft rounded forms, gentle studio lighting" },
+  { label: "Vintage badge",    emoji: "", note: "vintage badge and emblem design, classic engraved-style linework, circular composition" },
+  { label: "Watercolor",       emoji: "", note: "soft watercolor artwork, gentle pigment blooms, textured paper feel" },
 ];
 
 // Saved Brand Fonts (July 2026) — a curated Google Font <select> with a "Custom
 // font…" escape hatch. Shared by the headline + body pickers in Studio.
 function FontField({ label, value, onChange }: { label: string; value: string; onChange: (family: string) => void }) {
-  // 🔥 AI-curated monthly shelf — replaces the static "Trending 2026" group
+  // AI-curated monthly shelf — replaces the static "Trending 2026" group
   // while it's loaded; the static group is the offline fallback.
   const trending = useTrendingFonts();
   const knownFamilies = trending
@@ -106,7 +106,7 @@ function FontField({ label, value, onChange }: { label: string; value: string; o
         className="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/50"
       >
         {trending && (
-          <optgroup label={`🔥 ${trending.label}`}>
+          <optgroup label={`${trending.label}`}>
             {trending.fonts.map((f) => (
               <option key={`trend-${f.family}`} value={f.family}>{f.family}</option>
             ))}
@@ -168,10 +168,10 @@ const POLL_INTERVAL_MS = 3000;
 
 // Nix's encouraging lines after a real share — warm, proud, a little cheeky
 const SHARE_MESSAGES = [
-  "Congrats — it looks amazing! 🎉",
+  "Congrats — it looks amazing!",
   "You just put your brand into the world. Let's keep building.",
   "Looking good! What do you want to create next?",
-  "That's how brands grow — one share at a time. 🚀",
+  "That's how brands grow — one share at a time.",
 ];
 
 // Random seed in [0, 2^31-1] — safe for all fal models
@@ -1037,7 +1037,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                       initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
                       animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0.4, 1.1, 0.6] }}
                       transition={{ duration: 1.1, delay: 0.3 + s.d, ease: "easeOut" }}
-                    >✦</motion.span>
+                    ></motion.span>
                   ))}
                 </div>
               )}
@@ -1054,9 +1054,9 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 </motion.div>
               </div>
 
-              <h2 className="font-display text-2xl font-black text-white mb-1">Boom — done! ✨</h2>
+              <h2 className="font-display text-2xl font-black text-white mb-1">Boom — done!</h2>
               <p className="text-sm font-semibold mb-4" style={{ color: "#10b981" }}>
-                +10 XP · {streak}-day streak 🔥
+                +10 XP · {streak}-day streak 
               </p>
 
               {celebratingJob.output_url && (
@@ -1068,21 +1068,21 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               )}
 
               {/* Nix invite — share at peak intent */}
-              <p className="text-xs text-muted mb-2.5">Love it? Show the world 🌍.</p>
+              <p className="text-xs text-muted mb-2.5">Love it? Show the world .</p>
 
-              {/* Two glowing paths at peak emotion: Share (orange) + Make another (green) */}
+              {/* Two paths at peak emotion: Share + Make another (both green; the spark is Conjure) */}
               <div className="space-y-2.5 mb-4">
                 <button
                   onClick={() => handleRevealShare(celebratingJob)}
-                  className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] motion-safe:animate-conjure-pulse transition-opacity hover:opacity-90"
+                  className="btn-green w-full !rounded-2xl text-sm transition-opacity hover:opacity-90"
                 >
-                  📣 Share it
+                  Share it
                 </button>
                 <button
                   onClick={handleMakeAnother}
                   className="w-full rounded-2xl px-4 py-3 text-sm font-bold text-white bg-secondary hover:bg-secondary/85 shadow-[0_0_12px_rgba(16,185,129,0.35)] transition-colors"
                 >
-                  ✨ Make another
+                  Make another
                 </button>
 
                 {/* Secondary create paths — quieter so the two bold actions stay magnetic */}
@@ -1092,14 +1092,14 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                     disabled={generating || activeJobs.length >= maxConcurrentJobs}
                     className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    🎨 Variation · ⚡{celebratingJobCost}
+                    Variation · ⚡{celebratingJobCost}
                   </button>
                   <button
                     onClick={() => handleNewStyle(celebratingJob)}
                     disabled={generating || activeJobs.length >= maxConcurrentJobs || isCooking}
                     className="flex-1 rounded-xl border border-white/12 bg-white/5 px-3 py-2.5 text-xs font-semibold text-muted hover:text-white hover:border-white/25 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    🪄 New style · ⚡{celebratingJobCost}
+                    New style · ⚡{celebratingJobCost}
                   </button>
                 </div>
               </div>
@@ -1123,7 +1123,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 26 }}
             className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-sm z-50"
           >
-            <div className="relative rounded-2xl border border-[#FF8C42]/40 bg-card/95 backdrop-blur px-5 py-4 shadow-glow overflow-hidden">
+            <div className="relative rounded-2xl border border-primary/40 bg-card/95 backdrop-blur px-5 py-4 shadow-glow overflow-hidden">
               {/* Sparkle burst — skipped under reduced motion */}
               {!reduce && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -1132,7 +1132,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                       initial={{ opacity: 0, x: 0, y: 0, scale: 0.4 }}
                       animate={{ opacity: [0, 1, 0], x: s.x * 0.5, y: s.y * 0.5, scale: [0.4, 1, 0.5] }}
                       transition={{ duration: 1, delay: 0.1 + s.d, ease: "easeOut" }}
-                    >✦</motion.span>
+                    ></motion.span>
                   ))}
                 </div>
               )}
@@ -1156,9 +1156,9 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleShareKeepBuilding}
-                      className="rounded-xl px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+                      className="btn-green !px-3 !py-1.5 text-xs !rounded-xl hover:opacity-90 transition-opacity"
                     >
-                      ✨ Create something new
+                      Create something new
                     </button>
                     <button
                       onClick={() => setShareCelebrating(false)}
@@ -1206,7 +1206,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   <>
                     <div className="flex items-center justify-between gap-3 flex-wrap">
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-[#E9C75A]">⭐ Bring your own logo</p>
+                        <p className="text-xs font-bold text-[#E9C75A]">Bring your own logo</p>
                         <p className="text-[11px] text-faint mt-0.5">
                           Already have a logo? Upload it and Nix stamps it on every product art & social graphic.
                         </p>
@@ -1250,7 +1250,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 ) : (
                   <a href="/pricing" className="flex items-center justify-between gap-3 group">
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#E9C75A]">⭐ Bring your own logo</p>
+                      <p className="text-xs font-bold text-[#E9C75A]">Bring your own logo</p>
                       <p className="text-[11px] text-faint mt-0.5">
                         Upload your real logo and stamp it on everything you create.
                       </p>
@@ -1523,7 +1523,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                   className="h-4 w-4 accent-[#8B5CF6]"
                 />
                 <span className="text-xs text-muted">
-                  <span className="font-semibold text-primary-light">✍️ Put my brand name on it</span>
+                  <span className="font-semibold text-primary-light">Put my brand name on it</span>
                   {" "}— AI-drawn text can look off; leave this off for clean art and use the logo stamp instead
                 </span>
               </label>
@@ -1556,7 +1556,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                 className="h-4 w-4 accent-[#D4AF37]"
               />
               <span className="text-xs text-muted">
-                <span className="font-semibold text-[#E9C75A]">⭐ Stamp my official logo</span>
+                <span className="font-semibold text-[#E9C75A]">Stamp my official logo</span>
                 {" "}on this creation (bottom-right watermark)
               </span>
             </label>
@@ -1578,7 +1578,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               disabled={isCooking}
               className="text-xs text-secondary hover:text-white transition-colors disabled:opacity-50"
             >
-              {isCooking ? "✨ Nix is cooking…" : "✨ Re-cook"}
+              {isCooking ? "Nix is cooking…" : "Re-cook"}
             </button>
           </div>
           <textarea
@@ -1587,7 +1587,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               seedRef.current = generateSeed(); // manual edit = new creative intent
               setPrompt(e.target.value);
             }}
-            placeholder={isCooking ? "✨ Nix is writing your prompt…" : "Describe what to create, or let Nix write it for you."}
+            placeholder={isCooking ? "Nix is writing your prompt…" : "Describe what to create, or let Nix write it for you."}
             rows={3}
             className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-faint focus:outline-none focus:border-primary/50 resize-none"
           />
@@ -1625,7 +1625,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                       : "border-white/10 bg-white/3 text-muted hover:border-secondary/40 hover:text-white"
                   }`}
                 >
-                  {chip.emoji} {chip.label}{selected ? " ✓" : ""}
+                  {chip.label}{selected ? " ✓" : ""}
                 </button>
               );
             })}
@@ -1709,7 +1709,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             auto-picked and badged; every engine stays available as an override */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-primary-light font-bold mb-2">
-            ⚙️ Creative Engine
+            Creative Engine
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {MODEL_OPTIONS.filter(({ nameOnOnly }) =>
@@ -1733,7 +1733,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
                     <span className="text-sm font-semibold">{label}</span>
                     {isRecommended && (
                       <span className="text-[9px] font-bold uppercase tracking-wider text-secondary border border-secondary/40 rounded px-1 leading-4">
-                        ✨ Best for this
+                        Best for this
                       </span>
                     )}
                     {isAltEngine && (
@@ -1750,12 +1750,12 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </div>
           {modelKey === "seedream_v45" && (
             <p className="mt-2 text-xs text-amber-400/80">
-              ⚠ Artistic uses a different AI engine — it will reimagine your prompt with a painterly style, not just improve quality.
+              Artistic uses a different AI engine — it will reimagine your prompt with a painterly style, not just improve quality.
             </p>
           )}
           {modelKey === "recraft_v3" && selectedBrandId && (
             <p className="mt-2 text-xs text-secondary/80">
-              🎨 Design Pro receives your brand&apos;s exact palette colors — expect the closest color match of any engine.
+              Design Pro receives your brand&apos;s exact palette colors — expect the closest color match of any engine.
             </p>
           )}
         </div>
@@ -1772,18 +1772,18 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </div>
         )}
 
-        {/* Conjure button — orange, magnetic, the most visible thing on the page */}
+        {/* Conjure button — THE spark: the one orange button on this screen (Sept 6 2026) */}
         <button
           onClick={handleGenerate}
           disabled={generating || isCooking || activeJobs.length >= maxConcurrentJobs}
-          className="w-full rounded-2xl py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_20px_rgba(255,107,53,0.45),0_0_40px_rgba(255,107,53,0.2)] motion-safe:animate-conjure-pulse disabled:opacity-60 disabled:cursor-not-allowed transition-opacity hover:opacity-90 active:opacity-80"
+          className="btn-primary w-full !rounded-2xl !py-4 text-base"
         >
           {generating
             ? "Submitting…"
             : isCooking
-            ? "✨ Nix is writing your prompt…"
+            ? "Nix is writing your prompt…"
             : activeJobs.length >= maxConcurrentJobs
-            ? `⏳ Generating… (${maxConcurrentJobs} active)`
+            ? `Generating… (${maxConcurrentJobs} active)`
             : `⚡ Conjure for ${energyCost} energy`}
         </button>
       </div>

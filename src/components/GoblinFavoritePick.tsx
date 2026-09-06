@@ -27,19 +27,19 @@ interface Props {
 
 const MEDALS = [
   {
-    icon: "🥇",
+    icon: "",
     label: "Goblin's Top Pick",
     color: "border-yellow-500/40 bg-yellow-500/8",
     badge: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
   },
   {
-    icon: "🥈",
+    icon: "",
     label: "Strong Contender",
     color: "border-white/15 bg-white/3",
     badge: "bg-white/10 text-white/70 border-white/20",
   },
   {
-    icon: "🥉",
+    icon: "",
     label: "Solid Choice",
     color: "border-white/10 bg-white/2",
     badge: "bg-white/8 text-white/60 border-white/15",
@@ -85,7 +85,6 @@ export default function GoblinFavoritePick({ favoriteName, alternativeNames, rec
       className="space-y-4"
     >
       <div className="flex items-center gap-3 px-1">
-        <span className="text-2xl">⭐</span>
         <div>
           <h2 className="font-display text-xl font-black text-white">Goblin&apos;s Favorite Pick</h2>
           <p className="text-xs text-muted">Nix ranked these from best to great</p>
@@ -123,7 +122,7 @@ export default function GoblinFavoritePick({ favoriteName, alternativeNames, rec
                     )}
                     {i === 0 && pick.bestFor && (
                       <p className="text-xs text-primary-light font-medium mt-1">
-                        🎯 Best for: {pick.bestFor}
+                        Best for: {pick.bestFor}
                       </p>
                     )}
                   </div>

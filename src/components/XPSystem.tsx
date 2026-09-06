@@ -171,7 +171,7 @@ export function XPProvider({ children }: { children: React.ReactNode }) {
             transition={{ type: "spring", bounce: 0.4 }}
             className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
           >
-            <div className="rounded-3xl border border-primary/40 bg-[rgba(12,10,24,0.98)] backdrop-blur-xl px-8 py-5 text-center shadow-2xl">
+            <div className="rounded-3xl border border-primary/40 bg-[rgba(27,29,34,0.98)] backdrop-blur-xl px-8 py-5 text-center shadow-2xl">
               <p className="text-4xl mb-2">{levelUpMsg.emoji}</p>
               <p className="text-xs font-bold tracking-widest uppercase text-primary-light mb-1">Level Up!</p>
               <p className="font-display text-2xl font-black text-white">{levelUpMsg.name}</p>

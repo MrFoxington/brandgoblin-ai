@@ -91,14 +91,14 @@ interface EnergyData {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: "📸", label: "Instagram Posts",  type: "instagram_post",   energy: 10 },
-  { icon: "📝", label: "Blog Article",     type: "blog_post",        energy: 100 },
-  { icon: "📧", label: "Email Newsletter", type: "email_campaign",   energy: 30 },
-  { icon: "🎥", label: "Video Ideas",      type: "campaign_ideas",   energy: 60 },
-  { icon: "💰", label: "Promotions",       type: "promotion",        energy: 30 },
+  { icon: "", label: "Instagram Posts",  type: "instagram_post",   energy: 10 },
+  { icon: "", label: "Blog Article",     type: "blog_post",        energy: 100 },
+  { icon: "", label: "Email Newsletter", type: "email_campaign",   energy: 30 },
+  { icon: "", label: "Video Ideas",      type: "campaign_ideas",   energy: 60 },
+  { icon: "", label: "Promotions",       type: "promotion",        energy: 30 },
   { icon: "#️⃣",  label: "Hashtags",        type: "hashtag_set",      energy: 5  },
-  { icon: "💡", label: "Product Ideas",    type: "product_description", energy: 30 },
-  { icon: "📣", label: "Ad Copy",          type: "ad_copy",          energy: 30 },
+  { icon: "", label: "Product Ideas",    type: "product_description", energy: 30 },
+  { icon: "", label: "Ad Copy",          type: "ad_copy",          energy: 30 },
 ];
 
 const NIX_GREETINGS = [
@@ -238,12 +238,11 @@ export default function DailyCreatorDashboard({
             <NixPose pose="waving" size={90} glow priority />
           </div>
           <div>
-            <p className="text-xs font-bold tracking-widest uppercase text-primary-light mb-1">✦ Brand Vault</p>
+            <p className="text-xs font-bold tracking-widest uppercase text-primary-light mb-1">Brand Vault</p>
             <h1 className="font-display text-3xl sm:text-4xl font-black text-white">
-              {greeting}{name ? `, ${name}` : ""} 👋
+              {greeting}{name ? `, ${name}` : ""} 
             </h1>
             <p className="text-sm text-muted mt-1 flex items-center gap-2">
-              <span className="text-primary-light">🧌</span>
               Nix says: &ldquo;{nixSays}&rdquo;
             </p>
             {/* One-time ask — only when no name is set and not dismissed */}
@@ -257,7 +256,7 @@ export default function DailyCreatorDashboard({
                   onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
                   maxLength={24}
                   placeholder="Your name"
-                  className="w-32 rounded-lg border border-[rgba(45,45,78,0.8)] bg-white/5 px-2.5 py-1.5 text-xs text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                  className="w-32 rounded-lg border border-[rgba(250,247,242,0.12)] bg-white/5 px-2.5 py-1.5 text-xs text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
                 />
                 <button
                   type="button"
@@ -287,7 +286,7 @@ export default function DailyCreatorDashboard({
           className="flex items-center gap-3 shrink-0"
         >
           <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
-            ✦ Create a Brand
+            Create a Brand
           </Link>
         </motion.div>
       </div>
@@ -301,27 +300,24 @@ export default function DailyCreatorDashboard({
           className="grid grid-cols-3 gap-4"
         >
           {/* Streak */}
-          <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-4 text-center">
+          <div className="rounded-2xl border border-gold/25 bg-gold/5 p-4 text-center">
             <motion.p
-              className="text-3xl mb-1"
-              animate={{ scale: streak > 1 ? [1, 1.2, 1] : 1 }}
+              className="font-display font-black text-gold text-2xl tabular-nums"
+              animate={{ scale: streak > 1 ? [1, 1.15, 1] : 1 }}
               transition={{ delay: 0.6, duration: 0.4 }}
             >
-              🔥
+              {streak}
             </motion.p>
-            <p className="font-display font-black text-white text-xl tabular-nums">{streak}</p>
             <p className="text-xs text-faint mt-0.5">day streak</p>
           </div>
           {/* Brands */}
           <div className="rounded-2xl border border-white/8 bg-white/3 p-4 text-center">
-            <p className="text-3xl mb-1">🧌</p>
-            <p className="font-display font-black text-white text-xl tabular-nums">{brandCount}</p>
+            <p className="font-display font-black text-white text-2xl tabular-nums">{brandCount}</p>
             <p className="text-xs text-faint mt-0.5">brand{brandCount !== 1 ? "s" : ""} created</p>
           </div>
           {/* Plan */}
           <div className={`rounded-2xl border p-4 text-center ${isPro ? "border-primary/20 bg-primary/5" : "border-white/8 bg-white/3"}`}>
-            <p className="text-3xl mb-1">{isPro ? "✨" : "⚡"}</p>
-            <p className="font-display font-black text-white text-xl">{isMax ? "Max" : isPro ? "Pro" : "Free"}</p>
+            <p className="font-display font-black text-white text-2xl">{isMax ? "Max" : isPro ? "Pro" : "Free"}</p>
             <p className="text-xs text-faint mt-0.5">{isMax ? "Creator Max" : isPro ? "Creator Pro" : "upgrade available"}</p>
           </div>
         </motion.div>
@@ -401,7 +397,7 @@ export default function DailyCreatorDashboard({
             <button
               type="button"
               onClick={() => setShowRefill(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] hover:opacity-90 active:opacity-80 transition-opacity"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-[#3A9A70] hover:opacity-90 active:opacity-80 transition-opacity"
             >
               ⚡ Refill Creative Energy
             </button>
@@ -433,7 +429,7 @@ export default function DailyCreatorDashboard({
               </div>
               <div className="space-y-1.5 pr-4">
                 <p className="text-xs font-bold text-secondary uppercase tracking-widest">
-                  ✦ Today&apos;s Idea
+                  Today&apos;s Idea
                   {dailyIdea.brandName && (
                     <span className="text-faint normal-case tracking-normal font-normal ml-2">
                       for {dailyIdea.brandName}
@@ -479,7 +475,6 @@ export default function DailyCreatorDashboard({
                   href={`/dashboard/creator-pro?contentType=${action.type}`}
                   className="group flex flex-col items-center gap-2 rounded-2xl border border-white/8 bg-white/3 p-4 text-center hover:border-primary/40 hover:bg-primary/8 transition-all duration-200 hover:scale-105"
                 >
-                  <span className="text-2xl group-hover:scale-110 transition-transform">{action.icon}</span>
                   <span className="text-xs font-semibold text-white leading-snug">{action.label}</span>
                   <span className="text-[10px] text-faint">⚡ {action.energy}</span>
                 </Link>
@@ -504,7 +499,7 @@ export default function DailyCreatorDashboard({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold tracking-widest uppercase text-amber-400">🎨 Goblin Studio</span>
+              <span className="text-xs font-bold tracking-widest uppercase text-amber-400">Goblin Studio</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-semibold border border-amber-400/20">NEW</span>
             </div>
             <p className="font-display font-bold text-white text-sm">Turn your brand into real images</p>
@@ -527,7 +522,7 @@ export default function DailyCreatorDashboard({
               <NixPose pose="conjuring" size={64} glow={false} float={false} animated={false} />
             </div>
             <div className="flex-1 min-w-0">
-              <span className="badge-purple text-xs">✨ Creator Pro · $19/mo</span>
+              <span className="badge-purple text-xs">Creator Pro · $19/mo</span>
               <p className="font-display font-bold text-white text-lg mt-1">Unlock your full AI Marketing Department</p>
               <p className="text-xs text-muted mt-0.5">Everything in Free, plus the tools that actually grow a brand:</p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-1.5 mt-3 text-sm text-muted">
@@ -541,9 +536,9 @@ export default function DailyCreatorDashboard({
               <div className="flex flex-wrap items-center gap-3 mt-5">
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_16px_rgba(255,107,53,0.45)] hover:opacity-90 active:opacity-80 transition-opacity"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl px-6 py-2.5 text-sm font-bold text-white bg-spark hover:bg-spark-hover hover:opacity-90 active:opacity-80 transition-opacity"
                 >
-                  ✦ Upgrade to Creator Pro
+                  Upgrade to Creator Pro
                 </Link>
                 <span className="text-xs text-faint">Cancel anytime · No contracts</span>
               </div>
@@ -563,7 +558,7 @@ export default function DailyCreatorDashboard({
           <div className="flex items-center gap-3">
             <NixPose pose="conjuring" size={56} glow={false} float={false} animated={false} />
             <div>
-              <span className="badge-purple text-xs">✨ Creator Pro</span>
+              <span className="badge-purple text-xs">Creator Pro</span>
               <p className="font-display font-bold text-white text-sm mt-0.5">Your AI Marketing Department is ready</p>
               <p className="text-xs text-muted">Social posts · Blog content · Email campaigns · Ad copy</p>
             </div>

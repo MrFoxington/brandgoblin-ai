@@ -52,6 +52,58 @@ See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
+## 🗓️ SESSION LOG — September 6, 2026, later (🖤 CREATOR STUDIO PHASE A: the dark studio skin. Committed, NOT pushed.)
+
+Same day, after the redesign went live. Fox's calls (one question at a time, saved in
+project memory `app-design-direction.md` + plan doc **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**):
+dark studio inside · their own work first on the home screen · canvas-first Studio with a
+tool rail + gallery + first-timer tips + "liquid" feel. Old look tagged **`design-v1-dark-purple`**
+(= `a427ac9`) so it's one command away. Fox's rule on ORANGE: keep it as THE SPARK, exactly
+one per screen, on the action that creates or buys (Conjure, Create, Buy); inside the app
+only, marketing stays green. Everything else clickable is green.
+
+**Phase A = the skin, no layout changes. `npx tsc --noEmit` clean.**
+- **Fonts**: body defaults flipped to Fraunces / Hanken Grotesk / JetBrains Mono app-wide
+  (the `.theme-marketing` scope already used them). Space Grotesk + Inter REMOVED from
+  layout.tsx. `.font-display.font-black/.font-extrabold` tamed to 700 + SOFT 20 so existing
+  headings don't turn into bricks.
+- **Tokens** (tailwind.config.ts): `bg` #141518 (warm ink, was blue-black), `surface` #1B1D22,
+  `raised` #22252B, `border` paper/8, **`primary` is now GOBLIN GREEN** (#2E7D5B / light
+  #8FD9B3) so every `border-primary/20`, `bg-primary/5`, `text-primary-light` tint in the app
+  turned green in one move; `spark` #FF6B35 (+hover); `muted`/`faint` are paper alphas;
+  `shadow-glow` = quiet green ring (no purple halo); hero-mesh/cta/section gradients are
+  ink-era; pulse keyframes no longer halo.
+- **globals.css**: `.btn-primary` = THE SPARK (flat orange, no gradient/pulse/shimmer);
+  new `.btn-green`; `.btn-secondary`/`.btn-ghost`/`.input`/`.label`/`.bg-card` restyled to
+  ink surfaces + paper hairlines; `.badge-purple` is now the NEUTRAL pill (name kept);
+  new `.badge-gold`; `.gradient-text` = green italic Fraunces (the marketing accent, inside);
+  `.section-heading` 600 weight; scrollbar ink; print styles ink.
+- **Navbar (dark tone) rewritten = the QUIET NAV**: plain links Vault · Studio (gold dot) ·
+  Nix (purple dot) · Creator Pro · Labs (admin, emerald dot) · Pricing with an active
+  underline (`usePathname`), plus ONE spark button "Create" (→ /generate). The four glowing
+  pills + Dashboard ghost + "✦ Generate" are gone. Mobile menu mirrors it, no emoji.
+- **Sweep**: every `rgba(45,45,78,x)` navy tint (≈80 sites, 21 files) → paper hairlines /
+  faint paper tints; `rgba(12,10,24)`, `rgba(10,10,15)`, `#0a0a0f` → ink. Orange gradients:
+  Conjure = spark; upgrade CTAs (dashboard card, EnergyWidget) = spark; share buttons
+  (JobCard, Lightbox, post-reveal, NixGallery), refill buttons, "Create something new" =
+  GREEN. Refill-modal savings tag → gold.
+- **Emoji purge on in-app chrome (191 removed, 30 files)**: dashboard quick-create icons,
+  greeting 👋, section labels, Studio section headers / style chips / buttons, JobCard +
+  Lightbox buttons, settings headers, Creator Pro hub + ContentEngine card icons, Continue
+  Building cards, BrandActions cards, Nix Zone headings, badge shelf header, generate page
+  chrome (personality chip emoji LEFT as-is: they're the picker's icons, Fox's call later).
+  KEPT: ⚡ ✓ ✕ ★ ☆ ↩ ⤴ 🔒 🔮 🔊 🔇 and all Nix images. Empty icon slots removed (no blank
+  spans); streak/brands/plan stat cards now show the number as the hero.
+- NOT touched (later phases): LoadingScreen (the allowed magic moment), XPSystem level-up,
+  BrandKitView section icons, print/PDF page styling (still purple labels), CrystalIcon,
+  admin page, generate-page vibe emoji.
+
+**▶ NEXT:** Fox pushes → Claude walks dashboard / Studio / brand kit / generate / settings
+live and fixes anything off (esp. Fraunces at big sizes, contrast on ink, any blank spot
+where an emoji used to be). Then Phase B (work-first Vault) per the plan doc.
+
+---
+
 ## 🗓️ SESSION LOG — September 6, 2026 (🎨 BRAND MATURITY P4 SHIPPED: grown-up design system · 👑 CREATOR MAX $49 TIER BUILT (P6). Two commits, NOT pushed. ⚠️ MIGRATION + STRIPE STEPS BEFORE MAX GOES LIVE)
 
 Cowork session after a 3.5-week gap (nothing had moved since Aug 12). Fox's calls this

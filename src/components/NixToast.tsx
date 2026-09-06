@@ -72,7 +72,7 @@ export function NixToastProvider({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 80, scale: 0.85 }}
               transition={{ type: "spring", bounce: 0.35, duration: 0.5 }}
-              className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-primary/30 bg-[rgba(12,10,24,0.95)] backdrop-blur-md px-4 py-3 shadow-2xl max-w-xs"
+              className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-primary/30 bg-[rgba(27,29,34,0.96)] backdrop-blur-md px-4 py-3 shadow-2xl max-w-xs"
             >
               {toast.type === "nix" && (
                 <Image src="/nix/happy-waving-nix.png" alt="Nix" width={36} height={36} className="shrink-0" />

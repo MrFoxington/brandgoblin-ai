@@ -19,11 +19,11 @@ export default function NotFound() {
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link href="/dashboard" className="btn-primary !py-2.5 !px-5 text-sm">
-          ✦ Back to my Brand Vault
+          Back to my Brand Vault
         </Link>
         <Link
           href="/"
-          className="rounded-xl border border-[rgba(45,45,78,0.8)] px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:text-white"
+          className="rounded-xl border border-[rgba(250,247,242,0.12)] px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:text-white"
         >
           Go to the homepage
         </Link>

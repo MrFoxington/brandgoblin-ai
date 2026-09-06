@@ -28,9 +28,9 @@ export default async function ShowcasePage() {
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_24px_rgba(255,107,53,0.5)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-spark hover:bg-spark-hover hover:opacity-90 transition-opacity"
           >
-            ✦ Start Creating — Free
+            Start Creating — Free
           </Link>
         </div>
 
@@ -43,7 +43,7 @@ export default async function ShowcasePage() {
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-lg font-bold text-white mb-1">Fresh creations coming soon ✨</p>
+            <p className="text-lg font-bold text-white mb-1">Fresh creations coming soon</p>
             <p className="text-sm text-muted">Real brands made with Goblin Studio will appear here.</p>
           </div>
         )}
@@ -52,9 +52,9 @@ export default async function ShowcasePage() {
         <div className="text-center mt-14">
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_24px_rgba(255,107,53,0.5)] motion-safe:animate-conjure-pulse hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-2xl px-7 py-4 text-base font-bold text-white bg-spark hover:bg-spark-hover hover:opacity-90 transition-opacity"
           >
-            ✦ Start Creating — Free
+            Start Creating — Free
           </Link>
         </div>
       </div>

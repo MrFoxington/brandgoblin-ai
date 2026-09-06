@@ -29,7 +29,7 @@ export default function EmptyState() {
             <Link
               key={ex}
               href="/generate"
-              className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-4 py-3 text-left text-sm text-muted transition hover:border-primary/40 hover:text-white"
+              className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] px-4 py-3 text-left text-sm text-muted transition hover:border-primary/40 hover:text-white"
             >
               &ldquo;{ex}&rdquo;
             </Link>

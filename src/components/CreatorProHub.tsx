@@ -9,12 +9,12 @@ import type { CreatorContentType, BrandVoiceMode, CreatorContentRow, BrandGenera
 // ─── Config ────────────────────────────────────────────────────────────────
 
 const VOICE_OPTIONS: { key: BrandVoiceMode; label: string; emoji: string }[] = [
-  { key: "professional",  label: "Professional",  emoji: "👔" },
-  { key: "funny",         label: "Funny",          emoji: "😄" },
-  { key: "luxury",        label: "Luxury",         emoji: "💎" },
-  { key: "friendly",      label: "Friendly",       emoji: "🤝" },
-  { key: "inspirational", label: "Inspirational",  emoji: "✨" },
-  { key: "minimalist",    label: "Minimalist",     emoji: "◻️" },
+  { key: "professional",  label: "Professional",  emoji: "" },
+  { key: "funny",         label: "Funny",          emoji: "" },
+  { key: "luxury",        label: "Luxury",         emoji: "" },
+  { key: "friendly",      label: "Friendly",       emoji: "" },
+  { key: "inspirational", label: "Inspirational",  emoji: "" },
+  { key: "minimalist",    label: "Minimalist",     emoji: "" },
   { key: "bold",          label: "Bold",           emoji: "⚡" },
 ];
 
@@ -29,7 +29,7 @@ type CardGroup = {
 const CARD_GROUPS: CardGroup[] = [
   {
     key: "social",
-    emoji: "📱",
+    emoji: "",
     title: "Social Content",
     desc: "Posts for every platform",
     types: [
@@ -44,14 +44,14 @@ const CARD_GROUPS: CardGroup[] = [
   },
   {
     key: "blog",
-    emoji: "📝",
+    emoji: "",
     title: "Blog Post",
     desc: "SEO-ready long-form content",
     types: [{ key: "blog_post", label: "Blog Post" }],
   },
   {
     key: "email",
-    emoji: "📧",
+    emoji: "",
     title: "Email Campaigns",
     desc: "Subject lines, copy & CTAs",
     types: [
@@ -61,7 +61,7 @@ const CARD_GROUPS: CardGroup[] = [
   },
   {
     key: "ads",
-    emoji: "📢",
+    emoji: "",
     title: "Ads & Promotions",
     desc: "Copy that converts",
     types: [
@@ -74,14 +74,14 @@ const CARD_GROUPS: CardGroup[] = [
   },
   {
     key: "calendar",
-    emoji: "📅",
+    emoji: "",
     title: "Content Calendar",
     desc: "30-day content plan",
     types: [{ key: "content_calendar", label: "Content Calendar" }],
   },
   {
     key: "strategy",
-    emoji: "🎯",
+    emoji: "",
     title: "Marketing Ideas",
     desc: "Strategy & campaign concepts",
     types: [
@@ -92,7 +92,7 @@ const CARD_GROUPS: CardGroup[] = [
   },
   {
     key: "voice",
-    emoji: "🎙️",
+    emoji: "",
     title: "Brand Voice",
     desc: "Voice guidelines & examples",
     types: [{ key: "brand_voice_suggestions", label: "Brand Voice Guide" }],
@@ -267,14 +267,14 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
             <select
               value={selectedBrandId}
               onChange={(e) => setSelectedBrandId(e.target.value)}
-              className="w-full rounded-xl border border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.6)] px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none"
+              className="w-full rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none"
             >
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.output_data.recommendedName}
                 </option>
               ))}
-              <option value="custom">✏️ Enter custom brand</option>
+              <option value="custom">Enter custom brand</option>
             </select>
           </div>
           <div>
@@ -282,10 +282,10 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
             <select
               value={brandVoice}
               onChange={(e) => setBrandVoice(e.target.value as BrandVoiceMode)}
-              className="w-full rounded-xl border border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.6)] px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none"
+              className="w-full rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none"
             >
               {VOICE_OPTIONS.map((v) => (
-                <option key={v.key} value={v.key}>{v.emoji} {v.label}</option>
+                <option key={v.key} value={v.key}>{v.label}</option>
               ))}
             </select>
           </div>
@@ -301,7 +301,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                 placeholder="e.g. NovaBrew"
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
-                className="w-full rounded-xl border border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                className="w-full rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
               />
             </div>
             <div>
@@ -311,7 +311,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                 placeholder="e.g. Specialty coffee subscription"
                 value={customIdea}
                 onChange={(e) => setCustomIdea(e.target.value)}
-                className="w-full rounded-xl border border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                className="w-full rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
               />
             </div>
           </div>
@@ -328,10 +328,10 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                   brandVoice === v.key
                     ? "border-primary/60 bg-primary/20 text-primary-light"
-                    : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
+                    : "border-[rgba(250,247,242,0.12)] text-muted hover:border-primary/40 hover:text-white"
                 }`}
               >
-                {v.emoji} {v.label}
+                {v.label}
               </button>
             ))}
           </div>
@@ -351,10 +351,9 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                 className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-5 text-left transition ${
                   isActive
                     ? "border-primary/60 bg-primary/10"
-                    : "border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.1)] hover:border-primary/40 hover:bg-[rgba(45,45,78,0.2)]"
+                    : "border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.03)] hover:border-primary/40 hover:bg-[rgba(250,247,242,0.045)]"
                 }`}
               >
-                <span className="text-3xl">{group.emoji}</span>
                 <div>
                   <p className="font-display font-bold text-white text-sm">{group.title}</p>
                   <p className="text-xs text-muted mt-0.5">{group.desc}</p>
@@ -376,7 +375,6 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
         return (
           <div className="bg-card rounded-2xl p-6 space-y-5">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{group.emoji}</span>
               <div>
                 <h2 className="font-display text-lg font-bold text-white">{group.title}</h2>
                 <p className="text-xs text-muted">{group.desc}</p>
@@ -395,7 +393,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                       className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                         activeType === t.key
                           ? "border-secondary/60 bg-secondary/20 text-secondary"
-                          : "border-[rgba(45,45,78,0.8)] text-muted hover:border-secondary/40 hover:text-white"
+                          : "border-[rgba(250,247,242,0.12)] text-muted hover:border-secondary/40 hover:text-white"
                       }`}
                     >
                       {t.label}
@@ -412,7 +410,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                 disabled={!canGenerate}
                 className="btn-primary !py-3 !px-8 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loading ? "🧌 Conjuring…" : `✦ Generate ${group.types.find(t => t.key === activeType)?.label ?? group.title}`}
+                {loading ? "Conjuring…" : `Generate ${group.types.find(t => t.key === activeType)?.label ?? group.title}`}
               </button>
               {!brandName.trim() && (
                 <p className="text-xs text-yellow-400">Select a brand above first</p>
@@ -429,7 +427,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-white">
-                    ✨ Generated: <span className="text-primary-light">{result.title}</span>
+                    Generated: <span className="text-primary-light">{result.title}</span>
                   </p>
                   <span className="text-xs text-faint">Saved to your vault</span>
                 </div>
@@ -444,7 +442,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
       {recent.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-lg font-bold text-white">📚 Recent Generations</h2>
+            <h2 className="font-display text-lg font-bold text-white">Recent Generations</h2>
             <span className="text-xs text-faint">{recent.length} saved</span>
           </div>
           <div className="space-y-3">
@@ -452,11 +450,10 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
               <div key={item.id} className="bg-card rounded-xl overflow-hidden">
                 <button
                   onClick={() => setExpandedRecent(expandedRecent === item.id ? null : item.id)}
-                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-[rgba(45,45,78,0.2)] transition"
+                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-[rgba(250,247,242,0.045)] transition"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="text-lg shrink-0">
-                      {CARD_GROUPS.find((g) => g.types.some((t) => t.key === item.content_type))?.emoji ?? "✦"}
                     </span>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{item.title}</p>
@@ -470,7 +467,7 @@ export default function CreatorProHub({ brands, recentContent: initialRecent }: 
                   </span>
                 </button>
                 {expandedRecent === item.id && (
-                  <div className="border-t border-[rgba(45,45,78,0.6)] bg-[rgba(10,10,15,0.4)] p-5 max-h-96 overflow-y-auto">
+                  <div className="border-t border-[rgba(250,247,242,0.10)] bg-[rgba(20,21,24,0.5)] p-5 max-h-96 overflow-y-auto">
                     <ResultRenderer
                       contentType={item.content_type}
                       content={item.content as { items: unknown[] }}
@@ -502,7 +499,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { hook?: string; copy: string; hashtags?: string[]; cta?: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             {item.hook && <p className="text-xs font-bold text-primary-light mb-1">Hook</p>}
             {item.hook && <p className="text-sm font-semibold text-white mb-2">{item.hook}</p>}
             <p className="text-sm text-muted leading-relaxed mb-2">{item.copy}</p>
@@ -522,7 +519,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-2">
         {(items as { copy: string; hashtags?: string[] }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] px-4 py-3 flex items-start justify-between gap-2">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] px-4 py-3 flex items-start justify-between gap-2">
             <p className="text-sm text-white leading-relaxed flex-1">{item.copy}{item.hashtags?.length ? " " + item.hashtags.join(" ") : ""}</p>
             <CopyButton text={item.copy + (item.hashtags?.length ? " " + item.hashtags.join(" ") : "")} label="" className="shrink-0" />
           </div>
@@ -536,7 +533,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-2">
         {(items as string[][]).map((set, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] px-4 py-3 flex items-start justify-between gap-2">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] px-4 py-3 flex items-start justify-between gap-2">
             <p className="text-xs text-muted flex-1 leading-relaxed">{set.join(" ")}</p>
             <CopyButton text={set.join(" ")} label="" className="shrink-0" />
           </div>
@@ -573,7 +570,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { subjectLine?: string; subject?: string; preheader?: string; channel?: string; body: string; cta: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             {item.channel && <p className="text-xs font-bold text-secondary mb-2 uppercase tracking-widest">{item.channel}</p>}
             <p className="text-xs font-bold text-primary-light mb-0.5">Subject</p>
             <p className="text-sm font-semibold text-white mb-1">{item.subjectLine ?? item.subject}</p>
@@ -594,11 +591,11 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { headline: string; body: string; cta?: string; offer?: string; urgency?: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             {item.offer && <p className="text-xs font-bold text-yellow-400 mb-1">{item.offer}</p>}
             <p className="text-sm font-bold text-white mb-1">{item.headline}</p>
             <p className="text-xs text-muted leading-relaxed mb-2">{item.body}</p>
-            {item.urgency && <p className="text-xs text-red-400 mb-2">⏱ {item.urgency}</p>}
+            {item.urgency && <p className="text-xs text-red-400 mb-2">{item.urgency}</p>}
             <div className="flex items-center justify-between">
               {item.cta && <span className="rounded-full bg-primary/20 border border-primary/30 px-3 py-0.5 text-xs text-primary-light">{item.cta}</span>}
               <CopyButton text={`${item.headline}\n${item.body}${item.cta ? "\nCTA: " + item.cta : ""}`} label="" />
@@ -614,7 +611,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { headline: string; shortDesc: string; longDesc: string; bullets: string[]; cta: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             <p className="text-sm font-bold text-white mb-1">{item.headline}</p>
             <p className="text-xs text-secondary italic mb-2">{item.shortDesc}</p>
             <p className="text-xs text-muted leading-relaxed mb-2">{item.longDesc}</p>
@@ -644,7 +641,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
             <p className="text-sm font-bold text-white mb-1">{week.week} <span className="text-secondary text-xs font-normal">— {week.theme}</span></p>
             <div className="space-y-1.5">
               {week.posts?.map((post, pi) => (
-                <div key={pi} className="flex items-start gap-3 rounded-lg bg-[rgba(45,45,78,0.15)] px-3 py-2">
+                <div key={pi} className="flex items-start gap-3 rounded-lg bg-[rgba(250,247,242,0.035)] px-3 py-2">
                   <span className="text-xs text-faint w-16 shrink-0">{post.day}</span>
                   <span className="text-xs text-secondary shrink-0">{post.platform}</span>
                   <span className="text-xs text-muted flex-1">{post.topic}</span>
@@ -663,7 +660,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { idea?: string; name?: string; concept?: string; why?: string; goal?: string; channels?: string[]; tactics?: string[] }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             <p className="text-sm font-bold text-white mb-1">{item.idea ?? item.name}</p>
             <p className="text-xs text-muted leading-relaxed mb-2">{item.why ?? item.concept ?? item.goal}</p>
             {item.channels && <p className="text-xs text-faint">{item.channels.join(" · ")}</p>}
@@ -685,7 +682,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { segment: string; description: string; channels: string[]; messaging: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             <p className="text-sm font-bold text-white mb-1">{item.segment}</p>
             <p className="text-xs text-muted leading-relaxed mb-2">{item.description}</p>
             <p className="text-xs text-secondary mb-1">{item.channels?.join(" · ")}</p>
@@ -701,7 +698,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { tone: string; description: string; examples: string[]; avoid: string[] }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             <p className="text-sm font-bold text-white mb-1">{item.tone}</p>
             <p className="text-xs text-muted mb-3">{item.description}</p>
             <p className="text-xs font-bold text-secondary mb-1">Examples</p>
@@ -721,7 +718,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
     return (
       <div className="space-y-3">
         {(items as { season: string; theme: string; headline: string; copy: string; cta: string }[]).map((item, i) => (
-          <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] p-4">
+          <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="badge-purple text-xs">{item.season}</span>
               <span className="text-xs text-secondary">{item.theme}</span>
@@ -742,7 +739,7 @@ function ResultRenderer({ contentType, content }: { contentType: CreatorContentT
   return (
     <div className="space-y-2">
       {(items as string[]).map((item, i) => (
-        <div key={i} className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] px-4 py-3 flex items-start justify-between gap-2">
+        <div key={i} className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] px-4 py-3 flex items-start justify-between gap-2">
           <p className="text-sm text-white leading-relaxed">{item}</p>
           <CopyButton text={item} label="" className="shrink-0" />
         </div>

@@ -149,7 +149,7 @@ function Card({
       className={`relative rounded-2xl border p-5 text-left ${
         highlight
           ? "border-primary/50 bg-primary/10"
-          : "border-[rgba(45,45,78,0.8)] bg-[rgba(20,20,40,0.6)]"
+          : "border-[rgba(250,247,242,0.12)] bg-[rgba(27,29,34,0.7)]"
       }`}
     >
       {!shouldReduce && <RevealBurst />}
@@ -205,7 +205,7 @@ function SectionCard({ section, content, studioHref }: RevealedSection & { studi
             {alts.map((a) => (
               <span
                 key={a.name}
-                className="rounded-full border border-[rgba(45,45,78,0.9)] bg-white/5 px-3 py-1 text-sm font-semibold text-white"
+                className="rounded-full border border-[rgba(250,247,242,0.14)] bg-white/5 px-3 py-1 text-sm font-semibold text-white"
               >
                 {a.name}
               </span>

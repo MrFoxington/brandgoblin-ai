@@ -49,7 +49,7 @@ export default function PreviewActions({
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-[rgba(45,45,78,0.8)] bg-[rgba(12,10,24,0.95)] px-4 py-3 backdrop-blur-md">
+    <div className="flex items-center justify-between gap-3 border-b border-[rgba(250,247,242,0.12)] bg-[rgba(27,29,34,0.96)] px-4 py-3 backdrop-blur-md">
       <Link
         href={`/brand/${brandId}`}
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-white transition-colors"

@@ -1,27 +1,14 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { NixToastProvider } from "@/components/NixToast";
 import { XPProvider } from "@/components/XPSystem";
 import { SoundFxProvider } from "@/components/primitives/SoundFx";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-// Brand Maturity P4 (Sept 2026): the grown-up marketing type system.
-// Fraunces (display) + Hanken Grotesk (body) + JetBrains Mono (hex codes / labels).
-// Only the `.theme-marketing` scope uses them for now; the in-app surfaces keep
-// Space Grotesk + Inter until they inherit the system. See globals.css.
+// Brand Maturity P4 + Creator Studio Phase A (Sept 2026): ONE type system for
+// marketing and app alike. Fraunces (display) + Hanken Grotesk (body) +
+// JetBrains Mono (hex codes / labels). Space Grotesk + Inter retired Sept 6.
 const fraunces = Fraunces({
   subsets: ["latin"],
   style: ["normal", "italic"],
@@ -101,7 +88,7 @@ export default function RootLayout({
         <meta name="application-name" content="BrandGoblin AI" />
       </head>
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} ${fraunces.variable} ${hanken.variable} ${jetbrainsMono.variable} min-h-screen bg-bg font-sans antialiased`}
+        className={`${fraunces.variable} ${hanken.variable} ${jetbrainsMono.variable} min-h-screen bg-bg font-sans antialiased`}
       >
         <SoundFxProvider>
           <XPProvider>

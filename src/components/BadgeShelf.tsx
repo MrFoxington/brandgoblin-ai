@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 🏆 BadgeShelf — the Trophy Shelf (July 18 2026, Fox's collector-badge idea).
+ * BadgeShelf — the Trophy Shelf (July 18 2026, Fox's collector-badge idea).
  * Lives on the dashboard where users see it every day. Earned badges glow on
  * the shelf; locked slots tease the next quest; tap any badge for the
  * fullscreen trophy view. Art auto-lights-up: when a conjured emblem PNG lands
@@ -85,7 +85,6 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
         {/* Header */}
         <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🏆</span>
             <h2 className="font-display font-bold text-white text-sm">Trophy Shelf</h2>
           </div>
           <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2.5 py-0.5 text-xs font-semibold text-[#E9C75A] tabular-nums">
@@ -196,7 +195,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
 
               {selected.earned ? (
                 <span className="mb-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#E9C75A]">
-                  ✦ Earned ✦
+                  Earned
                 </span>
               ) : (
                 <span className="mb-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-faint">
@@ -220,7 +219,7 @@ export default function BadgeShelf({ stats }: { stats: BadgeStats }) {
                   className="btn-primary px-5 py-2.5 text-sm"
                   onClick={() => setSelected(null)}
                 >
-                  ✦ Start the quest →
+                  Start the quest →
                 </Link>
               )}
             </motion.div>

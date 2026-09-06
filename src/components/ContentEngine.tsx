@@ -12,17 +12,17 @@ const CONTENT_TYPES: {
   desc: string;
   button: string;
 }[] = [
-  { key: "social_posts",       label: "Social Posts",        emoji: "📸", desc: "10 Instagram post ideas",        button: "Conjure Posts" },
-  { key: "captions",           label: "Captions",            emoji: "✍️", desc: "10 fresh captions",              button: "Conjure Captions" },
-  { key: "blog_ideas",         label: "Blog Ideas",          emoji: "📝", desc: "10 blog topics",                 button: "Conjure Blogs" },
-  { key: "ad_copy",            label: "Ad Copy",             emoji: "📢", desc: "10 ad ideas",                    button: "Conjure Ads" },
-  { key: "email_campaigns",    label: "Email Campaigns",     emoji: "📧", desc: "5 email campaign ideas",         button: "Conjure Emails" },
-  { key: "video_ideas",        label: "Video Ideas",         emoji: "🎬", desc: "10 Reel/TikTok ideas",           button: "Conjure Videos" },
-  { key: "hashtags",           label: "Hashtags",            emoji: "🏷️", desc: "10 hashtag sets",               button: "Conjure Hashtags" },
-  { key: "seasonal_campaigns", label: "Seasonal Campaigns",  emoji: "🌟", desc: "5 campaign ideas",               button: "Conjure Campaign" },
-  { key: "meme_ideas",         label: "Meme Ideas",          emoji: "😄", desc: "10 meme concepts",               button: "Conjure Memes" },
-  { key: "headline_ideas",     label: "Headlines",           emoji: "🎯", desc: "10 promo headlines",             button: "Conjure Headlines" },
-  { key: "website_copy",       label: "Website Copy",        emoji: "🌐", desc: "10 copy variations",             button: "Conjure Copy" },
+  { key: "social_posts",       label: "Social Posts",        emoji: "", desc: "10 Instagram post ideas",        button: "Conjure Posts" },
+  { key: "captions",           label: "Captions",            emoji: "", desc: "10 fresh captions",              button: "Conjure Captions" },
+  { key: "blog_ideas",         label: "Blog Ideas",          emoji: "", desc: "10 blog topics",                 button: "Conjure Blogs" },
+  { key: "ad_copy",            label: "Ad Copy",             emoji: "", desc: "10 ad ideas",                    button: "Conjure Ads" },
+  { key: "email_campaigns",    label: "Email Campaigns",     emoji: "", desc: "5 email campaign ideas",         button: "Conjure Emails" },
+  { key: "video_ideas",        label: "Video Ideas",         emoji: "", desc: "10 Reel/TikTok ideas",           button: "Conjure Videos" },
+  { key: "hashtags",           label: "Hashtags",            emoji: "", desc: "10 hashtag sets",               button: "Conjure Hashtags" },
+  { key: "seasonal_campaigns", label: "Seasonal Campaigns",  emoji: "", desc: "5 campaign ideas",               button: "Conjure Campaign" },
+  { key: "meme_ideas",         label: "Meme Ideas",          emoji: "", desc: "10 meme concepts",               button: "Conjure Memes" },
+  { key: "headline_ideas",     label: "Headlines",           emoji: "", desc: "10 promo headlines",             button: "Conjure Headlines" },
+  { key: "website_copy",       label: "Website Copy",        emoji: "", desc: "10 copy variations",             button: "Conjure Copy" },
   { key: "cta_ideas",          label: "CTA Ideas",           emoji: "⚡", desc: "10 call-to-action variations",  button: "Conjure CTAs" },
 ];
 
@@ -90,7 +90,6 @@ export default function ContentEngine({
       {showUpgrade && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
           <div className="bg-card w-full max-w-md rounded-2xl border border-primary/20 p-8 text-center shadow-2xl">
-            <span className="text-4xl block mb-4">🧌</span>
             <h3 className="font-display text-xl font-extrabold text-white mb-2">
               Unlock Creator Pro
             </h3>
@@ -98,7 +97,7 @@ export default function ContentEngine({
               Unlock Creator Pro to keep growing your brand with fresh posts, captions, blogs, ads, campaigns, and marketing ideas every month.
             </p>
             <Link href="/pricing" className="btn-primary w-full py-3 block text-center mb-3">
-              ✦ Upgrade to Creator Pro
+              Upgrade to Creator Pro
             </Link>
             <button
               onClick={() => setShowUpgrade(false)}
@@ -125,7 +124,7 @@ export default function ContentEngine({
             </div>
             {!isPro && (
               <Link href="/pricing" className="btn-primary !py-2 !px-5 text-sm shrink-0">
-                ✦ Upgrade to Creator Pro
+                Upgrade to Creator Pro
               </Link>
             )}
           </div>
@@ -139,10 +138,9 @@ export default function ContentEngine({
             const isOpen = expanded === ct.key;
 
             return (
-              <div key={ct.key} className="flex flex-col rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.15)] overflow-hidden">
+              <div key={ct.key} className="flex flex-col rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.035)] overflow-hidden">
                 <div className="flex items-center justify-between gap-3 p-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl shrink-0">{ct.emoji}</span>
                     <div className="min-w-0">
                       <p className="font-semibold text-white text-sm">{ct.label}</p>
                       <p className="text-xs text-muted">{ct.desc}</p>
@@ -154,7 +152,7 @@ export default function ContentEngine({
                       disabled={isLoading || !!loading}
                       className="btn-ghost !text-xs !py-1.5 !px-3 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {isLoading ? "✨ Conjuring…" : isPro ? ct.button : `🔒 ${ct.button}`}
+                      {isLoading ? "Conjuring…" : isPro ? ct.button : `🔒 ${ct.button}`}
                     </button>
                     {hasResult && (
                       <button
@@ -177,7 +175,7 @@ export default function ContentEngine({
                 )}
 
                 {isOpen && hasResult && (
-                  <div className="border-t border-[rgba(45,45,78,0.6)] bg-[rgba(10,10,15,0.4)] p-4 max-h-96 overflow-y-auto">
+                  <div className="border-t border-[rgba(250,247,242,0.10)] bg-[rgba(20,21,24,0.5)] p-4 max-h-96 overflow-y-auto">
                     <ContentResults contentType={ct.key} data={results[ct.key]} />
                   </div>
                 )}
@@ -197,7 +195,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-4">
         {(items as { hook: string; caption: string; visualIdea: string; hashtags: string[] }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <p className="text-xs font-bold text-primary-light mb-1">Hook</p>
             <p className="text-sm text-white font-semibold mb-2">{item.hook}</p>
             <p className="text-xs font-bold text-secondary mb-1">Caption</p>
@@ -218,7 +216,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-3">
         {(items as { title: string; summary: string; seoKeywords: string[] }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <div className="flex items-start justify-between gap-2">
               <p className="text-sm font-bold text-white">{item.title}</p>
               <CopyButton text={item.title} label="" className="shrink-0" />
@@ -235,7 +233,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-3">
         {(items as { headline: string; body: string; cta: string }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <p className="text-sm font-bold text-white mb-1">{item.headline}</p>
             <p className="text-xs text-muted mb-2 leading-relaxed">{item.body}</p>
             <div className="flex items-center justify-between">
@@ -252,7 +250,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-3">
         {(items as { subjectLine: string; emailBody: string; offer: string }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <p className="text-xs font-bold text-primary-light mb-1">Subject</p>
             <p className="text-sm font-bold text-white mb-2">{item.subjectLine}</p>
             <p className="text-xs text-muted mb-2 leading-relaxed">{item.emailBody}</p>
@@ -270,7 +268,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-3">
         {(items as { hook: string; videoConcept: string; cta: string }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <p className="text-xs font-bold text-primary-light mb-1">Hook</p>
             <p className="text-sm font-bold text-white mb-2">{item.hook}</p>
             <p className="text-xs text-muted mb-2 leading-relaxed">{item.videoConcept}</p>
@@ -288,7 +286,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-2">
         {(items as string[][]).map((set, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3 flex items-start justify-between gap-2">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3 flex items-start justify-between gap-2">
             <p className="text-xs text-muted flex-1 leading-relaxed">{set.join(" ")}</p>
             <CopyButton text={set.join(" ")} label="" className="shrink-0" />
           </div>
@@ -301,11 +299,11 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
     return (
       <div className="space-y-3">
         {(items as { campaignTheme: string; offer: string; socialPostIdea: string; emailIdea: string }[]).map((item, i) => (
-          <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <p className="text-sm font-bold text-white mb-1">{item.campaignTheme}</p>
             <p className="text-xs text-secondary mb-1">Offer: {item.offer}</p>
-            <p className="text-xs text-muted mb-1">📸 {item.socialPostIdea}</p>
-            <p className="text-xs text-muted">📧 {item.emailIdea}</p>
+            <p className="text-xs text-muted mb-1">{item.socialPostIdea}</p>
+            <p className="text-xs text-muted">{item.emailIdea}</p>
           </div>
         ))}
       </div>
@@ -316,7 +314,7 @@ function ContentResults({ contentType, data }: { contentType: MarketingContentTy
   return (
     <div className="space-y-2">
       {(items as string[]).map((item, i) => (
-        <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2 flex items-start justify-between gap-2">
+        <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] px-3 py-2 flex items-start justify-between gap-2">
           <p className="text-sm text-white leading-relaxed">{item}</p>
           <CopyButton text={item} label="" className="shrink-0" />
         </div>

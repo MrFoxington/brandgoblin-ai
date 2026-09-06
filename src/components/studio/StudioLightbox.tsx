@@ -184,9 +184,9 @@ export default function StudioLightbox({
           <button
             onClick={() => onShare()}
             disabled={sharing}
-            className="rounded-xl px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] hover:opacity-90 disabled:opacity-60 transition-opacity"
+            className="rounded-xl px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-[#3A9A70] hover:opacity-90 disabled:opacity-60 transition-opacity"
           >
-            {copied ? "✓ Copied" : sharing ? "…" : "Share it ✨"}
+            {copied ? "✓ Copied" : sharing ? "…" : "Share it"}
           </button>
 
           {canMoreLikeThis && onMoreLikeThis && (
@@ -195,7 +195,7 @@ export default function StudioLightbox({
               disabled={moreLikeThis}
               className="rounded-xl px-4 py-2 text-sm font-bold text-white bg-secondary hover:bg-secondary/85 shadow-[0_0_10px_rgba(16,185,129,0.3)] disabled:opacity-60 disabled:cursor-wait transition-colors"
             >
-              {moreLikeThis ? "Creating…" : "✨ More like this"}
+              {moreLikeThis ? "Creating…" : "More like this"}
             </button>
           )}
 
@@ -217,7 +217,7 @@ export default function StudioLightbox({
               className="rounded-xl px-3 py-2 text-sm border border-white/15 bg-white/5 hover:bg-white/10 disabled:opacity-70 transition-colors"
             >
               <span className={isFavorite ? "drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]" : ""}>
-                {isFavorite ? "⭐" : "☆"}
+                {isFavorite ? "★" : "☆"}
               </span>
             </button>
           )}

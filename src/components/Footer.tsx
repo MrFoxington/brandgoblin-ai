@@ -36,7 +36,7 @@ export default function Footer({ tone = "dark" }: { tone?: "light" | "dark" } = 
   }
 
   return (
-    <footer className={`border-t pt-14 pb-10 ${light ? "border-line bg-paper-2" : "border-[rgba(45,45,78,0.8)]"}`}>
+    <footer className={`border-t pt-14 pb-10 ${light ? "border-line bg-paper-2" : "border-[rgba(250,247,242,0.12)]"}`}>
       <div className="mx-auto max-w-6xl px-4 space-y-8">
 
         {/* Main footer row */}
@@ -107,7 +107,7 @@ export default function Footer({ tone = "dark" }: { tone?: "light" | "dark" } = 
                 <span
                   key={item.label}
                   className={`rounded-full border px-3 py-1 text-xs font-medium cursor-default transition ${
-                    light ? "border-line-2 text-ink-faint" : "border-[rgba(45,45,78,0.6)] text-faint"
+                    light ? "border-line-2 text-ink-faint" : "border-[rgba(250,247,242,0.10)] text-faint"
                   }`}
                 >
                   {item.label}
@@ -119,7 +119,7 @@ export default function Footer({ tone = "dark" }: { tone?: "light" | "dark" } = 
         </div>
 
         {/* Bottom */}
-        <p className={`text-center text-xs border-t pt-6 ${light ? "text-ink-faint border-line" : "text-faint border-[rgba(45,45,78,0.4)]"}`}>
+        <p className={`text-center text-xs border-t pt-6 ${light ? "text-ink-faint border-line" : "text-faint border-[rgba(250,247,242,0.08)]"}`}>
           Powered by Claude. © 2026 BrandGoblin AI
         </p>
       </div>

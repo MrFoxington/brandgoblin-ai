@@ -143,7 +143,7 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
                     animate={{ opacity: [0, 1, 0], x: s.x, y: s.y, scale: [0.4, 1.1, 0.6] }}
                     transition={{ duration: 1.1, delay: 0.3 + s.d, ease: "easeOut" }}
                   >
-                    ✦
+                    
                   </motion.span>
                 ))}
               </div>
@@ -205,7 +205,7 @@ export default function RefillCelebration({ contentGeneratorId = "content-genera
               onClick={dismiss}
               className="btn-primary w-full py-3 text-base"
             >
-              ✦ Let&apos;s build →
+              Let&apos;s build →
             </button>
           </motion.div>
         </motion.div>

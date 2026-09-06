@@ -39,7 +39,7 @@ const MODEL_LABELS: Record<string, string> = {
 // Tags for derived (post-processed / uploaded) jobs
 const DERIVED_TAGS: Record<string, string> = {
   bg_removal:      "Background removed",
-  clarity_upscaler: "✨ Upscaled",
+  clarity_upscaler: "Upscaled",
   upload:          "⤴ Uploaded",
 };
 
@@ -279,7 +279,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
               transition={{ type: "spring", stiffness: 500, damping: 16 }}
               className={`block text-base ${fav ? "drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]" : ""}`}
             >
-              {fav ? "⭐" : "☆"}
+              {fav ? "★" : "☆"}
             </motion.span>
           </button>
         )}
@@ -300,9 +300,9 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
           <button
             onClick={handleShare}
             disabled={sharing}
-            className="flex-1 rounded-xl px-3 py-2 text-xs font-bold text-white text-center bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] shadow-[0_0_12px_rgba(255,107,53,0.4)] motion-safe:animate-conjure-pulse hover:opacity-90 disabled:opacity-60 transition-opacity"
+            className="flex-1 rounded-xl px-3 py-2 text-xs font-bold text-white text-center bg-primary hover:bg-[#3A9A70] hover:opacity-90 disabled:opacity-60 transition-opacity"
           >
-            {copied ? "✓ Copied" : sharing ? "…" : "Share it ✨"}
+            {copied ? "✓ Copied" : sharing ? "…" : "Share it"}
           </button>
 
           {/* More like this — GREEN, solid (the create-again action).
@@ -313,7 +313,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
               disabled={moreLikeThis}
               className="flex-1 rounded-xl px-3 py-2 text-xs font-bold text-white text-center bg-secondary hover:bg-secondary/85 shadow-[0_0_10px_rgba(16,185,129,0.3)] disabled:opacity-60 disabled:cursor-wait transition-colors"
             >
-              {moreLikeThis ? "Creating…" : "✨ More like this"}
+              {moreLikeThis ? "Creating…" : "More like this"}
             </button>
           )}
 
@@ -336,14 +336,14 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
             <button
               onClick={() => handleProcess("bg_removal")}
               disabled={!!processing}
-              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint/80 hover:text-faint hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint hover:text-paper hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
             >
-              {processing === "bg_removal" ? "Removing BG…" : `✂ Remove BG · ⚡${bgRemovalCost}`}
+              {processing === "bg_removal" ? "Removing BG…" : `Remove BG · ⚡${bgRemovalCost}`}
             </button>
             <button
               onClick={() => handleProcess("clarity_upscaler")}
               disabled={!!processing}
-              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint/80 hover:text-faint hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-md border border-white/8 text-faint hover:text-paper hover:border-white/15 disabled:opacity-50 disabled:cursor-wait transition-colors"
             >
               {processing === "clarity_upscaler" ? "Upscaling…" : `↑ Upscale · ⚡${upscaleCost}`}
             </button>
@@ -372,7 +372,7 @@ export default function JobCard({ job, onMoreLikeThis, onProcess, onShareSuccess
                 <span className="hidden group-hover/official:inline">✕ Remove official logo</span>
               </>
             ) : (
-              "⭐ Make this my official logo"
+              "Make this my official logo"
             )}
           </button>
         )}

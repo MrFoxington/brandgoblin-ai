@@ -88,7 +88,7 @@ function Card({ kit }: { kit: BrandKit }) {
         style={{ color: textColor === "white" ? "#fff" : "#1a1a1a" }}
       >
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", opacity: 0.7, textTransform: "uppercase", marginBottom: 10 }}>
-          ✦ New Brand Alert
+          New Brand Alert
         </p>
         <h1 style={{ fontSize: 44, fontWeight: 900, lineHeight: 1.05, marginBottom: 10, letterSpacing: "-0.02em" }}>
           {kit.recommendedName}
@@ -173,14 +173,14 @@ export default function ShareCard({ kit }: ShareCardProps) {
                   onClick={handleDownload}
                   className="btn-primary !py-2 !px-4 text-sm flex items-center gap-2"
                 >
-                  📥 Download PNG
+                  Download PNG
                 </button>
                 <button
                   type="button"
                   onClick={handleCopyLink}
                   className="btn-secondary !py-2 !px-4 text-sm flex items-center gap-2"
                 >
-                  {copied ? "✓ Link copied!" : "🔗 Copy link"}
+                  {copied ? "✓ Link copied!" : "Copy link"}
                 </button>
               </div>
 

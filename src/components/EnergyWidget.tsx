@@ -62,7 +62,7 @@ export default function EnergyWidget() {
           </a>
           <button
             onClick={() => setShowModal(true)}
-            className="w-full rounded-xl border border-[#FF6B35]/50 bg-[#FF6B35]/5 py-2 text-sm font-semibold text-[#FF8C42] hover:bg-[#FF6B35]/15 transition-colors"
+            className="w-full rounded-xl border border-primary/60 bg-primary/10 py-2 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-colors"
           >
             ⚡ Top up energy
           </button>
@@ -91,7 +91,7 @@ export default function EnergyWidget() {
   const warningMessages = {
     low:      { icon: "⚡", text: "Creative Energy running low. Nix still has some magic left, but you may want to refill soon." },
     critical: { icon: "⚡", text: "Almost out of Creative Energy. Refill anytime to keep creating." },
-    empty:    { icon: "🔋", text: "Nix is out of Creative Energy for now. Refill instantly or wait for your next monthly reset." },
+    empty:    { icon: "", text: "Nix is out of Creative Energy for now. Refill instantly or wait for your next monthly reset." },
   };
 
   return (
@@ -115,7 +115,7 @@ export default function EnergyWidget() {
               ? "bg-orange-500/10 border border-orange-500/20 text-orange-400"
               : "bg-yellow-500/10 border border-yellow-500/20 text-yellow-400"
           }`}>
-            {warningMessages[energy.warningLevel].icon} {warningMessages[energy.warningLevel].text}
+            {warningMessages[energy.warningLevel].text}
           </div>
         )}
 
@@ -149,7 +149,7 @@ export default function EnergyWidget() {
             <ul className="space-y-1">
               {energy.estimates.map((est) => (
                 <li key={est} className="text-xs text-muted flex items-center gap-2">
-                  <span className="text-primary-light">✦</span> {est}
+                  <span className="text-primary-light">·</span> {est}
                 </li>
               ))}
             </ul>
@@ -159,7 +159,7 @@ export default function EnergyWidget() {
         {/* Refill button */}
         <button
           onClick={() => setShowModal(true)}
-          className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] py-2.5 text-sm font-bold text-white shadow-[0_0_12px_rgba(255,107,53,0.4)] hover:opacity-90 transition-opacity"
+          className="mt-4 w-full rounded-xl bg-primary hover:bg-[#3A9A70] py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity"
         >
           ⚡ {isFree ? "Top up energy" : "Refill Energy"}
         </button>

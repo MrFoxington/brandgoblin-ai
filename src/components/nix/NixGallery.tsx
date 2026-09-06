@@ -13,7 +13,7 @@ interface Props {
   items: GalleryItem[];
 }
 
-const SHARE_TEXT = "Meet Nix from BrandGoblin 🧙✨ brandgoblinai.com";
+const SHARE_TEXT = "Meet Nix from BrandGoblin brandgoblinai.com";
 
 function itemFileName(name: string, path: string) {
   const ext = path.split(".").pop() ?? "png";
@@ -71,9 +71,9 @@ export default function NixGallery({ items }: Props) {
             <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => handleShare(item)}
-                className="rounded-lg bg-gradient-to-r from-[#FF6B35] to-[#FF8C42] px-2.5 py-1.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
+                className="rounded-lg bg-primary hover:bg-[#3A9A70] px-2.5 py-1.5 text-xs font-bold text-white hover:opacity-90 transition-opacity"
               >
-                {copied === item.path ? "✓ Copied" : "Share ✨"}
+                {copied === item.path ? "✓ Copied" : "Share"}
               </button>
               <button
                 onClick={() => { playButtonPress(); downloadFile(item.path, itemFileName(item.name, item.path)); }}

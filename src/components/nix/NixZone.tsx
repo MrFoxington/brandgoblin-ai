@@ -11,7 +11,7 @@ function SectionHeading({ emoji, title, hint }: { emoji: string; title: string; 
   return (
     <div className="mb-4">
       <h2 className="font-display text-xl font-black text-white flex items-center gap-2">
-        <span aria-hidden>{emoji}</span> {title}
+        {title}
       </h2>
       <p className="text-xs text-faint mt-0.5">{hint}</p>
     </div>
@@ -42,26 +42,26 @@ export default function NixZone() {
         <div>
           <h1 className="font-display text-3xl font-black text-white mb-1">{NIX_ZONE_LABEL}</h1>
           <p className="text-sm text-muted">
-            Free Nix goodies — wallpapers, stickers, and more. Grab them, share them, spread the goblin. 🧙
+            Free Nix goodies — wallpapers, stickers, and more. Grab them, share them, spread the goblin. 
           </p>
         </div>
       </div>
 
       {/* Wallpapers */}
       <section>
-        <SectionHeading emoji="🖼" title="Wallpapers" hint="Desktop & phone — lightly marked so Nix travels with them." />
+        <SectionHeading emoji="" title="Wallpapers" hint="Desktop & phone — lightly marked so Nix travels with them." />
         <NixWallpapers wallpapers={WALLPAPERS} />
       </section>
 
       {/* Stickers */}
       <section>
-        <SectionHeading emoji="🌟" title="Sticker Pack" hint="Transparent PNGs for your messengers." />
+        <SectionHeading emoji="" title="Sticker Pack" hint="Transparent PNGs for your messengers." />
         <NixStickers stickers={STICKERS} />
       </section>
 
       {/* Gallery */}
       <section>
-        <SectionHeading emoji="🎬" title="Nix Gallery" hint="Nix doing cool stuff — share the fun." />
+        <SectionHeading emoji="" title="Nix Gallery" hint="Nix doing cool stuff — share the fun." />
         <NixGallery items={GALLERY} />
       </section>
     </div>

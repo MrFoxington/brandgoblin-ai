@@ -62,7 +62,6 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
 
           {/* Celebration header */}
           <div className="mb-10 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 px-8 py-10 text-center">
-            <span className="logo-glow block text-5xl mb-4">🎉</span>
             <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mb-3">
               Your Idea Has Become A Brand.
             </h1>
@@ -120,7 +119,7 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
             <p className="text-muted mb-5">Every great brand started as just an idea. Now you have yours.</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/generate" className="btn-primary px-8 py-3">
-                ✦ Create Another Brand
+                Create Another Brand
               </Link>
               <Link href="/dashboard" className="btn-secondary px-8 py-3">
                 View Brand Vault

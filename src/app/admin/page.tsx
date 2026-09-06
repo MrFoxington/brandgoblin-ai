@@ -286,7 +286,7 @@ export default async function AdminPage() {
               ) : (
                 <div className="space-y-3">
                   {testimonialRows.map((t: { id: string; testimonial_text: string; created_at: string }) => (
-                    <div key={t.id} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                    <div key={t.id} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                       <p className="text-sm text-muted leading-relaxed">&ldquo;{t.testimonial_text}&rdquo;</p>
                       <p className="text-xs text-faint mt-1">{new Date(t.created_at).toLocaleDateString()}</p>
                     </div>
@@ -332,7 +332,7 @@ function Bar({ label, count, total, color }: { label: string; count: number; tot
         <span className="text-muted">{label}</span>
         <span className="text-white font-semibold">{count} <span className="text-faint font-normal">({pct}%)</span></span>
       </div>
-      <div className="h-2 w-full rounded-full bg-[rgba(45,45,78,0.6)]">
+      <div className="h-2 w-full rounded-full bg-[rgba(250,247,242,0.10)]">
         <div className={`h-2 rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
       </div>
     </div>

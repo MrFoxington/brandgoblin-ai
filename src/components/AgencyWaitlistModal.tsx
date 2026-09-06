@@ -87,7 +87,7 @@ export default function AgencyWaitlistModal({ onClose }: { onClose: () => void }
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-[rgba(45,45,78,0.8)] bg-[rgba(10,10,15,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                className="w-full rounded-xl border border-[rgba(250,247,242,0.12)] bg-[rgba(20,21,24,0.6)] px-4 py-3 text-sm text-white placeholder:text-faint focus:border-primary/60 focus:outline-none"
               />
               {error && <p className="text-xs text-red-400">{error}</p>}
               <button

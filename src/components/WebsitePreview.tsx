@@ -230,7 +230,7 @@ export default function WebsitePreview({
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-sm font-semibold text-white flex items-center gap-2 min-w-0">
-              🌐 <span className="hidden sm:inline truncate">Website Preview — built from your brand kit</span>
+              <span className="hidden sm:inline truncate">Website Preview — built from your brand kit</span>
               <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/70 shrink-0">
                 Concept
               </span>
@@ -241,7 +241,7 @@ export default function WebsitePreview({
                 className="rounded-lg border border-primary/50 bg-primary/20 px-3 py-1.5 text-sm font-semibold text-primary-light hover:bg-primary/30 hover:text-white transition-colors"
                 title="Copy a paste-ready brief for GoDaddy Airo, Framer, or any AI website builder"
               >
-                {copied ? "✓ Copied!" : "✨ Copy website prompt"}
+                {copied ? "✓ Copied!" : "Copy website prompt"}
               </button>
               <button
                 onClick={onClose}
@@ -315,7 +315,7 @@ export default function WebsitePreview({
                       className="mx-auto mb-6 inline-block rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide"
                       style={{ borderColor: `${t.accent}66`, color: t.text, backgroundColor: `${t.accent}1a` }}
                     >
-                      ✦ {kit.taglines[0]}
+                      {kit.taglines[0]}
                     </motion.p>
                   )}
                   <motion.h1
@@ -453,7 +453,7 @@ export default function WebsitePreview({
                   <p className="font-display text-base font-black" style={{ color: t.text }}>{name}</p>
                   {w.footerTagline && <p className="mt-2 italic">{w.footerTagline}</p>}
                   <p className="mt-4 opacity-70">
-                    © {new Date().getFullYear()} {name} · Made with BrandGoblin AI 🧌
+                    © {new Date().getFullYear()} {name} · Made with BrandGoblin AI 
                   </p>
                 </div>
               </div>

@@ -152,7 +152,7 @@ function FontSelect({ value, onChange }: { value: string; onChange: (family: str
       <select
         value={isCustom ? "__custom__" : value}
         onChange={(e) => onChange(e.target.value === "__custom__" ? "" : e.target.value)}
-        className="w-full rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
+        className="w-full rounded-lg bg-[rgba(250,247,242,0.06)] border border-[rgba(250,247,242,0.12)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
       >
         {trending && (
           <optgroup label={`🔥 ${trending.label}`}>
@@ -176,7 +176,7 @@ function FontSelect({ value, onChange }: { value: string; onChange: (family: str
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Type any Google Font name"
-          className="mt-1.5 w-full rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
+          className="mt-1.5 w-full rounded-lg bg-[rgba(250,247,242,0.06)] border border-[rgba(250,247,242,0.12)] px-3 py-2 text-sm text-white focus:outline-none focus:border-primary/60"
         />
       )}
     </>
@@ -259,7 +259,7 @@ function BrandFontsSection({
           <select
             value={weight}
             onChange={(e) => setWeight(Number(e.target.value))}
-            className="rounded-lg bg-[rgba(45,45,78,0.3)] border border-[rgba(45,45,78,0.8)] px-2 py-1.5 text-sm text-white focus:outline-none focus:border-primary/60"
+            className="rounded-lg bg-[rgba(250,247,242,0.06)] border border-[rgba(250,247,242,0.12)] px-2 py-1.5 text-sm text-white focus:outline-none focus:border-primary/60"
           >
             <option value={400}>Regular (400)</option>
             <option value={500}>Medium (500)</option>
@@ -382,7 +382,7 @@ export default function BrandKitView({
       <RerollError sectionKey="taglines" />
       <ul className="space-y-2">
         {kit.taglines.map((t, i) => (
-          <li key={i} className="flex items-center justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2 text-sm text-white">
+          <li key={i} className="flex items-center justify-between gap-2 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] px-3 py-2 text-sm text-white">
             <span>&ldquo;{t}&rdquo;</span><CopyButton text={t} label="" />
           </li>
         ))}
@@ -405,7 +405,7 @@ export default function BrandKitView({
       <RerollError sectionKey="colorPalette" />
       <div className="space-y-2">
         {kit.colorPalette.map((c) => (
-          <div key={c.hex} className="flex items-center gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={c.hex} className="flex items-center gap-3 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <span className="h-10 w-10 shrink-0 rounded-lg border border-white/10" style={{ backgroundColor: c.hex }} />
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-white text-sm">{c.name}</p>
@@ -463,7 +463,7 @@ export default function BrandKitView({
     // 8: Logo Direction (renamed from "Logo Prompt")
     <SectionCard key="logo" emoji="🖼️" title="Logo Direction" badge="Design" copyText={kit.logoPrompt} {...sp("logoDirection")}>
       <RerollError sectionKey="logoDirection" />
-      <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4 space-y-3">
+      <div className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-4 space-y-3">
         <p className="text-sm text-muted leading-relaxed">{kit.logoPrompt}</p>
         <div className="pt-2 border-t border-white/8">
           <Link
@@ -485,7 +485,7 @@ export default function BrandKitView({
       <p className="text-sm text-muted leading-relaxed">{kit.mascot.appearance}</p>
       <p className="text-sm text-muted leading-relaxed">{kit.mascot.personality}</p>
       <p className="text-sm italic text-faint leading-relaxed">{kit.mascot.visualDescription}</p>
-      <div className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4">
+      <div className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-4">
         <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary-light">AI Image Prompt</p>
         <p className="text-xs text-muted leading-relaxed">{kit.mascot.imagePrompt}</p>
       </div>
@@ -523,7 +523,7 @@ export default function BrandKitView({
             <p className="label mb-2">Features</p>
             <div className="space-y-2">
               {kit.websiteCopy.features.map((f, i) => (
-                <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                   <p className="text-sm font-semibold text-white">{f.title}</p>
                   <p className="text-sm text-muted mt-0.5 leading-relaxed">{f.description}</p>
                 </div>
@@ -547,7 +547,7 @@ export default function BrandKitView({
             <p className="label mb-2">FAQs</p>
             <div className="space-y-2">
               {kit.websiteCopy.faqs.map((q, i) => (
-                <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                   <p className="text-sm font-semibold text-white">{q.question}</p>
                   <p className="text-sm text-muted mt-0.5 leading-relaxed">{q.answer}</p>
                 </div>
@@ -562,13 +562,13 @@ export default function BrandKitView({
             <p className="label mb-2">SEO</p>
             <div className="space-y-2">
               {kit.websiteCopy.seoTitle && (
-                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                   <div><p className="text-xs text-faint">Title tag</p><p className="text-sm text-white">{kit.websiteCopy.seoTitle}</p></div>
                   <CopyButton text={kit.websiteCopy.seoTitle} label="" className="shrink-0" />
                 </div>
               )}
               {kit.websiteCopy.metaDescription && (
-                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+                <div className="flex items-start justify-between gap-2 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                   <div><p className="text-xs text-faint">Meta description</p><p className="text-sm text-muted">{kit.websiteCopy.metaDescription}</p></div>
                   <CopyButton text={kit.websiteCopy.metaDescription} label="" className="shrink-0" />
                 </div>
@@ -636,7 +636,7 @@ export default function BrandKitView({
       <RerollError sectionKey="socialKit" />
       <div className="space-y-3">
         {[{ platform: "Instagram", bio: kit.socialKit.instagramBio }, { platform: "X / Twitter", bio: kit.socialKit.twitterBio }, { platform: "TikTok", bio: kit.socialKit.tiktokBio }].map(({ platform, bio }) => (
-          <div key={platform} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <div key={platform} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <div className="mb-1 flex items-center justify-between">
               <p className="text-xs font-bold text-primary-light">{platform}</p><CopyButton text={bio} label="" />
             </div>
@@ -647,7 +647,7 @@ export default function BrandKitView({
           <p className="label mb-2">Launch posts</p>
           <div className="space-y-2">
             {kit.socialKit.launchPosts.map((p, i) => (
-              <div key={i} className="rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+              <div key={i} className="rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm text-white leading-relaxed">{p}</p>
                   <CopyButton text={p} label="" className="shrink-0" />
@@ -685,7 +685,7 @@ export default function BrandKitView({
       <RerollError sectionKey="launchPlan" />
       <ol className="space-y-2">
         {kit.launchPlan.map((step, i) => (
-          <li key={i} className="flex gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-3">
+          <li key={i} className="flex gap-3 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-3">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary/20 text-xs font-black text-secondary">{i + 1}</span>
             <span className="text-sm text-muted leading-relaxed">{step}</span>
           </li>

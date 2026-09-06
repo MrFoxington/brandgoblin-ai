@@ -166,7 +166,7 @@ export default function BrandNamesSection({
 
           <div className="flex items-center justify-between mb-4">
             <span className="flex items-center gap-2 rounded-full border border-yellow-400/40 bg-yellow-400/10 px-3 py-1 text-xs font-bold text-yellow-400 uppercase tracking-widest">
-              🏆 Goblin&apos;s Favorite Pick
+              Goblin&apos;s Favorite Pick
             </span>
             <CopyButton text={currentFavorite.name} label="" />
           </div>
@@ -176,14 +176,14 @@ export default function BrandNamesSection({
           <p className="text-secondary font-medium italic mb-5">"{currentFavorite.tagline}"</p>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.3)] p-4">
+            <div className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.06)] p-4">
               <p className="text-xs font-bold uppercase tracking-widest text-primary-light mb-2">
                 Why the Goblin picked it
               </p>
               <p className="text-sm text-muted leading-relaxed">{currentFavorite.whyPicked}</p>
             </div>
             {currentFavorite.bestFor && (
-              <div className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.3)] p-4">
+              <div className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.06)] p-4">
                 <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-2">
                   Best for
                 </p>
@@ -220,7 +220,7 @@ export default function BrandNamesSection({
               {currentAlts.map((alt, i) => (
                 <div
                   key={alt.name + i}
-                  className="rounded-xl border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] p-4 flex flex-col gap-2"
+                  className="rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] p-4 flex flex-col gap-2"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-display font-bold text-white text-lg">{alt.name}</p>
@@ -254,14 +254,13 @@ export default function BrandNamesSection({
           disabled={conjuring}
           className="btn-secondary w-full py-3 text-sm font-semibold disabled:opacity-50"
         >
-          {conjuring ? "Conjuring names…" : "✨ Conjure More Names"}
+          {conjuring ? "Conjuring names…" : "Conjure More Names"}
         </button>
 
         {/* Modal */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
             <div className="bg-card w-full max-w-sm rounded-2xl border border-primary/20 p-8 text-center shadow-2xl">
-              <span className="text-4xl block mb-4">🧌</span>
               <h3 className="font-display text-xl font-extrabold text-white mb-2">
                 What would you like?
               </h3>
@@ -274,10 +273,10 @@ export default function BrandNamesSection({
                   disabled={conjuring}
                   className="btn-primary w-full py-3 disabled:opacity-50"
                 >
-                  {conjuring ? "Conjuring…" : "✨ More Names Only"}
+                  {conjuring ? "Conjuring…" : "More Names Only"}
                 </button>
                 <a href="/generate" className="btn-secondary w-full py-3 block text-center">
-                  🔄 Regenerate Full Brand
+                  Regenerate Full Brand
                 </a>
                 <button
                   onClick={() => setShowModal(false)}
@@ -307,7 +306,7 @@ export default function BrandNamesSection({
         {brandNames?.map((n, i) => (
           <li
             key={n.name + i}
-            className="flex items-start justify-between gap-3 rounded-lg border border-[rgba(45,45,78,0.6)] bg-[rgba(45,45,78,0.2)] px-3 py-2.5"
+            className="flex items-start justify-between gap-3 rounded-lg border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.045)] px-3 py-2.5"
           >
             <div>
               <p className="font-display font-semibold text-white">{n.name}</p>

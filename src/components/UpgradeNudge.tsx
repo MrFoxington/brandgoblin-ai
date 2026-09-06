@@ -6,11 +6,11 @@ import NixPose from "./primitives/NixPose";
 import Sparkles from "./primitives/Sparkles";
 
 const PERKS = [
-  "♾️ Unlimited brand kits",
-  "🔄 Re-conjure any section",
-  "📝 Unlimited content generation",
+  "Unlimited brand kits",
+  "Re-conjure any section",
+  "Unlimited content generation",
   "⚡ Creator Pro dashboard",
-  "🎯 Priority brand generation",
+  "Priority brand generation",
 ];
 
 export default function UpgradeNudge() {
@@ -54,7 +54,7 @@ export default function UpgradeNudge() {
         <div className="flex-1 space-y-4">
           <div>
             <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary-light mb-1">
-              ✦ You&apos;re on the free plan
+              You&apos;re on the free plan
             </p>
             <h3 className="font-display text-2xl font-black text-white leading-tight">
               Your brand is ready.<br />
@@ -80,7 +80,7 @@ export default function UpgradeNudge() {
               disabled={loading}
               className="btn-primary !py-3 !px-6 text-sm font-bold disabled:opacity-60"
             >
-              {loading ? "Redirecting to checkout…" : "🚀 Upgrade to Creator Pro →"}
+              {loading ? "Redirecting to checkout…" : "Upgrade to Creator Pro →"}
             </button>
             <p className="text-xs text-faint">Cancel anytime · No contracts</p>
           </div>

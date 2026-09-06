@@ -133,7 +133,7 @@ export default function GoblinFeedback({
                   className={`rounded-xl border-2 px-5 py-4 text-center font-semibold transition-all ${
                     rating === r.value
                       ? r.color + " scale-[1.03]"
-                      : "border-[rgba(45,45,78,0.8)] text-muted hover:border-primary/40 hover:text-white"
+                      : "border-[rgba(250,247,242,0.12)] text-muted hover:border-primary/40 hover:text-white"
                   }`}
                 >
                   <span className="block text-2xl mb-1">{r.emoji}</span>
@@ -189,7 +189,7 @@ export default function GoblinFeedback({
                 <button
                   key={opt.value}
                   onClick={() => submitValidation(opt.value)}
-                  className="rounded-xl border-2 border-[rgba(45,45,78,0.8)] px-5 py-4 text-sm font-semibold text-muted transition hover:border-primary/50 hover:text-white hover:bg-primary/10"
+                  className="rounded-xl border-2 border-[rgba(250,247,242,0.12)] px-5 py-4 text-sm font-semibold text-muted transition hover:border-primary/50 hover:text-white hover:bg-primary/10"
                 >
                   {opt.label}
                 </button>

@@ -7,14 +7,14 @@ import NixPose from "./primitives/NixPose";
 import type { BrandInput } from "@/types";
 
 const CARDS = [
-  { id: "social",   icon: "🚀", label: "Social Media",        desc: "Posts, captions & hashtags",    color: "hover:border-purple-500/40 hover:bg-purple-500/8",  glowColor: "rgba(139,92,246,0.3)" },
-  { id: "website",  icon: "🌐", label: "Website Copy",         desc: "Headlines, about & CTAs",        color: "hover:border-blue-500/40 hover:bg-blue-500/8",     glowColor: "rgba(59,130,246,0.3)" },
-  { id: "email",    icon: "📧", label: "Email Campaigns",      desc: "Welcome, nurture & promos",      color: "hover:border-green-500/40 hover:bg-green-500/8",   glowColor: "rgba(34,197,94,0.3)"  },
-  { id: "blog",     icon: "📰", label: "Blog Posts",           desc: "SEO-ready long-form content",    color: "hover:border-yellow-500/40 hover:bg-yellow-500/8", glowColor: "rgba(234,179,8,0.3)"  },
-  { id: "ads",      icon: "📈", label: "Ad Copy",              desc: "Facebook, Instagram & Google",   color: "hover:border-orange-500/40 hover:bg-orange-500/8", glowColor: "rgba(249,115,22,0.3)" },
-  { id: "products", icon: "📦", label: "Product Descriptions", desc: "Convert browsers to buyers",     color: "hover:border-pink-500/40 hover:bg-pink-500/8",     glowColor: "rgba(236,72,153,0.3)" },
-  { id: "podcast",  icon: "🎙", label: "Podcast",              desc: "Show names, intros & episodes",  color: "hover:border-red-500/40 hover:bg-red-500/8",       glowColor: "rgba(239,68,68,0.3)"  },
-  { id: "merch",    icon: "🎁", label: "Merchandise",          desc: "Product ideas & descriptions",   color: "hover:border-teal-500/40 hover:bg-teal-500/8",     glowColor: "rgba(20,184,166,0.3)" },
+  { id: "social",   icon: "", label: "Social Media",        desc: "Posts, captions & hashtags",    color: "hover:border-purple-500/40 hover:bg-purple-500/8",  glowColor: "rgba(139,92,246,0.3)" },
+  { id: "website",  icon: "", label: "Website Copy",         desc: "Headlines, about & CTAs",        color: "hover:border-blue-500/40 hover:bg-blue-500/8",     glowColor: "rgba(59,130,246,0.3)" },
+  { id: "email",    icon: "", label: "Email Campaigns",      desc: "Welcome, nurture & promos",      color: "hover:border-green-500/40 hover:bg-green-500/8",   glowColor: "rgba(34,197,94,0.3)"  },
+  { id: "blog",     icon: "", label: "Blog Posts",           desc: "SEO-ready long-form content",    color: "hover:border-yellow-500/40 hover:bg-yellow-500/8", glowColor: "rgba(234,179,8,0.3)"  },
+  { id: "ads",      icon: "", label: "Ad Copy",              desc: "Facebook, Instagram & Google",   color: "hover:border-orange-500/40 hover:bg-orange-500/8", glowColor: "rgba(249,115,22,0.3)" },
+  { id: "products", icon: "", label: "Product Descriptions", desc: "Convert browsers to buyers",     color: "hover:border-pink-500/40 hover:bg-pink-500/8",     glowColor: "rgba(236,72,153,0.3)" },
+  { id: "podcast",  icon: "", label: "Podcast",              desc: "Show names, intros & episodes",  color: "hover:border-red-500/40 hover:bg-red-500/8",       glowColor: "rgba(239,68,68,0.3)"  },
+  { id: "merch",    icon: "", label: "Merchandise",          desc: "Product ideas & descriptions",   color: "hover:border-teal-500/40 hover:bg-teal-500/8",     glowColor: "rgba(20,184,166,0.3)" },
 ];
 
 // Pick the best starting card for this brand based on traits/vibe
@@ -87,7 +87,7 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
       {/* Header */}
       <div className="text-center space-y-2">
         <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary-light">
-          ✦ Keep the magic going ✦
+          Keep the magic going 
         </p>
         <h2 className="font-display text-2xl font-black text-white">Continue Building</h2>
         <p className="text-sm text-muted">Your brand is alive — now let&apos;s give it a voice.</p>
@@ -104,7 +104,6 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
         <div className="space-y-0.5">
           <p className="text-xs font-bold text-secondary uppercase tracking-widest">Nix recommends starting with</p>
           <p className="font-display font-black text-white text-lg">
-            {CARDS.find((c) => c.id === recommended)?.icon}{" "}
             {CARDS.find((c) => c.id === recommended)?.label}
           </p>
           <p className="text-xs text-muted leading-relaxed">{NIX_RECS[recommended]}</p>
@@ -136,11 +135,10 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
                       : `border-white/10 bg-white/3 ${card.color}`
                     } hover:scale-105`}
                 >
-                  <span className="text-2xl group-hover:scale-110 transition-transform duration-200">{card.icon}</span>
                   <span className="text-sm font-bold text-white">{card.label}</span>
                   <span className="text-xs text-faint leading-snug">{card.desc}</span>
                   {isRecommended && (
-                    <span className="text-[10px] font-bold text-secondary tracking-widest uppercase mt-0.5">Nix Pick ✦</span>
+                    <span className="text-[10px] font-bold text-secondary tracking-widest uppercase mt-0.5">Nix Pick</span>
                   )}
                 </Link>
               ) : (
@@ -155,15 +153,11 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
                         : "border-white/8 bg-white/2 opacity-70"
                       }`}
                   >
-                    <span className="text-2xl relative">
-                      {card.icon}
-                      {/* Lock badge */}
-                      <span className="absolute -top-1 -right-2 text-[10px]">🔒</span>
-                    </span>
+                    <span className="text-xs" aria-label="Locked">🔒</span>
                     <span className={`text-sm font-bold ${isRecommended ? "text-white" : "text-white/60"}`}>{card.label}</span>
                     <span className="text-xs text-faint leading-snug">{card.desc}</span>
                     {isRecommended && (
-                      <span className="text-[10px] font-bold text-secondary tracking-widest uppercase mt-0.5">Start here ✦</span>
+                      <span className="text-[10px] font-bold text-secondary tracking-widest uppercase mt-0.5">Start here</span>
                     )}
                   </button>
 
@@ -206,7 +200,7 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
       >
         {isPro ? (
           <Link href={base} className="btn-primary px-8 py-3 inline-block">
-            ✨ Open Creator Pro Studio
+            Open Creator Pro Studio
           </Link>
         ) : (
           <button
@@ -215,7 +209,7 @@ export default function ContinueBuilding({ brandId, userPlan = "free", brandInpu
             disabled={checkoutLoading}
             className="btn-primary px-8 py-3 disabled:opacity-60"
           >
-            {checkoutLoading ? "Redirecting…" : "🚀 Unlock All Builders →"}
+            {checkoutLoading ? "Redirecting…" : "Unlock All Builders →"}
           </button>
         )}
         <p className="text-xs text-faint">

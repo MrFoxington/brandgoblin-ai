@@ -148,7 +148,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md rounded-3xl border border-primary/30 bg-[rgba(12,10,24,0.98)] p-8 shadow-2xl">
+      <div className="relative w-full max-w-md rounded-3xl border border-primary/30 bg-[rgba(27,29,34,0.98)] p-8 shadow-2xl">
         {/* Close */}
         <button
           onClick={onClose}
@@ -199,7 +199,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
                       </span>
                     )}
                     {pack.savings && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6B35]/15 text-[#FF8C42] font-semibold">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gold/15 text-gold font-semibold">
                         {pack.savings}
                       </span>
                     )}
@@ -226,7 +226,7 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
         {isProMember === false && selectedPack === "starter" && (
           <div className="mb-4 rounded-2xl border border-primary/40 bg-gradient-to-r from-primary/15 to-secondary/10 p-4">
             <p className="text-xs text-white font-semibold mb-1">
-              💡 Same $19 — every month
+              Same $19 — every month
             </p>
             <p className="text-xs text-muted mb-3">
               Creator Pro gives you <span className="text-white font-semibold">1,000⚡ every month</span>,
@@ -238,14 +238,14 @@ export default function EnergyRefillModal({ isOpen, onClose, onSuccess, isEmpty 
               disabled={loading}
               className="w-full rounded-xl bg-gradient-to-r from-primary to-secondary py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity disabled:opacity-60"
             >
-              ✨ Get Creator Pro instead — $19/month
+              Get Creator Pro instead — $19/month
             </button>
           </div>
         )}
 
         {isProMember === false && selectedPack !== "starter" && (
           <p className="mb-4 text-center text-xs text-faint">
-            ⭐ Creator Pro members get +20% bonus energy on every pack
+            Creator Pro members get +20% bonus energy on every pack
           </p>
         )}
 
