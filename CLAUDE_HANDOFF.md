@@ -80,8 +80,8 @@ and the four Sept 6 session logs below only if the Studio or Vault needs touchin
 **The Creator Studio plan is complete and fully live** (checked at 1440 + 390, three real
 Conjures on the canvas, coach walked with `?coach=1`, share-card pipeline verified in the
 browser). Fox's two 9 PM catches (brand history on brand switch; no orange nav button in-app)
-are fixed in the newest commit; make sure it is pushed and check them live first (see that
-log). `git log origin/main..main` should be empty at the start of the next session.
+are fixed, pushed and verified live. `git log origin/main..main` should be empty at the start
+of the next session.
 
 **P7 in one paragraph (from the Brand Maturity plan):** the root domain `brandgoblinai.com`
 still serves the old GoDaddy Airo page while the product lives at `app.brandgoblinai.com`.
@@ -124,7 +124,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, 9 PM (🔧 TWO FOX CATCHES after using the Studio: brand history + the nav spark. Committed, NOT pushed.)
+## 🗓️ SESSION LOG — September 6, 2026, 9 PM (🔧 TWO FOX CATCHES after using the Studio: brand history + the nav spark. PUSHED + LIVE.)
 
 Fox used the new Studio for real and sent a screenshot (Valkraft selected, "Your canvas is
 waiting", empty strip) with two notes.
@@ -151,8 +151,12 @@ Conjure, Creator Pro = Generate (gate page: Upgrade), brand kit page = "Create i
 marketing = the nav Create / Start free. Project memory `app-design-direction.md` item 2
 updated.
 
-**▶ NEXT:** Fox pushes → confirm on the live Studio: pick Valkraft, canvas + strip fill with its
-product art; the header has no orange button in-app; the Vault's "+ Create" is orange.
+**✅ PUSHED BY FOX + LIVE-CHECKED (`19f235d`).** In-app header: zero orange (only Conjure on the
+page). Switching the rail to Valkraft: "Fetching Valkraft's creations" for under a second, then
+its Product Art on the canvas and 14 recents in the strip. Gallery chips: Valkraft 19 cards,
+Fossil Fuel 46, Juicy Hazy 75 (all older than the 60-job window, all now reachable).
+
+**▶ NEXT:** P7 one website, then Labs video (see START HERE).
 
 ---
 
