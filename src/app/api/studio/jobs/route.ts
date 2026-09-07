@@ -16,6 +16,7 @@ import {
   markJobFailed,
   completeJob,
   listUserJobs,
+  listUserJobsForBrand,
 } from "@/lib/studio/jobs";
 import type { StudioModelKey, ImageType } from "@/lib/studio/models";
 
@@ -433,11 +434,25 @@ export async function POST(request: Request) {
 }
 
 // ── GET /api/studio/jobs — list recent jobs (re-signed URLs) ────────────────
-export async function GET() {
+// ?brand=<id>       every completed creation for that brand (hidden included)
+// ?brand=none       every completed freeform creation
+// ?brand=all        every completed creation, all brands
+// (no param)        the recent window, as before
+export async function GET(request: Request) {
   const supabase = createClient();
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+  }
+
+  const brand = new URL(request.url).searchParams.get("brand");
+  if (brand) {
+    const key = brand === "none" ? null : brand === "all" ? "all" : brand;
+    if (key !== null && key !== "all" && !/^[0-9a-f-]{36}$/i.test(key)) {
+      return NextResponse.json({ error: "Bad brand id." }, { status: 400 });
+    }
+    const jobs = await listUserJobsForBrand(authData.user.id, key);
+    return NextResponse.json({ jobs });
   }
 
   const jobs = await listUserJobs(authData.user.id);

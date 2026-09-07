@@ -232,6 +232,13 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   const [openSections, setOpenSections] = useState<Set<RailKey>>(
     () => new Set<RailKey>(initialJobId ? ["type"] : ["type", "prompt", "details"])
   );
+  // Sept 7 2026 fix: the page loads a recent window, so an older brand looked
+  // empty on the canvas. Each brand's full history is fetched the first time it
+  // is selected (rail or gallery chip) and merged in. "all" loads everything.
+  const loadedBrandsRef = useRef<Set<string>>(new Set());
+  const [brandLoading, setBrandLoading] = useState<string | null>(null);
+  const [allLoaded, setAllLoaded] = useState(false);
+
   // Phase D: the first-timer coach. "First timer" is decided once, at load.
   const [firstTimer] = useState(() => forceCoach || !initialJobs.some((j) => j.status === "completed"));
   const [coachSaved, setCoachSaved] = useState(false);
@@ -297,6 +304,41 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
   useEffect(() => { stopAnticipationRef.current = stopAnticipation; }, [stopAnticipation]);
   useEffect(() => { playStreakRef.current = playStreak; }, [playStreak]);
   useEffect(() => { streakRef.current = streak; }, [streak]);
+
+  // Merge a brand's history into the loaded jobs (newest first, no duplicates).
+  const loadBrandHistory = useCallback(async (brandKey: string) => {
+    if (loadedBrandsRef.current.has(brandKey)) return;
+    loadedBrandsRef.current.add(brandKey);
+    setBrandLoading(brandKey);
+    try {
+      const res = await fetch(`/api/studio/jobs?brand=${encodeURIComponent(brandKey)}`);
+      if (!res.ok) { loadedBrandsRef.current.delete(brandKey); return; }
+      const data = (await res.json()) as { jobs?: StudioJobRow[] };
+      const incoming = data.jobs ?? [];
+      if (incoming.length) {
+        setJobs((prev) => {
+          const seen = new Set(prev.map((j) => j.id));
+          const fresh = incoming.filter((j) => !seen.has(j.id));
+          if (!fresh.length) return prev;
+          return [...prev, ...fresh].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        });
+      }
+      if (brandKey === "all") setAllLoaded(true);
+    } catch {
+      loadedBrandsRef.current.delete(brandKey);
+    } finally {
+      setBrandLoading((cur) => (cur === brandKey ? null : cur));
+    }
+  }, []);
+
+  // The rail's brand and the gallery's brand chip both pull that brand's history.
+  useEffect(() => {
+    loadBrandHistory(selectedBrandId || "none");
+  }, [selectedBrandId, loadBrandHistory]);
+  useEffect(() => {
+    if (galleryBrand === "all") return;
+    loadBrandHistory(galleryBrand || "none");
+  }, [galleryBrand, loadBrandHistory]);
 
   // Phone tool sheet: Esc closes it, focus lands on its close button when it opens.
   const sheetCloseRef = useRef<HTMLButtonElement>(null);
@@ -1223,6 +1265,7 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
             <StudioCanvas
               job={canvasJob}
               activeCount={activeJobs.length}
+              loadingBrand={brandLoading === (selectedBrandId || "none") ? selectedBrandName : null}
               brandName={canvasBrandName}
               cardBrand={cardBrandFor(canvasJob)}
               cardFilename={`${brandSlugFor(canvasJob)}-share-card.jpg`}
@@ -1338,6 +1381,20 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
           </div>
         )}
 
+        {galleryBrand === "all" && !allLoaded && (
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-[rgba(250,247,242,0.10)] bg-[rgba(250,247,242,0.03)] px-4 py-2.5">
+            <p className="text-xs text-muted">Showing your most recent creations. Pick a brand to see all of its work, or load everything.</p>
+            <button
+              type="button"
+              onClick={() => loadBrandHistory("all")}
+              disabled={brandLoading === "all"}
+              className="shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-light transition-colors hover:bg-primary/20 hover:text-white disabled:opacity-60"
+            >
+              {brandLoading === "all" ? "Loading…" : "Load everything"}
+            </button>
+          </div>
+        )}
+
         {galleryJobs.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {galleryJobs.map((job) => (
@@ -1361,6 +1418,8 @@ export default function StudioImageGenerator({ brands, initialJobs, isPro = fals
               ? "Nothing hidden. Tap ✕ Hide on any creation to tuck it away here."
               : galleryTab === "favorites"
               ? `No favorites yet. Tap the ☆ on any creation to add it to ${FAVORITES_LABEL}.`
+              : brandLoading
+              ? "Fetching this brand's creations…"
               : jobs.length === 0
               ? "Your creations will collect here. Hit Conjure to make the first one."
               : "Nothing here for this brand yet."}

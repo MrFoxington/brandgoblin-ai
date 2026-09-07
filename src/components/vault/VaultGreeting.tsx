@@ -130,7 +130,8 @@ export default function VaultGreeting({
         transition={{ delay: 0.15, duration: 0.3 }}
         className="shrink-0"
       >
-        <button type="button" onClick={onCreate} className="btn-green !px-6 !py-3 text-sm w-full sm:w-auto">
+        {/* THE SPARK of the Vault (Sept 7 2026: the nav no longer carries one in-app). */}
+        <button type="button" onClick={onCreate} className="btn-primary !px-6 !py-3 text-sm w-full sm:w-auto">
           + Create
         </button>
       </motion.div>

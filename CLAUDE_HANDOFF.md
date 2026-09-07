@@ -52,8 +52,9 @@ rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on 
 
 **Design (Sept 6, 2026):** marketing pages = warm paper / ink / goblin green / Fraunces (Brand
 Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink surfaces, same
-type, green everyday buttons, ONE orange "spark" per screen (nav Create, Conjure, Buy), clean
-typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
+type, green everyday buttons, ONE orange "spark" per screen (in-app: Vault "+ Create", Studio
+Conjure, Creator Pro Generate, kit page "Create in Studio"; the nav Create is marketing-only
+since Sept 7), clean typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
 `design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
 opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
 and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
@@ -78,7 +79,9 @@ and the four Sept 6 session logs below only if the Studio or Vault needs touchin
 
 **The Creator Studio plan is complete and fully live** (checked at 1440 + 390, three real
 Conjures on the canvas, coach walked with `?coach=1`, share-card pipeline verified in the
-browser). `git log origin/main..main` should be empty at the start of the next session.
+browser). Fox's two 9 PM catches (brand history on brand switch; no orange nav button in-app)
+are fixed in the newest commit; make sure it is pushed and check them live first (see that
+log). `git log origin/main..main` should be empty at the start of the next session.
 
 **P7 in one paragraph (from the Brand Maturity plan):** the root domain `brandgoblinai.com`
 still serves the old GoDaddy Airo page while the product lives at `app.brandgoblinai.com`.
@@ -118,6 +121,38 @@ give Fox the push lines. Fox reports most users are on desktop, so design for de
 and collapse cleanly on phones.
 
 ---
+
+---
+
+## 🗓️ SESSION LOG — September 6, 2026, 9 PM (🔧 TWO FOX CATCHES after using the Studio: brand history + the nav spark. Committed, NOT pushed.)
+
+Fox used the new Studio for real and sent a screenshot (Valkraft selected, "Your canvas is
+waiting", empty strip) with two notes.
+
+**1. Switching brands showed nothing for older brands.** Cause: the Studio page loads the 60
+most recent jobs; Valkraft / Fossil Fuel / Juicy Hazy art is older than that window, so the
+canvas and strip were empty and the gallery only had Rōnin Man. (The pre-Phase-C Studio had the
+same 20-job window; the canvas just made it obvious.) Fix: **each brand's full history loads
+the first time it is selected.** `listUserJobsForBrand(userId, brand | null | "all", 400)` in
+`lib/studio/jobs.ts` (completed jobs incl. hidden, batch-signed); `GET /api/studio/jobs?brand=
+<id>|none|all` (uuid-validated); in `StudioImageGenerator` a `loadBrandHistory(key)` merges the
+rows into `jobs` (dedupe by id, re-sort newest first) with a `loadedBrandsRef` guard, triggered
+by the rail's brand AND by a gallery brand chip; the empty canvas says "Fetching Valkraft's
+creations" while it runs; the "All brands" gallery shows a one-line note with a **Load
+everything** button (`?brand=all`) instead of silently truncating.
+
+**2. The orange nav "Create" pulled attention away from the work.** Fox: once you are inside
+the app, each section should direct you to create INSIDE that section; the orange header CTA
+belongs to the start (marketing / first arrival), not to the Vault or the Studio. Fix: the
+Navbar renders the Create spark for logged-in users only in `tone="light"` (marketing pages);
+in the app the header is quiet (wordmark, links, sound, Admin). **New spark map, one per
+screen:** Vault = "+ Create" (now `btn-primary`; the rail's Upgrade card went GREEN), Studio =
+Conjure, Creator Pro = Generate (gate page: Upgrade), brand kit page = "Create in Studio",
+marketing = the nav Create / Start free. Project memory `app-design-direction.md` item 2
+updated.
+
+**▶ NEXT:** Fox pushes → confirm on the live Studio: pick Valkraft, canvas + strip fill with its
+product art; the header has no orange button in-app; the Vault's "+ Create" is orange.
 
 ---
 

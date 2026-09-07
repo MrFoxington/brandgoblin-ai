@@ -38,9 +38,11 @@ interface Props {
   onSaved?: () => void;
   /** Coach tip pinned above the toolbar (Phase D). */
   coachTip?: ReactNode;
+  /** Name of the brand whose history is still being fetched (empty state copy). */
+  loadingBrand?: string | null;
 }
 
-export default function StudioCanvas({ job, activeCount, brandName, cardBrand, cardFilename, callbacks, onOpenTools, onSaved, coachTip }: Props) {
+export default function StudioCanvas({ job, activeCount, brandName, cardBrand, cardFilename, callbacks, onOpenTools, onSaved, coachTip, loadingBrand = null }: Props) {
   const cooking = activeCount > 0;
   return (
     <div className="relative overflow-hidden rounded-3xl border border-[rgba(250,247,242,0.08)] bg-surface">
@@ -57,7 +59,7 @@ export default function StudioCanvas({ job, activeCount, brandName, cardBrand, c
           coachTip={coachTip}
         />
       ) : (
-        <EmptyCanvas cooking={cooking} onOpenTools={onOpenTools} />
+        <EmptyCanvas cooking={cooking} onOpenTools={onOpenTools} loadingBrand={loadingBrand} />
       )}
 
       {/* Nix cooking ON the canvas. Leaves instantly when the result lands so
@@ -79,7 +81,7 @@ export default function StudioCanvas({ job, activeCount, brandName, cardBrand, c
   );
 }
 
-function EmptyCanvas({ cooking, onOpenTools }: { cooking: boolean; onOpenTools: () => void }) {
+function EmptyCanvas({ cooking, onOpenTools, loadingBrand }: { cooking: boolean; onOpenTools: () => void; loadingBrand: string | null }) {
   return (
     <div className="flex min-h-[360px] flex-col items-center justify-center gap-4 p-8 text-center lg:min-h-[560px]">
       <Image
@@ -87,18 +89,27 @@ function EmptyCanvas({ cooking, onOpenTools }: { cooking: boolean; onOpenTools: 
         alt="Nix ready to create"
         width={120}
         height={120}
-        className={`object-contain ${cooking ? "opacity-0" : "opacity-80"}`}
+        className={`object-contain ${cooking ? "opacity-0" : loadingBrand ? "opacity-50 motion-safe:animate-pulse" : "opacity-80"}`}
         priority
       />
-      <div>
-        <h2 className="font-display text-2xl font-bold text-white">Your canvas is waiting</h2>
-        <p className="mx-auto mt-1 max-w-xs text-sm text-muted">
-          Pick a brand and what to make in the tools, then hit Conjure. Your creation lands right here.
-        </p>
-      </div>
-      <button type="button" onClick={onOpenTools} className="btn-green !py-2.5 !px-5 text-sm lg:hidden">
-        Open the tools
-      </button>
+      {loadingBrand ? (
+        <div>
+          <h2 className="font-display text-2xl font-bold text-white">Fetching {loadingBrand}&apos;s creations</h2>
+          <p className="mx-auto mt-1 max-w-xs text-sm text-muted">One moment. Everything you have made for this brand is on its way.</p>
+        </div>
+      ) : (
+        <>
+          <div>
+            <h2 className="font-display text-2xl font-bold text-white">Your canvas is waiting</h2>
+            <p className="mx-auto mt-1 max-w-xs text-sm text-muted">
+              Pick a brand and what to make in the tools, then hit Conjure. Your creation lands right here.
+            </p>
+          </div>
+          <button type="button" onClick={onOpenTools} className="btn-green !py-2.5 !px-5 text-sm lg:hidden">
+            Open the tools
+          </button>
+        </>
+      )}
     </div>
   );
 }

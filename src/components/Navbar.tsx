@@ -22,7 +22,8 @@ const VISITOR_LINKS = [
 
 // Creator Studio Phase A (Sept 6 2026): the QUIET nav. The four glowing pills
 // (Studio / Nix / Labs / Generate) are now plain links with a small colour dot
-// (gold = Studio, purple = Nix, emerald = Labs) plus ONE spark button: Create.
+// (gold = Studio, purple = Nix, emerald = Labs). The orange Create button shows
+// on marketing pages only (Sept 7): in the app, each section has its own spark.
 type AppLink = { label: string; href: string; dot?: string; adminOnly?: boolean };
 const APP_LINKS: AppLink[] = [
   { label: "Vault", href: "/dashboard" },
@@ -136,10 +137,15 @@ export default function Navbar({ tone = "dark" }: { tone?: NavTone } = {}) {
                   Admin
                 </Link>
               )}
-              {/* THE SPARK — the one orange button in the nav. */}
-              <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
-                Create
-              </Link>
+              {/* Sept 7 2026 (Fox): the nav spark belongs to the marketing pages
+                  only. Inside the app each section owns its one orange action
+                  (Vault "+ Create", Studio "Conjure", Creator Pro "Generate"), so
+                  the header stays quiet and attention lands on the work. */}
+              {light && (
+                <Link href="/generate" className="btn-primary !py-2.5 !px-5 text-sm">
+                  Create
+                </Link>
+              )}
             </>
           ) : (
             <>

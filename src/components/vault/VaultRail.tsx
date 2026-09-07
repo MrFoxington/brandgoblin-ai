@@ -277,8 +277,8 @@ export default function VaultRail({
             <li className="flex gap-2"><span className="text-secondary">✓</span> Posts, blogs, emails and ad copy</li>
             <li className="flex gap-2"><span className="text-secondary">✓</span> Unlimited brand kits</li>
           </ul>
-          {/* The dashboard's one spark: the buy action. */}
-          <Link href="/pricing" className="btn-primary mt-3 w-full !py-2.5 text-sm">
+          {/* Green, not orange: the Vault's one spark is "+ Create" (Fox, Sept 7). */}
+          <Link href="/pricing" className="btn-green mt-3 w-full !py-2.5 text-sm">
             Upgrade to Creator Pro
           </Link>
           <p className="mt-2 text-center text-[11px] text-faint">Cancel anytime</p>

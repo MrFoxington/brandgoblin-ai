@@ -328,6 +328,48 @@ export async function listUserJobs(userId: string, limit = 20): Promise<StudioJo
   return jobs;
 }
 
+// ── A brand's full Studio history (Creator Studio Phase C fix, Sept 7 2026) ───
+// The Studio page loads a recent window; switching to an older brand must bring
+// EVERYTHING that brand has (Fox: "if you look at Valkraft or Fossil Fuel I've
+// made product art for those before, they should be in there"). brand = a brand
+// id, null = freeform creations, "all" = every completed job. Hidden ones come
+// too (the Hidden tab needs them). Signed in one batch.
+
+export async function listUserJobsForBrand(
+  userId: string,
+  brand: string | null | "all",
+  limit = 400
+): Promise<StudioJobRow[]> {
+  const supabase = createAdminClient();
+  let q = supabase
+    .from("studio_jobs")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (brand === null) q = q.is("brand_id", null);
+  else if (brand !== "all") q = q.eq("brand_id", brand);
+  const { data } = await q;
+  if (!data?.length) return [];
+
+  const jobs = data as StudioJobRow[];
+  const paths = jobs.map((j) => j.storage_path).filter((p): p is string => !!p);
+  if (paths.length) {
+    try {
+      const { data: signed } = await supabase.storage.from("studio-assets").createSignedUrls(paths, 60 * 60);
+      const byPath = new Map<string, string>();
+      for (const s of signed ?? []) if (s.path && s.signedUrl) byPath.set(s.path, s.signedUrl);
+      for (const job of jobs) {
+        if (job.storage_path && byPath.has(job.storage_path)) job.output_url = byPath.get(job.storage_path)!;
+      }
+    } catch {
+      // non-fatal
+    }
+  }
+  return jobs;
+}
+
 // ── List visible creations for the Vault gallery (Creator Studio Phase B) ─────
 // Completed + not hidden, newest first. Signs every storage path in ONE batch
 // call instead of one round trip per job (the dashboard shows up to ~40).
