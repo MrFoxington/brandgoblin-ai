@@ -50,21 +50,22 @@ job). Email verification + Resend transactional email are live.
 **Plans (Sept 6, 2026):** Free · Creator Pro $19/mo (1,000⚡) · **Creator Max $49/mo** (4,000⚡,
 rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on it himself.
 
-**Design (Sept 6, 2026):** marketing pages = warm paper / ink / goblin green / Fraunces (Brand
-Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink surfaces, same
-type, green everyday buttons, ONE orange "spark" per screen (in-app: Vault "+ Create", Studio
-Conjure, Creator Pro Generate, kit page "Create in Studio"; the nav Create is marketing-only
-since Sept 7), clean typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
-`design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE (Sept 6, late): the dashboard
-opens on the user's latest creation, a masonry gallery of everything, one green Create chooser,
-and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
-night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
-one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
-all pushed. **Phase D (first-timer coach, "Today in the Studio", share card with NO watermark on
-any tier, Fox's rule) is LIVE and checked (Sept 6, late night).** Everything is pushed
-(`origin/main` = `010231e`), the repo is clean except the pre-existing `docs/NIX_CONTENT_QUEUE.md`
-edit Fox has not committed. **The Creator Studio plan (A skin · B Vault · C canvas · D coach +
-daily loop + clean sharing) is COMPLETE.**
+**Design (Sept 6-7, 2026):** marketing pages = warm paper / ink / goblin green / Fraunces
+(Brand Maturity P4). Inside the app = the DARK STUDIO skin (Creator Studio Phase A): ink
+surfaces, same type, green everyday buttons, ONE orange "spark" per screen owned by the
+section (Vault "+ Create", Studio Conjure, Creator Pro Generate, kit page "Create in Studio";
+the header's orange Create is marketing-only since Sept 7, the in-app header is quiet), clean
+typographic wordmark (no logo PNG), emoji icons gone, Nix untouched. Old look = git tag
+`design-v1-dark-purple`. **Phase B (the work-first Vault) is LIVE:** the dashboard opens on the
+user's latest creation, a masonry gallery of everything, one orange "+ Create" chooser, a quiet
+right rail. **Phase C (the Studio canvas) is LIVE:** tool rail · canvas · recent strip on
+desktop, canvas + bottom-sheet tools on phones, one gallery for every brand, `?job=` deep links
+from the Vault, and (Sept 7 fix) every brand's FULL history loads the moment it is selected.
+**Phase D (first-timer coach, "Today in the Studio", share card with NO watermark on any
+tier, Fox's rule) is LIVE.** All of it live-checked at 1440 + 390, three real Conjures run on
+the canvas. **Everything is pushed (`origin/main` = `c04fbe6`).** The repo is clean except the
+pre-existing `docs/NIX_CONTENT_QUEUE.md` edit Fox has not committed. **The Creator Studio plan
+(A skin · B Vault · C canvas · D coach + daily loop + clean sharing) is COMPLETE.**
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
@@ -79,9 +80,8 @@ and the four Sept 6 session logs below only if the Studio or Vault needs touchin
 
 **The Creator Studio plan is complete and fully live** (checked at 1440 + 390, three real
 Conjures on the canvas, coach walked with `?coach=1`, share-card pipeline verified in the
-browser). Fox's two 9 PM catches (brand history on brand switch; no orange nav button in-app)
-are fixed, pushed and verified live. `git log origin/main..main` should be empty at the start
-of the next session.
+browser, Fox's two evening catches fixed and verified). `git log origin/main..main` should be
+empty at the start of the next session; if not, give Fox the push lines first.
 
 **P7 in one paragraph (from the Brand Maturity plan):** the root domain `brandgoblinai.com`
 still serves the old GoDaddy Airo page while the product lives at `app.brandgoblinai.com`.
