@@ -39,13 +39,13 @@ You are Claude Code, acting as lead developer + asset manager for **BrandGoblin 
 
 ---
 
-## ✅ HONEST STATUS (updated September 6, 2026) — READ FIRST
+## ✅ HONEST STATUS (updated September 7, 2026) — READ FIRST
 
 **REVENUE-CAPABLE AND WORKING END-TO-END IN LIVE MODE.** Real purchases, energy refills, the
 monthly Pro/Max energy grant, dunning, and the customer portal all verified working with the
 live webhook actually firing. App lives at **`https://app.brandgoblinai.com`** (root
-`brandgoblinai.com` is STILL the old GoDaddy Airo landing page — retiring it is P7, next after
-the Vault). Email verification + Resend transactional email are live.
+`brandgoblinai.com` is STILL the old GoDaddy Airo landing page — retiring it is P7, the NEXT
+job). Email verification + Resend transactional email are live.
 
 **Plans (Sept 6, 2026):** Free · Creator Pro $19/mo (1,000⚡) · **Creator Max $49/mo** (4,000⚡,
 rollover, strongest model, 4 concurrent, +30% packs) — Max is live, Fox is on it himself.
@@ -59,29 +59,42 @@ opens on the user's latest creation, a masonry gallery of everything, one green 
 and a quiet right rail.** Live and verified. **Phase C (the Studio canvas) is LIVE (Sept 6,
 night): tool rail · canvas · recent strip on desktop, canvas + bottom-sheet tools on phones,
 one gallery for every brand, `?job=` deep links from the Vault.** Live-checked at 1440 + 390;
-all pushed. **Phase D (first-timer coach, "Today in the Studio", share card) is LIVE and checked
-(Sept 6, late night); a clean-card follow-up (no watermark on any tier, Fox's rule) awaits push.
-The Creator Studio plan is complete.**
+all pushed. **Phase D (first-timer coach, "Today in the Studio", share card with NO watermark on
+any tier, Fox's rule) is LIVE and checked (Sept 6, late night).** Everything is pushed
+(`origin/main` = `010231e`), the repo is clean except the pre-existing `docs/NIX_CONTENT_QUEUE.md`
+edit Fox has not committed. **The Creator Studio plan (A skin · B Vault · C canvas · D coach +
+daily loop + clean sharing) is COMPLETE.**
 
 **The constraint is still DISTRIBUTION, not product.** See `docs/CREATOR_PRO_GROWTH_ENGINE.md`.
 
 ---
 
-## 🚀 START HERE — NEXT SESSION = LIVE-CHECK PHASE D, THEN THE ROADMAP (P7 one site, Labs video)
+## 🚀 START HERE — NEXT SESSION = P7: ONE WEBSITE (Airo dies), THEN GOBLIN LABS VIDEO
 
-Read, in this order: (1) this status block, (2) **`docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`**,
-(3) the Phase D + C + B session logs below, (4) project memory `app-design-direction.md` +
-`brandgoblin-ship-workflow.md`.
+Read, in this order: (1) this status block, (2) project memory `brand-maturity-plan.md` (P7 is
+defined there) + `app-design-direction.md` + `brandgoblin-ship-workflow.md` + `never-gate-the-
+finish-line.md` (Fox's rules, incl. NO watermarks), (3) `docs/STUDIO_DESIGN_PLAN_SEPT_2026.md`
+and the four Sept 6 session logs below only if the Studio or Vault needs touching.
 
-**All four Creator Studio phases are live and checked.** One follow-up commit (the share card
-with no BrandGoblin mark, Fox's no-watermark rule) may still need `git push origin main`; check
-`git log origin/main..main`. The Creator Studio plan is complete. Next per Fox's roadmap: P7 one
-website (Airo dies, root domain → app), then Goblin Labs video. Untested live only because it
-needs a real tap: the share sheet opening from "Share card" (the build pipeline itself is
-verified). `/dashboard/studio?coach=1` previews the coach on any account.
+**The Creator Studio plan is complete and fully live** (checked at 1440 + 390, three real
+Conjures on the canvas, coach walked with `?coach=1`, share-card pipeline verified in the
+browser). `git log origin/main..main` should be empty at the start of the next session.
 
-Still unseen on a real account: the brand-kit hero on the Vault, the empty-vault hero, a free
-account's rail (Upgrade spark), the Studio's empty canvas, and a true first-timer's coach run.
+**P7 in one paragraph (from the Brand Maturity plan):** the root domain `brandgoblinai.com`
+still serves the old GoDaddy Airo page while the product lives at `app.brandgoblinai.com`.
+Make it ONE site: point the root at the Vercel app (DNS on GoDaddy, Vercel domain settings,
+redirect `www` and `app` → root or root → app, Fox decides which is canonical), retire Airo,
+then check every link, OAuth/Supabase redirect URL, Stripe return URL, Resend template link and
+the `NEXT_PUBLIC_SITE_URL` env for the domain change. Fox runs DNS and env changes himself; give
+him exact steps. After P7: Goblin Labs video ("made fucking amazing", newest models, verify
+model IDs + prices when starting, don't guess). A video is just a creation on the Studio canvas.
+
+Small things still unseen on a real account: the brand-kit hero on the Vault, the empty-vault
+hero, a free account's rail (Upgrade spark), the Studio's empty canvas, a true first-timer's
+coach run, and the share sheet actually opening from "Share card" (needs a real tap; the card
+build itself is verified). Known leftovers: em dashes inside GENERATED kit text (the kit prompt,
+a later sweep), personality-chip emoji on /generate, XPSystem level emoji, LoadingScreen, the
+print/PDF page styling (all deliberate, later).
 
 **Phase C in one paragraph:** the Studio (`src/components/studio/StudioImageGenerator.tsx`,
 1,900 lines, + `src/app/dashboard/studio/page.tsx`) becomes canvas-first. Three-column desktop:
@@ -108,7 +121,7 @@ and collapse cleanly on phones.
 
 ---
 
-## 🗓️ SESSION LOG — September 6, 2026, late night (🧭 CREATOR STUDIO PHASE D: coach + Today + share card. PUSHED + LIVE; clean-card follow-up pending push.)
+## 🗓️ SESSION LOG — September 6, 2026, late night (🧭 CREATOR STUDIO PHASE D: coach + Today + share card. PUSHED + LIVE, clean card included.)
 
 Fox: "Yes, go ahead with phase D." Built straight after C. `npx tsc --noEmit` clean; subagent
 review found 5 real issues, all fixed before commit (listed below).
@@ -188,10 +201,13 @@ ONLY the user's brand (name, tagline, palette dots); the "Made in Goblin Studio"
 gone, the share-sheet title is just the brand name, and a freeform creation gets a plain ink
 frame with no words. The one shape he does like, for later: a small "Made with BrandGoblin"
 END CARD on a shared VIDEO (a closing frame, never an overlay). Saved in project memory
-`never-gate-the-finish-line.md` (Rule 5). Committed as the follow-up commit, NOT pushed.
+`never-gate-the-finish-line.md` (Rule 5). Follow-up commit `010231e`, pushed by Fox and live.
 
-**▶ NEXT:** Fox pushes the clean-card commit → the Creator Studio plan is complete → roadmap:
-P7 one website (Airo dies), then Goblin Labs video.
+**Session total (Sept 6, one day):** Brand Maturity P4 + Creator Max, then Creator Studio A, B,
+C, D. Commits from Phase B on: d320e95, b3b595d, 216cca7, 2e4d131, 5c6885f, 67039f5, f39ccc7,
+010231e. Fox spent 124 energy on the three canvas test runs (his call).
+
+**▶ NEXT:** P7 one website (Airo dies), then Goblin Labs video. See START HERE.
 
 ---
 
